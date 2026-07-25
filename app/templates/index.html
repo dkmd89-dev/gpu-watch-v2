@@ -2,34 +2,497 @@
 <html lang="de">
 <head>
   <meta charset="utf-8">
-  <title>GPU-Watch</title>
+  <title>Hardware Deal Finder</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: system-ui, sans-serif; max-width: 700px; margin: 2rem auto; padding: 0 1rem; background:#111; color:#eee; }
-    h1 { font-size: 1.3rem; }
-    .card { background:#1c1c1c; border-radius:10px; padding:1rem; margin-bottom:0.8rem; }
-    .price { font-weight:bold; color:#7CFC98; font-size:1.1rem; }
-    .rule { color:#8ab4f8; font-size:0.85rem; }
-    .meta { color:#999; font-size:0.8rem; }
-    a { color:#8ab4f8; }
-    button { background:#2b6cff; color:white; border:none; padding:0.6rem 1rem; border-radius:8px; cursor:pointer; }
+    :root {
+      --bg: #0e0f12;
+      --surface: #1a1c20;
+      --surface-2: #22252a;
+      --border: #2c2f36;
+      --text: #eaeaea;
+      --text-muted: #9aa0a8;
+      --accent: #5b8cff;
+      --accent-soft: rgba(91, 140, 255, 0.15);
+      --green: #4fd67a;
+      --amber: #ffb454;
+      --red: #ff6b6b;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 3rem;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      display: inline-block;
+      flex-shrink: 0;
+    }
+    .status-dot.running {
+      background: var(--green);
+      box-shadow: 0 0 0 rgba(79, 214, 122, 0.5);
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(79, 214, 122, 0.5); }
+      70%  { box-shadow: 0 0 0 8px rgba(79, 214, 122, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(79, 214, 122, 0); }
+    }
+
+    button.scan-btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.6rem 1.1rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    button.scan-btn:hover { filter: brightness(1.1); }
+    button.scan-btn:disabled { opacity: 0.6; cursor: default; }
+
+    .status-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .status-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 1.5rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.8rem;
+    }
+    .status-row span strong { color: var(--text); font-weight: 600; }
+
+    .progress-track {
+      height: 6px;
+      background: var(--surface-2);
+      border-radius: 4px;
+      overflow: hidden;
+      display: none;
+      margin-bottom: 0.8rem;
+    }
+    .progress-track.visible { display: block; }
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .counters {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 0.7rem;
+    }
+
+    .counter-card {
+      background: var(--surface-2);
+      border-radius: var(--radius-sm);
+      padding: 0.7rem 0.6rem;
+      text-align: center;
+    }
+    .counter-value {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .counter-value.topdeal { color: var(--amber); }
+    .counter-label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 0.15rem;
+    }
+
+    .listings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      position: relative;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      white-space: nowrap;
+    }
+    .badge.top-deal {
+      background: rgba(255, 180, 84, 0.18);
+      color: var(--amber);
+    }
+
+    .rule { color: var(--accent); font-size: 0.82rem; font-weight: 600; }
+    .title { font-size: 0.95rem; line-height: 1.3; }
+    .price { font-weight: 700; color: var(--green); font-size: 1.15rem; }
+    .stars { color: var(--amber); font-size: 0.85rem; letter-spacing: 1px; }
+    .meta { color: var(--text-muted); font-size: 0.78rem; }
+    .card a {
+      color: var(--accent);
+      font-size: 0.85rem;
+      text-decoration: none;
+      margin-top: 0.3rem;
+    }
+    .card a:hover { text-decoration: underline; }
+
+    .empty-state {
+      color: var(--text-muted);
+      text-align: center;
+      padding: 3rem 1rem;
+    }
+
+    .filter-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.2rem;
+      margin-bottom: 1.2rem;
+    }
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: 1rem;
+    }
+    .filter-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      min-width: 140px;
+    }
+    .filter-field label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .filter-field select,
+    .filter-field input {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: var(--radius-sm);
+      padding: 0.45rem 0.6rem;
+      font-size: 0.85rem;
+    }
+    .filter-reset {
+      margin-left: auto;
+    }
+    button.reset-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 0.45rem 0.9rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 0.82rem;
+    }
+    button.reset-btn:hover { color: var(--text); border-color: var(--accent); }
+    .filter-count {
+      margin-top: 0.6rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
   </style>
 </head>
 <body>
-  <h1>🎮 GPU-Watch – gefundene Angebote</h1>
-  <button onclick="fetch('/api/scan-now',{method:'POST'}).then(()=>alert('Scan gestartet'))">Jetzt manuell scannen</button>
-  <div style="margin-top:1.5rem">
+  <header>
+    <h1><span class="status-dot" id="statusDot"></span> Hardware Deal Finder</h1>
+    <button class="scan-btn" id="scanBtn" onclick="startScan()">Jetzt manuell scannen</button>
+  </header>
+
+  <section class="status-panel">
+    <div class="status-row">
+      <span>Status: <strong id="statusText">–</strong></span>
+      <span>Letzter Scan: <strong id="lastScan">–</strong></span>
+      <span>Nächster Scan: <strong id="nextScan">–</strong></span>
+    </div>
+    <div class="progress-track" id="progressTrack">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="counters">
+      <div class="counter-card">
+        <div class="counter-value" id="cntScanned">–</div>
+        <div class="counter-label">Gescannt (letzter Lauf)</div>
+      </div>
+      <div class="counter-card">
+        <div class="counter-value" id="cntSaved">–</div>
+        <div class="counter-label">Gespeichert gesamt</div>
+      </div>
+      <div class="counter-card">
+        <div class="counter-value" id="cntOffice">–</div>
+        <div class="counter-label">Office-PCs</div>
+      </div>
+      <div class="counter-card">
+        <div class="counter-value" id="cntGaming">–</div>
+        <div class="counter-label">Gaming-PCs</div>
+      </div>
+      <div class="counter-card">
+        <div class="counter-value topdeal" id="cntTopDeals">–</div>
+        <div class="counter-label">Top-Deals</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="filter-panel" id="filterPanel" {% if not found %}style="display:none"{% endif %}>
+    <div class="filter-row">
+      <div class="filter-field">
+        <label for="filterCategory">Kategorie</label>
+        <select id="filterCategory"><option value="">Alle</option></select>
+      </div>
+      <div class="filter-field">
+        <label for="filterSource">Quelle</label>
+        <select id="filterSource"><option value="">Alle</option></select>
+      </div>
+      <div class="filter-field">
+        <label for="filterMinScore">Deal-Score</label>
+        <select id="filterMinScore">
+          <option value="0">Alle</option>
+          <option value="95">★★★★★ (≥95)</option>
+          <option value="80">★★★★☆ oder besser (≥80)</option>
+          <option value="60">★★★☆☆ oder besser (≥60)</option>
+          <option value="40">★★☆☆☆ oder besser (≥40)</option>
+        </select>
+      </div>
+      <div class="filter-field">
+        <label for="filterMaxPrice">Preis bis (€)</label>
+        <input type="number" id="filterMaxPrice" min="0" placeholder="z.B. 300">
+      </div>
+      <div class="filter-field filter-reset">
+        <button class="reset-btn" id="resetFilters" onclick="resetFilters()">Filter zurücksetzen</button>
+      </div>
+    </div>
+    <div class="filter-count" id="filterCount"></div>
+    <!-- Hinweis: Ein Hersteller-Filter ist noch nicht moeglich, da es
+         aktuell keinen Hersteller-Detector gibt (deal_score.py setzt
+         das "hersteller"-Gewicht bewusst auf 0, siehe Phase 6). Folgt
+         als eigener Schritt, sobald diese Erkennung existiert. -->
+  </section>
+
+  <div class="listings-grid" id="listingsGrid">
   {% for f in found %}
-    <div class="card">
-      <div class="rule">{{ f.rule }}</div>
-      <div>{{ f.title }}</div>
+    <div class="card"
+         data-category="{{ f.category or 'unbekannt' }}"
+         data-source="{{ f.source or 'unbekannt' }}"
+         data-price="{{ f.price }}"
+         data-score="{{ f.deal_score if (f.deal_score is defined and f.deal_score is not none) else 0 }}">
+      <div class="card-top">
+        <span class="rule">{{ f.rule }}</span>
+        {% if f.is_top_deal %}<span class="badge top-deal">🔥 Top-Deal</span>{% endif %}
+      </div>
+      <div class="title">{{ f.title }}</div>
       <div class="price">{{ "%.0f"|format(f.price) }} €</div>
-      <div class="meta">{{ f.source }} · {{ f.location }} · {{ f.found_at }}</div>
+      {% if f.deal_stars %}<div class="stars">{{ f.deal_stars }}</div>{% endif %}
+      <div class="meta">
+        {{ f.source }} · {{ f.location }}
+        {%- if f.category %} · {{ f.category }}{% endif %} · {{ f.found_at }}
+      </div>
       <a href="{{ f.url }}" target="_blank">Zum Angebot →</a>
     </div>
   {% else %}
-    <p>Noch keine Treffer. Der erste Scan läuft im Hintergrund.</p>
+    <div class="empty-state">Noch keine Treffer. Der erste Scan läuft im Hintergrund.</div>
   {% endfor %}
   </div>
+  <div class="empty-state" id="noMatchState" style="display:none">Keine Angebote entsprechen den gewählten Filtern.</div>
+
+  <script>
+    function startScan() {
+      const btn = document.getElementById('scanBtn');
+      btn.disabled = true;
+      fetch('/api/scan-now', { method: 'POST' })
+        .then(() => { refreshStatus(); })
+        .catch(() => { btn.disabled = false; });
+    }
+
+    function fmtTime(iso) {
+      if (!iso) return '–';
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return '–';
+      return d.toLocaleString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+    }
+
+    let wasRunning = false;
+
+    function refreshStatus() {
+      fetch('/api/status')
+        .then(r => r.json())
+        .then(s => {
+          const dot = document.getElementById('statusDot');
+          const btn = document.getElementById('scanBtn');
+          const running = !!s.scan_running;
+
+          dot.classList.toggle('running', running);
+          btn.disabled = running;
+          document.getElementById('statusText').textContent = running ? 'Scan läuft…' : 'Bereit';
+          document.getElementById('lastScan').textContent = fmtTime(s.last_scan_finished_at);
+          document.getElementById('nextScan').textContent = fmtTime(s.next_scan_at);
+
+          const progressTrack = document.getElementById('progressTrack');
+          const progressFill = document.getElementById('progressFill');
+          const total = (s.scan_progress && s.scan_progress.total) || 0;
+          const current = (s.scan_progress && s.scan_progress.current) || 0;
+          if (running && total > 0) {
+            progressTrack.classList.add('visible');
+            progressFill.style.width = Math.min(100, (current / total) * 100) + '%';
+          } else {
+            progressTrack.classList.remove('visible');
+          }
+
+          document.getElementById('cntScanned').textContent = s.scanned_count_last_scan ?? '–';
+          document.getElementById('cntSaved').textContent = s.saved_count ?? '–';
+          document.getElementById('cntOffice').textContent = (s.category_counts && s.category_counts.office_pc) || 0;
+          document.getElementById('cntGaming').textContent = (s.category_counts && s.category_counts.gaming_pc) || 0;
+          document.getElementById('cntTopDeals').textContent = s.top_deal_count ?? 0;
+
+          // Nach Abschluss eines Scans einmalig neu laden, damit die
+          // Trefferliste (aktuell noch serverseitig gerendert) aktuell ist.
+          // Filter/Live-Refresh der Liste folgen in Phase 8.5/8.6.
+          if (wasRunning && !running) {
+            location.reload();
+          }
+          wasRunning = running;
+        })
+        .catch(() => {});
+    }
+
+    refreshStatus();
+    setInterval(refreshStatus, 5000);
+
+    // --- Phase 8.5: Client-seitige Filter ---
+    // Arbeitet direkt auf den bereits serverseitig gerenderten Karten
+    // (kein zusätzlicher Fetch nötig) -- Kategorie-/Quellen-Optionen
+    // werden dynamisch aus den vorhandenen Karten abgeleitet, damit
+    // neue Kategorien/Quellen (rein per YAML/Scraper ergänzt) hier
+    // automatisch auftauchen, ohne dieses Template anzufassen.
+    function initFilters() {
+      const cards = Array.from(document.querySelectorAll('#listingsGrid .card'));
+      if (cards.length === 0) return;
+
+      const categories = [...new Set(cards.map(c => c.dataset.category))].sort();
+      const sources = [...new Set(cards.map(c => c.dataset.source))].sort();
+
+      const catSelect = document.getElementById('filterCategory');
+      categories.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat;
+        opt.textContent = cat;
+        catSelect.appendChild(opt);
+      });
+
+      const srcSelect = document.getElementById('filterSource');
+      sources.forEach(src => {
+        const opt = document.createElement('option');
+        opt.value = src;
+        opt.textContent = src;
+        srcSelect.appendChild(opt);
+      });
+
+      ['filterCategory', 'filterSource', 'filterMinScore'].forEach(id => {
+        document.getElementById(id).addEventListener('change', applyFilters);
+      });
+      document.getElementById('filterMaxPrice').addEventListener('input', applyFilters);
+
+      applyFilters();
+    }
+
+    function applyFilters() {
+      const category = document.getElementById('filterCategory').value;
+      const source = document.getElementById('filterSource').value;
+      const minScore = parseFloat(document.getElementById('filterMinScore').value) || 0;
+      const maxPriceRaw = document.getElementById('filterMaxPrice').value;
+      const maxPrice = maxPriceRaw === '' ? null : parseFloat(maxPriceRaw);
+
+      const cards = document.querySelectorAll('#listingsGrid .card');
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const cardCategory = card.dataset.category;
+        const cardSource = card.dataset.source;
+        const cardPrice = parseFloat(card.dataset.price);
+        const cardScore = parseFloat(card.dataset.score);
+
+        let visible = true;
+        if (category && cardCategory !== category) visible = false;
+        if (source && cardSource !== source) visible = false;
+        if (cardScore < minScore) visible = false;
+        if (maxPrice !== null && !isNaN(maxPrice) && cardPrice > maxPrice) visible = false;
+
+        card.style.display = visible ? '' : 'none';
+        if (visible) visibleCount++;
+      });
+
+      document.getElementById('filterCount').textContent =
+        `${visibleCount} von ${cards.length} Angeboten`;
+
+      const noMatch = document.getElementById('noMatchState');
+      noMatch.style.display = (cards.length > 0 && visibleCount === 0) ? '' : 'none';
+    }
+
+    function resetFilters() {
+      document.getElementById('filterCategory').value = '';
+      document.getElementById('filterSource').value = '';
+      document.getElementById('filterMinScore').value = '0';
+      document.getElementById('filterMaxPrice').value = '';
+      applyFilters();
+    }
+
+    initFilters();
+  </script>
 </body>
 </html>
