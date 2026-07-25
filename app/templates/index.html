@@ -329,6 +329,46 @@
     .trend-up { color: var(--red); }
     .trend-down { color: var(--green); }
     .trend-stable { color: var(--text-muted); }
+
+    .log-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.2rem;
+      margin-top: 1.5rem;
+    }
+    .log-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.6rem;
+    }
+    .log-header h2 {
+      font-size: 1.05rem;
+      margin: 0;
+    }
+    .log-hint {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+    .log-box {
+      background: var(--surface-2);
+      border-radius: var(--radius-sm);
+      padding: 0.7rem 0.8rem;
+      max-height: 260px;
+      overflow-y: auto;
+      font-family: "SF Mono", Consolas, Menlo, monospace;
+      font-size: 0.75rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 0;
+    }
+    .log-line-error { color: var(--red); }
+    .log-line-warning { color: var(--amber); }
+    .log-line-info { color: var(--text-muted); }
   </style>
 </head>
 <body>
@@ -445,6 +485,14 @@
     </div>
   </section>
 
+  <section class="log-panel">
+    <div class="log-header">
+      <h2>Scan-Log</h2>
+      <span class="log-hint">letzte 20 Zeilen · aktualisiert alle 5s</span>
+    </div>
+    <pre class="log-box" id="logBox">–</pre>
+  </section>
+
   <script>
     function startScan() {
       const btn = document.getElementById('scanBtn');
@@ -494,15 +542,54 @@
           document.getElementById('cntGaming').textContent = (s.category_counts && s.category_counts.gaming_pc) || 0;
           document.getElementById('cntTopDeals').textContent = s.top_deal_count ?? 0;
 
+          updateLogBox(s.scan_log_tail);
+
           // Nach Abschluss eines Scans einmalig neu laden, damit die
-          // Trefferliste (aktuell noch serverseitig gerendert) aktuell ist.
-          // Filter/Live-Refresh der Liste folgen in Phase 8.5/8.6.
+          // Trefferliste und die Modell-Auswahl der Preisdiagramme
+          // aktuell sind (Live-Refresh ohne Reload waere ein groesserer
+          // eigener Umbau, siehe Notiz zu Phase 8.5/8.6 oben).
           if (wasRunning && !running) {
             location.reload();
           }
           wasRunning = running;
         })
         .catch(() => {});
+    }
+
+    // Phase 8.7: Scan-Log-Anzeige. scan_log_tail kommt bereits fertig
+    // aus /api/status (Schritt 8.1, _tail_log()) -- kein neuer Endpunkt
+    // noetig, nur die Anzeige + farbliche Hervorhebung nach Log-Level.
+    function logLineClass(line) {
+      if (line.includes(' ERROR ')) return 'log-line-error';
+      if (line.includes(' WARNING ')) return 'log-line-warning';
+      return 'log-line-info';
+    }
+
+    function updateLogBox(lines) {
+      const box = document.getElementById('logBox');
+      if (!lines || lines.length === 0) {
+        box.textContent = 'Noch keine Log-Einträge.';
+        return;
+      }
+
+      // Nur automatisch ans Ende scrollen, wenn der Nutzer ohnehin schon
+      // unten war -- sonst würde jedes Polling eine manuell nach oben
+      // gescrollte Position wieder nach unten reißen.
+      const wasAtBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 10;
+
+      box.innerHTML = lines
+        .map(line => `<span class="${logLineClass(line)}">${escapeHtml(line)}</span>`)
+        .join('\n');
+
+      if (wasAtBottom) {
+        box.scrollTop = box.scrollHeight;
+      }
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
     }
 
     refreshStatus();
