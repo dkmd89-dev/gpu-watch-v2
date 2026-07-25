@@ -147,3 +147,10 @@
 {"price": 190.0, "date": "2026-07-25T09:33:00.614379+00:00", "source": "eBay", "model": "office_pc", "category": "office_pc", "deal_score": 47}
 {"price": 474.99, "date": "2026-07-25T09:33:01.620173+00:00", "source": "eBay", "model": "gaming_pc", "category": "gaming_pc", "deal_score": 42}
 {"price": 500.0, "date": "2026-07-25T09:33:02.786162+00:00", "source": "eBay", "model": "gaming_pc", "category": "gaming_pc", "deal_score": 40}
+{"price": 190.0, "date": "2026-07-25T09:36:12.985769+00:00", "source": "eBay", "model": "office_pc", "category": "office_pc", "deal_score": 47}
+{"price": 474.99, "date": "2026-07-25T09:36:14.037028+00:00", "source": "eBay", "model": "gaming_pc", "category": "gaming_pc", "deal_score": 42}
+{"price": 500.0, "date": "2026-07-25T09:36:15.251340+00:00", "source": "eBay", "model": "gaming_pc", "category": "gaming_pc", "deal_score": 40}
+{"price": 250.0, "date": "2026-07-25T09:47:17.184767+00:00", "source": "Kleinanzeigen", "model": "rtx_3060_12gb", "category": "gpu", "deal_score": 25}
+{"price": 250.0, "date": "2026-07-25T09:47:17.211045+00:00", "source": "Kleinanzeigen", "model": "rtx_3060_12gb", "category": "gpu", "deal_score": 25}
+{"price": 190.0, "date": "2026-07-25T09:47:17.731627+00:00", "source": "eBay", "model": "office_pc", "category": "office_pc", "deal_score": 47}
+{"price": 500.0, "date": "2026-07-25T09:47:19.922565+00:00", "source": "eBay", "model": "gaming_pc", "category": "gaming_pc", "deal_score": 40}

@@ -142,6 +142,20 @@ def test_evaluate_ohne_erkannten_hersteller_nutzt_platzhalter():
     assert r.deal_score == 60  # Platzhalter, keine Marke im Titel
 
 
+def test_evaluate_liefert_manufacturer_name_auf_matchresult():
+    cfg = load_rules("rules")
+    r = evaluate("Dell OptiPlex i5-8500 16GB RAM 512GB SSD Tower", 150.0, cfg)
+    assert r.matched is True
+    assert r.manufacturer_name == "Dell"
+
+
+def test_evaluate_manufacturer_name_none_ohne_erkennbare_marke():
+    cfg = load_rules("rules")
+    r = evaluate("Office PC i5-8500 16GB RAM 512GB SSD Tower", 150.0, cfg)
+    assert r.matched is True
+    assert r.manufacturer_name is None
+
+
 if __name__ == "__main__":
     import pytest
     raise SystemExit(pytest.main([__file__, "-v"]))

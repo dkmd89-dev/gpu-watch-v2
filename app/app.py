@@ -264,6 +264,7 @@ def run_scan():
                 **item,
                 "rule": result.rule_label,
                 "category": result.category,
+                "manufacturer": result.manufacturer_name,
                 "deal_score": result.deal_score,
                 "deal_stars": result.deal_stars,
                 "is_top_deal": top_deal_result.is_top_deal,
@@ -402,10 +403,17 @@ def api_status():
     found = _load_json(FOUND_FILE, [])
 
     category_counts: dict[str, int] = {}
+    manufacturer_counts: dict[str, int] = {}
     top_deal_count = 0
     for f in found:
         cat = f.get("category") or "unbekannt"
         category_counts[cat] = category_counts.get(cat, 0) + 1
+        # Aeltere found.json-Eintraege aus der Zeit vor dem Hersteller-
+        # Detector haben dieses Feld noch nicht -- .get() liefert dafuer
+        # robust None statt eines KeyError, "unbekannt" gruppiert sie mit
+        # Treffern, bei denen im Titel schlicht keine Marke erkennbar war.
+        manufacturer = f.get("manufacturer") or "unbekannt"
+        manufacturer_counts[manufacturer] = manufacturer_counts.get(manufacturer, 0) + 1
         if f.get("is_top_deal"):
             top_deal_count += 1
 
@@ -426,6 +434,7 @@ def api_status():
         "new_hits_last_scan": status_snapshot["new_hits_last_scan"],
         "saved_count": len(found),
         "category_counts": category_counts,
+        "manufacturer_counts": manufacturer_counts,
         "top_deal_count": top_deal_count,
         "sources": SOURCES,
         "scan_log_tail": _tail_log(LOG_FILE, 20),

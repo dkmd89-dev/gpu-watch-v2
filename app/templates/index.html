@@ -421,6 +421,10 @@
         <select id="filterSource"><option value="">Alle</option></select>
       </div>
       <div class="filter-field">
+        <label for="filterManufacturer">Hersteller</label>
+        <select id="filterManufacturer"><option value="">Alle</option></select>
+      </div>
+      <div class="filter-field">
         <label for="filterMinScore">Deal-Score</label>
         <select id="filterMinScore">
           <option value="0">Alle</option>
@@ -439,10 +443,6 @@
       </div>
     </div>
     <div class="filter-count" id="filterCount"></div>
-    <!-- Hinweis: Ein Hersteller-Filter ist noch nicht moeglich, da es
-         aktuell keinen Hersteller-Detector gibt (deal_score.py setzt
-         das "hersteller"-Gewicht bewusst auf 0, siehe Phase 6). Folgt
-         als eigener Schritt, sobald diese Erkennung existiert. -->
   </section>
 
   <div class="listings-grid" id="listingsGrid">
@@ -450,6 +450,7 @@
     <div class="card"
          data-category="{{ f.category or 'unbekannt' }}"
          data-source="{{ f.source or 'unbekannt' }}"
+         data-manufacturer="{{ f.manufacturer or 'unbekannt' }}"
          data-price="{{ f.price }}"
          data-score="{{ f.deal_score if (f.deal_score is defined and f.deal_score is not none) else 0 }}">
       <div class="card-top">
@@ -461,7 +462,8 @@
       {% if f.deal_stars %}<div class="stars">{{ f.deal_stars }}</div>{% endif %}
       <div class="meta">
         {{ f.source }} · {{ f.location }}
-        {%- if f.category %} · {{ f.category }}{% endif %} · {{ f.found_at }}
+        {%- if f.category %} · {{ f.category }}{% endif %}
+        {%- if f.manufacturer %} · {{ f.manufacturer }}{% endif %} · {{ f.found_at }}
       </div>
       <a href="{{ f.url }}" target="_blank">Zum Angebot →</a>
     </div>
@@ -595,18 +597,20 @@
     refreshStatus();
     setInterval(refreshStatus, 5000);
 
-    // --- Phase 8.5: Client-seitige Filter ---
+    // --- Phase 8.5 (+ Hersteller-Filter-Folgeschritt): Client-seitige Filter ---
     // Arbeitet direkt auf den bereits serverseitig gerenderten Karten
-    // (kein zusätzlicher Fetch nötig) -- Kategorie-/Quellen-Optionen
-    // werden dynamisch aus den vorhandenen Karten abgeleitet, damit
-    // neue Kategorien/Quellen (rein per YAML/Scraper ergänzt) hier
-    // automatisch auftauchen, ohne dieses Template anzufassen.
+    // (kein zusätzlicher Fetch nötig) -- Kategorie-/Quellen-/Hersteller-
+    // Optionen werden dynamisch aus den vorhandenen Karten abgeleitet,
+    // damit neue Kategorien/Quellen/Marken (rein per YAML/Scraper/
+    // Detector ergänzt) hier automatisch auftauchen, ohne dieses
+    // Template anzufassen.
     function initFilters() {
       const cards = Array.from(document.querySelectorAll('#listingsGrid .card'));
       if (cards.length === 0) return;
 
       const categories = [...new Set(cards.map(c => c.dataset.category))].sort();
       const sources = [...new Set(cards.map(c => c.dataset.source))].sort();
+      const manufacturers = [...new Set(cards.map(c => c.dataset.manufacturer))].sort();
 
       const catSelect = document.getElementById('filterCategory');
       categories.forEach(cat => {
@@ -624,7 +628,15 @@
         srcSelect.appendChild(opt);
       });
 
-      ['filterCategory', 'filterSource', 'filterMinScore'].forEach(id => {
+      const mfrSelect = document.getElementById('filterManufacturer');
+      manufacturers.forEach(mfr => {
+        const opt = document.createElement('option');
+        opt.value = mfr;
+        opt.textContent = mfr;
+        mfrSelect.appendChild(opt);
+      });
+
+      ['filterCategory', 'filterSource', 'filterManufacturer', 'filterMinScore'].forEach(id => {
         document.getElementById(id).addEventListener('change', applyFilters);
       });
       document.getElementById('filterMaxPrice').addEventListener('input', applyFilters);
@@ -635,6 +647,7 @@
     function applyFilters() {
       const category = document.getElementById('filterCategory').value;
       const source = document.getElementById('filterSource').value;
+      const manufacturer = document.getElementById('filterManufacturer').value;
       const minScore = parseFloat(document.getElementById('filterMinScore').value) || 0;
       const maxPriceRaw = document.getElementById('filterMaxPrice').value;
       const maxPrice = maxPriceRaw === '' ? null : parseFloat(maxPriceRaw);
@@ -645,12 +658,14 @@
       cards.forEach(card => {
         const cardCategory = card.dataset.category;
         const cardSource = card.dataset.source;
+        const cardManufacturer = card.dataset.manufacturer;
         const cardPrice = parseFloat(card.dataset.price);
         const cardScore = parseFloat(card.dataset.score);
 
         let visible = true;
         if (category && cardCategory !== category) visible = false;
         if (source && cardSource !== source) visible = false;
+        if (manufacturer && cardManufacturer !== manufacturer) visible = false;
         if (cardScore < minScore) visible = false;
         if (maxPrice !== null && !isNaN(maxPrice) && cardPrice > maxPrice) visible = false;
 
@@ -668,6 +683,7 @@
     function resetFilters() {
       document.getElementById('filterCategory').value = '';
       document.getElementById('filterSource').value = '';
+      document.getElementById('filterManufacturer').value = '';
       document.getElementById('filterMinScore').value = '0';
       document.getElementById('filterMaxPrice').value = '';
       applyFilters();

@@ -45,6 +45,12 @@ class MatchResult:
     # lauffaehig.
     category: str | None = None  # rule._category, None im Legacy-Einzeldatei-Modus
     price_history_model: str | None = None  # stabiler Gruppierungs-Schluessel
+    # Dashboard-Filter-Folgeschritt: erkannter Herstellername (siehe
+    # categories/detectors/manufacturer.py), None wenn im Titel keine Marke
+    # erkennbar war. Additives Feld mit Default -- bestehender Code, der
+    # MatchResult ueber die bisherigen Felder erstellt/liest, bleibt
+    # unveraendert lauffaehig.
+    manufacturer_name: str | None = None
 
 
 def load_rules(path: str = "rules.yaml") -> dict:
@@ -485,6 +491,7 @@ def evaluate(
             # Rating-Stufen/Marken derselben Hardware werden dann allerdings
             # NICHT zusammengefasst (siehe Docstring in price_history.py).
             price_history_model=price_history_model,
+            manufacturer_name=score_inputs.get("manufacturer_name"),
         )
 
     return MatchResult(matched=False)
