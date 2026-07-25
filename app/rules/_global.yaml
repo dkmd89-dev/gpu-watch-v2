@@ -63,8 +63,8 @@ notifications:
   urgent_price_threshold: 150
   tags:
     - moneybag
-  gate_min_stars: "★☆☆☆☆"
-  gate_max_price: 250
+  gate_min_stars: "★★★★★"
+  gate_max_price: 150
 
 # ============================================================
 # Deal-Score-Gewichte (Phase 6) -- siehe scoring/deal_score.py
