@@ -12,7 +12,8 @@ from matcher import load_rules, evaluate
 from scrapers import search_kleinanzeigen, search_ebay
 from notify import send_ntfy, emoji_for
 from scoring.deal_score import stars_meet_minimum
-from price_history import append_price_point, make_price_point
+from price_history import append_price_point, make_price_point, read_price_points
+from price_stats import compute_all_price_stats
 
 DATA_DIR = Path(os.environ.get("DATA_DIR", "/data"))
 DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -89,6 +90,32 @@ def _save_json(path: Path, data) -> None:
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2))
 
 
+def _load_market_prices(path: Path) -> dict[str, float]:
+    """Baut das {price_history_model: Marktpreis}-Mapping aus price_history.jsonl.
+
+    Phase 7 (Schritt 7.5): einmal pro Scan aufgerufen, BEVOR die Item-Schleife
+    startet -- die daraus resultierenden Marktpreise werden an evaluate()
+    durchgereicht (siehe matcher.py, Schritt 7.4). Fehlt die Datei oder ist
+    sie noch leer (z.B. frisch installierte Instanz ohne bisherige Treffer),
+    liefert read_price_points() bereits eine leere Liste -- dann ist auch
+    dieses Mapping leer und evaluate() verhält sich exakt wie vor Schritt 7.4
+    (reines regelbasiertes max_price-Signal). Ein Fehler beim Statistik-Aufbau
+    darf den Scan nicht abbrechen -- Marktpreise sind eine Zusatzfunktion,
+    kein kritischer Pfad (analog zu append_price_point() in price_history.py).
+    """
+    try:
+        points = read_price_points(path)
+        stats_by_model = compute_all_price_stats(points)
+        return {
+            model: stats.market_price
+            for model, stats in stats_by_model.items()
+            if stats is not None
+        }
+    except Exception as e:
+        log.error("Marktpreis-Statistik konnte nicht berechnet werden: %s", e, exc_info=True)
+        return {}
+
+
 def run_scan():
     global _scan_running
 
@@ -129,6 +156,13 @@ def run_scan():
         )
         raw += search_ebay(search_terms, global_max_price, defaults["location_plz"])
 
+        # Phase 7 (Schritt 7.5): Marktpreise EINMAL pro Scan aus der bisherigen
+        # Preishistorie berechnen (nicht pro Item -- price_history.jsonl waechst
+        # waehrend des Scans durch append_price_point() weiter unten, ein Re-Read
+        # pro Item wuerde unnoetig I/O verursachen und wachsende Ergebnisse waeren
+        # ohnehin fuer denselben Scan-Durchlauf nicht gewuenscht).
+        market_prices = _load_market_prices(PRICE_HISTORY_FILE)
+
         new_hits = 0
         for item in raw:
             if item["price"] is None:
@@ -146,7 +180,7 @@ def run_scan():
                 # werden (siehe Phase-0-Analyse, Befund d).
                 _save_json(SEEN_FILE, list(seen))
 
-            result = evaluate(item["title"], item["price"], rules_cfg)
+            result = evaluate(item["title"], item["price"], rules_cfg, market_prices=market_prices)
             if not result.matched:
                 continue
 

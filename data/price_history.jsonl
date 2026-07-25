@@ -29,3 +29,15 @@
 {"price": 474.99, "date": "2026-07-25T05:46:12.327294+00:00", "source": "eBay", "model": "gaming_pc", "category": "gaming_pc", "deal_score": 33}
 {"price": 130.0, "date": "2026-07-25T05:46:12.368914+00:00", "source": "eBay", "model": "office_pc", "category": "office_pc", "deal_score": 40}
 {"price": 500.0, "date": "2026-07-25T05:46:12.906629+00:00", "source": "eBay", "model": "gaming_pc", "category": "gaming_pc", "deal_score": 32}
+{"price": 219.0, "date": "2026-07-25T05:48:27.292708+00:00", "source": "eBay", "model": "rtx_3060_12gb", "category": "gpu", "deal_score": 19}
+{"price": 190.0, "date": "2026-07-25T05:48:27.418782+00:00", "source": "eBay", "model": "office_pc", "category": "office_pc", "deal_score": 43}
+{"price": 350.0, "date": "2026-07-25T05:48:27.772166+00:00", "source": "eBay", "model": "gaming_pc", "category": "gaming_pc", "deal_score": 56}
+{"price": 474.99, "date": "2026-07-25T05:48:27.900284+00:00", "source": "eBay", "model": "gaming_pc", "category": "gaming_pc", "deal_score": 33}
+{"price": 500.0, "date": "2026-07-25T05:48:28.464609+00:00", "source": "eBay", "model": "gaming_pc", "category": "gaming_pc", "deal_score": 32}
+{"price": 210.0, "date": "2026-07-25T05:59:28.786532+00:00", "source": "Kleinanzeigen", "model": "rtx_3060_12gb", "category": "gpu", "deal_score": 15}
+{"price": 200.0, "date": "2026-07-25T05:59:28.804043+00:00", "source": "Kleinanzeigen", "model": "rtx_3070", "category": "gpu", "deal_score": 8}
+{"price": 219.0, "date": "2026-07-25T05:59:28.987492+00:00", "source": "eBay", "model": "rtx_3060_12gb", "category": "gpu", "deal_score": 19}
+{"price": 190.0, "date": "2026-07-25T05:59:29.095500+00:00", "source": "eBay", "model": "office_pc", "category": "office_pc", "deal_score": 43}
+{"price": 350.0, "date": "2026-07-25T05:59:29.488055+00:00", "source": "eBay", "model": "gaming_pc", "category": "gaming_pc", "deal_score": 56}
+{"price": 474.99, "date": "2026-07-25T05:59:29.616193+00:00", "source": "eBay", "model": "gaming_pc", "category": "gaming_pc", "deal_score": 33}
+{"price": 500.0, "date": "2026-07-25T05:59:30.240888+00:00", "source": "eBay", "model": "gaming_pc", "category": "gaming_pc", "deal_score": 32}
