@@ -237,6 +237,71 @@ def test_score_liegt_immer_im_bereich_0_bis_100():
         assert 0 <= r.score <= 100
 
 
+# ---------- _price_score: Marktpreis-Integration (Phase 7, Schritt 7.4) ----------
+
+def test_price_score_ohne_marktpreis_unveraendert_wie_vorher():
+    # Rueckwaertskompatibilitaet: market_price=None (Default) -> exakt das
+    # bisherige, rein regelbasierte Verhalten.
+    assert _price_score(100, 200) == _price_score(100, 200, market_price=None)
+    assert _price_score(100, 200, market_price=None) == 50
+
+
+def test_price_score_bei_preis_gleich_marktpreis_ist_neutral_50():
+    # ohne max_price, rein marktpreisbasiert -> Preis == Marktpreis -> 50
+    assert _price_score(200, None, market_price=200) == 50
+
+
+def test_price_score_deutlich_unter_marktpreis_ohne_max_price():
+    # 50% unter Marktpreis -> Score 100 (obere Kappung)
+    assert _price_score(100, None, market_price=200) == 100
+
+
+def test_price_score_deutlich_ueber_marktpreis_ohne_max_price():
+    # 50% ueber Marktpreis -> Score 0 (untere Kappung)
+    assert _price_score(300, None, market_price=200) == 0
+
+
+def test_price_score_marktpreis_null_faellt_auf_regelbasiert_zurueck():
+    assert _price_score(100, 200, market_price=0) == _price_score(100, 200)
+
+
+def test_price_score_marktpreis_negativ_faellt_auf_regelbasiert_zurueck():
+    assert _price_score(100, 200, market_price=-10) == _price_score(100, 200)
+
+
+def test_price_score_beide_signale_werden_gewichtet_gemittelt():
+    # regelbasiert (price=100, max_price=200): 50
+    # marktpreisbasiert (price=100, market_price=150, +33.3% unter Markt): 83
+    # blended = 0.6*83 + 0.4*50 = 69.8 -> 70
+    rule_based = _price_score(100, 200)
+    market_based = _price_score(100, None, market_price=150)
+    blended = _price_score(100, 200, market_price=150)
+    assert rule_based == 50
+    assert blended != rule_based
+    assert blended != market_based
+    assert min(rule_based, market_based) <= blended <= max(rule_based, market_based)
+
+
+def test_compute_deal_score_gibt_market_price_an_price_score_weiter():
+    r_ohne_markt = compute_deal_score(
+        price=100, max_price=200, deal_rating="Okay", weights={"price": 1.0}
+    )
+    r_mit_markt = compute_deal_score(
+        price=100, max_price=200, deal_rating="Okay", weights={"price": 1.0},
+        market_price=150,  # 33% unter Marktpreis -> anderer Wert als rein regelbasiert
+    )
+    assert r_ohne_markt.score == 50  # rein regelbasiert (max_price=200)
+    assert r_mit_markt.components["price"] != r_ohne_markt.components["price"]
+
+
+def test_compute_deal_score_ohne_market_price_unveraendert():
+    # Bestehendes Verhalten (siehe aeltere Sterne-Schwellen-Tests oben)
+    # darf durch den neuen optionalen Parameter nicht beeinflusst werden.
+    r = compute_deal_score(price=10, max_price=200, deal_rating=None, weights={"price": 1.0})
+    assert r.score == 95
+    assert r.stars == "★★★★★"
+
+
 if __name__ == "__main__":
     import pytest
     raise SystemExit(pytest.main([__file__, "-v"]))

@@ -339,7 +339,23 @@ def _build_score_inputs(title_lower: str, requirements: dict | None, features: d
     }
 
 
-def evaluate(title: str, price: float, rules_cfg: dict) -> MatchResult:
+def evaluate(
+    title: str,
+    price: float,
+    rules_cfg: dict,
+    market_prices: dict[str, float] | None = None,
+) -> MatchResult:
+    """Wertet Titel/Preis gegen die Regel-Matrix aus.
+
+    market_prices (Phase 7, Schritt 7.4): optionales Mapping
+    {price_history_model: Marktpreis}, typischerweise gebaut aus
+    price_stats.compute_all_price_stats() ueber die gesammelte
+    Preishistorie (siehe price_history.py). evaluate() liest dabei
+    selbst KEINE Dateien -- der Aufrufer (app.py) uebergibt die bereits
+    berechneten Marktpreise, damit matcher.py weiterhin frei von I/O und
+    einfach testbar bleibt. None (Standard) -> unveraendertes Verhalten
+    wie vor Schritt 7.4 (reines max_price-Signal im Deal-Score).
+    """
     title_l = title.lower()
     defaults = rules_cfg.get("defaults", {})
     global_excludes = defaults.get("exclude_global", [])
@@ -417,15 +433,21 @@ def evaluate(title: str, price: float, rules_cfg: dict) -> MatchResult:
             or rules_cfg.get("scoring_weights")
             or DEFAULT_WEIGHTS
         )
+        rule_label = rule.get("label", "?")
+        # price_history_model bestimmt sowohl den Gruppierungs-Schluessel
+        # fuer die Preishistorie (siehe MatchResult unten) als auch den
+        # Lookup-Key fuer einen ggf. vorab berechneten Marktpreis (Schritt 7.4).
+        price_history_model = rule.get("price_history_model", rule_label)
+        market_price = (market_prices or {}).get(price_history_model)
         score_result = compute_deal_score(
             price=price,
             max_price=max_price,
             deal_rating=rule.get("deal_rating"),
             weights=scoring_weights,
+            market_price=market_price,
             **score_inputs,
         )
 
-        rule_label = rule.get("label", "?")
         return MatchResult(
             matched=True,
             rule_label=rule_label,
@@ -440,7 +462,7 @@ def evaluate(title: str, price: float, rules_cfg: dict) -> MatchResult:
             # Phase 7 auch ohne YAML-Änderung sofort nutzbar ist -- separate
             # Rating-Stufen/Marken derselben Hardware werden dann allerdings
             # NICHT zusammengefasst (siehe Docstring in price_history.py).
-            price_history_model=rule.get("price_history_model", rule_label),
+            price_history_model=price_history_model,
         )
 
     return MatchResult(matched=False)

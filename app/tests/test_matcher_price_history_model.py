@@ -69,6 +69,41 @@ def test_legacy_einzeldatei_modus_faellt_auf_rule_label_zurueck():
     assert r.price_history_model == r.rule_label
 
 
+# ---------- market_prices-Parameter (Phase 7, Schritt 7.4) ----------
+
+def test_evaluate_ohne_market_prices_unveraendert():
+    # Rueckwaertskompatibilitaet: kein market_prices-Argument (Default None)
+    # -> identisches Ergebnis wie vor Schritt 7.4.
+    cfg = load_rules("rules")
+    r_ohne_arg = evaluate("ASUS RTX 3060 12GB ROG Strix", 185.0, cfg)
+    r_mit_none = evaluate("ASUS RTX 3060 12GB ROG Strix", 185.0, cfg, market_prices=None)
+    assert r_ohne_arg.deal_score == r_mit_none.deal_score
+
+
+def test_evaluate_nutzt_marktpreis_fuer_passendes_model():
+    cfg = load_rules("rules")
+    market_prices = {"rtx_3060_12gb": 185.0}  # Marktpreis == Angebotspreis -> neutral
+
+    r_ohne_markt = evaluate("ASUS RTX 3060 12GB ROG Strix", 185.0, cfg)
+    r_mit_markt = evaluate("ASUS RTX 3060 12GB ROG Strix", 185.0, cfg, market_prices=market_prices)
+
+    assert r_mit_markt.deal_score != r_ohne_markt.deal_score
+
+
+def test_evaluate_ignoriert_marktpreis_fuer_anderes_model():
+    # market_prices enthaelt nur einen Eintrag fuer ein ANDERES Modell ->
+    # darf das Ergebnis fuer die RTX-3060-Regel nicht beeinflussen.
+    cfg = load_rules("rules")
+    market_prices = {"office_pc": 999.0}
+
+    r_ohne_markt = evaluate("ASUS RTX 3060 12GB ROG Strix", 185.0, cfg)
+    r_mit_fremdem_markt = evaluate(
+        "ASUS RTX 3060 12GB ROG Strix", 185.0, cfg, market_prices=market_prices
+    )
+
+    assert r_ohne_markt.deal_score == r_mit_fremdem_markt.deal_score
+
+
 if __name__ == "__main__":
     import pytest
     raise SystemExit(pytest.main([__file__, "-v"]))
