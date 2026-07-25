@@ -3,6 +3,7 @@ import json
 import time
 import logging
 import threading
+from dataclasses import asdict
 from pathlib import Path
 from datetime import datetime, timedelta, timezone
 
@@ -13,7 +14,8 @@ from scrapers import search_kleinanzeigen, search_ebay
 from notify import send_ntfy, emoji_for
 from scoring.deal_score import stars_meet_minimum
 from price_history import append_price_point, make_price_point, read_price_points
-from price_stats import compute_all_price_stats
+from price_stats import compute_all_price_stats, compute_price_stats, PriceStats
+from top_deal import evaluate_top_deal
 
 DATA_DIR = Path(os.environ.get("DATA_DIR", "/data"))
 DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -132,30 +134,37 @@ def _tail_log(path: Path, n: int) -> list[str]:
         return []
 
 
-def _load_market_prices(path: Path) -> dict[str, float]:
-    """Baut das {price_history_model: Marktpreis}-Mapping aus price_history.jsonl.
+def _load_price_stats(path: Path) -> dict[str, PriceStats]:
+    """Berechnet die volle Preisstatistik je price_history_model.
 
-    Phase 7 (Schritt 7.5): einmal pro Scan aufgerufen, BEVOR die Item-Schleife
-    startet -- die daraus resultierenden Marktpreise werden an evaluate()
-    durchgereicht (siehe matcher.py, Schritt 7.4). Fehlt die Datei oder ist
-    sie noch leer (z.B. frisch installierte Instanz ohne bisherige Treffer),
-    liefert read_price_points() bereits eine leere Liste -- dann ist auch
-    dieses Mapping leer und evaluate() verhält sich exakt wie vor Schritt 7.4
-    (reines regelbasiertes max_price-Signal). Ein Fehler beim Statistik-Aufbau
-    darf den Scan nicht abbrechen -- Marktpreise sind eine Zusatzfunktion,
-    kein kritischer Pfad (analog zu append_price_point() in price_history.py).
+    Gemeinsame Basis für zwei Verwendungszwecke:
+    - Marktpreise fürs Deal-Score-Scoring (Schritt 7.5, siehe
+      _market_prices_from_stats() unten)
+    - Top-Deal-Erkennung (Schritt 8.2, siehe evaluate_top_deal() in run_scan())
+
+    Ein Fehler beim Statistik-Aufbau darf den Scan nicht abbrechen --
+    Preisstatistik ist eine Zusatzfunktion, kein kritischer Pfad (analog zu
+    append_price_point() in price_history.py).
     """
     try:
         points = read_price_points(path)
-        stats_by_model = compute_all_price_stats(points)
-        return {
-            model: stats.market_price
-            for model, stats in stats_by_model.items()
-            if stats is not None
-        }
+        return compute_all_price_stats(points)
     except Exception as e:
-        log.error("Marktpreis-Statistik konnte nicht berechnet werden: %s", e, exc_info=True)
+        log.error("Preisstatistik konnte nicht berechnet werden: %s", e, exc_info=True)
         return {}
+
+
+def _market_prices_from_stats(stats_by_model: dict[str, PriceStats]) -> dict[str, float]:
+    """Reduziert die volle Preisstatistik (siehe _load_price_stats()) auf das
+    {price_history_model: Marktpreis}-Mapping, das evaluate() erwartet
+    (Schritt 7.4/7.5). None (kein Modell in der Historie) -> unveraendertes
+    Verhalten wie vor Schritt 7.4 (reines regelbasiertes max_price-Signal).
+    """
+    return {
+        model: stats.market_price
+        for model, stats in stats_by_model.items()
+        if stats is not None
+    }
 
 
 def run_scan():
@@ -208,12 +217,16 @@ def run_scan():
         with _status_lock:
             _scan_status["scan_progress_total"] = len(raw)
 
-        # Phase 7 (Schritt 7.5): Marktpreise EINMAL pro Scan aus der bisherigen
-        # Preishistorie berechnen (nicht pro Item -- price_history.jsonl waechst
-        # waehrend des Scans durch append_price_point() weiter unten, ein Re-Read
-        # pro Item wuerde unnoetig I/O verursachen und wachsende Ergebnisse waeren
-        # ohnehin fuer denselben Scan-Durchlauf nicht gewuenscht).
-        market_prices = _load_market_prices(PRICE_HISTORY_FILE)
+        # Phase 7 (Schritt 7.5) + Phase 8 (Schritt 8.2): Preisstatistik EINMAL
+        # pro Scan aus der bisherigen Preishistorie berechnen (nicht pro Item --
+        # price_history.jsonl waechst waehrend des Scans durch append_price_point()
+        # weiter unten, ein Re-Read pro Item wuerde unnoetig I/O verursachen und
+        # wachsende Ergebnisse waeren ohnehin fuer denselben Scan-Durchlauf nicht
+        # gewuenscht). Liefert die Grundlage fuer ZWEI Signale aus derselben
+        # Berechnung: market_prices (Deal-Score, Schritt 7.5) und
+        # price_stats_by_model (Top-Deal-Erkennung, Schritt 8.2).
+        price_stats_by_model = _load_price_stats(PRICE_HISTORY_FILE)
+        market_prices = _market_prices_from_stats(price_stats_by_model)
 
         new_hits = 0
         for idx, item in enumerate(raw, start=1):
@@ -239,12 +252,26 @@ def run_scan():
             if not result.matched:
                 continue
 
+            # Phase 8 (Schritt 8.2): datengetriebene Top-Deal-Erkennung
+            # (unabhaengig von der regelbasierten deal_rating-Einstufung,
+            # siehe top_deal.py-Docstring). Nutzt dieselbe, oben bereits
+            # berechnete Preisstatistik -- kein zusaetzlicher Datei-Zugriff.
+            top_deal_result = evaluate_top_deal(
+                item["price"], price_stats_by_model.get(result.price_history_model)
+            )
+
             entry = {
                 **item,
                 "rule": result.rule_label,
                 "category": result.category,
                 "deal_score": result.deal_score,
                 "deal_stars": result.deal_stars,
+                "is_top_deal": top_deal_result.is_top_deal,
+                "top_deal_discount_pct": (
+                    round(top_deal_result.discount_pct, 1)
+                    if top_deal_result.discount_pct is not None
+                    else None
+                ),
                 "found_at": datetime.now(timezone.utc).isoformat(),
             }
 
@@ -362,23 +389,25 @@ def api_found():
 
 @app.route("/api/status")
 def api_status():
-    """Live-Status fürs Dashboard (Phase 8, Schritt 8.1).
+    """Live-Status fürs Dashboard (Phase 8, Schritt 8.1 + 8.2).
 
     Rein lesend, aggregiert bestehende Daten (found.json + In-Memory-
     Status-State) -- keine neue Persistenz, kein Einfluss auf run_scan().
 
-    top_deal_count ist bewusst None: top_deal.py (Schritt 7.3) ist noch
-    nicht in run_scan() verdrahtet (siehe Schritt 8.2), found.json-Einträge
-    tragen daher noch kein is_top_deal-Flag. Das Feld ist schon Teil des
-    API-Vertrags, damit das Dashboard (Schritt 8.4+) nicht später erneut
-    angepasst werden muss.
+    top_deal_count zählt Einträge mit is_top_deal=True (Schritt 8.2).
+    Ältere found.json-Einträge aus der Zeit vor Schritt 8.2 haben dieses
+    Feld noch nicht -- .get("is_top_deal") liefert dafür robust False
+    statt eines KeyError.
     """
     found = _load_json(FOUND_FILE, [])
 
     category_counts: dict[str, int] = {}
+    top_deal_count = 0
     for f in found:
         cat = f.get("category") or "unbekannt"
         category_counts[cat] = category_counts.get(cat, 0) + 1
+        if f.get("is_top_deal"):
+            top_deal_count += 1
 
     with _status_lock:
         status_snapshot = dict(_scan_status)
@@ -397,9 +426,59 @@ def api_status():
         "new_hits_last_scan": status_snapshot["new_hits_last_scan"],
         "saved_count": len(found),
         "category_counts": category_counts,
-        "top_deal_count": None,
+        "top_deal_count": top_deal_count,
         "sources": SOURCES,
         "scan_log_tail": _tail_log(LOG_FILE, 20),
+    })
+
+
+@app.route("/api/price-history")
+def api_price_history_index():
+    """Kurz-Übersicht aller price_history_model-Schlüssel mit Statistik,
+    aber OHNE Zeitreihe (Schritt 8.3) -- fürs Dashboard, um zu ermitteln,
+    für welche Modelle überhaupt Preishistorie/Diagramme verfügbar sind.
+    Für die volle Zeitreihe eines einzelnen Modells siehe
+    /api/price-history/<model>.
+    """
+    points = read_price_points(PRICE_HISTORY_FILE)
+    stats_by_model = compute_all_price_stats(points)
+    return jsonify({
+        model: asdict(stats)
+        for model, stats in stats_by_model.items()
+        if stats is not None
+    })
+
+
+@app.route("/api/price-history/<model>")
+def api_price_history_detail(model):
+    """Aggregierte Statistik + chronologische Zeitreihe für EIN
+    price_history_model (Schritt 8.3), z.B. fürs Preisdiagramm im
+    Dashboard.
+
+    Unbekanntes/noch nie gesehenes model -> KEIN 404, sondern stats=null
+    und series=[] (analog zum fail-soft-Verhalten von read_price_points()
+    bei fehlender Datei) -- ein neu angelegtes Kategorie-/Hardware-Modell
+    ohne bisherige Treffer ist kein Fehlerfall, sondern der Normalzustand
+    direkt nach dem Anlegen einer neuen YAML-Regel.
+    """
+    points = read_price_points(PRICE_HISTORY_FILE)
+    model_points = sorted(
+        (p for p in points if p.model == model), key=lambda p: p.date
+    )
+    stats = compute_price_stats(model, model_points)
+
+    return jsonify({
+        "model": model,
+        "stats": asdict(stats) if stats is not None else None,
+        "series": [
+            {
+                "price": p.price,
+                "date": p.date,
+                "source": p.source,
+                "deal_score": p.deal_score,
+            }
+            for p in model_points
+        ],
     })
 
 
