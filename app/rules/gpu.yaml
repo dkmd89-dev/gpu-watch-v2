@@ -28,17 +28,20 @@
 
 category: "gpu"
 label: "Grafikkarten"
+
+# BREITE SUCHBEGRIFFE
 search_terms:
-  - "RTX 3060 12GB"
-  - "RTX 3060 Ti"
+  - "Grafikkarte"
+  - "GPU"
+  - "RTX"
+  - "RX"
+  - "Radeon"
+  - "GeForce"
+  - "RTX 3060"
   - "RTX 3070"
   - "RTX 4060"
-  - "RTX 2080 Ti"
-  - "RX 6700 XT"
-  - "RX 6750 XT"
+  - "RX 6700"
   - "RX 6800"
-  - "RX 7600"
-  - "RX 7600 XT"
 
 # Diese Kategorie sucht ausschließlich einzelne Grafikkarten. Komplette
 # PC-Systeme, Laptops und Zubehör sollen NICHT als GPU-Treffer erscheinen
@@ -71,6 +74,7 @@ search_terms:
 # Ausstattung/Hersteller/Zustand/Lieferumfang bleiben auf 0, da für
 # diese Kategorie kein echtes Signal existiert (kein "Fake"-Score).
 # ============================================================
+
 scoring_weights:
   price: 0.9
   ausstattung: 0
@@ -79,19 +83,24 @@ scoring_weights:
   zustand: 0
   lieferumfang: 0
 
+# ============================================================
+# OPTIMIERTE EXCLUDES – NUR klare PCs
+# ============================================================
 exclude_category:
+  # KOMPLETTE PCs
   - "gaming pc"
   - "gaming-pc"
   - "gamer pc"
   - "spiele pc"
-  - "setup"
   - "komplett pc"
   - "fertig pc"
   - "pc komplett"
-  - "system"
-  - "computer"
-  - "rechner"
+  - "komplettsystem"
+  - "komplett-system"
   - "workstation"
+  - "setup"
+  
+  # MONITORE & PERIPHERIE
   - "monitor"
   - "monitore"
   - "bildschirm"
@@ -99,8 +108,8 @@ exclude_category:
   - "maus"
   - "mit monitor"
   - "mit bildschirm"
-  - "komplettsystem"
-  - "komplett-system"
+  
+  # KÜHLUNG / ZUBEHÖR
   - "wasserkühler"
   - "waterblock"
   - "gpu block"
@@ -108,369 +117,299 @@ exclude_category:
   - "kühlkörper"
   - "backplate"
   - "luftkühler"
+  
+  # ENTFERNT (waren zu breit):
+  # - "system"
+  # - "computer"
+  # - "rechner"
 
+# ============================================================
+# REGELN – OHNE require_all_of, mit höheren Preisgrenzen
+# ============================================================
 rules:
   # ============================================================
-  # RTX 3060 12GB - TOP-DEAL (bis 190€)
+  # RTX 3060 12GB
   # ============================================================
-
-  - label: "ASUS RTX 3060 12GB"
-    match: ["rtx 3060", "rtx3060", "rtx-3060", "3060", "3060-12g"]
+  - label: "RTX 3060 12GB ★ Top-Deal"
+    match: 
+      - "rtx 3060"
+      - "3060 12g"
+      - "3060-12g"
+      - "3060 12gb"
     price_history_model: "rtx_3060_12gb"
-    price_history_model: "rtx_3060_12gb"
-    require_all_of: [["asus"], ["rog strix", "dual", "tuf"]]
-    exclude: ["ti", "3070", "3080"]
-    max_price: 190
-    deal_rating: "Top-Deal"
-
-  - label: "MSI RTX 3060 12GB"
-    match: ["rtx 3060", "rtx3060", "rtx-3060", "3060", "3060-12g"]
-    price_history_model: "rtx_3060_12gb"
-    price_history_model: "rtx_3060_12gb"
-    require_all_of: [["msi"], ["gaming x", "ventus", "trio"]]
-    exclude: ["ti", "3070", "3080"]
-    max_price: 190
-    deal_rating: "Top-Deal"
-
-  - label: "Gigabyte RTX 3060 12GB"
-    match: ["rtx 3060", "rtx3060", "rtx-3060", "3060", "3060-12g"]
-    price_history_model: "rtx_3060_12gb"
-    price_history_model: "rtx_3060_12gb"
-    require_all_of: [["gigabyte"], ["aorus", "eagle", "gaming oc"]]
-    exclude: ["ti", "3070", "3080"]
-    max_price: 190
-    deal_rating: "Top-Deal"
-
-  - label: "EVGA RTX 3060 12GB"
-    match: ["rtx 3060", "rtx3060", "rtx-3060", "3060", "3060-12g"]
-    price_history_model: "rtx_3060_12gb"
-    price_history_model: "rtx_3060_12gb"
-    require_all_of: [["evga"], ["ftw", "xc", "black"]]
-    exclude: ["ti", "3070", "3080"]
-    max_price: 180
-    deal_rating: "Top-Deal"
-
-  - label: "Inno3D RTX 3060 12GB"
-    match: ["rtx 3060", "rtx3060", "rtx-3060", "3060", "3060-12g"]
-    price_history_model: "rtx_3060_12gb"
-    price_history_model: "rtx_3060_12gb"
-    require_all_of: [["inno3d", "inno 3d"], ["ichill"]]
-    exclude: ["ti", "3070", "3080"]
-    max_price: 190
-    deal_rating: "Top-Deal"
-
-  - label: "Palit RTX 3060 12GB"
-    match: ["rtx 3060", "rtx3060", "rtx-3060", "3060", "3060-12g"]
-    price_history_model: "rtx_3060_12gb"
-    price_history_model: "rtx_3060_12gb"
-    require_all_of: [["palit"], ["gaming pro", "dual", "stormx"]]
-    exclude: ["ti", "3070", "3080"]
-    max_price: 190
-    deal_rating: "Top-Deal"
-
-  - label: "Gainward RTX 3060 12GB"
-    match: ["rtx 3060", "rtx3060", "rtx-3060", "3060", "3060-12g"]
-    price_history_model: "rtx_3060_12gb"
-    price_history_model: "rtx_3060_12gb"
-    require_all_of: [["gainward"], ["ghost", "phoenix"]]
-    exclude: ["ti", "3070", "3080"]
-    max_price: 190
-    deal_rating: "Top-Deal"
-
-  - label: "PNY RTX 3060 12GB"
-    match: ["rtx 3060", "rtx3060", "rtx-3060", "3060", "3060-12g"]
-    price_history_model: "rtx_3060_12gb"
-    price_history_model: "rtx_3060_12gb"
-    require_all_of: [["pny"], ["xlr8", "dual"]]
-    exclude: ["ti", "3070", "3080"]
-    max_price: 190
-    deal_rating: "Top-Deal"
-
-  - label: "KFA2/Galax RTX 3060 12GB"
-    match: ["rtx 3060", "rtx3060", "rtx-3060", "3060", "3060-12g"]
-    price_history_model: "rtx_3060_12gb"
-    price_history_model: "rtx_3060_12gb"
-    require_all_of: [["kfa2", "galax"], ["hof"]]
-    exclude: ["ti", "3070", "3080"]
-    max_price: 180
-    deal_rating: "Top-Deal"
-
-  - label: "Zotac RTX 3060 12GB"
-    match: ["rtx 3060", "rtx3060", "rtx-3060", "3060", "3060-12g"]
-    price_history_model: "rtx_3060_12gb"
-    price_history_model: "rtx_3060_12gb"
-    require_all_of: [["zotac"], ["twin edge", "gaming", "amp"]]
-    exclude: ["ti", "3070", "3080"]
-    max_price: 175
-    deal_rating: "Top-Deal"
-
-  # ============================================================
-  # RTX 3060 12GB - GUTER PREIS (bis 230€, Markt-Median)
-  # ============================================================
-  - label: "RTX 3060 12GB, gute Marke"
-    match: ["rtx 3060", "rtx3060", "rtx-3060", "3060", "3060-12g"]
-    price_history_model: "rtx_3060_12gb"
-    price_history_model: "rtx_3060_12gb"
-    require_all_of:
-      [
-        [
-          "asus",
-          "msi",
-          "gigabyte",
-          "evga",
-          "inno3d",
-          "palit",
-          "gainward",
-          "pny",
-          "kfa2",
-          "galax",
-          "zotac",
-        ],
-      ]
-    exclude: ["ti", "3070", "3080"]
-    max_price: 230
-    deal_rating: "Guter Preis"
-
-  # ============================================================
-  # RTX 3060 12GB - OKAY (bis 260€, alle Marken, noch marktüblich)
-  # ============================================================
-  - label: "RTX 3060 12GB"
-    match: ["rtx 3060", "rtx3060", "rtx-3060", "3060", "3060-12g"]
-    price_history_model: "rtx_3060_12gb"
-    price_history_model: "rtx_3060_12gb"
-    exclude:
+    exclude: 
       - "ti"
       - "3070"
       - "3080"
-    max_price: 260
-    deal_rating: "Okay"
+      - "4060"
+    max_price: 220
+    deal_rating: "Top-Deal"
+
+  - label: "RTX 3060 12GB"
+    match: 
+      - "rtx 3060"
+      - "3060 12g"
+      - "3060-12g"
+      - "3060 12gb"
+    price_history_model: "rtx_3060_12gb"
+    exclude: 
+      - "ti"
+      - "3070"
+      - "3080"
+      - "4060"
+    max_price: 280
+    deal_rating: "Guter Preis"
 
   # ============================================================
-  # RX 6700 XT - TOP-DEAL (bis 210€)
+  # RTX 3060 Ti
   # ============================================================
-
-  - label: "Sapphire RX 6700 XT"
-    match: ["6700 xt", "6700xt", "rx6700xt", "rx 6700"]
-    price_history_model: "rx_6700_xt"
-    price_history_model: "rx_6700_xt"
-    require_all_of: [["sapphire"], ["pulse", "nitro+", "nitro"]]
-    exclude: ["6750", "6800", "6900"]
-    max_price: 210
+  - label: "RTX 3060 Ti ★ Top-Deal"
+    match: 
+      - "3060 ti"
+      - "3060ti"
+      - "rtx 3060 ti"
+    price_history_model: "rtx_3060_ti"
+    exclude: 
+      - "3070"
+      - "3080"
+      - "4060"
+    max_price: 220
     deal_rating: "Top-Deal"
 
-  - label: "XFX RX 6700 XT"
-    match: ["6700 xt", "6700xt", "rx6700xt", "rx 6700"]
-    price_history_model: "rx_6700_xt"
-    price_history_model: "rx_6700_xt"
-    require_all_of: [["xfx"], ["merc", "qick", "swft"]]
-    exclude: ["6750", "6800", "6900"]
-    max_price: 210
-    deal_rating: "Top-Deal"
-
-  - label: "PowerColor RX 6700 XT"
-    match: ["6700 xt", "6700xt", "rx6700xt", "rx 6700"]
-    price_history_model: "rx_6700_xt"
-    price_history_model: "rx_6700_xt"
-    require_all_of: [["powercolor"], ["red devil", "hellhound", "fighter"]]
-    exclude: ["6750", "6800", "6900"]
-    max_price: 210
-    deal_rating: "Top-Deal"
-
-  - label: "ASRock RX 6700 XT"
-    match: ["6700 xt", "6700xt", "rx6700xt", "rx 6700"]
-    price_history_model: "rx_6700_xt"
-    price_history_model: "rx_6700_xt"
-    require_all_of: [["asrock"], ["phantom gaming", "challenger"]]
-    exclude: ["6750", "6800", "6900"]
-    max_price: 210
-    deal_rating: "Top-Deal"
-
-  - label: "Gigabyte RX 6700 XT"
-    match: ["6700 xt", "6700xt", "rx6700xt", "rx 6700"]
-    price_history_model: "rx_6700_xt"
-    price_history_model: "rx_6700_xt"
-    require_all_of: [["gigabyte"], ["aorus", "eagle", "gaming oc"]]
-    exclude: ["6750", "6800", "6900"]
-    max_price: 210
-    deal_rating: "Top-Deal"
-
-  - label: "MSI RX 6700 XT"
-    match: ["6700 xt", "6700xt", "rx6700xt", "rx 6700"]
-    price_history_model: "rx_6700_xt"
-    price_history_model: "rx_6700_xt"
-    require_all_of: [["msi"], ["gaming x", "ventus", "mech"]]
-    exclude: ["6750", "6800", "6900"]
-    max_price: 210
-    deal_rating: "Top-Deal"
-
-  - label: "ASUS RX 6700 XT"
-    match: ["6700 xt", "6700xt", "rx6700xt", "rx 6700"]
-    price_history_model: "rx_6700_xt"
-    price_history_model: "rx_6700_xt"
-    require_all_of: [["asus"], ["rog strix", "dual", "tuf"]]
-    exclude: ["6750", "6800", "6900"]
-    max_price: 210
-    deal_rating: "Top-Deal"
+  - label: "RTX 3060 Ti"
+    match: 
+      - "3060 ti"
+      - "3060ti"
+      - "rtx 3060 ti"
+    price_history_model: "rtx_3060_ti"
+    exclude: 
+      - "3070"
+      - "3080"
+      - "4060"
+    max_price: 280
+    deal_rating: "Guter Preis"
 
   # ============================================================
-  # RX 6700 XT - GUTER PREIS (bis 240€)
+  # RTX 3070
   # ============================================================
-  - label: "RX 6700 XT"
-    match: ["6700 xt", "6700xt", "rx6700xt", "rx 6700"]
+  - label: "RTX 3070 ★ Top-Deal"
+    match: 
+      - "rtx 3070"
+      - "3070 8g"
+      - "3070-8g"
+    price_history_model: "rtx_3070"
+    exclude: 
+      - "3070 ti"
+      - "3070ti"
+      - "3080"
+      - "3090"
+    max_price: 250
+    deal_rating: "Top-Deal"
+
+  - label: "RTX 3070"
+    match: 
+      - "rtx 3070"
+      - "3070 8g"
+      - "3070-8g"
+    price_history_model: "rtx_3070"
+    exclude: 
+      - "3070 ti"
+      - "3070ti"
+      - "3080"
+      - "3090"
+    max_price: 310
+    deal_rating: "Guter Preis"
+
+  # ============================================================
+  # RX 6700 XT
+  # ============================================================
+  - label: "RX 6700 XT ★ Top-Deal"
+    match: 
+      - "6700 xt"
+      - "6700xt"
+      - "rx 6700"
     price_history_model: "rx_6700_xt"
-    price_history_model: "rx_6700_xt"
-    exclude: ["6750", "6800", "6900"]
+    exclude: 
+      - "6750"
+      - "6800"
+      - "6900"
     max_price: 240
+    deal_rating: "Top-Deal"
+
+  - label: "RX 6700 XT"
+    match: 
+      - "6700 xt"
+      - "6700xt"
+      - "rx 6700"
+    price_history_model: "rx_6700_xt"
+    exclude: 
+      - "6750"
+      - "6800"
+      - "6900"
+    max_price: 300
     deal_rating: "Guter Preis"
 
   # ============================================================
   # RX 6750 XT
   # ============================================================
-  - label: "RX 6750 XT, Top-Deal"
-    match: ["6750 xt", "6750xt", "rx6750xt", "rx 6750"]
+  - label: "RX 6750 XT ★ Top-Deal"
+    match: 
+      - "6750 xt"
+      - "6750xt"
+      - "rx 6750"
     price_history_model: "rx_6750_xt"
-    price_history_model: "rx_6750_xt"
-    exclude: ["6800", "6900"]
-    max_price: 225
-    min_vram_gb: 12
+    exclude: 
+      - "6800"
+      - "6900"
+    max_price: 250
     deal_rating: "Top-Deal"
 
   - label: "RX 6750 XT"
-    match: ["6750 xt", "6750xt", "rx6750xt", "rx 6750"]
+    match: 
+      - "6750 xt"
+      - "6750xt"
+      - "rx 6750"
     price_history_model: "rx_6750_xt"
-    price_history_model: "rx_6750_xt"
-    exclude: ["6800", "6900"]
-    max_price: 250
-    min_vram_gb: 12
+    exclude: 
+      - "6800"
+      - "6900"
+    max_price: 310
     deal_rating: "Guter Preis"
 
   # ============================================================
-  # RTX 2080 Ti (11GB, ältere Karte -- entsprechend günstiger)
+  # RX 6800 (16GB)
   # ============================================================
-  - label: "RTX 2080 Ti, Top-Deal"
-    match: ["2080 ti", "2080ti", "rtx 2080"]
-    price_history_model: "rtx_2080_ti"
-    price_history_model: "rtx_2080_ti"
-    exclude: ["2080 super", "2070", "2060"]
-    max_price: 160
-    min_vram_gb: 11
-    deal_rating: "Top-Deal"
-
-  - label: "RTX 2080 Ti"
-    match: ["2080 ti", "2080ti", "rtx 2080"]
-    price_history_model: "rtx_2080_ti"
-    price_history_model: "rtx_2080_ti"
-    exclude: ["2080 super", "2070", "2060"]
-    max_price: 190
-    min_vram_gb: 11
-    deal_rating: "Guter Preis"
-
-  # ============================================================
-  # RTX 3070 (8GB)
-  # ============================================================
-  - label: "RTX 3070 FE, Top-Deal"
-    match: ["3070", "rtx 3070", "rtx3070", "rtx-3070"]
-    price_history_model: "rtx_3070"
-    price_history_model: "rtx_3070"
-    require_all_of: [["founders edition", "fe"], ["nvidia"]]
-    exclude: ["3070 ti", "3070ti"]
-    max_price: 200
-    min_vram_gb: 8
-    deal_rating: "Top-Deal"
-
-  - label: "RTX 3070, Top-Deal"
-    match: ["rtx 3070", "rtx3070", "rtx-3070", "3070"]
-    price_history_model: "rtx_3070"
-    price_history_model: "rtx_3070"
-    exclude: ["3070 ti", "3070ti", "3080", "3090", "3060"]
-    max_price: 200
-    min_vram_gb: 8
-    deal_rating: "Top-Deal"
-
-  - label: "RTX 3070"
-    match: ["rtx 3070", "rtx3070", "rtx-3070", "3070"]
-    price_history_model: "rtx_3070"
-    price_history_model: "rtx_3070"
-    exclude: ["3070 ti", "3070ti", "3080", "3090", "3060"]
-    max_price: 240
-    min_vram_gb: 8
-    deal_rating: "Guter Preis"
-
-  # ============================================================
-  # RTX 3060 Ti (8GB) -- Marktbeobachtung zeigt überraschend hohe
-  # Preise (200-300€), daher höher angesetzt als man erwarten würde
-  # ============================================================
-  - label: "RTX 3060 Ti, Top-Deal"
-    match: ["3060 ti", "3060ti", "rtx 3060 ti", "rtx3060ti"]
-    price_history_model: "rtx_3060_ti"
-    price_history_model: "rtx_3060_ti"
-    exclude: ["3070", "3080", "3090"]
-    max_price: 190
-    min_vram_gb: 8
-    deal_rating: "Top-Deal"
-
-  - label: "RTX 3060 Ti"
-    match: ["3060 ti", "3060ti", "rtx 3060 ti", "rtx3060ti"]
-    price_history_model: "rtx_3060_ti"
-    price_history_model: "rtx_3060_ti"
-    exclude: ["3070", "3080", "3090"]
-    max_price: 230
-    min_vram_gb: 8
-    deal_rating: "Guter Preis"
-
-  # ============================================================
-  # RX 6800 (16GB VRAM!)
-  # ============================================================
-  - label: "RX 6800, Top-Deal"
-    match: ["rx 6800", "rx6800"]
+  - label: "RX 6800 ★ Top-Deal"
+    match: 
+      - "rx 6800"
+      - "6800 16g"
     price_history_model: "rx_6800"
-    price_history_model: "rx_6800"
-    exclude: ["6800 xt", "6800xt", "6900", "rx 6900", "6800m"]
-    max_price: 250
-    min_vram_gb: 16
+    exclude: 
+      - "6800 xt"
+      - "6900"
+      - "6800m"
+    max_price: 290
     deal_rating: "Top-Deal"
 
   - label: "RX 6800"
-    match: ["rx 6800", "rx6800"]
+    match: 
+      - "rx 6800"
+      - "6800 16g"
     price_history_model: "rx_6800"
-    price_history_model: "rx_6800"
-    exclude: ["6800 xt", "6800xt", "6900", "rx 6900", "6800m"]
-    max_price: 280
-    min_vram_gb: 16
+    exclude: 
+      - "6800 xt"
+      - "6900"
+      - "6800m"
+    max_price: 350
     deal_rating: "Guter Preis"
 
   # ============================================================
-  # RTX 4060 (8GB, neuere Karte, noch relativ teuer gebraucht)
+  # RTX 4060
   # ============================================================
+  - label: "RTX 4060 ★ Top-Deal"
+    match: 
+      - "rtx 4060"
+      - "4060 8g"
+    price_history_model: "rtx_4060"
+    exclude: 
+      - "4060 ti"
+      - "4070"
+      - "4080"
+    max_price: 240
+    deal_rating: "Top-Deal"
+
   - label: "RTX 4060"
-    match: ["rtx 4060", "rtx4060"]
+    match: 
+      - "rtx 4060"
+      - "4060 8g"
     price_history_model: "rtx_4060"
-    price_history_model: "rtx_4060"
-    exclude: ["4060 ti", "4060ti"]
-    max_price: 250
-    min_vram_gb: 8
-    deal_rating: "Okay"
+    exclude: 
+      - "4060 ti"
+      - "4070"
+      - "4080"
+    max_price: 290
+    deal_rating: "Guter Preis"
 
   # ============================================================
   # RX 7600 XT (16GB)
   # ============================================================
+  - label: "RX 7600 XT ★ Top-Deal"
+    match: 
+      - "7600 xt"
+      - "7600xt"
+    price_history_model: "rx_7600_xt"
+    exclude: 
+      - "7700"
+      - "7800"
+      - "7900"
+    max_price: 180
+    deal_rating: "Top-Deal"
+
   - label: "RX 7600 XT"
-    match: ["7600 xt", "7600xt", "rx 7600"]
+    match: 
+      - "7600 xt"
+      - "7600xt"
+      - "rx 7600"
     price_history_model: "rx_7600_xt"
-    price_history_model: "rx_7600_xt"
-    exclude: ["7700", "7800", "7900"]
-    max_price: 160
-    min_vram_gb: 16
-    deal_rating: "Okay"
+    exclude: 
+      - "7700"
+      - "7800"
+      - "7900"
+    max_price: 230
+    deal_rating: "Guter Preis"
 
   # ============================================================
   # RX 7600 (8GB)
   # ============================================================
+  - label: "RX 7600 ★ Top-Deal"
+    match: 
+      - "rx 7600"
+      - "7600 8g"
+    price_history_model: "rx_7600"
+    exclude: 
+      - "7600 xt"
+      - "7700"
+      - "7800"
+    max_price: 160
+    deal_rating: "Top-Deal"
+
   - label: "RX 7600"
-    match: ["rx 7600", "rx7600"]
+    match: 
+      - "rx 7600"
+      - "7600 8g"
     price_history_model: "rx_7600"
-    price_history_model: "rx_7600"
-    exclude: ["7600 xt", "7600xt", "7700", "7800"]
-    max_price: 130
-    min_vram_gb: 8
-    deal_rating: "Okay"
+    exclude: 
+      - "7600 xt"
+      - "7700"
+      - "7800"
+    max_price: 210
+    deal_rating: "Guter Preis"
+
+  # ============================================================
+  # RTX 2080 Ti
+  # ============================================================
+  - label: "RTX 2080 Ti ★ Top-Deal"
+    match: 
+      - "2080 ti"
+      - "2080ti"
+      - "rtx 2080"
+    price_history_model: "rtx_2080_ti"
+    exclude: 
+      - "2080 super"
+      - "2070"
+      - "2060"
+    max_price: 220
+    deal_rating: "Top-Deal"
+
+  - label: "RTX 2080 Ti"
+    match: 
+      - "2080 ti"
+      - "2080ti"
+      - "rtx 2080"
+    price_history_model: "rtx_2080_ti"
+    exclude: 
+      - "2080 super"
+      - "2070"
+      - "2060"
+    max_price: 270
+    deal_rating: "Guter Preis"

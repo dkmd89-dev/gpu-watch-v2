@@ -10,23 +10,41 @@ defaults:
   min_vram_gb: 12
   location_plz: "76477"
   radius_km: 999999 # Unbegrenzt / ganz Deutschland
-  exclude_global:
-    - defekt
-    - kaputt
-    - bastler
-    - ersatzteil
-    - tausch
-    - suche
-    - gesucht
-    - kaufe
-    - ohne funktion
-    - beschädigt
-    - nur ovp
-    - leerkarton
-    - verpackung
-    - "ohne rückgabe"
-    - "funktion nicht getestet"
-    - "funktion unbekannt"
+exclude_global:
+  # Defekt & Bastler
+  - defekt
+  - kaputt
+  - bastler
+  - ersatzteil
+  - "ohne funktion"
+  - beschädigt
+  - "funktion nicht getestet"
+  - "funktion unbekannt"
+  - "ungetestet"
+  - "für teilespender"
+  - teilespender
+  - "schrott"
+
+  # Verpackungen & Merch
+  - "nur ovp"
+  - leerkarton
+  - verpackung
+  - "nur karton"
+  - "leerbox"
+  - "kabel"
+
+  # Gesuche, Tausch & Mietschrott
+  - tausch
+  - suche
+  - gesucht
+  - kaufe
+  - mieten
+  - vermietung
+  - "zur miete"
+
+  # Rechtliches / Riskant
+  - "ohne rückgabe"
+  - "sperrgut"
 
 # ============================================================
 # Globale Benachrichtigungseinstellungen (ntfy)
@@ -45,8 +63,8 @@ notifications:
   urgent_price_threshold: 150
   tags:
     - moneybag
-  gate_min_stars: "★★★★★"
-  gate_max_price: 150
+  gate_min_stars: "★☆☆☆☆"
+  gate_max_price: 250
 
 # ============================================================
 # Deal-Score-Gewichte (Phase 6) -- siehe scoring/deal_score.py
@@ -62,9 +80,9 @@ notifications:
 # existieren, können diese Gewichte neu verteilt werden.
 # ============================================================
 scoring_weights:
-  price: 0.5
-  ausstattung: 0.25
-  hardware_qualitaet: 0.25
+  price: 0.7
+  ausstattung: 0.15
+  hardware_qualitaet: 0.15
   hersteller: 0
   zustand: 0
   lieferumfang: 0
@@ -99,4 +117,3 @@ manufacturer_reputation:
   Terra: 70
   Eigenbau: 65
   _default: 60
-
