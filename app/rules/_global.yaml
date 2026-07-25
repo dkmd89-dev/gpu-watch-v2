@@ -1,0 +1,71 @@
+# ============================================================
+# Globale Defaults – gelten für ALLE Kategorien, sofern eine
+# Kategorie-YAML sie nicht selbst überschreibt.
+# ============================================================
+# Historie: bis Version 2 lag dieser Block als "defaults:" oben in
+# der (jetzt aufgeteilten) rules.yaml. Inhalt unverändert übernommen.
+# ============================================================
+
+defaults:
+  min_vram_gb: 12
+  location_plz: "76477"
+  radius_km: 999999 # Unbegrenzt / ganz Deutschland
+  exclude_global:
+    - defekt
+    - kaputt
+    - bastler
+    - ersatzteil
+    - tausch
+    - suche
+    - gesucht
+    - kaufe
+    - ohne funktion
+    - beschädigt
+    - nur ovp
+    - leerkarton
+    - verpackung
+    - "ohne rückgabe"
+    - "funktion nicht getestet"
+    - "funktion unbekannt"
+
+# ============================================================
+# Globale Benachrichtigungseinstellungen (ntfy)
+# ============================================================
+# urgent_price_threshold: Treffer bis zu diesem Preis werden mit
+#   Priorität "urgent" verschickt, alles darüber mit "default".
+#   (bisher hart in app.py: `priority="urgent" if price <= 150 ...`)
+# tags: ntfy-Tags/Icons für die Benachrichtigung.
+#
+# gate_min_stars / gate_max_price (Phase 6b): NUR Angebote, die BEIDE
+# Bedingungen erfüllen, lösen überhaupt eine Benachrichtigung aus.
+# Alle anderen Treffer werden weiterhin gespeichert (found.json) und
+# im Dashboard angezeigt, aber NICHT per ntfy verschickt.
+# ============================================================
+notifications:
+  urgent_price_threshold: 150
+  tags:
+    - moneybag
+  gate_min_stars: "★★★★★"
+  gate_max_price: 150
+
+# ============================================================
+# Deal-Score-Gewichte (Phase 6) -- siehe scoring/deal_score.py
+# ============================================================
+# Hersteller/Zustand/Lieferumfang sind bewusst auf 0 gesetzt: für diese
+# drei Komponenten existiert noch kein Detector (siehe deal_score.py-
+# Docstring), sie würden sonst nur den neutralen Platzhalterwert (60)
+# liefern und den erreichbaren Maximal-Score künstlich auf 92 (4 Sterne)
+# deckeln. Deren Gewicht wurde stattdessen auf die drei Komponenten mit
+# echter Datengrundlage verteilt: Preis 50%, Ausstattung 25%,
+# Hardwarequalität 25%. Damit sind wieder 100 Punkte / 5 Sterne
+# erreichbar. Sobald Detectors für Hersteller/Zustand/Lieferumfang
+# existieren, können diese Gewichte neu verteilt werden.
+# ============================================================
+scoring_weights:
+  price: 0.5
+  ausstattung: 0.25
+  hardware_qualitaet: 0.25
+  hersteller: 0
+  zustand: 0
+  lieferumfang: 0
+

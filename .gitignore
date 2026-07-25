@@ -1,0 +1,18 @@
+# Sensible Daten / API-Keys
+.env
+
+# Python Cache & Artefakte
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Laufzeit-Daten & Logs
+data/*.json
+data/*.log
+!data/STATUS.md
+
+# OS & Editor Artefakte
+.DS_Store
+.vscode/
+.idea/

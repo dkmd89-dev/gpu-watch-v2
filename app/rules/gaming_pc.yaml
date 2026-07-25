@@ -1,0 +1,75 @@
+# ============================================================
+# Gaming-PC Regel-Matrix (Phase 5)
+# ============================================================
+# Nutzt denselben Mechanismus wie office_pc.yaml (Hardware-Mindest-
+# anforderungen über categories/detectors/, ausgewertet über
+# matcher._evaluate_hardware_requirements()). RAM/CPU/Gehäuse-
+# Mindestanforderung ist laut Auftrag IDENTISCH zu Office-PC,
+# zusätzlich wird eine dedizierte GPU verlangt.
+#
+# Zwei gestaffelte Regeln (analog zur Top-Deal/Okay-Staffelung bei
+# den GPU-Regeln in gpu.yaml):
+#   1. "Top-Deal": dedizierte GPU MUSS aus der im Auftrag genannten
+#      Vorzugsliste stammen (GpuMatch.is_preferred, siehe
+#      categories/detectors/gpu.py) -> preferred_gpu_only: true
+#   2. "Okay": irgendeine dedizierte GPU genügt (z.B. eine neuere,
+#      nicht in der Vorzugsliste gepflegte Karte)
+# Die zuerst passende Regel gewinnt (siehe evaluate()), Top-Deal
+# steht daher vor Okay.
+#
+# ANNAHME (bitte prüfen): Preisgrenzen sind Platzhalter, da keine
+# Marktdaten für komplette Gaming-PCs vorliegen (anders als bei den
+# einzelnen GPU-Preisen in gpu.yaml). Nach dem ersten echten Scan
+# bitte kalibrieren.
+# ============================================================
+
+category: "gaming_pc"
+label: "Gaming-PC"
+search_terms:
+  - "Gaming PC"
+  - "Gamer PC"
+  - "Spiele PC"
+  - "Gaming Komplett PC"
+
+# Diese Kategorie WILL komplette PC-Systeme -- bewusst KEIN
+# exclude_category (identisch zur Begründung in office_pc.yaml).
+
+rules:
+  - label: "Gaming-PC (Top-Deal, bevorzugte GPU)"
+    requirements:
+      min_ram_gb: 8
+      ram_type_exclude:
+        - "DDR3"
+      min_cpu:
+        intel:
+          min_tier_rank: 5
+          min_generation: 8
+        amd:
+          min_tier_rank: 5
+          min_generation: 2000
+      case:
+        exclude_categories:
+          - "excluded"
+      requires_dedicated_gpu: true
+      preferred_gpu_only: true
+    max_price: 400
+    deal_rating: "Top-Deal"
+
+  - label: "Gaming-PC (Mindestanforderung erfüllt)"
+    requirements:
+      min_ram_gb: 8
+      ram_type_exclude:
+        - "DDR3"
+      min_cpu:
+        intel:
+          min_tier_rank: 5
+          min_generation: 8
+        amd:
+          min_tier_rank: 5
+          min_generation: 2000
+      case:
+        exclude_categories:
+          - "excluded"
+      requires_dedicated_gpu: true
+    max_price: 550
+    deal_rating: "Okay"

@@ -1,0 +1,12 @@
+services:
+  gpu-watch:
+    build: ./app
+    container_name: gpu-watch
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./data:/data
+      - ./app/rules:/app/rules
+    env_file:
+      - .env
+    restart: unless-stopped

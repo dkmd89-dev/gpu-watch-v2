@@ -1,0 +1,48 @@
+# ============================================================
+# Office-PC Regel-Matrix (Phase 5)
+# ============================================================
+# Anders als bei GPU-Regeln (Titel-Stichwort-Matching) werden hier
+# Hardware-MINDESTANFORDERUNGEN geprüft, ausgewertet über die Detectors
+# in categories/detectors/. Siehe matcher._evaluate_hardware_requirements().
+#
+# INTERPRETATION der CPU-Mindestanforderung (siehe Commit-Begründung):
+# Der Auftrag nennt konkrete Modelle (i5-8400+/8500+/8600+, i7-8700+,
+# Ryzen 5 2600+/3600+/5600+). Das wird hier als MUSTER interpretiert:
+# "Intel i5 oder besser, 8. Generation oder neuer" bzw. "AMD Ryzen 5
+# oder besser, 2000er-Serie oder neuer" -- deckt alle genannten Modelle
+# ab und bleibt auch für neuere Generationen (z.B. i5-12400) gültig,
+# ohne dass diese YAML bei jeder neuen CPU-Generation angepasst werden
+# müsste. Falls eine exakte Modell-Whitelist gewünscht ist, bitte
+# Rückmeldung geben.
+# ============================================================
+
+category: "office_pc"
+label: "Office-PC"
+search_terms:
+  - "Office PC"
+  - "Büro PC"
+  - "PC Komplettsystem"
+  - "Business PC"
+
+# Diese Kategorie WILL komplette PC-Systeme -- bewusst KEIN
+# exclude_category (anders als bei gpu.yaml, wo PCs ausgeschlossen werden).
+
+rules:
+  - label: "Office-PC (Mindestanforderung erfüllt)"
+    requirements:
+      min_ram_gb: 8
+      ram_type_exclude:
+        - "DDR3"
+      min_cpu:
+        intel:
+          min_tier_rank: 5   # i5 oder besser (i5=5, i7=7, i9=9)
+          min_generation: 8  # 8. Generation oder neuer
+        amd:
+          min_tier_rank: 5   # Ryzen 5 oder besser
+          min_generation: 2000  # 2000er-Serie oder neuer
+      case:
+        exclude_categories:
+          - "excluded"       # kein Tiny/Mini/USFF/SFF/All-in-One
+      requires_dedicated_gpu: false  # optional, schließt PCs MIT GPU nicht aus
+    max_price: 300
+    deal_rating: "Okay"

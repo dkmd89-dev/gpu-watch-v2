@@ -1,0 +1,28 @@
+# ============================================================
+# Test-Fixture: Legacy-Einzeldatei-Modus von matcher.load_rules().
+# ============================================================
+# Ersetzt die frühere, im Produktivbetrieb unreferenzierte app/rules.yaml
+# (Phase-0-Befund: docker-compose.yml mountet seit der Umstellung auf
+# rules/*.yaml nur noch das Verzeichnis, die Einzeldatei wurde nie
+# gelöscht). Der Einzeldatei-Modus selbst bleibt als rückwärtskompatibler
+# API-Pfad in matcher.load_rules() bestehen (z.B. für Alt-Installationen,
+# die noch nicht auf das Verzeichnis-Layout migriert haben) und wird über
+# diese schlanke Fixture statt der vollen Alt-Datei abgedeckt.
+# ============================================================
+
+defaults:
+  min_vram_gb: 12
+  location_plz: "76477"
+  radius_km: 999999
+  exclude_global:
+    - defekt
+    - kaputt
+    - bastler
+
+rules:
+  - label: "RTX 2080 Ti, Top-Deal"
+    match: ["2080 ti", "2080ti", "rtx 2080"]
+    exclude: ["2080 super", "2070", "2060"]
+    max_price: 160
+    min_vram_gb: 11
+    deal_rating: "Top-Deal"

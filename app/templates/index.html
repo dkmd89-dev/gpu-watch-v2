@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>GPU-Watch</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 700px; margin: 2rem auto; padding: 0 1rem; background:#111; color:#eee; }
+    h1 { font-size: 1.3rem; }
+    .card { background:#1c1c1c; border-radius:10px; padding:1rem; margin-bottom:0.8rem; }
+    .price { font-weight:bold; color:#7CFC98; font-size:1.1rem; }
+    .rule { color:#8ab4f8; font-size:0.85rem; }
+    .meta { color:#999; font-size:0.8rem; }
+    a { color:#8ab4f8; }
+    button { background:#2b6cff; color:white; border:none; padding:0.6rem 1rem; border-radius:8px; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <h1>🎮 GPU-Watch – gefundene Angebote</h1>
+  <button onclick="fetch('/api/scan-now',{method:'POST'}).then(()=>alert('Scan gestartet'))">Jetzt manuell scannen</button>
+  <div style="margin-top:1.5rem">
+  {% for f in found %}
+    <div class="card">
+      <div class="rule">{{ f.rule }}</div>
+      <div>{{ f.title }}</div>
+      <div class="price">{{ "%.0f"|format(f.price) }} €</div>
+      <div class="meta">{{ f.source }} · {{ f.location }} · {{ f.found_at }}</div>
+      <a href="{{ f.url }}" target="_blank">Zum Angebot →</a>
+    </div>
+  {% else %}
+    <p>Noch keine Treffer. Der erste Scan läuft im Hintergrund.</p>
+  {% endfor %}
+  </div>
+</body>
+</html>
