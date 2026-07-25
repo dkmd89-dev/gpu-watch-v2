@@ -117,3 +117,6 @@
 {"price": 190.0, "date": "2026-07-25T08:14:02.232232+00:00", "source": "eBay", "model": "office_pc", "category": "office_pc", "deal_score": 47}
 {"price": 350.0, "date": "2026-07-25T08:14:02.917989+00:00", "source": "eBay", "model": "gaming_pc", "category": "gaming_pc", "deal_score": 66}
 {"price": 500.0, "date": "2026-07-25T08:14:04.110802+00:00", "source": "eBay", "model": "gaming_pc", "category": "gaming_pc", "deal_score": 40}
+{"price": 190.0, "date": "2026-07-25T08:17:40.885193+00:00", "source": "eBay", "model": "office_pc", "category": "office_pc", "deal_score": 47}
+{"price": 350.0, "date": "2026-07-25T08:17:41.570182+00:00", "source": "eBay", "model": "gaming_pc", "category": "gaming_pc", "deal_score": 66}
+{"price": 500.0, "date": "2026-07-25T08:17:42.788800+00:00", "source": "eBay", "model": "gaming_pc", "category": "gaming_pc", "deal_score": 40}

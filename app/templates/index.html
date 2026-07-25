@@ -249,6 +249,86 @@
       font-size: 0.78rem;
       color: var(--text-muted);
     }
+
+    .chart-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.2rem;
+      margin-top: 1.5rem;
+    }
+    .chart-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.8rem;
+      margin-bottom: 0.8rem;
+    }
+    .chart-header h2 {
+      font-size: 1.05rem;
+      margin: 0;
+    }
+    #modelSelect {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: var(--radius-sm);
+      padding: 0.45rem 0.6rem;
+      font-size: 0.85rem;
+      min-width: 220px;
+    }
+    #priceChartSvg {
+      width: 100%;
+      height: auto;
+      background: var(--surface-2);
+      border-radius: var(--radius-sm);
+    }
+    .chart-line {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 2;
+    }
+    .chart-point {
+      fill: var(--accent);
+    }
+    .chart-point.top-deal-point {
+      fill: var(--amber);
+    }
+    .chart-market-line {
+      stroke: var(--text-muted);
+      stroke-width: 1;
+      stroke-dasharray: 4 3;
+    }
+    .chart-axis-label {
+      fill: var(--text-muted);
+      font-size: 9px;
+    }
+    .chart-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 0.6rem;
+      margin-top: 0.9rem;
+    }
+    .chart-stat {
+      background: var(--surface-2);
+      border-radius: var(--radius-sm);
+      padding: 0.6rem;
+      text-align: center;
+    }
+    .chart-stat-value {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .chart-stat-label {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      margin-top: 0.15rem;
+    }
+    .trend-up { color: var(--red); }
+    .trend-down { color: var(--green); }
+    .trend-stable { color: var(--text-muted); }
   </style>
 </head>
 <body>
@@ -350,6 +430,20 @@
   {% endfor %}
   </div>
   <div class="empty-state" id="noMatchState" style="display:none">Keine Angebote entsprechen den gewählten Filtern.</div>
+
+  <section class="chart-panel" id="chartPanel" style="display:none">
+    <div class="chart-header">
+      <h2>Preisverlauf</h2>
+      <select id="modelSelect"><option value="">Modell wählen…</option></select>
+    </div>
+    <div id="chartEmptyState" class="empty-state" style="display:none">
+      Für dieses Modell liegt noch keine Preishistorie vor.
+    </div>
+    <div id="chartContent" style="display:none">
+      <svg id="priceChartSvg" viewBox="0 0 640 260" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="chart-stats" id="chartStats"></div>
+    </div>
+  </section>
 
   <script>
     function startScan() {
@@ -493,6 +587,200 @@
     }
 
     initFilters();
+
+    // --- Phase 8.6: Preisdiagramme (Chart-Rendering auf Basis 8.3) ---
+    // Nutzt ausschliesslich die bestehenden Routen /api/price-history
+    // (Modell-Uebersicht) und /api/price-history/<model> (Zeitreihe +
+    // Statistik) aus Schritt 8.3 -- kein neuer Backend-Code.
+    // Bewusst ohne externe Chart-Bibliothek: ein einfacher SVG-Linien-
+    // chart reicht fuer das Grundgerüst und vermeidet eine zusaetzliche
+    // Abhaengigkeit (passt zum Rest des Projekts, z.B. price_stats.py
+    // nutzt bewusst nur die Python-Stdlib statt neuer Pakete).
+    const TREND_LABELS = {
+      steigend: { arrow: '↑ steigend', cls: 'trend-up' },
+      fallend: { arrow: '↓ fallend', cls: 'trend-down' },
+      stabil: { arrow: '→ stabil', cls: 'trend-stable' },
+      unbekannt: { arrow: '– unbekannt', cls: 'trend-stable' },
+    };
+
+    function initPriceCharts() {
+      fetch('/api/price-history')
+        .then(r => r.json())
+        .then(models => {
+          const modelNames = Object.keys(models).sort();
+          if (modelNames.length === 0) return;
+
+          const panel = document.getElementById('chartPanel');
+          panel.style.display = '';
+
+          const select = document.getElementById('modelSelect');
+          modelNames.forEach(name => {
+            const opt = document.createElement('option');
+            opt.value = name;
+            opt.textContent = `${name} (${models[name].count} Datenpunkte)`;
+            select.appendChild(opt);
+          });
+
+          select.addEventListener('change', () => {
+            if (select.value) loadModelChart(select.value);
+            else showChartEmpty(false, true);
+          });
+
+          // Erstes Modell direkt anzeigen, damit der Nutzer nicht erst
+          // manuell auswaehlen muss.
+          select.value = modelNames[0];
+          loadModelChart(modelNames[0]);
+        })
+        .catch(() => {});
+    }
+
+    function showChartEmpty(showEmpty, hideBoth) {
+      document.getElementById('chartEmptyState').style.display = hideBoth ? 'none' : (showEmpty ? '' : 'none');
+      document.getElementById('chartContent').style.display = (!hideBoth && !showEmpty) ? '' : 'none';
+    }
+
+    function loadModelChart(model) {
+      fetch(`/api/price-history/${encodeURIComponent(model)}`)
+        .then(r => r.json())
+        .then(data => {
+          if (!data.stats || !data.series || data.series.length === 0) {
+            showChartEmpty(true, false);
+            return;
+          }
+          showChartEmpty(false, false);
+          renderChart(data.series, data.stats);
+          renderChartStats(data.stats);
+        })
+        .catch(() => showChartEmpty(true, false));
+    }
+
+    function renderChart(series, stats) {
+      const svg = document.getElementById('priceChartSvg');
+      svg.innerHTML = '';
+
+      const width = 640, height = 260;
+      const padLeft = 50, padRight = 20, padTop = 20, padBottom = 30;
+      const plotW = width - padLeft - padRight;
+      const plotH = height - padTop - padBottom;
+
+      const prices = series.map(p => p.price);
+      let minP = Math.min(...prices, stats.min_price);
+      let maxP = Math.max(...prices, stats.max_price);
+      if (minP === maxP) { minP -= 1; maxP += 1; }
+
+      const xFor = i => series.length === 1
+        ? padLeft + plotW / 2
+        : padLeft + (i / (series.length - 1)) * plotW;
+      const yFor = price => padTop + plotH - ((price - minP) / (maxP - minP)) * plotH;
+
+      const ns = 'http://www.w3.org/2000/svg';
+
+      // Marktpreis-Referenzlinie
+      if (stats.market_price >= minP && stats.market_price <= maxP) {
+        const marketY = yFor(stats.market_price);
+        const line = document.createElementNS(ns, 'line');
+        line.setAttribute('x1', padLeft);
+        line.setAttribute('x2', width - padRight);
+        line.setAttribute('y1', marketY);
+        line.setAttribute('y2', marketY);
+        line.setAttribute('class', 'chart-market-line');
+        svg.appendChild(line);
+
+        const label = document.createElementNS(ns, 'text');
+        label.setAttribute('x', width - padRight);
+        label.setAttribute('y', marketY - 4);
+        label.setAttribute('text-anchor', 'end');
+        label.setAttribute('class', 'chart-axis-label');
+        label.textContent = `Marktpreis ${stats.market_price.toFixed(0)} €`;
+        svg.appendChild(label);
+      }
+
+      // Y-Achsen-Labels (min/max)
+      [minP, maxP].forEach(val => {
+        const label = document.createElementNS(ns, 'text');
+        label.setAttribute('x', padLeft - 6);
+        label.setAttribute('y', yFor(val) + 3);
+        label.setAttribute('text-anchor', 'end');
+        label.setAttribute('class', 'chart-axis-label');
+        label.textContent = `${val.toFixed(0)} €`;
+        svg.appendChild(label);
+      });
+
+      // Linie
+      if (series.length > 1) {
+        const pointsAttr = series.map((p, i) => `${xFor(i)},${yFor(p.price)}`).join(' ');
+        const polyline = document.createElementNS(ns, 'polyline');
+        polyline.setAttribute('points', pointsAttr);
+        polyline.setAttribute('class', 'chart-line');
+        svg.appendChild(polyline);
+      }
+
+      // Datenpunkte
+      series.forEach((p, i) => {
+        const circle = document.createElementNS(ns, 'circle');
+        circle.setAttribute('cx', xFor(i));
+        circle.setAttribute('cy', yFor(p.price));
+        circle.setAttribute('r', 4);
+        circle.setAttribute('class', 'chart-point');
+
+        const title = document.createElementNS(ns, 'title');
+        const dateLabel = new Date(p.date).toLocaleDateString('de-DE');
+        title.textContent = `${p.price.toFixed(0)} € · ${p.source} · ${dateLabel}`;
+        circle.appendChild(title);
+        svg.appendChild(circle);
+      });
+
+      // X-Achsen-Labels (erstes/letztes Datum)
+      if (series.length > 0) {
+        const firstDate = new Date(series[0].date).toLocaleDateString('de-DE');
+        const lastDate = new Date(series[series.length - 1].date).toLocaleDateString('de-DE');
+        const firstLabel = document.createElementNS(ns, 'text');
+        firstLabel.setAttribute('x', padLeft);
+        firstLabel.setAttribute('y', height - 8);
+        firstLabel.setAttribute('class', 'chart-axis-label');
+        firstLabel.textContent = firstDate;
+        svg.appendChild(firstLabel);
+
+        const lastLabel = document.createElementNS(ns, 'text');
+        lastLabel.setAttribute('x', width - padRight);
+        lastLabel.setAttribute('y', height - 8);
+        lastLabel.setAttribute('text-anchor', 'end');
+        lastLabel.setAttribute('class', 'chart-axis-label');
+        lastLabel.textContent = lastDate;
+        svg.appendChild(lastLabel);
+      }
+    }
+
+    function renderChartStats(stats) {
+      const trend = TREND_LABELS[stats.trend] || TREND_LABELS.unbekannt;
+      const trendPct = stats.trend_change_pct !== null && stats.trend_change_pct !== undefined
+        ? ` (${stats.trend_change_pct > 0 ? '+' : ''}${stats.trend_change_pct.toFixed(1)}%)`
+        : '';
+
+      const items = [
+        ['Minimum', `${stats.min_price.toFixed(0)} €`],
+        ['Maximum', `${stats.max_price.toFixed(0)} €`],
+        ['Durchschnitt', `${stats.mean_price.toFixed(0)} €`],
+        ['Median', `${stats.median_price.toFixed(0)} €`],
+        ['Marktpreis', `${stats.market_price.toFixed(0)} €`],
+        ['Datenpunkte', stats.count],
+      ];
+
+      const container = document.getElementById('chartStats');
+      container.innerHTML = items.map(([label, value]) => `
+        <div class="chart-stat">
+          <div class="chart-stat-value">${value}</div>
+          <div class="chart-stat-label">${label}</div>
+        </div>
+      `).join('') + `
+        <div class="chart-stat">
+          <div class="chart-stat-value ${trend.cls}">${trend.arrow}${trendPct}</div>
+          <div class="chart-stat-label">Trend</div>
+        </div>
+      `;
+    }
+
+    initPriceCharts();
   </script>
 </body>
 </html>
