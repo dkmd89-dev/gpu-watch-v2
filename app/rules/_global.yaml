@@ -69,3 +69,34 @@ scoring_weights:
   zustand: 0
   lieferumfang: 0
 
+# ============================================================
+# Hersteller-Reputationstabelle (Detector-Folgeschritt)
+# ============================================================
+# Werte 0-100, genutzt von scoring/deal_score.py::_hersteller_score(),
+# NUR wenn categories/detectors/manufacturer.py einen Hersteller erkennt
+# (siehe dort für die erkannten Namen -- müssen hier exakt übereinstimmen,
+# z.B. "HP" nicht "Hewlett-Packard"). "_default" greift für erkannte,
+# aber hier noch nicht gepflegte Marken.
+#
+# WICHTIG: Das "hersteller"-Gewicht in scoring_weights (oben) steht
+# weiterhin bewusst auf 0 -- diese Tabelle macht die Komponente technisch
+# nutzbar, ändert aber NICHT automatisch den produktiv laufenden Score.
+# Aktivierung (Gewicht > 0, ggf. Neuverteilung der übrigen Gewichte) ist
+# eine separate, bewusste Entscheidung (siehe Commit-Begründung).
+# ============================================================
+manufacturer_reputation:
+  Dell: 80
+  HP: 78
+  Lenovo: 85
+  Fujitsu: 75
+  Acer: 60
+  Asus: 75
+  MSI: 75
+  Medion: 55
+  Apple: 90
+  Captiva: 55
+  Schenker: 78
+  Terra: 70
+  Eigenbau: 65
+  _default: 60
+

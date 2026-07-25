@@ -195,6 +195,39 @@ def _ausstattung_score(
     return round((sum(checks) / len(checks)) * 100)
 
 
+def _hersteller_score(
+    manufacturer_name: str | None,
+    manufacturer_reputation: dict | None = None,
+) -> int:
+    """Score (0-100) auf Basis der erkannten Marke (siehe
+    categories/detectors/manufacturer.py) und einer YAML-konfigurierbaren
+    Reputationstabelle (rules/_global.yaml: "manufacturer_reputation").
+
+    Bewusst KEINE Reputationswerte im Python-Code hinterlegt (Phase 2:
+    Regeln/Gewichtungen gehören vollständig in YAML) -- dieses Modul
+    kennt nur, WIE die Tabelle interpretiert wird, nicht WELCHE Werte
+    sie enthält.
+
+    Auflösungsreihenfolge:
+    1. Kein erkannter Hersteller (manufacturer_name is None, z.B. reine
+       Komponentenliste ohne Markenangabe) -> neutraler Platzhalter, EXAKT
+       wie vor Einführung des Detectors (volle Rückwärtskompatibilität).
+    2. Keine Reputationstabelle übergeben (manufacturer_reputation is
+       None/leer) -> ebenfalls Platzhalter, auch wenn ein Hersteller
+       erkannt wurde (z.B. alte Einzeldatei-Regelkonfiguration ohne
+       "manufacturer_reputation"-Eintrag in _global.yaml).
+    3. Hersteller erkannt UND in der Tabelle vorhanden -> hinterlegter Wert.
+    4. Hersteller erkannt, aber NICHT in der Tabelle (z.B. neue, noch nicht
+       gepflegte Marke) -> Tabellen-Eintrag "_default", sonst Platzhalter.
+    """
+    if manufacturer_name is None or not manufacturer_reputation:
+        return _PLACEHOLDER_SCORE
+
+    default = manufacturer_reputation.get("_default", _PLACEHOLDER_SCORE)
+    value = manufacturer_reputation.get(manufacturer_name, default)
+    return max(0, min(100, round(value)))
+
+
 def compute_deal_score(
     price: float,
     max_price: float | None,
@@ -206,6 +239,8 @@ def compute_deal_score(
     has_ssd: bool | None = None,
     has_dedicated_gpu: bool | None = None,
     market_price: float | None = None,
+    manufacturer_name: str | None = None,
+    manufacturer_reputation: dict | None = None,
 ) -> DealScoreResult:
     """Berechnet den gewichteten Deal-Score (0-100) und die Stern-Einstufung.
 
@@ -218,6 +253,14 @@ def compute_deal_score(
     market_price), fließt in die "price"-Komponente ein (siehe
     _price_score()). None (Standard) -> unverändertes Verhalten wie vor
     Schritt 7.4.
+
+    manufacturer_name / manufacturer_reputation (Hersteller-Detector-
+    Folgeschritt): optionaler erkannter Herstellername (siehe
+    categories/detectors/manufacturer.py) und optionale YAML-Reputations-
+    tabelle (rules/_global.yaml: "manufacturer_reputation"), fließen in
+    die "hersteller"-Komponente ein (siehe _hersteller_score()). Werden
+    beide nicht übergeben (Standard), verhält sich diese Funktion EXAKT
+    wie zuvor (neutraler Platzhalter) -- volle Rückwärtskompatibilität.
     """
     weights = weights if weights is not None else DEFAULT_WEIGHTS
 
@@ -227,7 +270,7 @@ def compute_deal_score(
         "hardware_qualitaet": _hardware_qualitaet_score(
             deal_rating, cpu_headroom, ram_headroom_gb
         ),
-        "hersteller": _PLACEHOLDER_SCORE,
+        "hersteller": _hersteller_score(manufacturer_name, manufacturer_reputation),
         "zustand": _PLACEHOLDER_SCORE,
         "lieferumfang": _PLACEHOLDER_SCORE,
     }

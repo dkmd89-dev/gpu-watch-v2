@@ -10,6 +10,7 @@ from categories.detectors.ram import detect_ram_gb, detect_ram_type
 from categories.detectors.case import detect_case_type
 from categories.detectors.gpu import detect_dedicated_gpu
 from categories.detectors.storage import detect_ssd_gb
+from categories.detectors.manufacturer import detect_manufacturer
 from scoring.deal_score import compute_deal_score, DEFAULT_WEIGHTS
 
 # Legacy-Fallback: wird NUR noch verwendet, wenn load_rules() im alten
@@ -72,11 +73,18 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
     defaults = {}
     notifications = {}
     scoring_weights = {}
+    manufacturer_reputation = {}
     if global_file.exists():
         global_cfg = yaml.safe_load(global_file.read_text(encoding="utf-8")) or {}
         defaults = global_cfg.get("defaults", {})
         notifications = global_cfg.get("notifications", {})
         scoring_weights = global_cfg.get("scoring_weights", {})
+        # Hersteller-Detector-Folgeschritt: YAML-Reputationstabelle fuer die
+        # "hersteller"-Score-Komponente (siehe scoring/deal_score.py). Ohne
+        # Eintrag in _global.yaml bleibt dies ein leeres Dict -> die
+        # Komponente faellt weiterhin auf den neutralen Platzhalter zurueck
+        # (volle Rueckwaertskompatibilitaet, siehe _hersteller_score()).
+        manufacturer_reputation = global_cfg.get("manufacturer_reputation", {})
 
     merged_rules: list[dict] = []
     all_search_terms: set[str] = set()
@@ -119,6 +127,7 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
         "search_terms": sorted(all_search_terms),
         "notifications": notifications,
         "scoring_weights": scoring_weights,
+        "manufacturer_reputation": manufacturer_reputation,
         "_directory_mode": True,
     }
 
@@ -331,11 +340,23 @@ def _build_score_inputs(title_lower: str, requirements: dict | None, features: d
     # unfair abgewertet, nur weil sie (folgerichtig) keine SSD erwähnt.
     has_ssd = detect_ssd_gb(title_lower) is not None if requirements is not None else None
 
+    # Hersteller-Erkennung (Detector-Folgeschritt): anders als bei SSD gilt
+    # HIER keine Kategorie-Einschränkung -- die erkannten Marken umfassen
+    # sowohl PC-OEMs (Dell, Lenovo, ...) als auch GPU-AIB-Partner (Asus,
+    # MSI, ...), daher ist "Hersteller erkannt?" auch bei der klassischen
+    # GPU-Kategorie eine sinnvolle Frage (siehe categories/detectors/
+    # manufacturer.py). None bleibt der korrekte Wert, wenn im Titel gar
+    # keine Marke genannt wird -- die Score-Komponente behandelt das als
+    # neutralen Platzhalter (siehe scoring/deal_score._hersteller_score()).
+    manufacturer = detect_manufacturer(title_lower)
+    manufacturer_name = manufacturer.name if manufacturer is not None else None
+
     return {
         "cpu_headroom": cpu_headroom,
         "ram_headroom_gb": ram_headroom_gb,
         "has_ssd": has_ssd,
         "has_dedicated_gpu": has_dedicated_gpu,
+        "manufacturer_name": manufacturer_name,
     }
 
 
@@ -445,6 +466,7 @@ def evaluate(
             deal_rating=rule.get("deal_rating"),
             weights=scoring_weights,
             market_price=market_price,
+            manufacturer_reputation=rules_cfg.get("manufacturer_reputation") or None,
             **score_inputs,
         )
 

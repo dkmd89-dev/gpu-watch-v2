@@ -9,6 +9,7 @@ from scoring.deal_score import (
     _price_score,
     _hardware_qualitaet_score,
     _ausstattung_score,
+    _hersteller_score,
     DEFAULT_WEIGHTS,
 )
 
@@ -90,6 +91,40 @@ def test_ausstattung_score_teilweise():
 def test_ausstattung_score_nur_ein_kriterium_bekannt():
     assert _ausstattung_score(has_ssd=True, has_dedicated_gpu=None) == 100
     assert _ausstattung_score(has_ssd=False, has_dedicated_gpu=None) == 0
+
+
+# ---------- _hersteller_score (Detector-Folgeschritt) ----------
+
+def test_hersteller_score_ohne_erkannten_hersteller_platzhalter():
+    assert _hersteller_score(None) == 60
+
+
+def test_hersteller_score_ohne_reputationstabelle_platzhalter():
+    # Hersteller erkannt, aber keine Tabelle übergeben (z.B. Legacy-
+    # Einzeldatei-Modus ohne "manufacturer_reputation" in _global.yaml).
+    assert _hersteller_score("Dell", None) == 60
+    assert _hersteller_score("Dell", {}) == 60
+
+
+def test_hersteller_score_bekannte_marke_aus_tabelle():
+    table = {"Dell": 80, "Medion": 55, "_default": 60}
+    assert _hersteller_score("Dell", table) == 80
+    assert _hersteller_score("Medion", table) == 55
+
+
+def test_hersteller_score_unbekannte_marke_nutzt_default():
+    table = {"Dell": 80, "_default": 60}
+    assert _hersteller_score("EinNeuerHersteller", table) == 60
+
+
+def test_hersteller_score_unbekannte_marke_ohne_default_platzhalter():
+    table = {"Dell": 80}
+    assert _hersteller_score("EinNeuerHersteller", table) == 60
+
+
+def test_hersteller_score_wird_auf_null_bis_hundert_geklemmt():
+    assert _hersteller_score("X", {"X": 150}) == 100
+    assert _hersteller_score("X", {"X": -20}) == 0
 
 
 # ---------- compute_deal_score: Stern-Schwellen ----------
@@ -222,6 +257,36 @@ def test_alle_gewichte_null_liefert_platzhalter_ohne_crash():
     r = compute_deal_score(price=50, max_price=200, deal_rating="Okay", weights={})
     assert r.score == 60  # Platzhalter, kein Crash durch Division durch Null
 
+
+def test_compute_deal_score_ohne_hersteller_angaben_unveraendert():
+    # Rueckwaertskompatibilitaet: kein manufacturer_name/manufacturer_reputation
+    # uebergeben -> exakt derselbe Score wie vor der Detector-Verdrahtung.
+    r = compute_deal_score(price=50, max_price=200, deal_rating="Okay")
+    assert r.components["hersteller"] == 60
+
+
+def test_compute_deal_score_mit_hersteller_reputation():
+    weights = {"hersteller": 1.0}
+    table = {"Dell": 80, "_default": 60}
+    r = compute_deal_score(
+        price=50, max_price=200, deal_rating="Okay", weights=weights,
+        manufacturer_name="Dell", manufacturer_reputation=table,
+    )
+    assert r.components["hersteller"] == 80
+    assert r.score == 80
+
+
+def test_compute_deal_score_hersteller_ohne_treffer_bleibt_platzhalter():
+    weights = {"hersteller": 1.0}
+    table = {"Dell": 80, "_default": 60}
+    r = compute_deal_score(
+        price=50, max_price=200, deal_rating="Okay", weights=weights,
+        manufacturer_name=None, manufacturer_reputation=table,
+    )
+    assert r.components["hersteller"] == 60
+
+
+# ---------- compute_deal_score: YAML-Konfigurierbarkeit (Fortsetzung) ----------
 
 def test_components_dict_enthaelt_alle_sechs_schluessel():
     r = compute_deal_score(price=50, max_price=200, deal_rating="Okay")
