@@ -12,12 +12,17 @@ from matcher import load_rules, evaluate
 from scrapers import search_kleinanzeigen, search_ebay
 from notify import send_ntfy, emoji_for
 from scoring.deal_score import stars_meet_minimum
+from price_history import append_price_point, make_price_point
 
 DATA_DIR = Path(os.environ.get("DATA_DIR", "/data"))
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 SEEN_FILE = DATA_DIR / "seen.json"
 FOUND_FILE = DATA_DIR / "found.json"
 LOG_FILE = DATA_DIR / "gpu_watch.log"
+# Phase 7 (Schritt 7.1): append-only Zeitreihe, unabhaengig von FOUND_MAX_ITEMS-
+# Rotation und vom Notification-Gate -- Grundlage fuer Marktpreis-Statistik
+# (Schritt 7.2) und Top-Deal-Erkennung (Schritt 7.3).
+PRICE_HISTORY_FILE = DATA_DIR / "price_history.jsonl"
 
 # Phase-0-Befund: found.json war hart auf 200 Einträge gekappt, obwohl
 # ältere Doku von 1000 sprach (Diskrepanz). Jetzt explizit konfigurierbar
@@ -163,6 +168,21 @@ def run_scan():
                 _save_json(FOUND_FILE, found[:FOUND_MAX_ITEMS])
 
             new_hits += 1
+
+            # Phase 7 (Schritt 7.1): Preishistorie-Datenpunkt fuer JEDEN
+            # Treffer, unabhaengig vom Notification-Gate weiter unten (das
+            # nur steuert, ob ein ntfy-Push verschickt wird -- fuer die
+            # Marktpreis-Statistik zaehlt dagegen jeder gematchte Treffer).
+            append_price_point(
+                PRICE_HISTORY_FILE,
+                make_price_point(
+                    price=item["price"],
+                    source=item["source"],
+                    model=result.price_history_model or result.rule_label or "unbekannt",
+                    category=result.category,
+                    deal_score=result.deal_score,
+                ),
+            )
 
             # Phase 6b: Benachrichtigungs-Gate. Nur Treffer, die BEIDE
             # Bedingungen erfüllen, werden per ntfy verschickt -- alle

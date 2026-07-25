@@ -1,0 +1,74 @@
+"""Tests fuer MatchResult.category/price_history_model in matcher.evaluate()
+(Phase 7, Schritt 7.1)."""
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from matcher import load_rules, evaluate
+
+
+def test_gpu_treffer_liefert_kategorie_und_price_history_model():
+    cfg = load_rules("rules")
+    r = evaluate("ASUS RTX 3060 12GB ROG Strix", 185.0, cfg)
+    assert r.matched is True
+    assert r.category == "gpu"
+    assert r.price_history_model == "rtx_3060_12gb"
+
+
+def test_verschiedene_marken_desselben_modells_teilen_price_history_model():
+    # Zwei unterschiedliche Regeln (verschiedene Marken/Preisgrenzen), aber
+    # dieselbe Grafikkarte -- muss auf denselben Preishistorie-Schluessel
+    # gruppiert werden, sonst waere die Marktpreis-Statistik (Schritt 7.2)
+    # ueber viele Einzelregeln fragmentiert.
+    cfg = load_rules("rules")
+    r_asus = evaluate("ASUS RTX 3060 12GB ROG Strix", 185.0, cfg)
+    r_msi = evaluate("MSI RTX 3060 12GB Gaming X", 185.0, cfg)
+    assert r_asus.price_history_model == r_msi.price_history_model == "rtx_3060_12gb"
+
+
+def test_office_pc_treffer_liefert_kategorie_und_price_history_model():
+    cfg = load_rules("rules")
+    r = evaluate(
+        "Office PC Intel Core i5-8500 16GB DDR4 RAM 256GB SSD Tower", 250.0, cfg
+    )
+    assert r.matched is True
+    assert r.category == "office_pc"
+    assert r.price_history_model == "office_pc"
+
+
+def test_gaming_pc_beide_rating_stufen_teilen_price_history_model():
+    cfg = load_rules("rules")
+    top_deal = evaluate(
+        "Gaming PC Intel Core i5-8500 16GB DDR4 RAM RTX 3060 Tower", 350.0, cfg
+    )
+    okay = evaluate(
+        "Gaming PC Intel Core i5-8500 16GB DDR4 RAM RTX 4060 Tower", 500.0, cfg
+    )
+    assert top_deal.matched is True and okay.matched is True
+    assert top_deal.category == okay.category == "gaming_pc"
+    assert top_deal.price_history_model == okay.price_history_model == "gaming_pc"
+
+
+def test_kein_treffer_hat_keine_kategorie_und_kein_model():
+    cfg = load_rules("rules")
+    r = evaluate("RTX 3060 defekt", 50.0, cfg)
+    assert r.matched is False
+    assert r.category is None
+    assert r.price_history_model is None
+
+
+def test_legacy_einzeldatei_modus_faellt_auf_rule_label_zurueck():
+    # Legacy-Fixture hat kein price_history_model-Feld in der YAML -> Fallback
+    # auf rule_label (siehe matcher.evaluate()-Kommentar), keine _category.
+    fixture = str(Path(__file__).resolve().parent / "fixtures" / "legacy_single_file_rules.yaml")
+    cfg = load_rules(fixture)
+    r = evaluate("ASUS RTX 2080Ti DUAL Lüfter", 15.0, cfg)
+    assert r.matched is True
+    assert r.category is None
+    assert r.price_history_model == r.rule_label
+
+
+if __name__ == "__main__":
+    import pytest
+    raise SystemExit(pytest.main([__file__, "-v"]))

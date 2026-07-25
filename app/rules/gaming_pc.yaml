@@ -36,6 +36,11 @@ search_terms:
 
 rules:
   - label: "Gaming-PC (Top-Deal, bevorzugte GPU)"
+    # Phase 7.1: beide Regeln dieser Kategorie teilen sich denselben
+    # price_history_model-Schluessel -- Top-Deal/Okay sind Rating-Stufen
+    # DESSELBEN Bundle-Typs "Gaming-PC", keine unterschiedliche Hardware
+    # (anders als z.B. die vielen Einzel-GPU-Modelle in gpu.yaml).
+    price_history_model: "gaming_pc"
     requirements:
       min_ram_gb: 8
       ram_type_exclude:
@@ -56,6 +61,7 @@ rules:
     deal_rating: "Top-Deal"
 
   - label: "Gaming-PC (Mindestanforderung erfüllt)"
+    price_history_model: "gaming_pc"
     requirements:
       min_ram_gb: 8
       ram_type_exclude:

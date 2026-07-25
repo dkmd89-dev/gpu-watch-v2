@@ -29,6 +29,9 @@ search_terms:
 
 rules:
   - label: "Office-PC (Mindestanforderung erfüllt)"
+    # Phase 7.1: stabiler Gruppierungs-Schluessel fuer die Preishistorie.
+    # Bisher nur eine Regel in dieser Kategorie -- Modell = Kategorie.
+    price_history_model: "office_pc"
     requirements:
       min_ram_gb: 8
       ram_type_exclude:

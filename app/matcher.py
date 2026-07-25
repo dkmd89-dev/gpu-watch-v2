@@ -38,6 +38,12 @@ class MatchResult:
     deal_rating: str | None = None
     deal_score: int | None = None
     deal_stars: str | None = None
+    # Phase 7 (Schritt 7.1): fuer die Preishistorie. Additive Felder mit
+    # Defaults -- bestehender Code, der MatchResult per Keyword-Argumenten
+    # oder nur ueber die obigen Felder erstellt/liest, bleibt unveraendert
+    # lauffaehig.
+    category: str | None = None  # rule._category, None im Legacy-Einzeldatei-Modus
+    price_history_model: str | None = None  # stabiler Gruppierungs-Schluessel
 
 
 def load_rules(path: str = "rules.yaml") -> dict:
@@ -419,13 +425,22 @@ def evaluate(title: str, price: float, rules_cfg: dict) -> MatchResult:
             **score_inputs,
         )
 
+        rule_label = rule.get("label", "?")
         return MatchResult(
             matched=True,
-            rule_label=rule.get("label", "?"),
+            rule_label=rule_label,
             max_price=max_price,
             deal_rating=rule.get("deal_rating"),
             deal_score=score_result.score,
             deal_stars=score_result.stars,
+            category=rule.get("_category"),
+            # price_history_model ist optional in der YAML (siehe rules/*.yaml).
+            # Fehlt es (z.B. Legacy-Einzeldatei-Modus, noch nicht migrierte
+            # Kategorie-YAML), fällt es auf das Regel-Label zurück, damit
+            # Phase 7 auch ohne YAML-Änderung sofort nutzbar ist -- separate
+            # Rating-Stufen/Marken derselben Hardware werden dann allerdings
+            # NICHT zusammengefasst (siehe Docstring in price_history.py).
+            price_history_model=rule.get("price_history_model", rule_label),
         )
 
     return MatchResult(matched=False)
