@@ -4,7 +4,7 @@ import time
 import logging
 import threading
 from pathlib import Path
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from flask import Flask, render_template, jsonify
 
@@ -44,6 +44,31 @@ app = Flask(__name__)
 _seen_lock = threading.Lock()
 _scan_running = False
 _scan_lock = threading.Lock()
+
+# Phase 8 (Schritt 8.1): separater Status-State fürs Dashboard (/api/status).
+# Bewusst NICHT mit _scan_running/_scan_lock oben zusammengelegt -- jene
+# beiden steuern ausschließlich die "kein doppelter Scan"-Sperre und sollen
+# durch die Dashboard-Anbindung nicht mit zusätzlicher Verantwortung
+# (Fortschritts-/Zeitstempel-Tracking) belastet werden. Ein eigener Lock
+# hält beide Belange unabhängig voneinander änderbar.
+_status_lock = threading.Lock()
+_scan_status: dict = {
+    "scan_running": False,
+    "last_scan_started_at": None,
+    "last_scan_finished_at": None,
+    "last_scan_error": None,
+    "next_scan_at": None,
+    "scan_progress_current": 0,
+    "scan_progress_total": 0,
+    "scanned_count_last_scan": 0,
+    "new_hits_last_scan": 0,
+}
+
+# Suchquellen-Übersicht fürs Dashboard. Statisch, da app.py aktuell fest
+# search_kleinanzeigen()/search_ebay() aufruft (siehe unten) -- wird erst mit
+# dem Scraper-Plugin-System (Phase 9/10) dynamisch aus den geladenen Plugins
+# abgeleitet.
+SOURCES = ["kleinanzeigen", "ebay"]
 
 # Legacy-Fallback: wird NUR verwendet, falls die geladene Regel-Config
 # keine eigenen search_terms mitbringt (z.B. alter Einzeldatei-Modus mit
@@ -90,6 +115,23 @@ def _save_json(path: Path, data) -> None:
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2))
 
 
+def _tail_log(path: Path, n: int) -> list[str]:
+    """Liest die letzten `n` Zeilen aus der Log-Datei fürs Dashboard.
+
+    Fehlt die Datei (z.B. ganz frischer Container-Start) -> leere Liste,
+    kein Fehler. Ein Lesefehler wird geloggt statt die Status-Route zum
+    Absturz zu bringen (Dashboard-Zusatzinfo, kein kritischer Pfad).
+    """
+    if not path.exists():
+        return []
+    try:
+        lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+        return lines[-n:]
+    except OSError as e:
+        log.error("Scan-Log konnte nicht gelesen werden: %s", e, exc_info=True)
+        return []
+
+
 def _load_market_prices(path: Path) -> dict[str, float]:
     """Baut das {price_history_model: Marktpreis}-Mapping aus price_history.jsonl.
 
@@ -125,6 +167,13 @@ def run_scan():
             return
         _scan_running = True
 
+    with _status_lock:
+        _scan_status["scan_running"] = True
+        _scan_status["last_scan_started_at"] = datetime.now(timezone.utc).isoformat()
+        _scan_status["last_scan_error"] = None
+        _scan_status["scan_progress_current"] = 0
+        _scan_status["scan_progress_total"] = 0
+
     try:
         log.info("Starte Scan...")
         rules_cfg = load_rules(str(Path(__file__).parent / "rules"))
@@ -156,6 +205,9 @@ def run_scan():
         )
         raw += search_ebay(search_terms, global_max_price, defaults["location_plz"])
 
+        with _status_lock:
+            _scan_status["scan_progress_total"] = len(raw)
+
         # Phase 7 (Schritt 7.5): Marktpreise EINMAL pro Scan aus der bisherigen
         # Preishistorie berechnen (nicht pro Item -- price_history.jsonl waechst
         # waehrend des Scans durch append_price_point() weiter unten, ein Re-Read
@@ -164,7 +216,10 @@ def run_scan():
         market_prices = _load_market_prices(PRICE_HISTORY_FILE)
 
         new_hits = 0
-        for item in raw:
+        for idx, item in enumerate(raw, start=1):
+            with _status_lock:
+                _scan_status["scan_progress_current"] = idx
+
             if item["price"] is None:
                 continue
             uid = item["url"]
@@ -187,6 +242,7 @@ def run_scan():
             entry = {
                 **item,
                 "rule": result.rule_label,
+                "category": result.category,
                 "deal_score": result.deal_score,
                 "deal_stars": result.deal_stars,
                 "found_at": datetime.now(timezone.utc).isoformat(),
@@ -262,11 +318,20 @@ def run_scan():
 
         log.info("Scan fertig: %d neue Treffer von %d Angeboten geprüft.", new_hits, len(raw))
 
+        with _status_lock:
+            _scan_status["scanned_count_last_scan"] = len(raw)
+            _scan_status["new_hits_last_scan"] = new_hits
+
     except Exception as e:
         log.exception(f"Fehler im Scan: {e}")
+        with _status_lock:
+            _scan_status["last_scan_error"] = str(e)
     finally:
         with _scan_lock:
             _scan_running = False
+        with _status_lock:
+            _scan_status["scan_running"] = False
+            _scan_status["last_scan_finished_at"] = datetime.now(timezone.utc).isoformat()
 
 
 def scheduler_loop():
@@ -276,6 +341,11 @@ def scheduler_loop():
             run_scan()
         except Exception:
             log.exception("Fehler im Scan-Durchlauf")
+
+        next_at = datetime.now(timezone.utc) + timedelta(seconds=interval)
+        with _status_lock:
+            _scan_status["next_scan_at"] = next_at.isoformat()
+
         time.sleep(interval)
 
 
@@ -288,6 +358,49 @@ def index():
 @app.route("/api/found")
 def api_found():
     return jsonify(_load_json(FOUND_FILE, []))
+
+
+@app.route("/api/status")
+def api_status():
+    """Live-Status fürs Dashboard (Phase 8, Schritt 8.1).
+
+    Rein lesend, aggregiert bestehende Daten (found.json + In-Memory-
+    Status-State) -- keine neue Persistenz, kein Einfluss auf run_scan().
+
+    top_deal_count ist bewusst None: top_deal.py (Schritt 7.3) ist noch
+    nicht in run_scan() verdrahtet (siehe Schritt 8.2), found.json-Einträge
+    tragen daher noch kein is_top_deal-Flag. Das Feld ist schon Teil des
+    API-Vertrags, damit das Dashboard (Schritt 8.4+) nicht später erneut
+    angepasst werden muss.
+    """
+    found = _load_json(FOUND_FILE, [])
+
+    category_counts: dict[str, int] = {}
+    for f in found:
+        cat = f.get("category") or "unbekannt"
+        category_counts[cat] = category_counts.get(cat, 0) + 1
+
+    with _status_lock:
+        status_snapshot = dict(_scan_status)
+
+    return jsonify({
+        "scan_running": status_snapshot["scan_running"],
+        "last_scan_started_at": status_snapshot["last_scan_started_at"],
+        "last_scan_finished_at": status_snapshot["last_scan_finished_at"],
+        "last_scan_error": status_snapshot["last_scan_error"],
+        "next_scan_at": status_snapshot["next_scan_at"],
+        "scan_progress": {
+            "current": status_snapshot["scan_progress_current"],
+            "total": status_snapshot["scan_progress_total"],
+        },
+        "scanned_count_last_scan": status_snapshot["scanned_count_last_scan"],
+        "new_hits_last_scan": status_snapshot["new_hits_last_scan"],
+        "saved_count": len(found),
+        "category_counts": category_counts,
+        "top_deal_count": None,
+        "sources": SOURCES,
+        "scan_log_tail": _tail_log(LOG_FILE, 20),
+    })
 
 
 @app.route("/api/scan-now", methods=["POST"])
