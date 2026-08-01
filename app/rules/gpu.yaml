@@ -29,6 +29,14 @@
 category: "gpu"
 label: "Grafikkarten"
 
+# Notification-Gate-Folgeschritt: eigenes Preislimit fuer den ntfy-Push.
+# Die Regel-eigenen max_price-Werte oben liegen zwischen 160€ und 350€ --
+# ein einzelnes Limit muss also einen Kompromiss zwischen "greift ueberhaupt"
+# und "wirklich noch ein Schnaeppchen" finden. 250€ deckt den Grossteil der
+# Regeln ab, ohne die teuersten (RTX 4070er-Klasse, bis 350€) automatisch
+# als "Top-Deal" durchzuwinken. Bei Bedarf anpassen.
+notify_max_price: 250
+
 # BREITE SUCHBEGRIFFE
 search_terms:
   - "Grafikkarte"
@@ -117,11 +125,17 @@ exclude_category:
   - "kühlkörper"
   - "backplate"
   - "luftkühler"
-  
-  # ENTFERNT (waren zu breit):
-  # - "system"
-  # - "computer"
-  # - "rechner"
+
+  # ZUSTAND / DEFEKTE WARE
+  - "defekt"
+  - "defekte"
+  - "bastler"
+  - "für bastler"
+  - "an bastler"
+  - "kaputt"
+  - "not tested"
+  - "ungeprüft"
+
 
 # ============================================================
 # REGELN – OHNE require_all_of, mit höheren Preisgrenzen

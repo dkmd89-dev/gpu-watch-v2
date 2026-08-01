@@ -2,13 +2,40 @@
 Filterung/Matching/Bewertung passiert NICHT hier, sondern in matcher.py.
 """
 from __future__ import annotations
-import os
+
 import logging
+import os
+from urllib.parse import urlsplit, urlunsplit
+
 import requests
 
 from .base import Listing
 
 log = logging.getLogger(__name__)
+
+
+def _stable_item_url(item_web_url: str) -> str:
+    """Normalisiert eine eBay itemWebUrl auf einen stabilen, dedup-fähigen Wert.
+
+    Bug-Hintergrund (siehe price_history.jsonl-Analyse): itemWebUrl aus der
+    eBay Browse API enthält Query-Parameter wie "?hash=...&amdata=..." --
+    das sind Tracking-/Session-Werte, die für DASSELBE physische Angebot
+    bei unterschiedlichen API-Aufrufen unterschiedlich ausfallen können.
+    Da app.py Listings ausschließlich über item["url"] dedupliziert
+    (seen.json, siehe run_scan()), wurde dasselbe eBay-Angebot dadurch bei
+    jedem Scan erneut als "neu" behandelt -- sichtbar als massenhafte
+    Wiederholungen desselben Preises in price_history.jsonl.
+
+    Die eigentliche Item-Identität steckt stabil im Pfad (z.B.
+    "/itm/1234567890"), nicht in der Query. Wir behalten deshalb nur
+    Schema, Host und Pfad -- das Ergebnis ist weiterhin eine gültige,
+    funktionierende eBay-URL (ohne Tracking-Anhang), aber jetzt stabil
+    über mehrere Scans hinweg identisch für dasselbe Angebot.
+    """
+    if not item_web_url:
+        return item_web_url
+    parts = urlsplit(item_web_url)
+    return urlunsplit((parts.scheme, parts.netloc, parts.path, "", ""))
 
 
 def _ebay_token() -> str | None:
@@ -26,7 +53,7 @@ def _ebay_token() -> str | None:
             auth=(client_id, client_secret),
             data={
                 "grant_type": "client_credentials",
-                "scope": "https://api.ebay.com/oauth/api_scope",
+                "scope": "https://api.ebay.com/oauth/api_scope"
             },
             timeout=15,
         )
@@ -75,7 +102,7 @@ def search_ebay(search_terms: list[str], max_price: int, plz: str) -> list[Listi
                     "source": "eBay",
                     "title": it.get("title", ""),
                     "price": float(price_val) if price_val else None,
-                    "url": it.get("itemWebUrl", ""),
+                    "url": _stable_item_url(it.get("itemWebUrl", "")),
                     "location": it.get("itemLocation", {}).get("city", ""),
                     # Standardisiertes Schema (Phase 3), analog zu Kleinanzeigen.
                     # Bewusst leer statt ungeprüfter Annahmen über das exakte

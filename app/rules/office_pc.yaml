@@ -18,6 +18,12 @@
 
 category: "office_pc"
 label: "Office-PC"
+
+# Notification-Gate-Folgeschritt: eigenes Preislimit fuer den ntfy-Push.
+# Reale Scan-Daten zeigten Office-PCs bisher bei 130-190€ (max_price der
+# Regel oben: 300€). 200€ deckt die bisher beobachtete Preisspanne
+# vollstaendig ab und laesst trotzdem Luft nach oben. Bei Bedarf anpassen.
+notify_max_price: 200
 search_terms:
   - "Office PC"
   - "Büro PC"

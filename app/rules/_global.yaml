@@ -58,12 +58,22 @@ exclude_global:
 # Bedingungen erfüllen, lösen überhaupt eine Benachrichtigung aus.
 # Alle anderen Treffer werden weiterhin gespeichert (found.json) und
 # im Dashboard angezeigt, aber NICHT per ntfy verschickt.
+#
+# gate_max_price ist der FALLBACK-Preis, falls eine Kategorie kein
+# eigenes "notify_max_price" definiert (siehe rules/gpu.yaml,
+# rules/office_pc.yaml, rules/gaming_pc.yaml). Grund: ein einziges
+# globales Preislimit passt strukturell nicht zu allen Kategorien --
+# Gaming-PCs liegen typisch bei 200-550€, Office-PCs bei 130-300€,
+# ein fuer reine GPUs gedachtes Limit wuerde dort nie greifen.
+# rules/sata_ssd.yaml definiert bewusst kein eigenes notify_max_price
+# und nutzt diesen Fallback (150€ liegt ohnehin weit ueber den SSD-
+# eigenen max_price-Werten von max. 85€).
 # ============================================================
 notifications:
   urgent_price_threshold: 150
   tags:
     - moneybag
-  gate_min_stars: "★★★★★"
+  gate_min_stars: "★★★☆☆"
   gate_max_price: 150
 
 # ============================================================

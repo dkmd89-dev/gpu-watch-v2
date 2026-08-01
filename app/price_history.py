@@ -74,8 +74,8 @@ def append_price_point(path: Path, point: PricePoint) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
         with path.open("a", encoding="utf-8") as f:
             f.write(json.dumps(asdict(point), ensure_ascii=False) + "\n")
-    except OSError as e:
-        log.error("Preishistorie konnte nicht geschrieben werden: %s", e, exc_info=True)
+    except Exception:
+        log.exception("Preishistorie konnte nicht geschrieben werden")
 
 
 def read_price_points(path: Path) -> list[PricePoint]:

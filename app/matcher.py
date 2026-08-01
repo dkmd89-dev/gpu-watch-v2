@@ -51,6 +51,12 @@ class MatchResult:
     # MatchResult ueber die bisherigen Felder erstellt/liest, bleibt
     # unveraendert lauffaehig.
     manufacturer_name: str | None = None
+    # Notification-Gate-Folgeschritt: kategorie-eigenes Preislimit fuer den
+    # ntfy-Push (siehe rules/*.yaml "notify_max_price"). None, wenn die
+    # Kategorie keins definiert -> app.py faellt dann auf das globale
+    # notifications.gate_max_price aus _global.yaml zurueck. Additives Feld
+    # mit Default -- bestehender Code bleibt unveraendert lauffaehig.
+    notify_max_price: float | None = None
 
 
 def load_rules(path: str = "rules.yaml") -> dict:
@@ -82,7 +88,19 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
     manufacturer_reputation = {}
     if global_file.exists():
         global_cfg = yaml.safe_load(global_file.read_text(encoding="utf-8")) or {}
-        defaults = global_cfg.get("defaults", {})
+        defaults = dict(global_cfg.get("defaults", {}))
+        # Bugfix: "exclude_global:" liegt in _global.yaml als eigener
+        # Top-Level-Key (Geschwister von "defaults:"), NICHT darunter
+        # verschachtelt. evaluate() erwartet die Liste aber unter
+        # defaults["exclude_global"] (identisch zum alten Einzeldatei-
+        # Modus, siehe tests/fixtures/legacy_single_file_rules.yaml, wo
+        # exclude_global tatsaechlich UNTER defaults: steht). Ohne diese
+        # Zeile wurde exclude_global im Verzeichnis-Modus nie extrahiert
+        # -> global_excludes war in evaluate() immer [] -> der globale
+        # Ausschluss (defekt/kaputt/bastler/tausch/...) griff bei KEINER
+        # Kategorie mehr. dict(...) oben kopiert defaults, damit dieses
+        # Zuweisen das Original-YAML-Objekt nicht mutiert.
+        defaults["exclude_global"] = global_cfg.get("exclude_global", [])
         notifications = global_cfg.get("notifications", {})
         scoring_weights = global_cfg.get("scoring_weights", {})
         # Hersteller-Detector-Folgeschritt: YAML-Reputationstabelle fuer die
@@ -114,11 +132,21 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
         # None, falls die Kategorie keine eigenen Gewichte definiert -> Fallback
         # auf die globalen scoring_weights (siehe evaluate()).
         category_scoring_weights = cat_cfg.get("scoring_weights")
+        # Notification-Gate-Folgeschritt: kategorie-eigenes Preislimit fuer
+        # den ntfy-Push (optional). Grund: das globale gate_max_price aus
+        # _global.yaml gilt sonst pauschal fuer ALLE Kategorien -- bei
+        # Gaming-PCs (typisch 200-550€) und Office-PCs (typisch 130-300€)
+        # unterschreitet aber praktisch kein Treffer ein einheitliches,
+        # fuer reine GPUs gedachtes Preislimit. None, falls die Kategorie
+        # keins definiert -> Fallback auf das globale gate_max_price
+        # (siehe evaluate()/app.py, volle Rueckwaertskompatibilitaet).
+        category_notify_max_price = cat_cfg.get("notify_max_price")
         for rule in cat_cfg.get("rules", []):
             rule = dict(rule)  # Kopie, um das Original-YAML-Objekt nicht zu mutieren
             rule["_category"] = category_name
             rule["_category_exclude_terms"] = category_excludes
             rule["_scoring_weights"] = category_scoring_weights
+            rule["_notify_max_price"] = category_notify_max_price
             merged_rules.append(rule)
 
         # Suchbegriffe aus der Kategorie übernehmen, damit neue Kategorien
@@ -492,6 +520,7 @@ def evaluate(
             # NICHT zusammengefasst (siehe Docstring in price_history.py).
             price_history_model=price_history_model,
             manufacturer_name=score_inputs.get("manufacturer_name"),
+            notify_max_price=rule.get("_notify_max_price"),
         )
 
     return MatchResult(matched=False)

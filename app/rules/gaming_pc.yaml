@@ -25,6 +25,14 @@
 
 category: "gaming_pc"
 label: "Gaming-PC"
+
+# Notification-Gate-Folgeschritt: eigenes Preislimit fuer den ntfy-Push.
+# Reale Scan-Daten zeigten Gaming-PCs bisher bei 200-550€ (Median ca. 465€),
+# nie unter 200€ -- ein pauschales 150€-Limit haette hier strukturell NIE
+# gegriffen. 400€ orientiert sich an der Top-Deal-Preisgrenze der Regeln
+# oben und deckt damit die guenstigere Haelfte der beobachteten Treffer ab.
+# Bei Bedarf anpassen.
+notify_max_price: 400
 search_terms:
   - "Gaming PC"
   - "Gamer PC"

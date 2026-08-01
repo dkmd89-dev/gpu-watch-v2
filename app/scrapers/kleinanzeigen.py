@@ -2,9 +2,11 @@
 Filterung/Matching/Bewertung passiert NICHT hier, sondern in matcher.py.
 """
 from __future__ import annotations
+
+import logging
 import re
 import time
-import logging
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -79,7 +81,10 @@ def search_kleinanzeigen(
             if core_words and not any(w in title.lower() for w in core_words):
                 continue
             price = _price_to_float(price_el.get_text()) if price_el else None
-            href = title_el.get("href", "")
+            href = title_el.get("href")
+            if isinstance(href, list):
+                href = href[0] if href else ""
+            href = href or ""
             link = "https://www.kleinanzeigen.de" + href if href.startswith("/") else href
             listings.append(
                 {

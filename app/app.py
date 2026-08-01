@@ -103,7 +103,7 @@ NOTIFY_TAGS = ["moneybag"]
 # ntfy-Benachrichtigung aus. Alle anderen Treffer werden weiterhin in
 # found.json gespeichert und im Dashboard angezeigt, aber nicht verschickt.
 # Legacy-Fallback wie oben: greift nur ohne eigenen "notifications"-Block.
-NOTIFY_GATE_MIN_STARS = "★★★★★"
+NOTIFY_GATE_MIN_STARS = "★★☆☆☆"
 NOTIFY_GATE_MAX_PRICE = 150
 
 
@@ -307,7 +307,12 @@ def run_scan():
             # anderen sind bereits oben in found.json gespeichert und im
             # Dashboard sichtbar, lösen aber keinen Push aus.
             meets_star_gate = stars_meet_minimum(result.deal_stars or "", gate_min_stars)
-            meets_price_gate = item["price"] <= gate_max_price
+            # Kategorie-eigenes Preislimit hat Vorrang vor dem globalen
+            # gate_max_price (siehe matcher.py/rules/*.yaml "notify_max_price").
+            effective_gate_max_price = (
+                result.notify_max_price if result.notify_max_price is not None else gate_max_price
+            )
+            meets_price_gate = item["price"] <= effective_gate_max_price
 
             if meets_star_gate and meets_price_gate:
                 emoji = emoji_for(result.deal_rating)
@@ -335,7 +340,7 @@ def run_scan():
             else:
                 log.info(
                     "GESPEICHERT (Gate nicht erfüllt: %s/%s) [%s/%s] %s – %.0f € – %s",
-                    result.deal_stars, f"≤{gate_max_price}€" if meets_price_gate else f">{gate_max_price}€",
+                    result.deal_stars, f"≤{effective_gate_max_price}€" if meets_price_gate else f">{effective_gate_max_price}€",
                     result.rule_label, result.deal_rating,
                     item["title"], item["price"], item["url"],
                 )

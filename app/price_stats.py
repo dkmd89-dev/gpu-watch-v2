@@ -12,6 +12,9 @@ from __future__ import annotations
 import statistics
 from dataclasses import dataclass
 from datetime import datetime
+from zoneinfo import ZoneInfo
+
+now = datetime.now(ZoneInfo("Europe/Berlin"))
 
 from price_history import PricePoint
 
@@ -166,7 +169,7 @@ def compute_price_stats(model: str, points: list[PricePoint]) -> PriceStats | No
     )
 
 
-def compute_all_price_stats(points: list[PricePoint]) -> dict[str, PriceStats]:
+def compute_all_price_stats(points: list[PricePoint]) -> dict[str, PriceStats | None]:
     """Berechnet die Statistik fuer JEDES vorkommende price_history_model.
 
     Nimmt bereits eingelesene Datenpunkte entgegen (z.B. aus

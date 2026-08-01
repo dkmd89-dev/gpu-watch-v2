@@ -1,6 +1,19 @@
 category: "sata_ssd"
 label: "SATA SSDs (2.5 Zoll)"
 
+# WICHTIG -- min_vram_gb: 0 bei JEDER Regel unten:
+# matcher.py hat eine generische "VRAM-Check"-Heuristik (urspruenglich nur
+# fuer gpu.yaml gedacht), die per Regex (\d{1,2}\s*gb) nach GB-Zahlen im
+# Titel sucht und den Treffer verwirft, falls der gefundene Wert unter
+# min_vram_gb (Default 12) liegt. Kapazitaetsangaben wie "500GB" werden
+# dabei versehentlich als "0GB VRAM" fehlinterpretiert (Regex findet "00gb"
+# als Teilstring von "500gb" -> vram=0 -> faelschlich ausgeschlossen,
+# voll reproduzierbar getestet). Auch generische SATA-Interface-Angaben
+# wie "6Gb/s" koennen denselben Effekt ausloesen. Da SSD-Kapazitaet nichts
+# mit GPU-VRAM zu tun hat, wird dieser Check hier komplett deaktiviert.
+# Vermutlich der (Mit-)Grund, warum diese Kategorie bisher praktisch nie
+# gematcht hat.
+
 # BREITE SUCHBEGRIFFE (Fokus auf SATA / 2.5")
 search_terms:
   - "SATA SSD"
@@ -39,9 +52,111 @@ exclude_category:
 # REGELN
 rules:
   # ============================================================
+  # 250GB SATA SSD (2.5")
+  # ============================================================
+  # NEU: bisher fehlte jede Regel fuer 250GB -- vermutlich der
+  # Hauptgrund, warum diese Kategorie bisher praktisch nie gematcht hat,
+  # da gebrauchte 2.5"-SSDs ueberwiegend 250GB/500GB sind, nicht 1TB/2TB.
+  # Preise sind grobe Schaetzwerte (gebrauchter SATA-SSD-Markt 2026) --
+  # bitte nach den ersten echten Treffern gegenpruefen/anpassen.
+  - label: "250GB SATA SSD ★ Top-Deal"
+    min_vram_gb: 0  # SATA-Kapazitaet, keine GPU -- VRAM-Check hier irrelevant/schaedlich (siehe Kommentar unten)
+    match:
+      - "250gb sata"
+      - "250 gb sata"
+      - "250gb 2.5"
+      - "250 gb 2.5"
+      - "mx500 250"
+      - "870 evo 250"
+      - "860 evo 250"
+      - "intenso 250"
+    price_history_model: "sata_ssd_250gb"
+    exclude:
+      - "nvme"
+      - "m.2"
+      - "m2"
+      - "500gb"
+      - "1tb"
+      - "2tb"
+    max_price: 12
+    deal_rating: "Top-Deal"
+
+  - label: "250GB SATA SSD"
+    min_vram_gb: 0  # SATA-Kapazitaet, keine GPU -- VRAM-Check hier irrelevant/schaedlich (siehe Kommentar unten)
+    match:
+      - "250gb sata"
+      - "250 gb sata"
+      - "250gb 2.5"
+      - "250 gb 2.5"
+      - "mx500 250"
+      - "870 evo 250"
+      - "860 evo 250"
+      - "250gb ssd"
+      - "intenso 250"
+    price_history_model: "sata_ssd_250gb"
+    exclude:
+      - "nvme"
+      - "m.2"
+      - "m2"
+      - "500gb"
+      - "1tb"
+      - "2tb"
+    max_price: 18
+    deal_rating: "Guter Preis"
+
+  # ============================================================
+  # 500GB SATA SSD (2.5")
+  # ============================================================
+  - label: "500GB SATA SSD ★ Top-Deal"
+    min_vram_gb: 0  # SATA-Kapazitaet, keine GPU -- VRAM-Check hier irrelevant/schaedlich (siehe Kommentar unten)
+    match:
+      - "500gb sata"
+      - "500 gb sata"
+      - "500gb 2.5"
+      - "500 gb 2.5"
+      - "mx500 500"
+      - "870 evo 500"
+      - "860 evo 500"
+      - "intenso 500"
+    price_history_model: "sata_ssd_500gb"
+    exclude:
+      - "nvme"
+      - "m.2"
+      - "m2"
+      - "250gb"
+      - "1tb"
+      - "2tb"
+    max_price: 18
+    deal_rating: "Top-Deal"
+
+  - label: "500GB SATA SSD"
+    min_vram_gb: 0  # SATA-Kapazitaet, keine GPU -- VRAM-Check hier irrelevant/schaedlich (siehe Kommentar unten)
+    match:
+      - "500gb sata"
+      - "500 gb sata"
+      - "500gb 2.5"
+      - "500 gb 2.5"
+      - "mx500 500"
+      - "870 evo 500"
+      - "860 evo 500"
+      - "500gb ssd"
+      - "intenso 500"
+    price_history_model: "sata_ssd_500gb"
+    exclude:
+      - "nvme"
+      - "m.2"
+      - "m2"
+      - "250gb"
+      - "1tb"
+      - "2tb"
+    max_price: 28
+    deal_rating: "Guter Preis"
+
+  # ============================================================
   # 1TB SATA SSD (2.5")
   # ============================================================
   - label: "1TB SATA SSD ★ Top-Deal"
+    min_vram_gb: 0  # SATA-Kapazitaet, keine GPU -- VRAM-Check hier irrelevant/schaedlich (siehe Kommentar unten)
     match: 
       - "1tb sata"
       - "1 tb sata"
@@ -64,6 +179,7 @@ rules:
     deal_rating: "Top-Deal"
 
   - label: "1TB SATA SSD"
+    min_vram_gb: 0  # SATA-Kapazitaet, keine GPU -- VRAM-Check hier irrelevant/schaedlich (siehe Kommentar unten)
     match: 
       - "1tb sata"
       - "1 tb sata"
@@ -90,6 +206,7 @@ rules:
   # 2TB SATA SSD (2.5")
   # ============================================================
   - label: "2TB SATA SSD ★ Top-Deal"
+    min_vram_gb: 0  # SATA-Kapazitaet, keine GPU -- VRAM-Check hier irrelevant/schaedlich (siehe Kommentar unten)
     match: 
       - "2tb sata"
       - "2 tb sata"
@@ -111,6 +228,7 @@ rules:
     deal_rating: "Top-Deal"
 
   - label: "2TB SATA SSD"
+    min_vram_gb: 0  # SATA-Kapazitaet, keine GPU -- VRAM-Check hier irrelevant/schaedlich (siehe Kommentar unten)
     match: 
       - "2tb sata"
       - "2 tb sata"
