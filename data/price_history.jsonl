@@ -765,7 +765,10 @@
 {"price": 500.0, "date": "2026-08-01T16:36:36.676020+00:00", "source": "Kleinanzeigen", "model": "gaming_pc", "category": "gaming_pc", "deal_score": 44}
 {"price": 400.0, "date": "2026-08-01T16:36:36.696340+00:00", "source": "Kleinanzeigen", "model": "gaming_pc", "category": "gaming_pc", "deal_score": 54}
 {"price": 210.0, "date": "2026-08-01T16:36:36.875743+00:00", "source": "Kleinanzeigen", "model": "rtx_3060_12gb", "category": "gpu", "deal_score": 44}
-{"price": 270.0, "date": "2026-08-01T16:48:09.279011+00:00", "source": "Kleinanzeigen", "model": "rtx_3060_12gb", "category": "gpu", "deal_score": 28}
-{"price": 450.0, "date": "2026-08-01T17:20:27.502426+00:00", "source": "Kleinanzeigen", "model": "gaming_pc", "category": "gaming_pc", "deal_score": 41}
-{"price": 200.0, "date": "2026-08-01T17:32:00.529065+00:00", "source": "Kleinanzeigen", "model": "rtx_3060_12gb", "category": "gpu", "deal_score": 48}
-{"price": 299.99, "date": "2026-08-01T17:32:00.802965+00:00", "source": "eBay", "model": "office_pc", "category": "office_pc", "deal_score": 19}
+
+{"price": 170.0, "date": "2026-08-01T22:33:39.776063+00:00", "source": "Kleinanzeigen", "model": "sata_ssd_2tb", "category": "sata_ssd", "deal_score": 12}
+{"price": 15.0, "date": "2026-08-01T22:33:39.798854+00:00", "source": "eBay", "model": "sata_ssd_128gb", "category": "sata_ssd", "deal_score": 42}
+{"price": 180.0, "date": "2026-08-01T22:45:10.349435+00:00", "source": "Kleinanzeigen", "model": "sata_ssd_2tb", "category": "sata_ssd", "deal_score": 10}
+{"price": 280.0, "date": "2026-08-01T22:45:10.399613+00:00", "source": "Kleinanzeigen", "model": "rx_6700_xt", "category": "gpu", "deal_score": 28}
+{"price": 200.0, "date": "2026-08-01T22:45:10.419557+00:00", "source": "Kleinanzeigen", "model": "sata_ssd_2tb", "category": "sata_ssd", "deal_score": 6}
+{"price": 79.0, "date": "2026-08-01T22:45:10.446279+00:00", "source": "eBay", "model": "sata_ssd_1tb", "category": "sata_ssd", "deal_score": 32}

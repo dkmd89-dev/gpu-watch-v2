@@ -112,12 +112,14 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
 
     merged_rules: list[dict] = []
     all_search_terms: set[str] = set()
+    all_categories: set[str] = set()
     category_files = sorted(
         f for f in rules_dir.glob("*.yaml") if f.name != "_global.yaml"
     )
     for cat_file in category_files:
         cat_cfg = yaml.safe_load(cat_file.read_text(encoding="utf-8")) or {}
         category_name = cat_cfg.get("category", cat_file.stem)
+        all_categories.add(category_name)
         # Jede Kategorie kann eigene, kategorie-weite Ausschlussbegriffe
         # definieren (z.B. "kein komplettes PC-System" bei GPUs). Diese
         # gelten -- anders als die exclude_global-Liste -- nur für Regeln
@@ -159,6 +161,17 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
         "defaults": defaults,
         "rules": merged_rules,
         "search_terms": sorted(all_search_terms),
+        # Dashboard-Folgeschritt (Kategorie-Dropdown-Fix): VOLLSTAENDIGE
+        # Liste aller bekannten Kategorien aus den Rules -- unabhaengig
+        # davon, ob gerade Treffer dieser Kategorie in found.json vorhanden
+        # sind. Grund: das Dashboard leitete das Kategorie-Dropdown bisher
+        # NUR aus den aktuell sichtbaren Karten ab (found.json, gedeckelt
+        # auf FOUND_MAX_ITEMS=200) -- seltene Kategorien wie sata_ssd
+        # verschwanden dadurch aus dem Filter, sobald sie durch haeufigere
+        # Treffer (gpu/gaming_pc/office_pc) aus dem Fenster verdraengt
+        # wurden, obwohl real weiterhin Treffer dieser Kategorie existieren
+        # (siehe price_history.jsonl/gpu_watch.log).
+        "categories": sorted(all_categories),
         "notifications": notifications,
         "scoring_weights": scoring_weights,
         "manufacturer_reputation": manufacturer_reputation,

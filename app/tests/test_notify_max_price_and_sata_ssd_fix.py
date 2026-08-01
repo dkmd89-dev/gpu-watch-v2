@@ -96,6 +96,23 @@ def test_notify_max_price_unterschiedlich_pro_kategorie():
     assert office.notify_max_price == 200
 
 
+def test_load_rules_liefert_vollstaendige_kategorie_liste():
+    """Regressionstest fuer den Dashboard-Kategorie-Dropdown-Fix: load_rules()
+    muss eine "categories"-Liste mit ALLEN Kategorien aus den rules/*.yaml-
+    Dateien liefern -- unabhaengig davon, ob gerade Treffer dieser Kategorie
+    in found.json vorhanden sind. Vorher leitete das Dashboard die Dropdown-
+    Optionen NUR aus den aktuell sichtbaren Karten ab (found.json, gedeckelt
+    auf FOUND_MAX_ITEMS), wodurch seltene Kategorien wie sata_ssd aus dem
+    Filter verschwanden, sobald sie von haeufigeren Treffern verdraengt
+    wurden (siehe app.py index()/templates/index.html SERVER_CATEGORIES).
+    """
+    cfg = load_rules("rules")
+    assert "categories" in cfg
+    assert set(cfg["categories"]) == {"gaming_pc", "gpu", "office_pc", "sata_ssd"}
+    # Muss sortiert sein (Dropdown-Reihenfolge im Frontend)
+    assert cfg["categories"] == sorted(cfg["categories"])
+
+
 if __name__ == "__main__":
     import pytest
     raise SystemExit(pytest.main([__file__, "-v"]))

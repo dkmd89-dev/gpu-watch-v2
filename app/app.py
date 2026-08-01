@@ -385,7 +385,14 @@ def scheduler_loop():
 @app.route("/")
 def index():
     found = _load_json(FOUND_FILE, [])
-    return render_template("index.html", found=found)
+    # Dashboard-Folgeschritt: vollstaendige Kategorie-Liste aus den Rules
+    # (nicht nur aus den aktuell sichtbaren found.json-Eintraegen) fuers
+    # Kategorie-Filter-Dropdown im Template -- siehe matcher.py-Kommentar
+    # bei "categories". get(..., []) statt [] direkt, falls load_rules()
+    # im Legacy-Einzeldatei-Modus laeuft (dort existiert der Key nicht).
+    rules_cfg = load_rules(str(Path(__file__).parent / "rules"))
+    all_categories = rules_cfg.get("categories", [])
+    return render_template("index.html", found=found, all_categories=all_categories)
 
 
 @app.route("/api/found")

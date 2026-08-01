@@ -496,6 +496,11 @@
   </section>
 
   <script>
+    // Dashboard-Folgeschritt (Kategorie-Dropdown-Fix): vollstaendige
+    // Kategorie-Liste aus den Rules, serverseitig via Jinja eingebettet.
+    // Ergaenzt (nicht ersetzt) die bisherige, aus den sichtbaren Karten
+    // abgeleitete Liste in initFilters() -- siehe dortiger Kommentar.
+    const SERVER_CATEGORIES = {{ all_categories | tojson }};
     function startScan() {
       const btn = document.getElementById('scanBtn');
       btn.disabled = true;
@@ -606,9 +611,19 @@
     // Template anzufassen.
     function initFilters() {
       const cards = Array.from(document.querySelectorAll('#listingsGrid .card'));
-      if (cards.length === 0) return;
 
-      const categories = [...new Set(cards.map(c => c.dataset.category))].sort();
+      // Kategorie-Dropdown-Fix: Union aus der serverseitigen Rules-Liste
+      // (SERVER_CATEGORIES, immer vollstaendig) UND den aus den aktuell
+      // sichtbaren Karten abgeleiteten Kategorien (deckt z.B. "unbekannt"
+      // bei fehlendem category-Feld in Alt-Eintraegen ab, die nicht in den
+      // Rules stehen). Vorher NUR aus den Karten abgeleitet -- seltene
+      // Kategorien wie sata_ssd verschwanden dadurch aus dem Filter,
+      // sobald sie durch haeufigere Treffer aus dem FOUND_MAX_ITEMS-Fenster
+      // verdraengt wurden (siehe matcher.py-Kommentar bei "categories").
+      const categories = [...new Set([
+        ...(SERVER_CATEGORIES || []),
+        ...cards.map(c => c.dataset.category),
+      ])].filter(Boolean).sort();
       const sources = [...new Set(cards.map(c => c.dataset.source))].sort();
       const manufacturers = [...new Set(cards.map(c => c.dataset.manufacturer))].sort();
 
