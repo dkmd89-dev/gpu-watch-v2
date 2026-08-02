@@ -85,8 +85,8 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 1rem 1.2rem;
-      margin-bottom: 1.5rem;
+      padding: 0.8rem 1.2rem;
+      margin-bottom: 1.2rem;
     }
 
     .status-row {
@@ -381,13 +381,12 @@
 </head>
 <body>
   <header>
-    <h1><span class="status-dot" id="statusDot"></span> Hardware Deal Finder</h1>
+    <h1><span class="status-dot" id="statusDot" title="Bereit" role="status" aria-live="polite"></span> Hardware Deal Finder</h1>
     <button class="scan-btn" id="scanBtn" onclick="startScan()">Jetzt manuell scannen</button>
   </header>
 
   <section class="status-panel">
     <div class="status-row">
-      <span>Status: <strong id="statusText">–</strong></span>
       <span>Letzter Scan: <strong id="lastScan">–</strong></span>
       <span>Nächster Scan: <strong id="nextScan">–</strong></span>
     </div>
@@ -609,8 +608,10 @@
           const running = !!s.scan_running;
 
           dot.classList.toggle('running', running);
+          const statusLabel = running ? 'Scan läuft…' : 'Bereit';
+          dot.title = statusLabel;
+          dot.setAttribute('aria-label', statusLabel);
           btn.disabled = running;
-          document.getElementById('statusText').textContent = running ? 'Scan läuft…' : 'Bereit';
           document.getElementById('lastScan').textContent = fmtTime(s.last_scan_finished_at);
           document.getElementById('nextScan').textContent = fmtTime(s.next_scan_at);
 
