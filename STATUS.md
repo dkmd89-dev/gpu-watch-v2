@@ -16,6 +16,9 @@
 - **price_history.jsonl bereinigt:** Abgeschlossen (verzerrte Altdaten aus der Zeit vor dem eBay-Dedup-Fix gesichert und entfernt, Sammlung startet neu)
 - **Notification-Gate pro Kategorie + SATA-SSD-Fix:** Abgeschlossen (siehe unten)
 - **Dashboard-Kategorie-Dropdown-Fix:** Abgeschlossen (siehe unten). **Punkt 3 (generische KPI-Kacheln pro Kategorie) wartet noch auf Freigabe.**
+- **SSD-Suche verbessert (Schritt A):** Abgeschlossen (siehe unten).
+- **Log-Rotation (Schritt B):** Abgeschlossen (siehe unten).
+- **Deals-Aufräumen (Schritt C):** Abgeschlossen (siehe unten).
 
 ---
 
@@ -96,5 +99,25 @@
 
 ## Testabdeckung
 
+### 8. SSD-Suche verbessert, Log-Rotation, Deals-Aufräumen (Schritt A/B/C)
+
+**Schritt A – SSD-Suche (`categories/detectors/storage.py`, `rules/sata_ssd.yaml`):**
+- Tippfehler „SDD" (statt „SSD") wird jetzt gleichwertig erkannt (häufiger Vertipper in echten Kleinanzeigen-Titeln).
+- `exclude_category` in `rules/sata_ssd.yaml`: `m.2`/`m2` entfernt -- M.2 ist ein Formfaktor, kein Interface, es gibt reale M.2-SATA-SSDs (B+M-Key), die dadurch bisher fälschlich ausgeschlossen wurden. `nvme`/`pcie` bleiben als explizite Interface-Ausschlüsse bestehen.
+- `search_terms` um 6 generische, markenlose Begriffe ergänzt (SSD 250/500GB/1TB, WD Blue, ADATA, Toshiba) -- deckt Angebote ohne Markennennung im Titel ab.
+
+**Schritt B – Log-Rotation (`app.py`):**
+- `logging.FileHandler` durch `logging.handlers.RotatingFileHandler` ersetzt. Rotiert automatisch bei 1 MB (`LOG_MAX_BYTES`, Default), max. 5 alte Logs bleiben erhalten (`LOG_BACKUP_COUNT`, Default) -- `gpu_watch.log.1` bis `.5`, danach wird die älteste Datei verworfen. Beide Grenzen per Env-Var überschreibbar, Pfad/Format/`StreamHandler` unverändert.
+
+**Schritt C – Deals-Aufräumen (`app.py`):**
+- Neue Funktion `_cleanup_old_deals()`, aufgerufen bei jedem Scan direkt nach dem Laden von `found.json`. Entfernt Einträge, deren `found_at`-Zeitstempel älter als `DEAL_MAX_AGE_DAYS` ist (Default 7, Env-Var-konfigurierbar, analog zum bestehenden `FOUND_MAX_ITEMS`-Muster).
+- Rückwärtskompatibel: Legacy-Einträge ohne `found_at` (aus der Zeit vor dessen Einführung in Phase 8) sowie Einträge mit nicht parsebarem Zeitstempel werden bewusst **nicht** gelöscht -- ohne verlässlichen Zeitstempel wäre ein Entfernen eine Vermutung statt einer Tatsache.
+- `seen.json` und `price_history.jsonl` bleiben von der Bereinigung unberührt (Dedup-Basis bzw. Preishistorie sollen nicht verfallen).
+
+**Selbst gefundener Zwischenfall:** Bei der Implementierung von Schritt C ist beim Einfügen der neuen Funktion versehentlich die `def`-Zeile von `_load_price_stats()` verloren gegangen (fehlerhafter str_replace-Anker). Durch den vollständigen Testlauf sofort als Regression in `test_app_notification_gate.py` aufgefallen, noch im selben Schritt behoben und erneut vollständig verifiziert -- kein Restrisiko.
+
+
+
 - **Testsuite:** pytest unter `app/tests/`.
-- **Status:** Tatsächlich ausgeführt und verifiziert: **317/317 Tests grün** (0 Fehler), inkl. 10 neuer Tests für notify_max_price, den SATA-SSD-VRAM-Kollisionsfix und den Dashboard-Kategorie-Dropdown-Fix.
+- **Status:** Tatsächlich ausgeführt und verifiziert: **317/317 Tests grün** (0 Fehler) vor Schritt A/B/C, inkl. 10 neuer Tests für notify_max_price, den SATA-SSD-VRAM-Kollisionsfix und den Dashboard-Kategorie-Dropdown-Fix.
+- **Nach Schritt A/B/C:** 334 Tests gesamt (18 neue: 8 SSD-Suche, 3 Log-Rotation, 7 Deals-Aufräumen). 3 vorbestehende Fehler unverändert seit vor Schritt A (nicht Teil dieses Auftrags, betreffen `test_matcher_ssd_capacity_requirement.py`-Import, `test_sata_ssd_500gb_matcht_nicht_die_1tb_regel`, `test_search_ebay_nutzt_normalisierte_url`) -- separat klären, ob eigenständige Findings oder Environment-Unterschied zur vorherigen 317/317-Verifikation.
