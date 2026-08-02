@@ -16,6 +16,7 @@ from scrapers.registry import discover_scrapers
 from notify import send_ntfy, emoji_for, rating_stars_for
 from scoring.deal_score import stars_meet_minimum
 from price_history import append_price_point, make_price_point, read_price_points
+from duplicate_detection import find_duplicate, normalize_title
 from price_stats import compute_all_price_stats, compute_price_stats, PriceStats
 from top_deal import evaluate_top_deal
 
@@ -343,6 +344,13 @@ def run_scan():
         market_prices = _market_prices_from_stats(price_stats_by_model)
         resale_prices = _resale_prices_from_stats(price_stats_by_model)
 
+        # Baustein 5 (Duplicate-/Cross-Posting-Erkennung, STATUS.md Abschnitt
+        # 16): Rohdatenpunkte EINMAL pro Scan laden (analog price_stats_by_model
+        # oben) statt pro Treffer neu einzulesen. Waechst waehrend des Scans
+        # lokal mit (siehe Phase 2 unten) -- so werden auch Cross-Postings
+        # INNERHALB desselben Scan-Laufs erkannt, nicht erst beim naechsten Lauf.
+        price_points_this_scan = read_price_points(PRICE_HISTORY_FILE)
+
         # Kategorieweise-Auswertung-Auftrag: Reihenfolge aus matcher.py
         # (scan_priority, siehe rules/*.yaml). Fallback auf "categories"
         # (Legacy-Einzeldatei-Modus/keine eigene Priorität definiert).
@@ -487,16 +495,38 @@ def run_scan():
                 # Treffer, unabhaengig vom Notification-Gate weiter unten (das
                 # nur steuert, ob ein ntfy-Push verschickt wird -- fuer die
                 # Marktpreis-Statistik zaehlt dagegen jeder gematchte Treffer).
-                append_price_point(
-                    PRICE_HISTORY_FILE,
-                    make_price_point(
+                #
+                # Baustein 5 (Duplicate-/Cross-Posting-Erkennung): NUR der
+                # Preishistorie-Eintrag wird bei einem erkannten Duplikat
+                # uebersprungen -- das Match selbst landet unveraendert in
+                # found.json/Dashboard (siehe Konzept: verhindert Verzerrung
+                # der Marktpreis-Statistik, nicht Verlust echter Treffer).
+                price_history_model = result.price_history_model or result.rule_label or "unbekannt"
+                fingerprint = normalize_title(item["title"])
+                duplicate = find_duplicate(
+                    model=price_history_model,
+                    price=item["price"],
+                    fingerprint=fingerprint,
+                    existing_points=price_points_this_scan,
+                )
+                if duplicate is not None:
+                    log.info(
+                        "Duplicate-/Cross-Posting-Erkennung: Preishistorie-Eintrag "
+                        "uebersprungen (Modell=%s, Preis=%.2f, Quelle=%s) -- "
+                        "aehnlicher Datenpunkt vom %s bereits vorhanden.",
+                        price_history_model, item["price"], item["source"], duplicate.date,
+                    )
+                else:
+                    new_point = make_price_point(
                         price=item["price"],
                         source=item["source"],
-                        model=result.price_history_model or result.rule_label or "unbekannt",
+                        model=price_history_model,
                         category=result.category,
                         deal_score=result.deal_score,
-                    ),
-                )
+                        fingerprint=fingerprint,
+                    )
+                    append_price_point(PRICE_HISTORY_FILE, new_point)
+                    price_points_this_scan.append(new_point)
 
                 # Phase 6b: Benachrichtigungs-Gate. Nur Treffer, die BEIDE
                 # Bedingungen erfüllen, werden per ntfy verschickt -- alle
