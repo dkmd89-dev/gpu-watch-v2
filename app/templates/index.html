@@ -202,6 +202,14 @@
       background: rgba(72, 199, 116, 0.18);
       color: var(--green);
     }
+    /* Verhandlungs-Assistent (STATUS.md Abschnitt 16, Punkt 7): eigener,
+       orthogonaler Badge -- unabhaengig vom Top-Deal/Rating-Badge oben,
+       da "verhandelbar" eine zusaetzliche, keine konkurrierende Aussage
+       ist (kann parallel zu jedem deal_rating auftreten). */
+    .badge.negotiation {
+      background: rgba(91, 140, 255, 0.18);
+      color: var(--accent);
+    }
 
     .rule { color: var(--accent); font-size: 0.82rem; font-weight: 600; }
     /* Schritt 8.3: Titel + Preis in einer Zeile, Preis bleibt fest rechts
@@ -552,6 +560,9 @@
         {% elif f.deal_rating == "Guter Preis" %}
           <span class="badge rating-guter-preis">👍 Guter Preis {{ f.deal_rating_badge_stars }}</span>
         {% endif %}
+        {%- if f.negotiation_candidate is defined and f.negotiation_candidate %}
+          <span class="badge negotiation" title="Preis über der regulären Grenze, aber gute Ausstattung">🤝 Verhandelbar</span>
+        {%- endif %}
       </div>
       <div class="title-row">
         <span class="title">{{ f.title }}</span>
@@ -965,6 +976,12 @@
         badge = `<span class="badge rating-top-deal">⭐ Top-Deal ${escapeHtml(f.deal_rating_badge_stars || '')}</span>`;
       } else if (f.deal_rating === 'Guter Preis') {
         badge = `<span class="badge rating-guter-preis">👍 Guter Preis ${escapeHtml(f.deal_rating_badge_stars || '')}</span>`;
+      }
+      // Verhandlungs-Assistent (STATUS.md Abschnitt 16, Punkt 7): eigener,
+      // orthogonaler Badge -- wird an den obigen (falls vorhanden)
+      // angehaengt statt ihn zu ersetzen, analog zum Jinja-Pfad oben.
+      if (f.negotiation_candidate) {
+        badge += '<span class="badge negotiation" title="Preis über der regulären Grenze, aber gute Ausstattung">🤝 Verhandelbar</span>';
       }
 
       const starsHtml = f.deal_stars

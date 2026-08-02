@@ -462,6 +462,13 @@ def run_scan():
                         if result.estimated_margin_pct is not None
                         else None
                     ),
+                    # Verhandlungs-Assistent (STATUS.md Abschnitt 16, Punkt 7):
+                    # True, wenn dieses Match nur dank negotiation_*-Feldern
+                    # der Kategorie-Regel zustande kam (Preis > max_price,
+                    # aber Toleranz + Mindest-Score erfuellt). Additives Feld,
+                    # aeltere found.json-Eintraege ohne dieses Feld bleiben
+                    # dank is-defined-Check im Template kompatibel.
+                    "negotiation_candidate": result.negotiation_candidate,
                     "found_at": datetime.now(timezone.utc).isoformat(),
                 }
 
