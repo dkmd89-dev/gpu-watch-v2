@@ -67,6 +67,7 @@ def test_notification_gate_end_to_end():
 
         with patch.object(scrapers.kleinanzeigen, "search_kleinanzeigen", return_value=fake_listings), \
              patch.object(scrapers.ebay, "search_ebay", return_value=[]), \
+                 patch.object(scrapers.quoka, "search_quoka", return_value=[]), \
              patch.object(app_mod, "send_ntfy") as mock_send_ntfy:
 
             app_mod.run_scan()
@@ -110,6 +111,7 @@ def test_notification_gate_niemand_benachrichtigt_wenn_alle_ueber_preisgrenze():
 
         with patch.object(scrapers.kleinanzeigen, "search_kleinanzeigen", return_value=fake_listings), \
              patch.object(scrapers.ebay, "search_ebay", return_value=[]), \
+                 patch.object(scrapers.quoka, "search_quoka", return_value=[]), \
              patch.object(app_mod, "send_ntfy") as mock_send_ntfy:
 
             app_mod.run_scan()
@@ -146,6 +148,7 @@ def test_notification_gate_nutzt_kategorie_eigenes_preislimit_statt_globalem_fal
 
         with patch.object(scrapers.kleinanzeigen, "search_kleinanzeigen", return_value=fake_listings), \
              patch.object(scrapers.ebay, "search_ebay", return_value=[]), \
+                 patch.object(scrapers.quoka, "search_quoka", return_value=[]), \
              patch.object(app_mod, "send_ntfy") as mock_send_ntfy:
 
             app_mod.run_scan()

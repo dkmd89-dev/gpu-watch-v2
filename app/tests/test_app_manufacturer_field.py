@@ -49,6 +49,7 @@ def test_found_json_enthaelt_manufacturer_feld_bei_erkannter_marke():
 
         with patch.object(scrapers.kleinanzeigen, "search_kleinanzeigen", return_value=fake_listings), \
              patch.object(scrapers.ebay, "search_ebay", return_value=[]), \
+                 patch.object(scrapers.quoka, "search_quoka", return_value=[]), \
              patch.object(app_mod, "send_ntfy"):
 
             app_mod.run_scan()
@@ -76,6 +77,7 @@ def test_found_json_manufacturer_none_ohne_erkennbare_marke():
 
         with patch.object(scrapers.kleinanzeigen, "search_kleinanzeigen", return_value=fake_listings), \
              patch.object(scrapers.ebay, "search_ebay", return_value=[]), \
+                 patch.object(scrapers.quoka, "search_quoka", return_value=[]), \
              patch.object(app_mod, "send_ntfy"):
 
             app_mod.run_scan()
@@ -121,6 +123,7 @@ def test_api_status_liefert_manufacturer_counts():
 
         with patch.object(scrapers.kleinanzeigen, "search_kleinanzeigen", return_value=fake_listings), \
              patch.object(scrapers.ebay, "search_ebay", return_value=[]), \
+                 patch.object(scrapers.quoka, "search_quoka", return_value=[]), \
              patch.object(app_mod, "send_ntfy"):
 
             app_mod.run_scan()

@@ -1,4 +1,4 @@
-# status.md — Aktualisiert bis Schritt "Abschnitt-9-Verifikation + SATA-SSD-Requirement-Fix + generische KPI-Kacheln + requirements-dev.txt"
+# status.md — Aktualisiert bis Schritt "Plugin-Registry für Scraper (Schritt 1–3, Abschnitt 11)"
 
 ## Statusübersicht
 - **Phase 0 (Projektanalyse & Stabilisierung):** Abgeschlossen
@@ -23,6 +23,7 @@
 - **SATA-SSD-Requirement-Bug (`min_ssd_gb`/`max_ssd_gb` war No-Op):** Behoben (siehe Abschnitt 10).
 - **Dashboard: generische KPI-Kacheln pro Kategorie:** Abgeschlossen (siehe Abschnitt 10) — vorheriger offener Punkt 3 aus dem Dashboard-Kategorie-Dropdown-Fix ist damit erledigt.
 - **`requirements-dev.txt` ergänzt:** Abgeschlossen (siehe Abschnitt 10).
+- **Plugin-Registry für Scraper (Schritt 1–3):** Abgeschlossen (siehe Abschnitt 11). Neue Suchquellen (Phase 9) benötigen künftig keine Codeänderung mehr an `app.py`.
 
 ---
 
@@ -150,6 +151,18 @@
 **`.gitignore` erweitert:**
 - `data/*.txt` ergänzt (analog zu `data/*.log`). Grund: `data/gpu_watch.txt` (ein reales, 478 Zeilen langes Produktions-Log vom 01.08., zeigte u.a. genau den in Abschnitt 9/Ziel 2 behobenen `/api/status`-Polling-Spam) lag als untracked Laufzeit-Artefakt im Arbeitsbaum und wurde bewusst **nicht** committet.
 
+### 11. Plugin-Registry für Scraper (Schritt 1–3, `app/scrapers/`, `app/app.py`)
+
+**Ausgangslage:** Neue Suchquellen (Phase 9: Quoka, markt.de, ...) mussten bisher an ZWEI Stellen von Hand verdrahtet werden -- `scrapers/__init__.py` (statischer Import) und `app.py` (hartcodierter `raw += search_xxx(...)`-Aufruf). Widerspricht dem Phase-9/10-Ziel ("neue Quelle ohne Änderung an der Kernlogik").
+
+- **Schritt 1 – Discovery-Registry (`scrapers/registry.py`, neu):** `discover_scrapers()` scannt das `scrapers`-Package zur Laufzeit per `pkgutil.iter_modules` statt statischer Imports. Erkennt Plugins per Konvention (`SCRAPER_NAME`-Attribut + passende `search_<name>`-Funktion). Reine Infrastruktur, `app.py` unangetastet. `scrapers/kleinanzeigen.py`/`scrapers/ebay.py` erhielten nur je eine zusätzliche `SCRAPER_NAME`-Konstante.
+- **Schritt 2 – `app.py` auf Registry umgestellt:** `run_scan()` iteriert seither über `discover_scrapers()` statt zwei hartcodierte Aufrufe. Dabei wurde ein bei der Umsetzung selbst verursachter Bug (doppelter Scraping-Block → echte HTTP-Calls trotz Mock) im selben Schritt gefunden und behoben. `_SCRAPER_CALL_ARGS` als bewusster Übergangs-Adapter eingeführt, da `search_kleinanzeigen()`/`search_ebay()` damals noch unterschiedliche Parameterreihenfolgen hatten. 5 bestehende Testdateien mussten ihr Mock-Target von `app_mod.search_xxx` auf `scrapers.xxx.search_xxx` verschieben (die Registry importiert Module frisch statt `app.py`-Namen zu patchen).
+- **Schritt 3 – Signaturen vereinheitlicht (`scrapers/ebay.py`, `scrapers/base.py`, `app.py`):** `search_ebay()` folgt jetzt exakt dem `Scraper`-Protocol `(search_terms, plz, radius_km, max_price)`, identisch zu `search_kleinanzeigen()`. **Breaking Change** für positionelle Aufrufer (vorher `(search_terms, max_price, plz)`, kein `radius_km`) -- Repo-weite Prüfung ergab keine betroffene Aufrufstelle außer einem Test (nutzte bereits Keyword-Argumente, angepasst). `plz`/`radius_km` bleiben in `search_ebay()` ungenutzt (eBay Browse API kennt keine PLZ-Umkreissuche), dienen nur der Signatur-Kompatibilität. `_SCRAPER_CALL_ARGS`-Adapter in `app.py` vollständig entfernt -- generischer Aufruf `plugin.search(search_terms, plz, radius_km, max_price)` für alle Plugins.
+
+**Ergebnis:** Eine neue Quelle, die `Scraper`-Protocol erfüllt (Datei in `scrapers/` mit `SCRAPER_NAME` + passender `search_<name>`-Funktion mit der vereinheitlichten Signatur), wird automatisch mitgescannt -- keine Änderung an `app.py` mehr nötig. Damit ist die in Phase-9 geforderte Erweiterbarkeit für Scraper-Quellen erreicht (Kategorien waren das bereits seit Phase 2 über YAML).
+
+**Verifikation:** Alle drei Schritte end-to-end gegen den echten `run_scan()`-Code mit gemockten Scrapern verifiziert (kein Netzwerkzugriff in dieser Umgebung nötig/möglich) -- genau 1 Aufruf pro Quelle, identische 4-Argument-Signatur, keine echten HTTP-Calls. Vollständige Testsuite: **356/356 grün** (siehe Testabdeckung unten).
+
 ---
 
 ## Bekannte Probleme & Einschränkungen
@@ -166,5 +179,24 @@
 
 
 - **Testsuite:** pytest unter `app/tests/`.
-- **Status:** Tatsächlich ausgeführt und verifiziert: **317/317 Tests grün** (0 Fehler) vor Schritt A/B/C, inkl. 10 neuer Tests für notify_max_price, den SATA-SSD-VRAM-Kollisionsfix und den Dashboard-Kategorie-Dropdown-Fix.
-- **Nach Schritt A/B/C:** 334 Tests gesamt (18 neue: 8 SSD-Suche, 3 Log-Rotation, 7 Deals-Aufräumen). 3 vorbestehende Fehler unverändert seit vor Schritt A (nicht Teil dieses Auftrags, betreffen `test_matcher_ssd_capacity_requirement.py`-Import, `test_sata_ssd_500gb_matcht_nicht_die_1tb_regel`, `test_search_ebay_nutzt_normalisierte_url`) -- separat klären, ob eigenständige Findings oder Environment-Unterschied zur vorherigen 317/317-Verifikation.
+- **Aktueller Stand (direkt in dieser Session ausgeführt):** **356/356 Tests grün, 0 Fehler.** Inklusive der 5 neuen Registry-Tests (`test_scraper_registry.py`) und des an die neue `search_ebay()`-Signatur angepassten `test_scraper_ebay.py`.
+- Die zuvor in dieser Datei dokumentierten 3 vorbestehenden Fehler (`test_matcher_ssd_capacity_requirement.py`-Import, `test_sata_ssd_500gb_matcht_nicht_die_1tb_regel`, `test_search_ebay_nutzt_normalisierte_url`) treten beim aktuellen Lauf **nicht** auf -- gemäß Projektprinzip "keine unbesehenen Übernahmen aus der Doku" wird hier nur der tatsächlich in dieser Session verifizierte Zustand (356/356 grün) festgehalten; die Diskrepanz zur älteren Notiz wurde nicht weiter zurückverfolgt.
+- **Historie (frühere Läufe, nicht in dieser Session erneut geprüft):** 317/317 vor Schritt A/B/C; 334 gesamt nach Schritt A/B/C (18 neue Tests: 8 SSD-Suche, 3 Log-Rotation, 7 Deals-Aufräumen).
+
+---
+
+## Ausblick / Mögliche nächste Schritte
+
+Offene Punkte, unpriorisiert, keiner davon begonnen:
+
+1. **Phase 9 – Weitere Suchquellen (jetzt architektonisch vorbereitet):** Mit der Plugin-Registry (Abschnitt 11) kann eine neue Quelle rein additiv ergänzt werden (Datei in `scrapers/` + `SCRAPER_NAME` + `search_<name>(search_terms, plz, radius_km, max_price)`).
+   - **Quoka:** bereits als Kandidat geprüft, aber blockiert -- kein Zugriff auf rohes HTML in dieser Umgebung, nur Markdown-konvertierter Inhalt, dadurch keine verlässliche CSS-Selector-Bestimmung möglich. Drei Wege offen: (a) Robin lädt rohes Quoka-HTML hoch, (b) Best-Effort-Regex-Parser als unverifiziert kennzeichnen, (c) alternative Quelle zuerst prüfen.
+   - markt.de, Facebook Marketplace, Hardwareluxx, ComputerBase: noch nicht untersucht.
+2. **Gaming-PC-Preisgrenzen kalibrieren:** weiterhin explizit zurückgestellt, bis der produktive Container genug frische Daten (seit dem eBay-Dedup-Fix) gesammelt hat.
+3. **SATA-SSD-Preise & `notify_max_price`-Werte gegenprüfen:** aktuell grobe Schätzwerte (siehe Abschnitt 9), noch nicht anhand echter Marktdaten kalibriert.
+4. **`detect_ssd_gb()`-Wortstellungslücke (Abschnitt 10, offener Befund):** Titel der Form "…GB SATA SSD" (SATA zwischen Zahl und "SSD") werden von der strikten Adjazenzprüfung nicht erkannt -- dürfte produktiv reale SATA-SSD-Angebote als False Negative verpassen. Vorschlag: `_CONNECTOR`/Adjazenzprüfung in `storage.py` um "sata"/"sata iii" als zulässiges Zwischenwort erweitern. Eigenständiger, isolierter Schritt (nicht mit anderen Änderungen mischen).
+5. **Detector-Registry für `categories/detectors/` (in der Plugin-Registry-Planung als Option 4 genannt, bewusst zurückgestellt):** analog zu Schritt 1 additive Discovery statt statischer Imports in `matcher.py`. Deutlich risikoärmer als die Scraper-Registry, da `matcher.py`-Aufrufe vorerst unverändert bleiben könnten.
+6. **Phase 10 – Plugin-System vollständig (Kategorien als Plugins):** Kategorien sind bereits YAML-basiert erweiterbar (seit Phase 2/5), aber noch keine "Plugins" im engeren Sinn (keine Discovery/Registry-Schicht wie jetzt bei Scrapern). Wäre der nächste konsequente Schritt, um Phase 10 vollständig zu erreichen.
+7. **Dashboard-Polishing:** nahtloser Live-Refresh der Angebotssortierung ohne vollen `location.reload()` (aus Abschnitt 9 offen geblieben).
+
+Kein Punkt ist priorisiert oder für den nächsten Schritt vorausgewählt -- Freigabe/Auswahl liegt bei Robin.

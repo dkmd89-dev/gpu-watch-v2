@@ -85,6 +85,7 @@ def test_verarbeitung_gruppiert_nach_kategorie_gpu_vor_sata_ssd():
 
         with patch.object(scrapers.kleinanzeigen, "search_kleinanzeigen", return_value=fake_listings), \
              patch.object(scrapers.ebay, "search_ebay", return_value=[]), \
+                 patch.object(scrapers.quoka, "search_quoka", return_value=[]), \
              patch.object(app_mod, "send_ntfy", MagicMock()):
             app_mod.run_scan()
 
@@ -118,6 +119,7 @@ def test_kategorie_ohne_treffer_wird_mit_0_treffer_geloggt():
 
         with patch.object(scrapers.kleinanzeigen, "search_kleinanzeigen", return_value=[]), \
              patch.object(scrapers.ebay, "search_ebay", return_value=[]), \
+                 patch.object(scrapers.quoka, "search_quoka", return_value=[]), \
              patch.object(app_mod, "send_ntfy", MagicMock()):
             app_mod.run_scan()
 

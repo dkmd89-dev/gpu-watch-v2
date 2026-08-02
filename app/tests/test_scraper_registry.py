@@ -10,11 +10,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from scrapers.registry import discover_scrapers, ScraperPlugin
 from scrapers import search_kleinanzeigen, search_ebay
+from scrapers.quoka import search_quoka
 
 
-def test_discover_scrapers_findet_kleinanzeigen_und_ebay():
+def test_discover_scrapers_findet_kleinanzeigen_ebay_und_quoka():
     plugins = discover_scrapers()
-    assert set(plugins.keys()) == {"kleinanzeigen", "ebay"}
+    assert set(plugins.keys()) == {"kleinanzeigen", "ebay", "quoka"}
 
 
 def test_discover_scrapers_liefert_scraper_plugin_instanzen():
@@ -30,6 +31,7 @@ def test_discover_scrapers_search_funktion_ist_identisch_zur_direkt_importierten
     plugins = discover_scrapers()
     assert plugins["kleinanzeigen"].search is search_kleinanzeigen
     assert plugins["ebay"].search is search_ebay
+    assert plugins["quoka"].search is search_quoka
 
 
 def test_discover_scrapers_name_feld_stimmt_mit_dict_key_ueberein():
