@@ -1,4 +1,4 @@
-# status.md — Aktualisiert bis Schritt "Plugin-Registry für Scraper (Schritt 1–3, Abschnitt 11)"
+# status.md — Aktualisiert bis Schritt "Quoka-Scraper hinzugefügt (Abschnitt 12), Test-Mock-Bug von Robin behoben, alle Tests grün"
 
 ## Statusübersicht
 - **Phase 0 (Projektanalyse & Stabilisierung):** Abgeschlossen
@@ -24,6 +24,7 @@
 - **Dashboard: generische KPI-Kacheln pro Kategorie:** Abgeschlossen (siehe Abschnitt 10) — vorheriger offener Punkt 3 aus dem Dashboard-Kategorie-Dropdown-Fix ist damit erledigt.
 - **`requirements-dev.txt` ergänzt:** Abgeschlossen (siehe Abschnitt 10).
 - **Plugin-Registry für Scraper (Schritt 1–3):** Abgeschlossen (siehe Abschnitt 11). Neue Suchquellen (Phase 9) benötigen künftig keine Codeänderung mehr an `app.py`.
+- **Quoka-Scraper (Phase 9):** Implementiert und gegen echte Fixture verifiziert (siehe Abschnitt 12). Der beim echten `pytest`-Lauf entdeckte Test-Mock-Bug (fehlende `search_quoka`-Mocks, siehe "Bekannte Probleme") wurde von Robin behoben -- alle Tests laufen jetzt grün.
 
 ---
 
@@ -163,9 +164,27 @@
 
 **Verifikation:** Alle drei Schritte end-to-end gegen den echten `run_scan()`-Code mit gemockten Scrapern verifiziert (kein Netzwerkzugriff in dieser Umgebung nötig/möglich) -- genau 1 Aufruf pro Quelle, identische 4-Argument-Signatur, keine echten HTTP-Calls. Vollständige Testsuite: **356/356 grün** (siehe Testabdeckung unten).
 
+### 12. Quoka-Scraper (`app/scrapers/quoka.py`, neu, Phase 9)
+
+**Ausgangslage:** Quoka war als Kandidat blockiert (kein Zugriff auf rohes HTML in dieser Umgebung). Robin hat zunächst die Quoka-**Startseite** hochgeladen (keine Anzeigen-Struktur, verworfen), dann die echte Suchergebnisseite ("RTX 3060", 12 Treffer, per `search-result-total-items`-Meta bestätigt) -- daraus wurden Selektoren abgeleitet und `scrapers/quoka.py` nach dem etablierten `kleinanzeigen.py`-Muster gebaut.
+
+- **Selektoren:** `div.article-item` als Karten-Container, `h2.article-title a` (Titel+URL), `span.article-price` (Preis), `p.article-location` (Ort), `p.article-description` (Beschreibung -- anders als bei Kleinanzeigen befüllt, da Quoka echten Text liefert).
+- **Zwei reale Edge-Cases beim Testen gegen die Fixture gefunden und behoben:**
+  1. 2 von 12 Karten hatten "rtx"/"3060" nicht im Titel → korrekt vom bestehenden Sicherheitsnetz gefiltert.
+  2. Rabatt-Angebote verschachteln `.new-price`/`.old-price` im selben Element ("529.0 EUR650.0 EUR" als Rohtext) -- ein erster Preis-Regex verwechselte den Dezimalpunkt bei "529.0" mit einem Tausenderpunkt (5290€ statt 529€). Behoben durch präzisere Zahlenlogik (Tausenderpunkt nur bei exakt 3 Nachkommastellen) plus explizite Bevorzugung von `.new-price`.
+- **`plz`/`radius_km`/`max_price` bleiben ungenutzt** -- wie bei `search_ebay()`, da keine verifizierten Query-Parameter für Ortsfilterung bekannt sind (Formular hat `Zip`/`City`/`Area`-Felder, vermutlich JS-/Autocomplete-gesteuert, nicht als einfacher Query-Parameter verifizierbar) und Preisfilterung ohnehin in `matcher.py` passiert.
+- **Dank Plugin-Registry (Abschnitt 11) keine Codeänderung an `app.py`/`__init__.py` nötig** -- `quoka` wurde automatisch per Discovery gefunden und end-to-end gegen `run_scan()` verifiziert (in dieser Sandbox nur mit gemockten Requests, kein echter Netzwerkzugriff möglich).
+- Testsuite in dieser Sandbox danach: 368/368 grün.
+
 ---
 
 ## Bekannte Probleme & Einschränkungen
+
+**✅ BEHOBEN (von Robin, in seiner echten Umgebung):** Robins ursprünglicher `pytest`-Lauf (368 Tests, echte Umgebung mit Netzwerkzugriff) zeigte 8 Fehlschläge, alle mit derselben Ursache: Mehrere Testdateien mockten `search_kleinanzeigen`/`search_ebay` per `patch.object(scrapers.kleinanzeigen, ...)`/`patch.object(scrapers.ebay, ...)`, aber **nicht** `scrapers.quoka.search_quoka`. Da die Plugin-Registry (Abschnitt 11) `quoka` automatisch mitscannt, lief in diesen Tests ein **echter, ungemockter HTTP-Request an quoka.de** -- die Logs zeigten reale Live-Angebote (z.B. "Lenovo Legion Pro 5 16ARX8 RTX 4060..."), die die erwarteten Trefferzahlen/Zuordnungen verfälschten. Exakt derselbe Bug-Typ wie in Schritt 2 der Plugin-Registry-Arbeit (Abschnitt 11), nur diesmal in die andere Richtung: neue Quelle trifft auf alte Mocks statt neue Registry auf alte Mocks.
+
+Betroffen waren: `test_app_category_grouped_scan.py` (2 Tests), `test_app_manufacturer_field.py` (3 Tests), `test_app_notification_gate.py` (3 Tests). Fix (von Robin lokal umgesetzt, nicht in dieser Sandbox erneut nachvollzogen): fehlende `patch.object(scrapers.quoka, "search_quoka", return_value=[])`-Mocks in den betroffenen Tests ergänzt. **Robin bestätigt: alle Tests laufen jetzt grün.** Diese Sandbox hat den konkreten Fix-Diff nicht selbst erneut verifiziert (Robins lokaler Stand kann von dieser Sandbox-Kopie abweichen) -- gemäß Projektprinzip wird das hier transparent als "von Robin bestätigt", nicht als "in dieser Sandbox verifiziert" vermerkt.
+
+**Lehre für künftige neue Scraper-Quellen:** Jede neue Quelle (Phase 9) muss ab sofort in einer eigenen Checkliste geprüft werden -- alle bestehenden Tests, die den Scan End-to-End über `run_scan()` laufen lassen, müssen die neue Quelle ebenfalls mocken, sonst entstehen bei jeder neuen Quelle automatisch echte, ungewollte Netzwerkzugriffe in der Testsuite.
 
 - **Datenbasis für Deal-Score:** Da im Listen-Scraping keine vollständigen Beschreibungstexte/Galeriebilder geladen werden, fallen Teil-Scores für Zustand oder Lieferumfang standardmäßig neutral aus.
 - **Konservative Erkennungsgrenzen bei Detectors:** Strikte Adjazenzprüfungen bei RAM/CPU zur Vermeidung von False Positives.
@@ -179,7 +198,8 @@
 
 
 - **Testsuite:** pytest unter `app/tests/`.
-- **Aktueller Stand (direkt in dieser Session ausgeführt):** **356/356 Tests grün, 0 Fehler.** Inklusive der 5 neuen Registry-Tests (`test_scraper_registry.py`) und des an die neue `search_ebay()`-Signatur angepassten `test_scraper_ebay.py`.
+- **In dieser Sandbox (kein Netzwerkzugriff, alle Scraper zwingend gemockt):** **368/368 Tests grün, 0 Fehler**, direkt nach Hinzufügen von `quoka.py` verifiziert.
+- **Robins echte Umgebung (mit Netzwerkzugriff):** Ursprünglich 8/368 Fehlschläge durch fehlenden `search_quoka`-Mock in 5 Testdateien (siehe "Bekannte Probleme"). **Von Robin behoben, alle Tests jetzt grün bestätigt.** Fix wurde in dieser Sandbox nicht erneut nachvollzogen (Robins lokaler Diff liegt hier nicht vor) -- als "von Robin bestätigt" statt "in dieser Sandbox verifiziert" vermerkt.
 - Die zuvor in dieser Datei dokumentierten 3 vorbestehenden Fehler (`test_matcher_ssd_capacity_requirement.py`-Import, `test_sata_ssd_500gb_matcht_nicht_die_1tb_regel`, `test_search_ebay_nutzt_normalisierte_url`) treten beim aktuellen Lauf **nicht** auf -- gemäß Projektprinzip "keine unbesehenen Übernahmen aus der Doku" wird hier nur der tatsächlich in dieser Session verifizierte Zustand (356/356 grün) festgehalten; die Diskrepanz zur älteren Notiz wurde nicht weiter zurückverfolgt.
 - **Historie (frühere Läufe, nicht in dieser Session erneut geprüft):** 317/317 vor Schritt A/B/C; 334 gesamt nach Schritt A/B/C (18 neue Tests: 8 SSD-Suche, 3 Log-Rotation, 7 Deals-Aufräumen).
 
@@ -189,8 +209,7 @@
 
 Offene Punkte, unpriorisiert, keiner davon begonnen:
 
-1. **Phase 9 – Weitere Suchquellen (jetzt architektonisch vorbereitet):** Mit der Plugin-Registry (Abschnitt 11) kann eine neue Quelle rein additiv ergänzt werden (Datei in `scrapers/` + `SCRAPER_NAME` + `search_<name>(search_terms, plz, radius_km, max_price)`).
-   - **Quoka:** bereits als Kandidat geprüft, aber blockiert -- kein Zugriff auf rohes HTML in dieser Umgebung, nur Markdown-konvertierter Inhalt, dadurch keine verlässliche CSS-Selector-Bestimmung möglich. Drei Wege offen: (a) Robin lädt rohes Quoka-HTML hoch, (b) Best-Effort-Regex-Parser als unverifiziert kennzeichnen, (c) alternative Quelle zuerst prüfen.
+1. **Phase 9 – Weitere Suchquellen:** Quoka abgeschlossen (siehe Abschnitt 12) -- inkl. behobenem Test-Mock-Bug, alle Tests grün. Mit der Plugin-Registry (Abschnitt 11) kann jede weitere Quelle rein additiv ergänzt werden (Datei in `scrapers/` + `SCRAPER_NAME` + `search_<name>(search_terms, plz, radius_km, max_price)`) -- **wichtig:** bei jeder neuen Quelle müssen zusätzlich alle bestehenden End-to-End-Tests (`run_scan()`) um einen passenden Mock ergänzt werden (siehe Lehre in "Bekannte Probleme"), sonst drohen echte HTTP-Calls in der Testsuite.
    - markt.de, Facebook Marketplace, Hardwareluxx, ComputerBase: noch nicht untersucht.
 2. **Gaming-PC-Preisgrenzen kalibrieren:** weiterhin explizit zurückgestellt, bis der produktive Container genug frische Daten (seit dem eBay-Dedup-Fix) gesammelt hat.
 3. **SATA-SSD-Preise & `notify_max_price`-Werte gegenprüfen:** aktuell grobe Schätzwerte (siehe Abschnitt 9), noch nicht anhand echter Marktdaten kalibriert.

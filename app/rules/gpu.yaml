@@ -110,6 +110,32 @@ exclude_category:
   - "komplett-system"
   - "workstation"
   - "setup"
+
+  # LAPTOPS / MOBILE GERÄTE (NEU)
+  - "laptop"
+  - "laptops"
+  - "notebook"
+  - "notebooks"
+  - "legion"          # Lenovo Gaming-Laptops
+  - "nitro"           # Acer Nitro Laptops
+  - "omen"            # HP Omen Laptops
+  - "gaming laptop"
+  - "gaming-notebook"
+  - "mobil"
+  - "tragbar"
+
+  # KONSOLEN (NEU)
+  - "playstation"
+  - "ps1"
+  - "ps2"
+  - "ps3"
+  - "ps4"
+  - "ps5"
+  - "xbox"
+  - "nintendo"
+  - "switch"
+  - "spielekonsole"
+  - "konsole"
   
   # MONITORE & PERIPHERIE
   - "monitor"

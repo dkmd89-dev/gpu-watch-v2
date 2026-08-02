@@ -22,6 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import scrapers.kleinanzeigen
 import scrapers.ebay
+import scrapers.quoka
 
 
 def _load_app_module(data_dir: str):

@@ -16,6 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import scrapers.kleinanzeigen
 import scrapers.ebay
+import scrapers.quoka
 
 
 def _load_app_module(data_dir: str):
@@ -47,7 +48,7 @@ def test_notification_gate_end_to_end():
         fake_listings = [
             {
                 "source": "Kleinanzeigen",
-                "title": "ASUS RTX 2080Ti DUAL Lüfter",
+                "title": "ASUS RTX 2080 Ti DUAL Lüfter",
                 "price": 5.0,  # sehr günstig -> hoher Score, Top-Deal-Regel
                 "url": "https://example.test/angebot-1",
                 "location": "Musterstadt",
@@ -137,7 +138,7 @@ def test_notification_gate_nutzt_kategorie_eigenes_preislimit_statt_globalem_fal
         fake_listings = [
             {
                 "source": "Kleinanzeigen",
-                "title": "ASUS RTX 2080Ti DUAL Lüfter",
+                "title": "ASUS RTX 2080 Ti DUAL Lüfter",
                 "price": 5.0,  # sehr guenstig -> 5 Sterne, Top-Deal-Regel
                 "url": "https://example.test/angebot-4",
                 "location": "Musterstadt",

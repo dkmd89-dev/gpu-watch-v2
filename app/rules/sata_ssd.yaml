@@ -28,6 +28,7 @@ search_terms:
   - "WD Blue SSD"
   - "ADATA SSD"
   - "Toshiba SSD"
+  - "Samsung SSD" 
 
 # SCORING-GEWICHTUNG
 scoring_weights:
@@ -54,6 +55,99 @@ exclude_category:
   - "externes gehaeuse"
   - "hdd"
   - "3.5"
+
+  # KONSOLEN (NEU)
+  - "playstation"
+  - "ps1"
+  - "ps2"
+  - "ps3"
+  - "ps4"
+  - "ps5"
+  - "xbox"
+  - "nintendo"
+  - "switch"
+  - "spielekonsole"
+  - "konsole"
+
+  # Laptop PC
+  - "laptop"
+  - "notebook"
+  - "komplett pc"
+  - "komplettsystem"
+  - "fertig pc"
+  - "pc komplett"
+  - "dell optiplex"      # NEU: häufige Office-PCs
+  - "hp prodesk"         # NEU
+  - "hp elitebook"       # NEU (Laptop-Serie)
+  - "fujitsu esprimo"    # NEU
+  - "lenovo thinkcentre" # NEU
+  - "lenovo thinkpad"    # NEU (Laptop-Serie)
+  - "acer aspire"        # NEU (Laptop-Serie)
+  - "asus vivobook"      # NEU (Laptop-Serie)
+  - "zbook"              # NEU (HP Workstation-Laptop)
+  - "server"             # NEU
+  - "mini-pc"            # NEU
+  - "nuc"                # NEU (Intel Mini-PC)
+  - "thin client"        # NEU
+  - "workstation"        # NEU
+  - "adapter"            # NEU
+  - "gehäuse"            # NEU
+  - "case"               # NEU
+  - "halterung"          # NEU
+
+  # LAPTOP-MODELLE (ohne "laptop"/"notebook" im Titel)
+  - "dell e5440"
+  - "dell latitude"
+  - "dell precision"
+  - "hp elitebook"
+  - "hp probook"
+  - "hp zbook"
+  - "lenovo thinkpad"
+  - "lenovo yoga"
+  - "acer aspire"
+  - "asus vivobook"
+  - "asus zenbook"
+  - "toshiba satellite"
+  - "toshiba portege"
+  - "macbook"
+  - "surface"
+  
+  # KOMPLETTE PCs (erweitert)
+  - "gaming pc"
+  - "gaming-pc"
+  - "gamer pc"
+  - "spiele pc"
+  - "komplett pc"
+  - "fertig pc"
+  - "pc komplett"
+  - "komplettsystem"
+  - "komplett-system"
+  - "workstation"
+  - "setup"
+  
+  # HDD-MODELLE (ohne "hdd" im Titel)
+  - "travelstar"        # Hitachi HDD-Serie
+  - "deskstar"          # Hitachi HDD-Serie
+  - "caviar"            # WD HDD-Serie
+  - "barracuda"         # Seagate HDD-Serie (Achtung: gibt auch Barracuda SSD!)
+  - "red pro"           # WD NAS HDD
+  - "purple"            # WD Surveillance HDD
+  - "gold"              # WD Enterprise HDD
+  
+  # KOMPLETTE PCs (ohne "pc" im Titel)
+  - "optiplex"          # Dell Office-PCs
+  - "precision"         # Dell Workstations
+  - "thinkcentre"       # Lenovo Office-PCs
+  - "esprimo"           # Fujitsu Office-PCs
+  - "prodesk"           # HP Office-PCs
+  - "elitedesk"         # HP Office-PCs
+  - "nuc"               # Intel Mini-PCs
+  - "mini pc"           # Mini-PCs
+  
+  # SERVER
+  - "proliant"          # HP Server
+  - "poweredge"         # Dell Server
+  - "thinkstation"      # Lenovo Workstations
 
 rules:
   # ============================================================
