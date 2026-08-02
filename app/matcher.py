@@ -10,6 +10,7 @@ from categories.detectors.ram import detect_ram_gb, detect_ram_type
 from categories.detectors.case import detect_case_type
 from categories.detectors.gpu import detect_dedicated_gpu
 from categories.detectors.storage import detect_ssd_gb
+from categories.detectors.psu import detect_psu_watt
 from categories.detectors.manufacturer import detect_manufacturer
 from scoring.deal_score import compute_deal_score, DEFAULT_WEIGHTS
 
@@ -86,6 +87,7 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
     notifications = {}
     scoring_weights = {}
     manufacturer_reputation = {}
+    fees = {}
     if global_file.exists():
         global_cfg = yaml.safe_load(global_file.read_text(encoding="utf-8")) or {}
         defaults = dict(global_cfg.get("defaults", {}))
@@ -109,6 +111,13 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
         # Komponente faellt weiterhin auf den neutralen Platzhalter zurueck
         # (volle Rueckwaertskompatibilitaet, siehe _hersteller_score()).
         manufacturer_reputation = global_cfg.get("manufacturer_reputation", {})
+        # Reselling-/Arbitrage-Konzept (STATUS.md Abschnitt 16): Gebühren-
+        # modell fuer scoring/profit.py::compute_profit(). Analog zu
+        # manufacturer_reputation oben -- leeres Dict, falls _global.yaml
+        # keine "fees:"-Sektion definiert (aeltere Configs) -> profit.py
+        # faellt dann auf neutrale 0-Defaults je Kostenposition zurueck,
+        # kein Crash (volle Rueckwaertskompatibilitaet).
+        fees = global_cfg.get("fees", {})
 
     merged_rules: list[dict] = []
     all_search_terms: set[str] = set()
@@ -198,6 +207,13 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
         "notifications": notifications,
         "scoring_weights": scoring_weights,
         "manufacturer_reputation": manufacturer_reputation,
+        # Reselling-/Arbitrage-Konzept (STATUS.md Abschnitt 16): additiver
+        # Key, analog zu manufacturer_reputation -- Aufrufer, die ihn nicht
+        # kennen (aeltere app.py-Version, Legacy-Einzeldatei-Modus), bleiben
+        # unveraendert lauffaehig, da dort schlicht nicht darauf zugegriffen
+        # wird. In diesem Schritt noch NICHT an evaluate()/deal_score.py
+        # angebunden (folgt in einem separaten Schritt, siehe STATUS.md).
+        "fees": fees,
         "_directory_mode": True,
     }
 
@@ -310,6 +326,31 @@ def _storage_meets_requirement(ssd_gb: int | None, requirement: dict) -> bool:
     return True
 
 
+def _psu_meets_requirement(psu_watt: int | None, requirement: dict) -> bool:
+    """Prüft die erkannte Netzteilleistung (Watt) gegen eine Mindest-/
+    Höchstgrenze.
+
+    requirement-Format: {"min_psu_watt": 550, "max_psu_watt": 1200} (beide
+    Grenzen optional, mind. eine muss gesetzt sein, damit der Aufrufer
+    diese Prüfung überhaupt anstößt -- siehe _evaluate_hardware_requirements).
+    Analog zu _storage_meets_requirement(), inkl. gleicher Begründung für
+    "keine Erkennung -> nicht erfüllt": ohne erkennbare Watt-Zahl im Titel
+    kann eine Leistungs-Anforderung nicht bestätigt werden.
+    """
+    if psu_watt is None:
+        return False
+
+    min_watt = requirement.get("min_psu_watt")
+    if min_watt is not None and psu_watt < min_watt:
+        return False
+
+    max_watt = requirement.get("max_psu_watt")
+    if max_watt is not None and psu_watt > max_watt:
+        return False
+
+    return True
+
+
 def _case_meets_requirement(case_match, requirement: dict) -> bool:
     """Prüft den erkannten Gehäusetyp gegen eine Ausschluss-Anforderung.
 
@@ -356,10 +397,10 @@ def _evaluate_hardware_requirements(title_lower: str, requirements: dict) -> tup
     Ruft nur die Detectors auf, die für die jeweils angegebenen
     Anforderungen tatsächlich gebraucht werden. Gibt zusätzlich zum
     Ergebnis ein "features"-Dict mit den erkannten Rohwerten zurück
-    (ram_gb, ram_type, cpu, case, gpu -- je nachdem, was tatsächlich
-    geprüft wurde), damit compute_deal_score() diese Werte für die
-    Score-Berechnung weiterverwenden kann, ohne dieselben Detectors
-    ein zweites Mal aufzurufen.
+    (ram_gb, ram_type, ssd_gb, psu_watt, cpu, case, gpu -- je nachdem,
+    was tatsächlich geprüft wurde), damit compute_deal_score() diese
+    Werte für die Score-Berechnung weiterverwenden kann, ohne dieselben
+    Detectors ein zweites Mal aufzurufen.
     """
     features: dict = {}
 
@@ -383,6 +424,16 @@ def _evaluate_hardware_requirements(title_lower: str, requirements: dict) -> tup
             "max_ssd_gb": requirements.get("max_ssd_gb"),
         }
         if not _storage_meets_requirement(ssd_gb, storage_requirement):
+            return False, features
+
+    if "min_psu_watt" in requirements or "max_psu_watt" in requirements:
+        psu_watt = detect_psu_watt(title_lower)
+        features["psu_watt"] = psu_watt
+        psu_requirement = {
+            "min_psu_watt": requirements.get("min_psu_watt"),
+            "max_psu_watt": requirements.get("max_psu_watt"),
+        }
+        if not _psu_meets_requirement(psu_watt, psu_requirement):
             return False, features
 
     if "min_cpu" in requirements:

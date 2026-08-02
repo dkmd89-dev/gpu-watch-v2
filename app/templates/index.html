@@ -725,9 +725,13 @@
 
           // Nach Abschluss eines Scans die Trefferliste + Filter-Optionen
           // gezielt neu laden (siehe refreshListings() weiter unten) --
-          // kein voller Seiten-Reload mehr nötig.
+          // kein voller Seiten-Reload mehr nötig. Ebenso die Modell-Auswahl
+          // der Preisdiagramme aktualisieren (siehe refreshPriceChartModels()
+          // weiter unten) -- ohne dieses Wissen wären neue price_history_model-
+          // Schlüssel erst nach manuellem Reload sichtbar.
           if (wasRunning && !running) {
             refreshListings();
+            refreshPriceChartModels();
           }
           wasRunning = running;
         })
@@ -1033,33 +1037,81 @@
     };
 
     function initPriceCharts() {
+      // Change-Listener wird UNABHÄNGIG von vorhandenen Daten registriert:
+      // beim initialen Laden kann price_history.jsonl noch leer sein
+      // (chartPanel bleibt dann per CSS display:none verborgen) -- der
+      // Listener muss trotzdem schon aktiv sein, damit er nicht verloren
+      // geht, sobald refreshPriceChartModels() nach dem ersten Scan die
+      // Modell-Liste befüllt (siehe unten).
+      const select = document.getElementById('modelSelect');
+      select.addEventListener('change', () => {
+        if (select.value) loadModelChart(select.value);
+        else showChartEmpty(false, true);
+      });
+
       fetch('/api/price-history')
         .then(r => r.json())
         .then(models => {
           const modelNames = Object.keys(models).sort();
-          if (modelNames.length === 0) return;
-
-          const panel = document.getElementById('chartPanel');
-          panel.style.display = '';
-
-          const select = document.getElementById('modelSelect');
-          modelNames.forEach(name => {
-            const opt = document.createElement('option');
-            opt.value = name;
-            opt.textContent = `${name} (${models[name].count} Datenpunkte)`;
-            select.appendChild(opt);
-          });
-
-          select.addEventListener('change', () => {
-            if (select.value) loadModelChart(select.value);
-            else showChartEmpty(false, true);
-          });
+          if (!applyPriceChartModelOptions(models) || modelNames.length === 0) return;
 
           // Erstes Modell direkt anzeigen, damit der Nutzer nicht erst
-          // manuell auswaehlen muss.
+          // manuell auswaehlen muss (nur beim initialen Laden -- danach
+          // behaelt refreshPriceChartModels() die Auswahl des Nutzers bei).
           select.value = modelNames[0];
           loadModelChart(modelNames[0]);
         })
+        .catch(() => {});
+    }
+
+    // Befuellt/aktualisiert die Modell-Auswahl der Preisdiagramme, OHNE
+    // bereits vorhandene Optionen zu verlieren oder eine laufende Auswahl
+    // des Nutzers zu verwerfen (gleiches Muster wie fillSelectOptions()
+    // bei den Listing-Filtern). Gibt zurueck, ob ueberhaupt Modelle
+    // vorhanden sind (chartPanel-Sichtbarkeit).
+    function applyPriceChartModelOptions(models) {
+      const modelNames = Object.keys(models).sort();
+      if (modelNames.length === 0) return false;
+
+      document.getElementById('chartPanel').style.display = '';
+
+      const select = document.getElementById('modelSelect');
+      const previousValue = select.value;
+      const existingOptions = new Map(
+        Array.from(select.options).filter(o => o.value).map(o => [o.value, o])
+      );
+
+      modelNames.forEach(name => {
+        const label = `${name} (${models[name].count} Datenpunkte)`;
+        const existingOpt = existingOptions.get(name);
+        if (existingOpt) {
+          // Datenpunkt-Anzahl kann seit dem letzten Laden gewachsen sein.
+          existingOpt.textContent = label;
+        } else {
+          const opt = document.createElement('option');
+          opt.value = name;
+          opt.textContent = label;
+          select.appendChild(opt);
+        }
+      });
+
+      if (previousValue && modelNames.includes(previousValue)) {
+        select.value = previousValue;
+      }
+      return true;
+    }
+
+    // Live-Refresh-Ergaenzung (siehe STATUS.md Abschnitt 14, "bewusst
+    // nicht angefasst"): haelt die Modell-Auswahl der Preisdiagramme
+    // nach jedem Scan-Ende synchron, ohne die aktuelle Auswahl des
+    // Nutzers zu verwerfen oder das aktuell angezeigte Diagramm
+    // ungefragt neu zu laden. Bislang tauchte ein komplett NEUES
+    // price_history_model (z.B. die erste Preishistorie einer bis dahin
+    // unbeobachteten Kategorie) erst nach manuellem Seiten-Reload auf.
+    function refreshPriceChartModels() {
+      fetch('/api/price-history')
+        .then(r => r.json())
+        .then(models => applyPriceChartModelOptions(models))
         .catch(() => {});
     }
 

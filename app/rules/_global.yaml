@@ -129,3 +129,38 @@ manufacturer_reputation:
   Terra: 70
   Eigenbau: 65
   _default: 60
+
+# ============================================================
+# Gebührenmodell (Reselling-/Arbitrage-Konzept, siehe STATUS.md
+# Abschnitt 16) -- genutzt von scoring/profit.py::compute_profit().
+# ============================================================
+# Bildet die Kosten ab, die beim Weiterverkauf eines Angebots anfallen,
+# damit der Profit-Score nicht die reine Preisdifferenz (Kaufpreis vs.
+# geschätzter Verkaufspreis) als Marge ausweist, sondern die tatsächlich
+# realistisch verbleibende Marge.
+#
+# platform_fee_pct: prozentuale Verkaufsgebühr der Zielplattform (z.B.
+#   eBay-Verkaufsprovision), bezogen auf den geschätzten Verkaufspreis.
+# payment_fee_pct: prozentuale Zahlungsabwicklungsgebühr (z.B. PayPal),
+#   ebenfalls bezogen auf den geschätzten Verkaufspreis.
+# shipping_cost: pauschale Versandkosten in Euro (Fixbetrag je Verkauf).
+# packaging_cost: pauschale Verpackungskosten in Euro (Fixbetrag).
+#
+# Alle vier Werte sind bewusst als einzelne, additive Kostenpositionen
+# statt einer einzigen Pauschale modelliert, damit sie unabhängig
+# voneinander kalibriert werden können (z.B. wenn sich eine Gebühr
+# ändert, ohne die anderen neu schätzen zu müssen). Fehlt "fees:"
+# komplett oder eine einzelne Position, greift in profit.py ein
+# neutraler Default von 0 für die fehlende Position (rückwärtskompatibel
+# -- kein Crash bei alten/unvollständigen Configs).
+#
+# WICHTIG: Diese Sektion macht die Profit-Berechnung nur TECHNISCH
+# nutzbar. Ob/wie stark sie in den Deal-Score einfließt, wird separat
+# über scoring_weights.profit gesteuert (Folgeschritt, aktuell noch
+# nicht angebunden -- siehe STATUS.md Abschnitt 16).
+# ============================================================
+fees:
+  platform_fee_pct: 10.0
+  payment_fee_pct: 2.5
+  shipping_cost: 6.0
+  packaging_cost: 1.5

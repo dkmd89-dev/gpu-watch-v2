@@ -1,0 +1,176 @@
+category: "netzteil"
+label: "Netzteile (ATX/PC-Netzteile)"
+
+# Kategorieweise-Auswertung-Auftrag: nach GPU (1) und SATA-SSD (2) als
+# drittes eigenständiges Einzelkomponenten-Angebot ausgewertet/geloggt.
+scan_priority: 3
+
+# ============================================================
+# Watt-Erkennung über requirements (categories/detectors/psu.py,
+# min_psu_watt/max_psu_watt -- Requirement-Typ wurde in diesem Schritt
+# neu in matcher._evaluate_hardware_requirements() ergänzt, analog zu
+# min_ssd_gb/max_ssd_gb bei SATA-SSD).
+#
+# Mindestanforderung 550W: laut Auftrag "mindestens für eine NVIDIA
+# GeForce RTX 3060" -- 550W entspricht NVIDIAs eigener Empfehlung für
+# ein komplettes System mit dieser Karte.
+# ============================================================
+
+search_terms:
+  - "Netzteil"
+  - "PC Netzteil"
+  - "ATX Netzteil"
+  - "Netzteil ATX"
+  - "550W Netzteil"
+  - "600W Netzteil"
+  - "650W Netzteil"
+  - "750W Netzteil"
+  - "850W Netzteil"
+  - "Netzteil 80 Plus"
+  - "Netzteil Gold"
+  - "Netzteil Bronze"
+  - "be quiet Netzteil"
+  - "be quiet Straight Power"
+  - "be quiet Pure Power"
+  - "be quiet System Power"
+  - "Corsair RM650"
+  - "Corsair RM750"
+  - "Corsair CX650"
+  - "Corsair CV650"
+  - "Seasonic Focus"
+  - "EVGA SuperNOVA"
+  - "Cooler Master MWE"
+  - "Thermaltake Toughpower"
+  - "Fractal Design Ion"
+  - "Netzteil modular"
+
+# SCORING-GEWICHTUNG
+# Analog zu sata_ssd.yaml: ein Netzteil ist eine einzelne, austauschbare
+# Komponente ohne CPU/RAM/GPU-Ausstattungsmerkmale -- Preis dominiert,
+# Hardwarequalität (hier: Leistungsklasse/Deal-Rating-Stufe) fließt
+# leicht mit ein. hersteller bleibt bei 0: die vorhandene
+# manufacturer_reputation-Tabelle in _global.yaml deckt PC-OEM-Marken
+# (Dell, HP, ...) ab, nicht PSU-Hersteller (be quiet!, Corsair,
+# Seasonic, ...) -- eine Aktivierung würde hier nur den globalen
+# _default-Wert (60) liefern, keine echte Differenzierung. Fähig, aber
+# bewusst inaktiv, exakt wie bei sata_ssd.yaml.
+scoring_weights:
+  price: 0.8
+  ausstattung: 0
+  hardware_qualitaet: 0.2
+  hersteller: 0
+  zustand: 0
+  lieferumfang: 0
+
+# EXCLUDES – komplette PCs/Laptops/Konsolen/Server STRIKT AUSSCHLIESSEN
+# (ein Netzteil, das nur als Teil eines Komplettsystems angeboten wird,
+# ist kein einzeln kaufbares Netzteil-Angebot). "defekt"/"bastler"/
+# "ersatzteil" etc. NICHT hier dupliziert -- bereits über exclude_global
+# in _global.yaml für ALLE Kategorien abgedeckt (siehe matcher.evaluate()).
+exclude_category:
+  # Komplette PCs
+  - "gaming pc"
+  - "gaming-pc"
+  - "gamer pc"
+  - "spiele pc"
+  - "komplett pc"
+  - "komplettsystem"
+  - "komplett-system"
+  - "fertig pc"
+  - "pc komplett"
+  - "office pc"
+  - "office-pc"
+
+  # Laptop/Notebook
+  - "laptop"
+  - "notebook"
+  - "macbook"
+  - "surface"
+
+  # Konsolen
+  - "playstation"
+  - "ps4"
+  - "ps5"
+  - "xbox"
+  - "nintendo"
+  - "switch"
+  - "spielekonsole"
+  - "konsole"
+
+  # Bekannte Komplett-PC-/Workstation-/Server-Modellreihen (ohne "pc"
+  # im Titel, gleiche Logik wie sata_ssd.yaml)
+  - "optiplex"
+  - "precision"
+  - "thinkcentre"
+  - "esprimo"
+  - "prodesk"
+  - "elitedesk"
+  - "nuc"
+  - "mini pc"
+  - "mini-pc"
+  - "proliant"
+  - "poweredge"
+  - "thinkstation"
+  - "server"
+  - "workstation"
+
+rules:
+  # ============================================================
+  # ~550-649W (Einstiegsklasse für RTX 3060, laut NVIDIA-Empfehlung)
+  # ============================================================
+  - label: "~550-649W Netzteil ★ Top-Deal"
+    price_history_model: "netzteil_550w"
+    requirements:
+      min_psu_watt: 550
+      max_psu_watt: 649
+    # Platzhalter-Preisgrenzen (ANNAHME, bitte prüfen) -- es liegen noch
+    # KEINE lokalen Marktdaten für diese neue Kategorie vor. Sobald
+    # price_history.jsonl genug "netzteil_*"-Datenpunkte gesammelt hat,
+    # analog zur SATA-SSD-Kalibrierung (Top-Deal ≈ p10, Guter Preis ≈
+    # Marktpreis, siehe STATUS.md) neu berechnen.
+    max_price: 20
+    deal_rating: "Top-Deal"
+
+  - label: "~550-649W Netzteil"
+    price_history_model: "netzteil_550w"
+    requirements:
+      min_psu_watt: 550
+      max_psu_watt: 649
+    max_price: 40
+    deal_rating: "Guter Preis"
+
+  # ============================================================
+  # ~650-749W
+  # ============================================================
+  - label: "~650-749W Netzteil ★ Top-Deal"
+    price_history_model: "netzteil_650w"
+    requirements:
+      min_psu_watt: 650
+      max_psu_watt: 749
+    max_price: 30
+    deal_rating: "Top-Deal"
+
+  - label: "~650-749W Netzteil"
+    price_history_model: "netzteil_650w"
+    requirements:
+      min_psu_watt: 650
+      max_psu_watt: 749
+    max_price: 50
+    deal_rating: "Guter Preis"
+
+  # ============================================================
+  # 750W+
+  # ============================================================
+  - label: "750W+ Netzteil ★ Top-Deal"
+    price_history_model: "netzteil_750w_plus"
+    requirements:
+      min_psu_watt: 750
+    max_price: 40
+    deal_rating: "Top-Deal"
+
+  - label: "750W+ Netzteil"
+    price_history_model: "netzteil_750w_plus"
+    requirements:
+      min_psu_watt: 750
+    max_price: 65
+    deal_rating: "Guter Preis"
