@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <title>Hardware Deal Finder</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     :root {
       --bg: #0e0f12;
@@ -127,6 +128,22 @@
       padding: 0.7rem 0.6rem;
       text-align: center;
     }
+    /* Fokus-Hierarchie (8.2): Top-Deals ist die wichtigste Kennzahl im
+       Panel -- bekommt zusaetzlich zur bereits bestehenden goldenen
+       Zahlenfarbe (.counter-value.topdeal) jetzt auch eine dezent
+       goldgetoente Kachel-Flaeche, damit sie beim ueberfliegen sofort
+       heraussticht. */
+    .counter-card.topdeal {
+      background: rgba(255, 180, 84, 0.13);
+    }
+    /* "Gescannt (letzter Lauf)" ist die am wenigsten wichtige Kennzahl
+       (rein technisch/transient) -- bewusst zurueckhaltender dargestellt
+       (kleiner, gedaempfte Farbe statt Akzentblau) statt gleichrangig
+       neben Gespeichert/Top-Deals zu stehen. */
+    .counter-card.muted .counter-value {
+      color: var(--text-muted);
+      font-size: 1.15rem;
+    }
     .counter-value {
       font-size: 1.4rem;
       font-weight: 700;
@@ -187,10 +204,38 @@
     }
 
     .rule { color: var(--accent); font-size: 0.82rem; font-weight: 600; }
+    /* Schritt 8.3: Titel + Preis in einer Zeile, Preis bleibt fest rechts
+       und bricht nicht um, der Titel darf mehrzeilig sein/umbrechen. */
+    .title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.6rem;
+    }
     .title { font-size: 0.95rem; line-height: 1.3; }
-    .price { font-weight: 700; color: var(--green); font-size: 1.15rem; }
+    .price {
+      font-weight: 700;
+      color: var(--green);
+      font-size: 1.15rem;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
     .stars { color: var(--amber); font-size: 0.85rem; letter-spacing: 1px; }
     .meta { color: var(--text-muted); font-size: 0.78rem; }
+    /* Schritt 8.3: kleines Plattform-Icon statt reinem Text-Label --
+       bewusst KEINE Original-Marken-Logos, nur generische Font-Awesome-
+       Icons zur Unterscheidbarkeit. Farben je Quelle wie zuvor. */
+    /* Schritt 8.3-Folge2: Font-Awesome <i>-Icon statt eigener SVG-Datei
+       (kein onerror-Fallback mehr nötig -- Font Awesome liefert für
+       unbekannte/künftige Quellen automatisch das generische
+       Marktplatz-Icon, siehe ICON_MAP/ICON_DEFAULT weiter unten). */
+    .platform-icon {
+      display: inline-block;
+      width: 1.05rem;
+      text-align: center;
+      vertical-align: -1px;
+      margin-right: 0.3rem;
+    }
     .card a {
       color: var(--accent);
       font-size: 0.85rem;
@@ -211,6 +256,11 @@
       border-radius: var(--radius);
       padding: 1rem 1.2rem;
       margin-bottom: 1.2rem;
+      /* Schritt 8.4: zusätzlicher Abstand nach oben, damit sich die
+         Filter-Leiste optisch von den KPI-Kacheln direkt darüber löst
+         (beide nutzen dieselbe Oberflächenfarbe/Panel-Optik und
+         verschwammen bei nur 1.2rem Standard-Panel-Abstand). */
+      margin-top: 0.6rem;
     }
     .filter-row {
       display: flex;
@@ -223,6 +273,13 @@
       flex-direction: column;
       gap: 0.3rem;
       min-width: 140px;
+    }
+    /* Schritt 8.4: Feldbreite an den Inhalt anpassen -- "Preis bis (€)"
+       braucht nur eine kurze Zahl, nicht dieselbe Breite wie z.B.
+       "Kategorie" (dessen Optionsliste dynamisch/länger sein kann). */
+    .filter-field.narrow {
+      min-width: 100px;
+      max-width: 130px;
     }
     .filter-field label {
       font-size: 0.72rem;
@@ -394,7 +451,7 @@
       <div class="progress-fill" id="progressFill"></div>
     </div>
     <div class="counters">
-      <div class="counter-card">
+      <div class="counter-card muted">
         <div class="counter-value" id="cntScanned">–</div>
         <div class="counter-label">Gescannt (letzter Lauf)</div>
       </div>
@@ -442,7 +499,7 @@
           <option value="40">★★☆☆☆ oder besser (≥40)</option>
         </select>
       </div>
-      <div class="filter-field">
+      <div class="filter-field narrow">
         <label for="filterMaxPrice">Preis bis (€)</label>
         <input type="number" id="filterMaxPrice" min="0" placeholder="z.B. 300">
       </div>
@@ -454,6 +511,19 @@
   </section>
 
   <div class="listings-grid" id="listingsGrid">
+  {#- Zuordnung Quelle -> Font-Awesome-Icon + Farbe. Einzige Quelle der
+      Wahrheit fuer Server-Render (unten) UND Client-Render
+      (renderCardHtml() im <script>-Block, via ICON_MAP/ICON_DEFAULT als
+      JSON). Neue Quellen (Phase 9/10, per YAML/Scraper-Plugin ergaenzt)
+      benoetigen KEINEN Eintrag hier -- sie erhalten automatisch
+      icon_default (generisches Marktplatz-Icon). Ein Eintrag hier ist
+      rein kosmetisch und optional. #}
+  {% set icon_map = {
+    'kleinanzeigen': {'icon': 'fa-solid fa-store', 'color': '#6bc95e'},
+    'ebay': {'icon': 'fa-brands fa-ebay', 'color': '#f3c94b'},
+    'quoka': {'icon': 'fa-solid fa-tag', 'color': '#ff8a5c'},
+  } %}
+  {% set icon_default = {'icon': 'fa-solid fa-shop', 'color': 'var(--text-muted)'} %}
   {% for f in found %}
     <div class="card"
          data-category="{{ f.category or 'unbekannt' }}"
@@ -463,20 +533,32 @@
          data-score="{{ f.deal_score if (f.deal_score is defined and f.deal_score is not none) else 0 }}">
       <div class="card-top">
         <span class="rule">{{ f.rule }}</span>
-        {% if f.deal_rating == "Top-Deal" %}
+        {#- Schritt 8.3: EIN standardisierter Badge-Slot oben rechts statt
+           zweier potenziell gleichzeitig sichtbarer Top-Deal-Badges.
+           Priorität: 1) is_top_deal (Preishistorie/Bestpreis-Erkennung,
+           Phase 7) 2) regelbasiertes deal_rating (Phase 6). Beide Felder
+           bleiben unverändert im Backend bestehen -- reine Anzeige-
+           Priorisierung, keine Daten gehen verloren. #}
+        {% if f.is_top_deal %}
+          <span class="badge top-deal">🔥 Top-Deal (Bestpreis)</span>
+        {% elif f.deal_rating == "Top-Deal" %}
           <span class="badge rating-top-deal">⭐ Top-Deal {{ f.deal_rating_badge_stars }}</span>
         {% elif f.deal_rating == "Guter Preis" %}
           <span class="badge rating-guter-preis">👍 Guter Preis {{ f.deal_rating_badge_stars }}</span>
         {% endif %}
-        {% if f.is_top_deal %}<span class="badge top-deal">🔥 Top-Deal</span>{% endif %}
       </div>
-      <div class="title">{{ f.title }}</div>
-      <div class="price">{{ "%.0f"|format(f.price) }} €</div>
+      <div class="title-row">
+        <span class="title">{{ f.title }}</span>
+        <span class="price">{{ "%.0f"|format(f.price) }} €</span>
+      </div>
       {% if f.deal_stars %}<div class="stars">{{ f.deal_stars }}</div>{% endif %}
       <div class="meta">
-        {{ f.source }} · {{ f.location }}
+        {%- set _src = f.source or 'unbekannt' -%}
+        {%- set _icon = icon_map.get(_src|lower, icon_default) -%}
+        <i class="platform-icon {{ _icon.icon }}" style="color: {{ _icon.color }};" title="{{ _src }}"></i>{{ _src }} · {{ f.location }}
         {%- if f.category %} · {{ f.category }}{% endif %}
-        {%- if f.manufacturer %} · {{ f.manufacturer }}{% endif %} · {{ f.found_at }}
+        {%- if f.manufacturer %} · {{ f.manufacturer }}{% endif %}
+        {%- if f.found_at %} · <span class="found-at" data-found-at="{{ f.found_at }}">{{ f.found_at }}</span>{% endif %}
       </div>
       <a href="{{ f.url }}" target="_blank">Zum Angebot →</a>
     </div>
@@ -519,6 +601,14 @@
     // die generisch erzeugten KPI-Kacheln lesbare Titel statt interner
     // Schluessel zeigen. Additiv zu SERVER_CATEGORIES, gleiches Prinzip.
     const SERVER_CATEGORY_LABELS = {{ category_labels | tojson }};
+    // Live-Refresh-Schritt: Basis-URL für Plattform-Icons, serverseitig
+    // via url_for() ermittelt (nicht hartkodiert), damit die clientseitige
+    // Kartenerzeugung (renderCardHtml(), siehe unten) exakt dieselbe URL
+    // erzeugt wie das serverseitige Jinja-Markup beim ersten Laden.
+    // Gleiche Quelle wie das Server-Render-Markup oben (icon_map/icon_default) --
+    // per tojson injiziert, damit Server- und Client-Render nicht auseinanderlaufen.
+    const ICON_MAP = {{ icon_map | tojson }};
+    const ICON_DEFAULT = {{ icon_default | tojson }};
 
     // Dashboard-Kachel-Folgeschritt: generisches KPI-Kachel-Rendering.
     // Ersetzt die bisher fest codierten "Office-PCs"/"Gaming-PCs"-Kacheln
@@ -633,12 +723,11 @@
 
           updateLogBox(s.scan_log_tail);
 
-          // Nach Abschluss eines Scans einmalig neu laden, damit die
-          // Trefferliste und die Modell-Auswahl der Preisdiagramme
-          // aktuell sind (Live-Refresh ohne Reload waere ein groesserer
-          // eigener Umbau, siehe Notiz zu Phase 8.5/8.6 oben).
+          // Nach Abschluss eines Scans die Trefferliste + Filter-Optionen
+          // gezielt neu laden (siehe refreshListings() weiter unten) --
+          // kein voller Seiten-Reload mehr nötig.
           if (wasRunning && !running) {
-            location.reload();
+            refreshListings();
           }
           wasRunning = running;
         })
@@ -684,6 +773,43 @@
     refreshStatus();
     setInterval(refreshStatus, 5000);
 
+    // --- Schritt 8.3: Deal-Karten -- relative Zeitangabe statt ISO-String ---
+    // Ersetzt den Textinhalt jedes ".found-at"-Elements (Rohwert steckt in
+    // data-found-at, bleibt im DOM erhalten -- reine Anzeige-Umwandlung).
+    // Läuft rein clientseitig, damit "vor 5 Minuten" auch ohne Seiten-
+    // Neuladen mit der Zeit weiterzählt; Karten selbst werden aktuell nur
+    // per vollem Seiten-Reload neu gerendert (kein separater Fetch nötig).
+    function formatRelativeFoundAt(isoString) {
+      const then = new Date(isoString);
+      if (isNaN(then.getTime())) return isoString; // unparsebar -> Rohwert
+      const now = new Date();
+      const diffMs = now - then;
+      const diffMin = Math.floor(diffMs / 60000);
+
+      if (diffMin < 1) return "gerade eben";
+      if (diffMin < 60) return `vor ${diffMin} Minute${diffMin === 1 ? '' : 'n'}`;
+
+      const pad = n => String(n).padStart(2, '0');
+      const time = `${pad(then.getHours())}:${pad(then.getMinutes())}`;
+      const isSameDay = then.toDateString() === now.toDateString();
+      if (isSameDay) return `heute, ${time}`;
+
+      const yesterday = new Date(now);
+      yesterday.setDate(now.getDate() - 1);
+      if (then.toDateString() === yesterday.toDateString()) return `gestern, ${time}`;
+
+      return `${pad(then.getDate())}.${pad(then.getMonth() + 1)}., ${time}`;
+    }
+
+    function updateRelativeTimestamps() {
+      document.querySelectorAll('.found-at[data-found-at]').forEach(el => {
+        el.textContent = formatRelativeFoundAt(el.dataset.foundAt);
+      });
+    }
+
+    updateRelativeTimestamps();
+    setInterval(updateRelativeTimestamps, 60000);
+
     // --- Phase 8.5 (+ Hersteller-Filter-Folgeschritt): Client-seitige Filter ---
     // Arbeitet direkt auf den bereits serverseitig gerenderten Karten
     // (kein zusätzlicher Fetch nötig) -- Kategorie-/Quellen-/Hersteller-
@@ -692,6 +818,23 @@
     // Detector ergänzt) hier automatisch auftauchen, ohne dieses
     // Template anzufassen.
     function initFilters() {
+      populateFilterOptions();
+
+      ['filterCategory', 'filterSource', 'filterManufacturer', 'filterMinScore'].forEach(id => {
+        document.getElementById(id).addEventListener('change', applyFilters);
+      });
+      document.getElementById('filterMaxPrice').addEventListener('input', applyFilters);
+
+      applyFilters();
+    }
+
+    // Live-Refresh-Schritt: aus initFilters() herausgezogen, damit die
+    // Dropdown-Optionen (Kategorie/Quelle/Hersteller) nach einem
+    // Live-Refresh (refreshListings(), siehe unten) neu ermittelt werden
+    // können, OHNE die Event-Listener erneut zu registrieren und OHNE
+    // bereits vorhandene <option>-Elemente zu duplizieren. Erhält die
+    // aktuell gewählten Filterwerte (nicht zurücksetzen bei jedem Refresh).
+    function populateFilterOptions() {
       const cards = Array.from(document.querySelectorAll('#listingsGrid .card'));
 
       // Kategorie-Dropdown-Fix: Union aus der serverseitigen Rules-Liste
@@ -709,36 +852,30 @@
       const sources = [...new Set(cards.map(c => c.dataset.source))].sort();
       const manufacturers = [...new Set(cards.map(c => c.dataset.manufacturer))].sort();
 
-      const catSelect = document.getElementById('filterCategory');
-      categories.forEach(cat => {
+      fillSelectOptions('filterCategory', categories);
+      fillSelectOptions('filterSource', sources);
+      fillSelectOptions('filterManufacturer', manufacturers);
+    }
+
+    // Ersetzt alle Optionen außer der ersten ("Alle") -- verhindert
+    // Duplikate bei wiederholtem Aufruf (z.B. nach jedem Live-Refresh)
+    // und stellt die vorher gewählte Auswahl wieder her, falls der Wert
+    // nach dem Refresh weiterhin existiert.
+    function fillSelectOptions(selectId, values) {
+      const select = document.getElementById(selectId);
+      const previousValue = select.value;
+      while (select.options.length > 1) {
+        select.remove(1);
+      }
+      values.forEach(value => {
         const opt = document.createElement('option');
-        opt.value = cat;
-        opt.textContent = cat;
-        catSelect.appendChild(opt);
+        opt.value = value;
+        opt.textContent = value;
+        select.appendChild(opt);
       });
-
-      const srcSelect = document.getElementById('filterSource');
-      sources.forEach(src => {
-        const opt = document.createElement('option');
-        opt.value = src;
-        opt.textContent = src;
-        srcSelect.appendChild(opt);
-      });
-
-      const mfrSelect = document.getElementById('filterManufacturer');
-      manufacturers.forEach(mfr => {
-        const opt = document.createElement('option');
-        opt.value = mfr;
-        opt.textContent = mfr;
-        mfrSelect.appendChild(opt);
-      });
-
-      ['filterCategory', 'filterSource', 'filterManufacturer', 'filterMinScore'].forEach(id => {
-        document.getElementById(id).addEventListener('change', applyFilters);
-      });
-      document.getElementById('filterMaxPrice').addEventListener('input', applyFilters);
-
-      applyFilters();
+      if (values.includes(previousValue)) {
+        select.value = previousValue;
+      }
     }
 
     function applyFilters() {
@@ -787,6 +924,98 @@
     }
 
     initFilters();
+
+    // --- Live-Refresh ohne location.reload() ---
+    // Baut eine Deal-Karte clientseitig 1:1 nach dem Vorbild des
+    // serverseitigen Jinja-Markups oben nach (siehe <div class="card">
+    // im Template) -- inkl. Badge-Priorität (is_top_deal > deal_rating),
+    // Titel+Preis-Zeile, Plattform-Icon mit Fallback, Sterne-Anzeige nur
+    // bei vorhandenem Score, relativer Zeitangabe. escapeHtml() (bereits
+    // für das Scan-Log vorhanden) schützt vor HTML-Injection über
+    // gescrapte Angebotstitel/-orte, genau wie textContent es beim
+    // serverseitigen Jinja-Autoescaping ohnehin tut.
+    function renderCardHtml(f) {
+      const category = f.category || 'unbekannt';
+      const source = f.source || 'unbekannt';
+      const manufacturer = f.manufacturer || 'unbekannt';
+      const price = Number(f.price) || 0;
+      const score = (f.deal_score !== undefined && f.deal_score !== null) ? f.deal_score : 0;
+
+      let badge = '';
+      if (f.is_top_deal) {
+        badge = '<span class="badge top-deal">🔥 Top-Deal (Bestpreis)</span>';
+      } else if (f.deal_rating === 'Top-Deal') {
+        badge = `<span class="badge rating-top-deal">⭐ Top-Deal ${escapeHtml(f.deal_rating_badge_stars || '')}</span>`;
+      } else if (f.deal_rating === 'Guter Preis') {
+        badge = `<span class="badge rating-guter-preis">👍 Guter Preis ${escapeHtml(f.deal_rating_badge_stars || '')}</span>`;
+      }
+
+      const starsHtml = f.deal_stars
+        ? `<div class="stars">${escapeHtml(f.deal_stars)}</div>`
+        : '';
+
+      const metaParts = [`${escapeHtml(source)} · ${escapeHtml(f.location || '')}`];
+      if (f.category) metaParts.push(escapeHtml(f.category));
+      if (f.manufacturer) metaParts.push(escapeHtml(f.manufacturer));
+      let foundAtHtml = '';
+      if (f.found_at) {
+        foundAtHtml = ` · <span class="found-at" data-found-at="${escapeHtml(f.found_at)}">${escapeHtml(f.found_at)}</span>`;
+      }
+
+      const iconInfo = ICON_MAP[(source || '').toLowerCase()] || ICON_DEFAULT;
+
+      return `
+    <div class="card"
+         data-category="${escapeHtml(category)}"
+         data-source="${escapeHtml(source)}"
+         data-manufacturer="${escapeHtml(manufacturer)}"
+         data-price="${price}"
+         data-score="${score}">
+      <div class="card-top">
+        <span class="rule">${escapeHtml(f.rule || '')}</span>
+        ${badge}
+      </div>
+      <div class="title-row">
+        <span class="title">${escapeHtml(f.title || '')}</span>
+        <span class="price">${price.toFixed(0)} €</span>
+      </div>
+      ${starsHtml}
+      <div class="meta"><i class="platform-icon ${iconInfo.icon}" style="color: ${iconInfo.color};" title="${escapeHtml(source)}"></i>${metaParts.join(' · ')}${foundAtHtml}
+      </div>
+      <a href="${escapeHtml(f.url || '#')}" target="_blank">Zum Angebot →</a>
+    </div>`;
+    }
+
+    // Ersetzt den vollen location.reload() nach Scan-Ende (bisher hier
+    // notwendig, um neue/aktualisierte Treffer, Filter-Optionen und
+    // Preis-Score-Werte anzuzeigen) durch einen gezielten Re-Fetch von
+    // /api/found (liefert exakt dieselben Rohdaten, die auch index()
+    // serverseitig für das erste Rendern nutzt) + Neuaufbau nur des
+    // Karten-Grids. Status-Kacheln/Log laufen bereits unabhängig über
+    // refreshStatus() (5s-Polling) weiter -- hier wird bewusst NICHT die
+    // ganze Seite neu geholt.
+    function refreshListings() {
+      fetch('/api/found')
+        .then(r => r.json())
+        .then(found => {
+          const grid = document.getElementById('listingsGrid');
+          grid.innerHTML = found.length
+            ? found.map(renderCardHtml).join('')
+            : '<div class="empty-state">Noch keine Treffer. Der erste Scan läuft im Hintergrund.</div>';
+
+          document.getElementById('filterPanel').style.display = found.length ? '' : 'none';
+
+          populateFilterOptions();
+          applyFilters();
+          updateRelativeTimestamps();
+        })
+        .catch(() => {
+          // Fallback: falls /api/found ausnahmsweise fehlschlägt, lieber
+          // die bisher sichtbaren Karten unverändert stehen lassen als
+          // einen Fehlerzustand zu zeigen -- beim naechsten Scan-Ende
+          // wird erneut versucht.
+        });
+    }
 
     // --- Phase 8.6: Preisdiagramme (Chart-Rendering auf Basis 8.3) ---
     // Nutzt ausschliesslich die bestehenden Routen /api/price-history
