@@ -18,6 +18,15 @@ from scoring.profit import compute_profit
 
 logger = logging.getLogger(__name__)
 
+# Baustein 3 (Bundle-/Part-Out-Erkennung, STATUS.md Abschnitt 16): Default-
+# Schwellenwert (Prozent), ab der eine im PC-Titel erkannte GPU als
+# "macht den PC im Grunde nur als GPU-Verkauf lohnenswert" gilt --
+# gpu_market_price / pc_price * 100 >= dieser Wert. Greift nur, falls
+# _global.yaml keine eigene "part_out_detection"-Sektion definiert
+# (aeltere Configs) -- analog zu duplicate_detection.py's Modulkonstanten,
+# volle Rueckwaertskompatibilitaet.
+DEFAULT_PART_OUT_THRESHOLD_PCT = 70.0
+
 # Legacy-Fallback: wird NUR noch verwendet, wenn load_rules() im alten
 # Einzeldatei-Modus (eine rules.yaml ohne Kategorie-Kontext) aufgerufen wird.
 # Im neuen Verzeichnis-Modus liegt die Liste stattdessen in der jeweiligen
@@ -80,6 +89,22 @@ class MatchResult:
     # Code bleibt unveraendert lauffaehig (regulaere Matches innerhalb von
     # max_price setzen dieses Feld nie).
     negotiation_candidate: bool = False
+    # Baustein 3 (Bundle-/Part-Out-Erkennung, STATUS.md Abschnitt 16): reines
+    # Zusatzsignal fuer PC-Angebote (Office-/Gaming-PC o.ae.), bei denen die
+    # im Titel erkannte dedizierte GPU laut bereits gesammeltem GPU-Markt-
+    # preis (rules/gpu.yaml-Kategorie) einen grossen Teil des PC-Gesamtpreises
+    # ausmacht -- "die GPU allein waere fast so viel wert wie der ganze PC".
+    # part_out_gpu_value: nachgeschlagener GPU-Marktpreis in Euro (None, wenn
+    #   keine GPU erkannt wurde ODER kein Mapping-Eintrag/Marktpreis vorliegt).
+    # part_out_ratio_pct: part_out_gpu_value / Angebotspreis * 100.
+    # is_part_out_candidate: True, wenn part_out_ratio_pct die konfigurierte
+    #   Schwelle erreicht (siehe DEFAULT_PART_OUT_THRESHOLD_PCT/_global.yaml
+    #   "part_out_detection"). KEIN Einfluss auf deal_score/deal_stars oder
+    #   das Notification-Gate -- rein informatives Signal, additive Felder
+    #   mit neutralen Defaults, bestehender Code bleibt unveraendert lauffaehig.
+    part_out_gpu_value: float | None = None
+    part_out_ratio_pct: float | None = None
+    is_part_out_candidate: bool = False
 
 
 def load_rules(path: str = "rules.yaml") -> dict:
@@ -111,6 +136,7 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
     manufacturer_reputation = {}
     fees = {}
     duplicate_detection_cfg = {}
+    part_out_detection_cfg = {}
     if global_file.exists():
         global_cfg = yaml.safe_load(global_file.read_text(encoding="utf-8")) or {}
         defaults = dict(global_cfg.get("defaults", {}))
@@ -148,6 +174,31 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
         # Modulkonstanten in duplicate_detection.py zurueck (kein Crash,
         # volle Rueckwaertskompatibilitaet).
         duplicate_detection_cfg = global_cfg.get("duplicate_detection", {})
+        # Baustein 3 (Bundle-/Part-Out-Erkennung, STATUS.md Abschnitt 16):
+        # additiver Key analog zu duplicate_detection -- leeres Dict, falls
+        # _global.yaml keine "part_out_detection:"-Sektion definiert
+        # (aeltere Configs). evaluate() faellt dann auf
+        # DEFAULT_PART_OUT_THRESHOLD_PCT zurueck (kein Crash, volle
+        # Rueckwaertskompatibilitaet).
+        part_out_detection_cfg = global_cfg.get("part_out_detection", {})
+
+    # Baustein 3, Schritt 1: Mapping-Tabelle GPU-Detector-Modellname ->
+    # price_history_model (siehe rules/mappings/component_values.yaml).
+    # Bewusst NICHT ueber den category_files-Glob unten geladen (siehe
+    # Kommentar in component_values.yaml: eine *.yaml direkt in rules/
+    # wuerde faelschlich als leere Kategorie eingelesen) -- eigener,
+    # expliziter Ladepfad in einem Unterverzeichnis. Fehlt die Datei
+    # (aeltere Installationen ohne Baustein 3) -> leeres Dict, Part-Out-
+    # Erkennung bleibt in evaluate() fuer alle Modelle inaktiv (kein Crash).
+    gpu_model_to_price_history_model: dict[str, str] = {}
+    component_values_file = rules_dir / "mappings" / "component_values.yaml"
+    if component_values_file.exists():
+        component_values_cfg = yaml.safe_load(
+            component_values_file.read_text(encoding="utf-8")
+        ) or {}
+        gpu_model_to_price_history_model = component_values_cfg.get(
+            "gpu_model_to_price_history_model", {}
+        )
 
     merged_rules: list[dict] = []
     all_search_terms: set[str] = set()
@@ -249,6 +300,12 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
         # ihn nicht kennen (aeltere app.py-Version, Legacy-Einzeldatei-Modus),
         # bleiben unveraendert lauffaehig.
         "duplicate_detection": duplicate_detection_cfg,
+        # Baustein 3 (Bundle-/Part-Out-Erkennung, STATUS.md Abschnitt 16,
+        # Schritt 1+2): additive Keys, analog zu duplicate_detection oben --
+        # Aufrufer, die sie nicht kennen (aeltere app.py-Version, Legacy-
+        # Einzeldatei-Modus), bleiben unveraendert lauffaehig.
+        "gpu_model_to_price_history_model": gpu_model_to_price_history_model,
+        "part_out_detection": part_out_detection_cfg,
         "_directory_mode": True,
     }
 
@@ -579,11 +636,27 @@ def evaluate(
     fuer dieses Modell auf market_prices zurueck -- volle Rueckwaerts-
     kompatibilitaet zum bisherigen Verhalten (Phase-1-Platzhalter-
     Entscheidung: estimated_resale_price == market_price).
+
+    Baustein 3 (Bundle-/Part-Out-Erkennung, STATUS.md Abschnitt 16,
+    Schritt 2): nutzt DIESELBEN market_prices wie oben (kein zusaetzlicher
+    Parameter) -- fuer PC-Angebote mit erkannter dedizierter GPU wird
+    geprueft, ob der GPU-Marktpreis (ueber rules_cfg["gpu_model_to_price_
+    history_model"], siehe rules/mappings/component_values.yaml) einen
+    grossen Anteil des PC-Gesamtpreises ausmacht (siehe MatchResult.
+    part_out_gpu_value/part_out_ratio_pct/is_part_out_candidate). Reines
+    Zusatzsignal, kein Einfluss auf deal_score/Notification-Gate.
     """
     title_l = title.lower()
     defaults = rules_cfg.get("defaults", {})
     global_excludes = defaults.get("exclude_global", [])
     directory_mode = rules_cfg.get("_directory_mode", False)
+    # Baustein 3 (Bundle-/Part-Out-Erkennung, STATUS.md Abschnitt 16,
+    # Schritt 2): einmalig vor der Regel-Schleife gelesen, analog zu
+    # global_excludes oben -- vermeidet wiederholte dict-Lookups pro Regel.
+    gpu_model_mapping = rules_cfg.get("gpu_model_to_price_history_model") or {}
+    part_out_threshold_pct = (rules_cfg.get("part_out_detection") or {}).get(
+        "gpu_value_ratio_threshold_pct", DEFAULT_PART_OUT_THRESHOLD_PCT
+    )
 
     # 1. Globaler Ausschluss (defekt, bastler, etc.) -- gilt für ALLE Kategorien
     if _any_term(title_l, global_excludes):
@@ -752,6 +825,35 @@ def evaluate(
                 continue
             negotiation_candidate = True
 
+        # Baustein 3 (Bundle-/Part-Out-Erkennung, STATUS.md Abschnitt 16,
+        # Schritt 2): reines Zusatzsignal, KEIN Einfluss auf score_result/
+        # deal_score/Notification-Gate (siehe MatchResult-Docstring oben).
+        # Bewusst OHNE Kategorie-Namen-Hardcoding (kein "if category ==
+        # 'gaming_pc'") -- die Pruefung greift generisch ueberall dort, wo
+        # eine Hardware-Requirement-Regel tatsaechlich eine dedizierte GPU
+        # erkannt hat (features["gpu"], siehe _evaluate_hardware_
+        # requirements()) UND fuer deren Modell sowohl ein Mapping-Eintrag
+        # (rules/mappings/component_values.yaml, Schritt 1) als auch ein
+        # bereits gesammelter GPU-Marktpreis (market_prices) vorliegen.
+        # Neue PC-Kategorien profitieren dadurch automatisch, ohne
+        # matcher.py anzufassen -- konsistent mit dem Architekturprinzip
+        # "neue Hardware nur ueber YAML" (Entwicklungsauftrag Phase 2).
+        part_out_gpu_value: float | None = None
+        part_out_ratio_pct: float | None = None
+        is_part_out_candidate = False
+        gpu_match = features.get("gpu")
+        if gpu_match is not None:
+            gpu_price_history_model = gpu_model_mapping.get(gpu_match.model)
+            if gpu_price_history_model is not None:
+                gpu_market_price = (market_prices or {}).get(gpu_price_history_model)
+                # price > 0 verhindert ZeroDivisionError bei "zu verschenken"-
+                # Angeboten (Randfall, in der Praxis kaum relevant, aber
+                # evaluate() darf hierbei nie abstuerzen).
+                if gpu_market_price is not None and price > 0:
+                    part_out_gpu_value = gpu_market_price
+                    part_out_ratio_pct = (gpu_market_price / price) * 100
+                    is_part_out_candidate = part_out_ratio_pct >= part_out_threshold_pct
+
         return MatchResult(
             matched=True,
             rule_label=rule_label,
@@ -772,6 +874,9 @@ def evaluate(
             estimated_margin_eur=profit.margin_abs if profit else None,
             estimated_margin_pct=profit.margin_pct if profit else None,
             negotiation_candidate=negotiation_candidate,
+            part_out_gpu_value=part_out_gpu_value,
+            part_out_ratio_pct=part_out_ratio_pct,
+            is_part_out_candidate=is_part_out_candidate,
         )
 
     return MatchResult(matched=False)

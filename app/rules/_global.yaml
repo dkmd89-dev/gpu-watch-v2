@@ -195,3 +195,28 @@ fees:
 duplicate_detection:
   price_tolerance_pct: 5.0
   window_days: 30.0
+
+# ============================================================
+# Bundle-/Part-Out-Erkennung (Reselling-/Arbitrage-Konzept, siehe
+# STATUS.md Abschnitt 16, Baustein 3) -- genutzt von matcher.py::evaluate().
+# ============================================================
+# Markiert PC-Angebote (Office-/Gaming-PC o.ae.), bei denen die im Titel
+# erkannte dedizierte GPU laut bereits gesammeltem GPU-Marktpreis (siehe
+# rules/gpu.yaml-Kategorie, Nachschlage-Tabelle in
+# rules/mappings/component_values.yaml) einen grossen Teil des PC-Gesamt-
+# preises ausmacht -- "der PC ist im Grunde nur die enthaltene GPU wert".
+#
+# gpu_value_ratio_threshold_pct: Schwelle in Prozent
+#   (gpu_marktpreis / pc_preis * 100), ab der is_part_out_candidate=True
+#   gesetzt wird. 70% als Startwert: eine GPU, die 70%+ des PC-Preises
+#   ausmacht, ist ein starkes Signal, dass sich Einzelverkauf der GPU
+#   eher lohnt als der PC als Ganzes.
+#
+# Fehlt diese Sektion komplett oder der Wert, faellt matcher.py's
+# Modulkonstante DEFAULT_PART_OUT_THRESHOLD_PCT (=70.0) als Default ein --
+# kein Crash, volle Rueckwaertskompatibilitaet (aeltere Configs ohne diese
+# Sektion). Reines Zusatzsignal (MatchResult.part_out_*-Felder) -- KEIN
+# Einfluss auf deal_score/deal_stars/Notification-Gate.
+# ============================================================
+part_out_detection:
+  gpu_value_ratio_threshold_pct: 70.0

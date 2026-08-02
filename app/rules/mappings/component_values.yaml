@@ -1,0 +1,72 @@
+# ============================================================
+# Komponenten-Wert-Mapping (Reselling-/Arbitrage-Konzept,
+# STATUS.md Abschnitt 16, Baustein 3: Bundle-/Part-Out-Erkennung)
+# ============================================================
+# Zweck: categories/detectors/gpu.py::detect_dedicated_gpu() liefert einen
+# NORMALISIERTEN Modellnamen aus dem Angebotstitel (z.B. "RTX 3060",
+# "RTX 3060 TI", "RX 6700 XT") -- das ist NICHT automatisch derselbe
+# Schluessel wie "price_history_model" in rules/gpu.yaml (z.B.
+# "rtx_3060_12gb", "rtx_3060_ti", "rx_6700_xt"), da dort teils feinere
+# Varianten (VRAM-Groesse) unterschieden werden. Diese Tabelle bildet die
+# Detector-Ausgabe EXPLIZIT auf den passenden price_history_model-
+# Schluessel ab, damit fuer Office-/Gaming-PC-Angebote (die selbst keine
+# eigene GPU-Preishistorie fuehren) der bereits gesammelte GPU-Marktpreis
+# nachgeschlagen werden kann ("ist die enthaltene GPU allein schon fast so
+# viel wert wie der ganze PC?").
+#
+# Bewusst als explizite Tabelle statt automatischer Text-Ableitung: eine
+# Ableitung waere bei mehrdeutigen Faellen (z.B. welche VRAM-Variante bei
+# reiner "RTX 3060"-Erwaehnung ohne "12GB"/"8GB" im Titel) unzuverlaessig.
+# Pflege erfolgt ausschliesslich hier -- keine Code-Aenderung noetig, wenn
+# rules/gpu.yaml um weitere Modelle/price_history_model-Schluessel erweitert
+# wird (Architekturprinzip "neue Hardware nur via YAML").
+#
+# Format: normalisierter GPU-Detector-Modellname (exakt wie von
+# detect_dedicated_gpu() als GpuMatch.model geliefert, GROSSSCHREIBUNG
+# beachten) -> price_history_model-Schluessel aus rules/gpu.yaml.
+#
+# Fehlt ein Modell hier (z.B. weil rules/gpu.yaml dafuer noch keine eigene
+# price_history_model-Regel definiert, oder weil der Detector es zwar
+# erkennt, aber keine GPU-Kategorie-Regel dafuer existiert -- siehe die
+# auskommentierten Beispiele unten aus der Gaming-PC-Vorzugsliste in
+# categories/detectors/gpu.py::_PREFERRED_MODELS): kein Crash, die
+# Part-Out-Erkennung bleibt fuer dieses Modell schlicht inaktiv (kein
+# Marktpreis nachschlagbar), bis entweder eine passende price_history_
+# model-Regel in rules/gpu.yaml existiert UND hier ergaenzt wird.
+#
+# WICHTIG: Diese Datei macht das Mapping nur TECHNISCH verfuegbar. Die
+# eigentliche Part-Out-Logik (Nachschlagen, Schwellenwert-Vergleich,
+# neue MatchResult-Felder) ist noch NICHT angebunden -- das ist ein
+# separater Folgeschritt (siehe STATUS.md Abschnitt 16, Baustein 3).
+#
+# SPEICHERORT bewusst rules/mappings/ (Unterverzeichnis), NICHT direkt in
+# rules/: matcher.py::_load_rules_from_dir() liest per glob("*.yaml") JEDE
+# Datei direkt in rules/ (ausser _global.yaml) als eigenstaendige Kategorie
+# ein (category_name = Dateiname ohne Endung, falls kein "category"-Feld
+# gesetzt ist). Eine Mapping-Tabelle direkt in rules/ wuerde dadurch faelsch-
+# lich als leere Kategorie "component_values" im Dashboard-Kategorie-Filter
+# auftauchen. glob("*.yaml") ist NICHT rekursiv, ein Unterverzeichnis wird
+# also nicht erfasst -- reine Pfadwahl, keine Aenderung an matcher.py noetig.
+# ============================================================
+
+gpu_model_to_price_history_model:
+  "RTX 3060": "rtx_3060_12gb"
+  "RTX 3060 TI": "rtx_3060_ti"
+  "RTX 3070": "rtx_3070"
+  "RTX 4060": "rtx_4060"
+  "RTX 2080 TI": "rtx_2080_ti"
+  "RX 6700 XT": "rx_6700_xt"
+  "RX 6750 XT": "rx_6750_xt"
+  "RX 6800": "rx_6800"
+  "RX 7600 XT": "rx_7600_xt"
+  "RX 7600": "rx_7600"
+
+  # Nicht gemappt, da fuer diese Modelle (noch) KEINE price_history_model-
+  # Regel in rules/gpu.yaml existiert -- sie tauchen zwar in
+  # categories/detectors/gpu.py::_PREFERRED_MODELS (Gaming-PC-Vorzugsliste,
+  # Phase 5) auf, haben aber keine eigene GPU-Kategorie-Regel und damit
+  # keine gesammelte Marktpreis-Datenbasis:
+  #   "GTX 1060", "GTX 1070", "GTX 1660", "RTX 2060", "RTX 2070", "RX 6600"
+  # Sobald rules/gpu.yaml eine Regel mit price_history_model fuer eines
+  # dieser Modelle bekommt, kann der Eintrag hier ergaenzt werden -- ohne
+  # Code-Aenderung.
