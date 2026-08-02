@@ -18,3 +18,4 @@ STATUS.md
 .vscode/
 .idea/
 data/price_history.jsonl
+*.backup
