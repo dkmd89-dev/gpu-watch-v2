@@ -13,9 +13,25 @@ DEAL_EMOJI = {
 }
 DEAL_EMOJI_FALLBACK = "💰"
 
+# Dashboard-Badge (feste Sternezahl je regelbasiertem deal_rating,
+# unabhaengig vom dynamisch berechneten deal_score/deal_stars aus
+# scoring/deal_score.py -- siehe app.py "deal_rating_badge_stars"). Bewusst
+# nur fuer "Top-Deal"/"Guter Preis" definiert; "Okay" bekommt kein eigenes
+# Sterne-Badge im Dashboard.
+DEAL_RATING_STARS = {
+    "Top-Deal": "★★★★★",
+    "Guter Preis": "★★★☆☆",
+}
+
 
 def emoji_for(deal_rating: str | None) -> str:
     return DEAL_EMOJI.get(deal_rating or "", DEAL_EMOJI_FALLBACK)
+
+
+def rating_stars_for(deal_rating: str | None) -> str | None:
+    """Feste Sternezahl fuers Dashboard-Rating-Badge, None wenn deal_rating
+    nicht "Top-Deal"/"Guter Preis" ist (z.B. "Okay" oder kein Treffer)."""
+    return DEAL_RATING_STARS.get(deal_rating or "")
 
 
 def send_ntfy(title: str, message: str, priority: str = "default", tags: list[str] | None = None):

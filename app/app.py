@@ -12,7 +12,7 @@ from flask import Flask, render_template, jsonify
 
 from matcher import load_rules, evaluate
 from scrapers import search_kleinanzeigen, search_ebay
-from notify import send_ntfy, emoji_for
+from notify import send_ntfy, emoji_for, rating_stars_for
 from scoring.deal_score import stars_meet_minimum
 from price_history import append_price_point, make_price_point, read_price_points
 from price_stats import compute_all_price_stats, compute_price_stats, PriceStats
@@ -389,6 +389,13 @@ def run_scan():
                     "manufacturer": result.manufacturer_name,
                     "deal_score": result.deal_score,
                     "deal_stars": result.deal_stars,
+                    "deal_rating": result.deal_rating,
+                    # Dashboard-Badge (Ziel: ⭐ Top-Deal + ★★★★★ bzw.
+                    # 👍 Guter Preis + ★★★☆☆) mit fester Sternezahl je
+                    # regelbasiertem deal_rating -- bewusst getrennt von
+                    # "deal_stars" oben, das weiterhin den vollen gewichteten
+                    # deal_score (Phase 6) widerspiegelt.
+                    "deal_rating_badge_stars": rating_stars_for(result.deal_rating),
                     "is_top_deal": top_deal_result.is_top_deal,
                     "top_deal_discount_pct": (
                         round(top_deal_result.discount_pct, 1)
