@@ -44,7 +44,7 @@ def test_evaluate_niedriger_score_bei_hohem_preis():
     cfg = load_rules(RULES_DIR)
     r = evaluate(
         "Gaming PC Intel Core i5-8500 16GB RAM RTX 3060 Tower",
-        399.0,  # nahe an max_price (400) der Top-Deal-Regel
+        299.0,  # nahe an max_price (300, kalibriert siehe Abschnitt 15) der Top-Deal-Regel
         cfg,
     )
     assert r.matched is True

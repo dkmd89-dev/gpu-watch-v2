@@ -42,10 +42,13 @@ def test_office_pc_treffer_liefert_kategorie_und_price_history_model():
 def test_gaming_pc_beide_rating_stufen_teilen_price_history_model():
     cfg = load_rules(RULES_DIR)
     top_deal = evaluate(
-        "Gaming PC Intel Core i5-8500 16GB DDR4 RAM RTX 3060 Tower", 350.0, cfg
+        "Gaming PC Intel Core i5-8500 16GB DDR4 RAM RTX 3060 Tower", 280.0, cfg
     )
     okay = evaluate(
-        "Gaming PC Intel Core i5-8500 16GB DDR4 RAM RTX 4060 Tower", 500.0, cfg
+        # 420€: innerhalb der kalibrierten Okay-Grenze (450€, siehe
+        # Abschnitt 15) -- vorher 500€, das nach der Kalibrierung ueber der
+        # neuen Grenze gelegen haette.
+        "Gaming PC Intel Core i5-8500 16GB DDR4 RAM RTX 4060 Tower", 420.0, cfg
     )
     assert top_deal.matched is True and okay.matched is True
     assert top_deal.category == okay.category == "gaming_pc"

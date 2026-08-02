@@ -80,7 +80,10 @@ rules:
           - "excluded"
       requires_dedicated_gpu: true
       preferred_gpu_only: true
-    max_price: 400
+    # Kalibriert (Abschnitt 15, Schritt 3) anhand 416 unzensierter
+    # price_history.jsonl-Datenpunkte fuer "gaming_pc" (02.08.2026):
+    # p10 = 300€ -> Top-Deal-Grenze. Vorher 400€ (Bauchgefuehl-Wert).
+    max_price: 300
     deal_rating: "Top-Deal"
 
   - label: "Gaming-PC (Mindestanforderung erfüllt)"
@@ -100,9 +103,11 @@ rules:
         exclude_categories:
           - "excluded"
       requires_dedicated_gpu: true
-    # 550 -> 750: Erfassungsfenster fuer die Datensammlung geoeffnet (siehe
-    # Kommentar zu notify_max_price oben). notify_max_price bleibt bei 400€,
-    # d.h. Treffer zwischen 550-750€ werden weiterhin NUR gespeichert/im
-    # Dashboard gezeigt, loesen aber keine Benachrichtigung aus.
-    max_price: 750
+    # Kalibriert (Abschnitt 15, Schritt 3+4) anhand 416 unzensierter
+    # price_history.jsonl-Datenpunkte fuer "gaming_pc" (02.08.2026):
+    # Marktpreis (getrimmter Mittelwert p10-p90) = 452€, Median = 450€ ->
+    # max_price auf 450€ gesetzt. Erfassungsfenster (Schritt 1: 550 -> 750)
+    # damit wie geplant zurueckgesetzt -- kein Datenmuell-Fenster mehr
+    # dauerhaft offen. notify_max_price bleibt unveraendert bei 400€.
+    max_price: 450
     deal_rating: "Okay"

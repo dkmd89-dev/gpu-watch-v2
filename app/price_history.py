@@ -34,6 +34,13 @@ class PricePoint:
         fragmentieren.
     category: z.B. "gpu", "office_pc", "gaming_pc" (rule._category aus dem
         Verzeichnis-Modus). None im Legacy-Einzeldatei-Modus.
+    fingerprint: normalisierter Angebotstitel (siehe duplicate_detection.py::
+        normalize_title()), Grundlage der Duplicate-/Cross-Posting-Erkennung
+        (STATUS.md Abschnitt 16, Punkt 5). Optional mit Default None --
+        aeltere price_history.jsonl-Zeilen ohne dieses Feld bleiben lesbar
+        (read_price_points() setzt es dann implizit auf None), genau wie
+        beim bisherigen Umgang mit percentile_75/estimated_resale_price in
+        price_stats.py.
     """
 
     price: float
@@ -42,6 +49,7 @@ class PricePoint:
     model: str
     category: str | None
     deal_score: int | None
+    fingerprint: str | None = None
 
 
 def make_price_point(
@@ -50,6 +58,7 @@ def make_price_point(
     model: str,
     category: str | None = None,
     deal_score: int | None = None,
+    fingerprint: str | None = None,
 ) -> PricePoint:
     """Baut einen PricePoint mit aktuellem UTC-Zeitstempel."""
     return PricePoint(
@@ -59,6 +68,7 @@ def make_price_point(
         model=model,
         category=category,
         deal_score=deal_score,
+        fingerprint=fingerprint,
     )
 
 
