@@ -1,4 +1,4 @@
-# status.md — Aktualisiert bis Schritt "Quoka-Scraper hinzugefügt (Abschnitt 12), Test-Mock-Bug von Robin behoben, alle Tests grün"
+# status.md — Aktualisiert bis Schritt "Plugin-System vollständig: Kontrakt-Test, Kategorie-Registry, Detector-Registry (Abschnitt 13); Dashboard-Redesign-Backlog ergänzt"
 
 ## Statusübersicht
 - **Phase 0 (Projektanalyse & Stabilisierung):** Abgeschlossen
@@ -25,6 +25,7 @@
 - **`requirements-dev.txt` ergänzt:** Abgeschlossen (siehe Abschnitt 10).
 - **Plugin-Registry für Scraper (Schritt 1–3):** Abgeschlossen (siehe Abschnitt 11). Neue Suchquellen (Phase 9) benötigen künftig keine Codeänderung mehr an `app.py`.
 - **Quoka-Scraper (Phase 9):** Implementiert und gegen echte Fixture verifiziert (siehe Abschnitt 12). Der beim echten `pytest`-Lauf entdeckte Test-Mock-Bug (fehlende `search_quoka`-Mocks, siehe "Bekannte Probleme") wurde von Robin behoben -- alle Tests laufen jetzt grün.
+- **Phase 10 (Plugin-System vollständig):** Abgeschlossen (siehe Abschnitt 13). Kontrakt-Test beweist YAML-only-Erweiterbarkeit für Kategorien; `categories/registry.py` (Kategorie-Discovery) und `categories/detectors/registry.py` (Detector-Discovery) ergänzen die bereits bestehende Scraper-Registry (Abschnitt 11) zu allen drei Plugin-Ebenen. `matcher.py` bewusst unverändert (siehe Begründung in Abschnitt 13).
 
 ---
 
@@ -176,6 +177,20 @@
 - **Dank Plugin-Registry (Abschnitt 11) keine Codeänderung an `app.py`/`__init__.py` nötig** -- `quoka` wurde automatisch per Discovery gefunden und end-to-end gegen `run_scan()` verifiziert (in dieser Sandbox nur mit gemockten Requests, kein echter Netzwerkzugriff möglich).
 - Testsuite in dieser Sandbox danach: 368/368 grün.
 
+### 13. Plugin-System vollständig: Kontrakt-Test, Kategorie-Registry, Detector-Registry (Phase 10 / STATUS.md-Ausblick Punkte 5 & 6)
+
+**Ausgangslage:** Phase 10 verlangt, dass sowohl neue Suchquellen als auch neue Hardware-Kategorien ausschließlich per Plugin/YAML ergänzt werden können, ohne den Kern anzufassen. Die Scraper-Seite war das bereits seit Abschnitt 11 (Discovery-Registry). Für Kategorien fehlte die explizite Analogie/der Beweis, für Detectors die Discovery-Schicht (Ausblick-Punkte 5 & 6 der vorherigen Fassung).
+
+- **Kontrakt-Test (`app/tests/test_rules_category_plugin_contract.py`, neu):** Beweist end-to-end (isoliertes `tmp_path`-Verzeichnis, synthetische `_plugin_test`-Kategorie), dass eine neue Hardware-Kategorie allein durch eine YAML-Datei in `rules/` entsteht -- Erkennung, Label, Suchbegriffe, `scan_priority`, `evaluate()`-Treffer inkl. `notify_max_price`, alles ohne Codeänderung an `matcher.py`/`app.py`.
+- **Kategorie-Registry (`app/categories/registry.py`, neu):** `CategoryPlugin`/`discover_categories()`, analog zu `scrapers/registry.py`. Scannt `rules/*.yaml` (außer `_global.yaml`) zur Laufzeit. Skip-Regel bewusst exakt an `matcher._load_rules_from_dir()` angeglichen (nur `_global.yaml`, keine pauschale Unterstrich-Regel).
+- **Detector-Registry (`app/categories/detectors/registry.py`, neu):** `DetectorPlugin`/`discover_detectors()`. Erkennt alle öffentlichen `detect_<name>`-Funktionen in `categories/detectors/*.py` per Namenskonvention -- 13 Detectors gefunden (u.a. mehrere pro Modul, z.B. `storage.py` → `ssd_gb`/`hdd_gb`/`nvme`). Private Hilfsfunktionen (`_size_to_gb` etc.) werden korrekt ausgeschlossen.
+- **Bewusste Nicht-Verdrahtung in `matcher.py` (für beide neuen Registries):** Die produktive Merge-/Auswertungslogik (`_load_rules_from_dir()`, `_evaluate_hardware_requirements()`) bleibt unverändert. Grund: `matcher.py` braucht pro Requirement-Prüfung einen bestimmten Detector mit fester Signatur in fester Reihenfolge -- eine generische "rufe alle gefundenen Plugins auf"-Schleife böte hier keinen Mehrwert, nur unnötiges Risiko am produktiven Matching-Pfad. Beide Registries dienen als Discovery-Bestandsaufnahme, Grundlage für generische Kontrakt-Tests und künftiges Plugin-Tooling -- identisches Muster wie Schritt 1 der Scraper-Registry (Abschnitt 11).
+- **Tests:** `test_category_registry.py` (7 Tests), `test_detector_registry.py` (8 Tests), `test_rules_category_plugin_contract.py` (6 Tests) -- alle von Robin gegen die echte Umgebung bestätigt grün (`test_detector_registry.py`: 8/8 bestätigt; `test_rules_category_plugin_contract.py`: 6/6 bestätigt).
+- **Bekannter Stolperstein dieser Session (kein Code-, sondern Auslieferungsfehler):** Zwei neu erstellte Dateien hießen beide `registry.py` (`app/categories/registry.py` und `app/categories/detectors/registry.py`) und wurden anfangs unter identischem Downloadnamen ausgeliefert -- Robin hat dadurch zweimal versehentlich die falsche Datei am falschen Pfad abgelegt (einmal fehlender Import, einmal falscher Dateiinhalt). Behoben durch eindeutig benannte Downloads (`categories_registry.py` / `detectors_registry.py`) mit expliziter Zielpfad-Tabelle. **Lehre:** bei mehreren gleichnamigen Dateien im selben Schritt künftig immer eindeutige Downloadnamen + Zielpfad-Tabelle verwenden.
+- **Verifikation:** In der Sandbox (kein `pytest` installierbar, kein Netzwerkzugriff) wurde die komplette Testlogik aller drei neuen Dateien manuell per `python3`-Assertions gegen den echten Code nachvollzogen, inkl. Regressionschecks von `matcher.evaluate()` auf echten Office-PC-/Gaming-PC-Titeln. In Robins echter Umgebung zusätzlich reguläre `pytest`-Läufe bestätigt grün (siehe oben).
+
+**Ergebnis:** Alle drei Plugin-Ebenen (Scraper, Kategorien, Detectors) sind jetzt konsistent per Discovery erfassbar. Phase 10 gilt als abgeschlossen.
+
 ---
 
 ## Bekannte Probleme & Einschränkungen
@@ -200,6 +215,7 @@ Betroffen waren: `test_app_category_grouped_scan.py` (2 Tests), `test_app_manufa
 - **Testsuite:** pytest unter `app/tests/`.
 - **In dieser Sandbox (kein Netzwerkzugriff, alle Scraper zwingend gemockt):** **368/368 Tests grün, 0 Fehler**, direkt nach Hinzufügen von `quoka.py` verifiziert.
 - **Robins echte Umgebung (mit Netzwerkzugriff):** Ursprünglich 8/368 Fehlschläge durch fehlenden `search_quoka`-Mock in 5 Testdateien (siehe "Bekannte Probleme"). **Von Robin behoben, alle Tests jetzt grün bestätigt.** Fix wurde in dieser Sandbox nicht erneut nachvollzogen (Robins lokaler Diff liegt hier nicht vor) -- als "von Robin bestätigt" statt "in dieser Sandbox verifiziert" vermerkt.
+- **Abschnitt 13 (Plugin-System vollständig):** 21 neue Tests (`test_category_registry.py`: 7, `test_detector_registry.py`: 8, `test_rules_category_plugin_contract.py`: 6). Von Robin in seiner echten Umgebung ausgeführt und bestätigt grün (`test_detector_registry.py` 8/8 bestätigt per Screenshot; `test_rules_category_plugin_contract.py` 6/6 bestätigt; `test_category_registry.py` nach Behebung des Auslieferungsfehlers noch nicht erneut von Robin bestätigt -- offen, siehe Ausblick).
 - Die zuvor in dieser Datei dokumentierten 3 vorbestehenden Fehler (`test_matcher_ssd_capacity_requirement.py`-Import, `test_sata_ssd_500gb_matcht_nicht_die_1tb_regel`, `test_search_ebay_nutzt_normalisierte_url`) treten beim aktuellen Lauf **nicht** auf -- gemäß Projektprinzip "keine unbesehenen Übernahmen aus der Doku" wird hier nur der tatsächlich in dieser Session verifizierte Zustand (356/356 grün) festgehalten; die Diskrepanz zur älteren Notiz wurde nicht weiter zurückverfolgt.
 - **Historie (frühere Läufe, nicht in dieser Session erneut geprüft):** 317/317 vor Schritt A/B/C; 334 gesamt nach Schritt A/B/C (18 neue Tests: 8 SSD-Suche, 3 Log-Rotation, 7 Deals-Aufräumen).
 
@@ -214,8 +230,14 @@ Offene Punkte, unpriorisiert, keiner davon begonnen:
 2. **Gaming-PC-Preisgrenzen kalibrieren:** weiterhin explizit zurückgestellt, bis der produktive Container genug frische Daten (seit dem eBay-Dedup-Fix) gesammelt hat.
 3. **SATA-SSD-Preise & `notify_max_price`-Werte gegenprüfen:** aktuell grobe Schätzwerte (siehe Abschnitt 9), noch nicht anhand echter Marktdaten kalibriert.
 4. **`detect_ssd_gb()`-Wortstellungslücke (Abschnitt 10, offener Befund):** Titel der Form "…GB SATA SSD" (SATA zwischen Zahl und "SSD") werden von der strikten Adjazenzprüfung nicht erkannt -- dürfte produktiv reale SATA-SSD-Angebote als False Negative verpassen. Vorschlag: `_CONNECTOR`/Adjazenzprüfung in `storage.py` um "sata"/"sata iii" als zulässiges Zwischenwort erweitern. Eigenständiger, isolierter Schritt (nicht mit anderen Änderungen mischen).
-5. **Detector-Registry für `categories/detectors/` (in der Plugin-Registry-Planung als Option 4 genannt, bewusst zurückgestellt):** analog zu Schritt 1 additive Discovery statt statischer Imports in `matcher.py`. Deutlich risikoärmer als die Scraper-Registry, da `matcher.py`-Aufrufe vorerst unverändert bleiben könnten.
-6. **Phase 10 – Plugin-System vollständig (Kategorien als Plugins):** Kategorien sind bereits YAML-basiert erweiterbar (seit Phase 2/5), aber noch keine "Plugins" im engeren Sinn (keine Discovery/Registry-Schicht wie jetzt bei Scrapern). Wäre der nächste konsequente Schritt, um Phase 10 vollständig zu erreichen.
-7. **Dashboard-Polishing:** nahtloser Live-Refresh der Angebotssortierung ohne vollen `location.reload()` (aus Abschnitt 9 offen geblieben).
+5. ~~Detector-Registry für `categories/detectors/`~~ **Erledigt** (siehe Abschnitt 13).
+6. ~~Phase 10 – Plugin-System vollständig (Kategorien als Plugins)~~ **Erledigt** (siehe Abschnitt 13).
+7. **Ausstehende Bestätigung:** `test_category_registry.py` (7 Tests) noch nicht erneut von Robin bestätigt, nachdem der Auslieferungsfehler aus Abschnitt 13 (falscher Dateiinhalt am Zielpfad) behoben wurde -- kurzer, risikoarmer Nachlauf: `pytest app/tests/test_category_registry.py -v` bzw. volle Suite.
+8. **Dashboard-Redesign (neu, von Robin am 02.08. vorgeschlagen, UI/UX-Feedback, unpriorisiert, keiner der Unterpunkte begonnen):** vier Hebel, jeweils eigenständig und isoliert umsetzbar (`templates/index.html`, ggf. `app.py` für Zeitstempel-Formatierung):
+   - **8.1 Header & Status-Leiste:** kompakter, "Jetzt manuell scannen"-Button neben den Titel; Text "Scan läuft..." durch pulsierenden Live-Indikator (Punkt/Spinner) ersetzen.
+   - **8.2 KPI-Kacheln:** dicke Rahmen entfernen, stattdessen subtile helle Hintergrundflächen ohne Rand; Top-Deals-Kachel farblich hervorheben (z.B. dezentes Gold), um sie gegenüber z.B. "Gescannt" optisch zu priorisieren.
+   - **8.3 Deal-Karten:** Titel+Preis in eine Zeile (Preis fett/farblich hervorgehoben); Top-Deal-Badge standardisiert oben rechts; Plattform-Icons (eBay/Kleinanzeigen/Quoka) statt Text-Label; Zeitstempel als relative Zeit ("vor 5 Minuten"/"heute, 14:20") statt ISO-String -- Umrechnung client- oder serverseitig zu entscheiden; leere Sterne-Bewertung ausblenden statt grau anzuzeigen, solange kein Score vorliegt.
+   - **8.4 Filter-Leiste:** mehr vertikaler Abstand zu den Kacheln darüber; Feldbreiten an Inhalt anpassen (z.B. "Preis bis (€)" schmaler als "Kategorie").
+   - Reihenfolge/Priorisierung der vier Unterpunkte: offen, liegt bei Robin. Nahtloser Live-Refresh ohne `location.reload()` (bisheriger Punkt 7) bleibt als zusätzlicher, unabhängiger Dashboard-Punkt bestehen.
 
 Kein Punkt ist priorisiert oder für den nächsten Schritt vorausgewählt -- Freigabe/Auswahl liegt bei Robin.
