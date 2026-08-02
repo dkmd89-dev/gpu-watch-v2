@@ -210,6 +210,14 @@
       background: rgba(91, 140, 255, 0.18);
       color: var(--accent);
     }
+    /* GPU-Part-Out-Erkennung (STATUS.md Abschnitt 16, Baustein 3): eigener,
+       orthogonaler Badge -- reines Zusatzsignal ("GPU allein macht Großteil
+       des Preises aus"), daher bewusst in Warnfarbe statt Positiv-Grün, ohne
+       eine negative Wertung des Angebots auszudrücken. */
+    .badge.part-out {
+      background: rgba(255, 107, 107, 0.18);
+      color: var(--red);
+    }
 
     .rule { color: var(--accent); font-size: 0.82rem; font-weight: 600; }
     /* Schritt 8.3: Titel + Preis in einer Zeile, Preis bleibt fest rechts
@@ -562,6 +570,9 @@
         {% endif %}
         {%- if f.negotiation_candidate is defined and f.negotiation_candidate %}
           <span class="badge negotiation" title="Preis über der regulären Grenze, aber gute Ausstattung">🤝 Verhandelbar</span>
+        {%- endif %}
+        {%- if f.is_part_out_candidate is defined and f.is_part_out_candidate %}
+          <span class="badge part-out" title="Der Marktwert der verbauten GPU macht einen Großteil des Angebotspreises aus">🧩 Part-Out-Kandidat{% if f.part_out_ratio_pct is not none %} ({{ "%.0f"|format(f.part_out_ratio_pct) }}% GPU-Wert){% endif %}</span>
         {%- endif %}
       </div>
       <div class="title-row">
@@ -982,6 +993,14 @@
       // angehaengt statt ihn zu ersetzen, analog zum Jinja-Pfad oben.
       if (f.negotiation_candidate) {
         badge += '<span class="badge negotiation" title="Preis über der regulären Grenze, aber gute Ausstattung">🤝 Verhandelbar</span>';
+      }
+      // GPU-Part-Out-Erkennung (STATUS.md Abschnitt 16, Baustein 3): eigener,
+      // orthogonaler Badge, analog zum Jinja-Pfad oben.
+      if (f.is_part_out_candidate) {
+        const ratioText = (f.part_out_ratio_pct !== undefined && f.part_out_ratio_pct !== null)
+          ? ` (${Number(f.part_out_ratio_pct).toFixed(0)}% GPU-Wert)`
+          : '';
+        badge += `<span class="badge part-out" title="Der Marktwert der verbauten GPU macht einen Großteil des Angebotspreises aus">🧩 Part-Out-Kandidat${ratioText}</span>`;
       }
 
       const starsHtml = f.deal_stars

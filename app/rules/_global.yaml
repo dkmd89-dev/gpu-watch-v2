@@ -220,3 +220,31 @@ duplicate_detection:
 # ============================================================
 part_out_detection:
   gpu_value_ratio_threshold_pct: 70.0
+
+# ============================================================
+# Time-to-Sell-Schätzung / Presence-Tracking (Reselling-/Arbitrage-
+# Konzept, siehe STATUS.md Abschnitt 16, Baustein 6) -- genutzt von
+# presence_tracking.py::detect_newly_delisted() ueber app.py::run_scan().
+# ============================================================
+# Ein zuvor gematchtes Angebot gilt als "delisted" (aus dem Markt
+# verschwunden, vermutlich verkauft), sobald es in delisting_threshold_scans
+# aufeinanderfolgenden Scans NICHT mehr in den rohen Suchergebnissen
+# auftaucht. Daraus wird ein Time-to-Sell-Datenpunkt (Verweildauer in
+# Tagen, first_seen -> last_seen) abgeleitet und in time_to_sell.jsonl
+# gespeichert -- Grundlage fuer eine spaetere Liquiditaets-Statistik je
+# Kategorie (Median/Mittelwert, Folgeschritt).
+#
+# delisting_threshold_scans: Anzahl aufeinanderfolgender Scans ohne
+#   erneutes Sichten, ab der ein Angebot als delisted gilt. 3 als
+#   Startwert: verhindert, dass ein einzelner verpasster/fehlgeschlagener
+#   Scan-Durchlauf (z.B. wegen eines temporaeren Plattform-Ausfalls) ein
+#   Angebot faelschlich als verkauft markiert.
+#
+# Fehlt diese Sektion komplett oder der Wert, faellt presence_tracking.py's
+# Modulkonstante DEFAULT_DELISTING_THRESHOLD_SCANS (=3) als Default ein --
+# kein Crash, volle Rueckwaertskompatibilitaet (aeltere Configs ohne diese
+# Sektion). Reines Zusatzsignal (time_to_sell.jsonl) -- KEIN Einfluss auf
+# deal_score/deal_stars/Notification-Gate.
+# ============================================================
+presence_tracking:
+  delisting_threshold_scans: 3

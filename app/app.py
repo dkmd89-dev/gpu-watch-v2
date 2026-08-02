@@ -17,6 +17,11 @@ from notify import send_ntfy, emoji_for, rating_stars_for
 from scoring.deal_score import stars_meet_minimum
 from price_history import append_price_point, make_price_point, read_price_points
 from duplicate_detection import find_duplicate, normalize_title
+from presence_tracking import (
+    migrate_seen_data, mark_seen, mark_matched, detect_newly_delisted,
+    DEFAULT_DELISTING_THRESHOLD_SCANS,
+)
+from time_to_sell import make_time_to_sell_point, append_time_to_sell_point
 from price_stats import compute_all_price_stats, compute_price_stats, PriceStats
 from top_deal import evaluate_top_deal
 
@@ -29,6 +34,10 @@ LOG_FILE = DATA_DIR / "gpu_watch.log"
 # Rotation und vom Notification-Gate -- Grundlage fuer Marktpreis-Statistik
 # (Schritt 7.2) und Top-Deal-Erkennung (Schritt 7.3).
 PRICE_HISTORY_FILE = DATA_DIR / "price_history.jsonl"
+# Baustein 6 (Time-to-Sell-Schätzung, STATUS.md Abschnitt 16), Schritt 2:
+# append-only Zeitreihe analog PRICE_HISTORY_FILE, aber für Verweildauern
+# delisteter Angebote statt Preise (siehe time_to_sell.py).
+TIME_TO_SELL_FILE = DATA_DIR / "time_to_sell.jsonl"
 
 # Phase-0-Befund: found.json war hart auf 200 Einträge gekappt, obwohl
 # ältere Doku von 1000 sprach (Diskrepanz). Jetzt explizit konfigurierbar
@@ -324,8 +333,24 @@ def run_scan():
         if "window_days" in dup_cfg:
             duplicate_kwargs["window_days"] = dup_cfg["window_days"]
 
+        # Baustein 6 (Time-to-Sell-Schätzung, STATUS.md Abschnitt 16),
+        # Schritt 2: Delisting-Schwelle (Anzahl aufeinanderfolgender Scans
+        # ohne erneutes Sichten) analog aus _global.yaml konfigurierbar,
+        # gleiches Muster wie duplicate_detection oben. Fehlt der Wert/die
+        # Sektion, greift presence_tracking.DEFAULT_DELISTING_THRESHOLD_SCANS.
+        presence_cfg = rules_cfg.get("presence_tracking") or {}
+        delisting_threshold_scans = presence_cfg.get(
+            "delisting_threshold_scans", DEFAULT_DELISTING_THRESHOLD_SCANS
+        )
+
         with _seen_lock:
-            seen = set(_load_json(SEEN_FILE, []))
+            # Baustein 6 (Time-to-Sell-Schätzung, STATUS.md Abschnitt 16),
+            # Schritt 1: seen.json speichert je URL jetzt zusätzlich
+            # first_seen/last_seen statt nur eine flache URL-Liste zu sein.
+            # migrate_seen_data() überführt ein bestehendes Alt-Format
+            # automatisch (siehe presence_tracking.py-Moduldoku) --
+            # rückwärtskompatibel, kein manueller Migrationsschritt nötig.
+            seen = migrate_seen_data(_load_json(SEEN_FILE, []))
             found = _load_json(FOUND_FILE, [])
             # Schritt C: veraltete Deals (> DEAL_MAX_AGE_DAYS) vor dem
             # Scan entfernen, damit found.json/das Dashboard nicht auf
@@ -396,6 +421,11 @@ def run_scan():
             _scan_status["scan_progress_total"] = len(raw)
 
         new_hits = 0
+        # Baustein 6, Schritt 1: EIN Zeitstempel für den gesamten Scan-Lauf
+        # (statt pro Item neu), analog zu "found_at" weiter unten -- ein
+        # Scan gilt als ein Zeitpunkt, zu dem alle darin enthaltenen
+        # Angebote "gesehen" wurden.
+        now_iso = datetime.now(timezone.utc).isoformat()
         # Treffer werden hier nur gesammelt (nach Kategorie gruppiert,
         # Reihenfolge innerhalb einer Kategorie = Scrape-Reihenfolge),
         # die eigentliche Verarbeitung (found.json/price_history/ntfy)
@@ -411,15 +441,32 @@ def run_scan():
             uid = item["url"]
 
             with _seen_lock:
-                if uid in seen:
+                already_seen = uid in seen
+                # Baustein 6, Schritt 1: last_seen wird für JEDES erneut
+                # gesehene Angebot aktualisiert (auch wenn es unten wegen
+                # already_seen übersprungen wird) -- das ist die Grundlage
+                # für die spätere Delisting-Erkennung (Schritt 2): ein
+                # Angebot gilt dort als delisted, wenn es N Scans lang
+                # NICHT mehr aktualisiert wurde. mark_seen() legt bei neuen
+                # URLs zusätzlich first_seen an.
+                mark_seen(seen, uid, now_iso)
+                if already_seen:
                     continue
-                seen.add(uid)
                 # Sofort persistieren statt erst am Scan-Ende: verhindert,
                 # dass ein Crash mitten im Scan dazu führt, dass bereits
                 # verarbeitete (und ggf. schon benachrichtigte) Angebote
                 # beim nächsten Lauf erneut gematcht und doppelt verschickt
-                # werden (siehe Phase-0-Analyse, Befund d).
-                _save_json(SEEN_FILE, list(seen))
+                # werden (siehe Phase-0-Analyse, Befund d). Für bereits
+                # bekannte URLs (nur last_seen aktualisiert) wird NICHT
+                # sofort persistiert -- das wäre bei tausenden bereits
+                # bekannten Angeboten pro Scan ein spürbarer I/O-Mehraufwand
+                # für eine unkritische Information (last_seen); diese
+                # Updates werden gesammelt am Scan-Ende geschrieben (siehe
+                # unten). Kein Datenverlustrisiko: bei einem Crash bleibt
+                # last_seen für diese Einträge lediglich auf dem Stand des
+                # vorherigen Scans -- first_seen (sicherheitsrelevant für
+                # Schritt 2) ist davon nicht betroffen.
+                _save_json(SEEN_FILE, seen)
 
             result = evaluate(
                 item["title"], item["price"], rules_cfg,
@@ -427,6 +474,13 @@ def run_scan():
             )
             if not result.matched:
                 continue
+
+            # Baustein 6, Schritt 2: category/price_history_model direkt im
+            # seen.json-Eintrag vermerken, damit die spätere Delisting-
+            # Erkennung (weiter unten) sie ohne Abhängigkeit von der auf
+            # FOUND_MAX_ITEMS begrenzten found.json nachschlagen kann.
+            with _seen_lock:
+                mark_matched(seen, uid, result.category, result.price_history_model)
 
             category_buckets.setdefault(result.category or "unbekannt", []).append((item, result))
 
@@ -490,6 +544,24 @@ def run_scan():
                     # aeltere found.json-Eintraege ohne dieses Feld bleiben
                     # dank is-defined-Check im Template kompatibel.
                     "negotiation_candidate": result.negotiation_candidate,
+                    # GPU-Part-Out-Erkennung (STATUS.md Abschnitt 16, Baustein 3,
+                    # Schritt 2 in matcher.py bereits berechnet). Rein additive
+                    # Felder fuer die Dashboard-Anzeige (Schritt 3) -- None/False,
+                    # solange keine dedizierte GPU erkannt wurde oder kein
+                    # Mapping-/Marktpreis-Eintrag vorliegt. Aeltere found.json-
+                    # Eintraege ohne diese Felder bleiben dank is-defined-Check
+                    # im Template kompatibel.
+                    "is_part_out_candidate": result.is_part_out_candidate,
+                    "part_out_gpu_value": (
+                        round(result.part_out_gpu_value, 0)
+                        if result.part_out_gpu_value is not None
+                        else None
+                    ),
+                    "part_out_ratio_pct": (
+                        round(result.part_out_ratio_pct, 1)
+                        if result.part_out_ratio_pct is not None
+                        else None
+                    ),
                     "found_at": datetime.now(timezone.utc).isoformat(),
                 }
 
@@ -591,8 +663,42 @@ def run_scan():
             # Kategorie durchsucht wurde).
             log.info("🔍 Kategorie '%s' fertig: %d Treffer", category_name, len(bucket))
 
+        # Baustein 6 (Time-to-Sell-Schätzung), Schritt 2: Delisting-Sweep
+        # EINMAL am Scan-Ende über alle bekannten URLs, nicht pro Item --
+        # analog zu price_stats_by_model oben (einmal pro Scan berechnet).
+        # raw_urls: exakt dieselbe Teilmenge, die auch oben im Scrape-Loop
+        # via mark_seen() aktualisiert wurde (item["price"] is not None),
+        # damit "aktuell gesehen" fuer Presence-Tracking und Delisting-
+        # Erkennung konsistent definiert ist.
+        raw_urls = {item["url"] for item in raw if item.get("price") is not None}
         with _seen_lock:
-            _save_json(SEEN_FILE, list(seen))
+            newly_delisted_urls = detect_newly_delisted(
+                seen, raw_urls, threshold=delisting_threshold_scans
+            )
+            for delisted_url in newly_delisted_urls:
+                entry = seen.get(delisted_url, {})
+                ttsp = make_time_to_sell_point(
+                    first_seen=entry.get("first_seen"),
+                    last_seen=entry.get("last_seen"),
+                    model=entry.get("price_history_model"),
+                    category=entry.get("category"),
+                )
+                if ttsp is None:
+                    # Kein gematchtes Angebot (kein price_history_model)
+                    # oder migrierter Alt-Eintrag ohne echte Historie
+                    # (first_seen is None) -- siehe time_to_sell.py-
+                    # Docstring. Kein Datenpunkt, aber weiterhin als
+                    # delisted markiert (verhindert erneute Pruefung).
+                    continue
+                append_time_to_sell_point(TIME_TO_SELL_FILE, ttsp)
+                log.info(
+                    "Delisting erkannt: Modell=%s, Kategorie=%s, "
+                    "Verweildauer=%.1f Tage (%s -> %s).",
+                    ttsp.model, ttsp.category, ttsp.days, ttsp.first_seen, ttsp.last_seen,
+                )
+
+        with _seen_lock:
+            _save_json(SEEN_FILE, seen)
             _save_json(FOUND_FILE, found[:FOUND_MAX_ITEMS])
 
         log.info(
