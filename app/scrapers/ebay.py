@@ -64,6 +64,13 @@ def _ebay_token() -> str | None:
         return None
 
 
+# Plugin-Metadaten fuer scrapers/registry.py (Discovery statt Imports,
+# Architekturplanung "Plugin-Registry"). Rein additiv -- die Funktion
+# search_ebay() selbst ist unveraendert und bleibt weiterhin direkt
+# importierbar (`from scrapers import search_ebay`).
+SCRAPER_NAME = "ebay"
+
+
 def search_ebay(search_terms: list[str], max_price: int, plz: str) -> list[Listing]:
     token = _ebay_token()
     if not token:

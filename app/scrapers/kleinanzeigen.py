@@ -47,6 +47,13 @@ def _clean_location(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+# Plugin-Metadaten fuer scrapers/registry.py (Discovery statt Imports,
+# Architekturplanung "Plugin-Registry"). Rein additiv -- die Funktion
+# search_kleinanzeigen() selbst ist unveraendert und bleibt weiterhin
+# direkt importierbar (`from scrapers import search_kleinanzeigen`).
+SCRAPER_NAME = "kleinanzeigen"
+
+
 def search_kleinanzeigen(
     search_terms: list[str], plz: str, radius_km: int, max_price: int
 ) -> list[Listing]:
