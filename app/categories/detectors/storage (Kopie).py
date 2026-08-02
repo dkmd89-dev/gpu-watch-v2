@@ -12,7 +12,7 @@ Speichergrößen, nicht 1024 GB), inkl. deutscher Dezimal-Kommaschreibweise
 from __future__ import annotations
 import re
 
-_CONNECTOR = r"[\s,:/\-()]*(?:SATA\s+)?"
+_CONNECTOR = r"[\s,:/\-()]*"
 
 # Zahl (optional mit Dezimalpunkt/-komma) + Einheit (GB/TB)
 _SIZE_UNIT = r"(\d{1,4}(?:[.,]\d{1,2})?)\s*(gb|tb)"

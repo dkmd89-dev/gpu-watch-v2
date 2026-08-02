@@ -4,11 +4,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+RULES_DIR = str(Path(__file__).resolve().parent.parent / "rules")
+
 from matcher import load_rules, evaluate, _build_score_inputs
 
 
 def test_evaluate_liefert_deal_score_und_stars_bei_treffer():
-    cfg = load_rules("rules")
+    cfg = load_rules(RULES_DIR)
     r = evaluate("ASUS RTX 2080Ti DUAL Lüfter", 15.0, cfg)
     assert r.matched is True
     assert r.deal_score is not None
@@ -18,7 +20,7 @@ def test_evaluate_liefert_deal_score_und_stars_bei_treffer():
 
 
 def test_evaluate_kein_treffer_hat_keinen_score():
-    cfg = load_rules("rules")
+    cfg = load_rules(RULES_DIR)
     r = evaluate("RTX 3060 Ti defekt", 50.0, cfg)
     assert r.matched is False
     assert r.deal_score is None
@@ -26,7 +28,7 @@ def test_evaluate_kein_treffer_hat_keinen_score():
 
 
 def test_evaluate_5_sterne_bei_optimalem_gaming_pc():
-    cfg = load_rules("rules")
+    cfg = load_rules(RULES_DIR)
     # Bestmoegliches Angebot: 0 Euro, Top-Deal-GPU, SSD vorhanden
     r = evaluate(
         "Gaming PC Intel Core i5-8500 16GB RAM RTX 3060 512GB SSD Tower",
@@ -39,7 +41,7 @@ def test_evaluate_5_sterne_bei_optimalem_gaming_pc():
 
 
 def test_evaluate_niedriger_score_bei_hohem_preis():
-    cfg = load_rules("rules")
+    cfg = load_rules(RULES_DIR)
     r = evaluate(
         "Gaming PC Intel Core i5-8500 16GB RAM RTX 3060 Tower",
         399.0,  # nahe an max_price (400) der Top-Deal-Regel
@@ -63,7 +65,7 @@ def test_evaluate_legacy_einzeldatei_modus_liefert_ebenfalls_score():
 
 
 def test_evaluate_score_reproduzierbar_fuer_gleiche_eingabe():
-    cfg = load_rules("rules")
+    cfg = load_rules(RULES_DIR)
     r1 = evaluate("ASUS RTX 2080Ti DUAL Lüfter", 15.0, cfg)
     r2 = evaluate("ASUS RTX 2080Ti DUAL Lüfter", 15.0, cfg)
     assert r1.deal_score == r2.deal_score
@@ -143,14 +145,14 @@ def test_evaluate_ohne_erkannten_hersteller_nutzt_platzhalter():
 
 
 def test_evaluate_liefert_manufacturer_name_auf_matchresult():
-    cfg = load_rules("rules")
+    cfg = load_rules(RULES_DIR)
     r = evaluate("Dell OptiPlex i5-8500 16GB RAM 512GB SSD Tower", 150.0, cfg)
     assert r.matched is True
     assert r.manufacturer_name == "Dell"
 
 
 def test_evaluate_manufacturer_name_none_ohne_erkennbare_marke():
-    cfg = load_rules("rules")
+    cfg = load_rules(RULES_DIR)
     r = evaluate("Office PC i5-8500 16GB RAM 512GB SSD Tower", 150.0, cfg)
     assert r.matched is True
     assert r.manufacturer_name is None

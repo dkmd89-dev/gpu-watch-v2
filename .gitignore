@@ -10,9 +10,11 @@ __pycache__/
 # Laufzeit-Daten & Logs
 data/*.json
 data/*.log
-!data/STATUS.md
+data/*.txt
+STATUS.md
 
 # OS & Editor Artefakte
 .DS_Store
 .vscode/
 .idea/
+data/price_history.jsonl

@@ -1,6 +1,10 @@
 category: "sata_ssd"
 label: "SATA SSDs (2.5 Zoll)"
 
+# Kategorieweise-Auswertung-Auftrag: SATA-SSD wird als zweites ausgewertet/geloggt.
+scan_priority: 2
+
+
 # ============================================================
 # Kapazitäts-Erkennung über requirements (storage.py)
 # ============================================================

@@ -65,6 +65,26 @@ logging.basicConfig(
 )
 log = logging.getLogger("gpu-watch")
 
+
+class _SuppressStatusPollingFilter(logging.Filter):
+    """Log-Aufraeumen (Ziel 2): unterdrueckt die wiederkehrenden Dashboard-
+    Polling-Zugriffe auf /api/status im werkzeug-Access-Log (Frontend fragt
+    das alle 5 Sekunden ab -- ohne Informationswert, blaeht das Log aber
+    stark auf, siehe gpu_watch.txt). Andere Requests (z.B. POST
+    /api/scan-now, GET /, GET /api/price-history) bleiben weiterhin
+    sichtbar -- nur diese eine, hochfrequente Polling-Route wird gefiltert.
+    """
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        return "/api/status" not in record.getMessage()
+
+
+# werkzeug ist der Logger-Name, unter dem Flasks Dev-Server jeden Request
+# loggt (siehe die "GET ... HTTP/1.1 200 -"-Zeilen). Filter NUR dort
+# registrieren, nicht global -- unser eigener "gpu-watch"-Logger bleibt
+# unberuehrt.
+logging.getLogger("werkzeug").addFilter(_SuppressStatusPollingFilter())
+
 app = Flask(__name__)
 
 _seen_lock = threading.Lock()
@@ -303,7 +323,22 @@ def run_scan():
         price_stats_by_model = _load_price_stats(PRICE_HISTORY_FILE)
         market_prices = _market_prices_from_stats(price_stats_by_model)
 
+        # Kategorieweise-Auswertung-Auftrag: Reihenfolge aus matcher.py
+        # (scan_priority, siehe rules/*.yaml). Fallback auf "categories"
+        # (Legacy-Einzeldatei-Modus/keine eigene Priorität definiert).
+        category_order = rules_cfg.get("category_order") or rules_cfg.get("categories") or []
+
+        # Phase 1: EINMALIGES Scraping (unveraendert -- ein Requestlauf pro
+        # Suchbegriff ueber ALLE Kategorien hinweg, wie bisher. KEINE
+        # Aufteilung in mehrere Scraping-Runden pro Kategorie, das wuerde
+        # die Anzahl der HTTP-Requests unnoetig vervielfachen).
         new_hits = 0
+        # Treffer werden hier nur gesammelt (nach Kategorie gruppiert,
+        # Reihenfolge innerhalb einer Kategorie = Scrape-Reihenfolge),
+        # die eigentliche Verarbeitung (found.json/price_history/ntfy)
+        # passiert danach gruppiert in Phase 2.
+        category_buckets: dict[str, list[tuple[dict, object]]] = {c: [] for c in category_order}
+
         for idx, item in enumerate(raw, start=1):
             with _status_lock:
                 _scan_status["scan_progress_current"] = idx
@@ -327,104 +362,125 @@ def run_scan():
             if not result.matched:
                 continue
 
-            # Phase 8 (Schritt 8.2): datengetriebene Top-Deal-Erkennung
-            # (unabhaengig von der regelbasierten deal_rating-Einstufung,
-            # siehe top_deal.py-Docstring). Nutzt dieselbe, oben bereits
-            # berechnete Preisstatistik -- kein zusaetzlicher Datei-Zugriff.
-            top_deal_result = evaluate_top_deal(
-                item["price"], price_stats_by_model.get(result.price_history_model)
-            )
+            category_buckets.setdefault(result.category or "unbekannt", []).append((item, result))
 
-            entry = {
-                **item,
-                "rule": result.rule_label,
-                "category": result.category,
-                "manufacturer": result.manufacturer_name,
-                "deal_score": result.deal_score,
-                "deal_stars": result.deal_stars,
-                "is_top_deal": top_deal_result.is_top_deal,
-                "top_deal_discount_pct": (
-                    round(top_deal_result.discount_pct, 1)
-                    if top_deal_result.discount_pct is not None
-                    else None
-                ),
-                "found_at": datetime.now(timezone.utc).isoformat(),
-            }
+        # Phase 2: kategorieweise Verarbeitung (found.json/price_history/ntfy
+        # -- exakt dieselbe Logik wie zuvor, nur gruppiert statt im rohen
+        # Scrape-Reihenfolge). category_order zuerst, danach evtl. weitere
+        # Kategorien, die nicht in category_order auftauchen (z.B. Legacy-
+        # Einzeldatei-Modus ohne "categories"/"category_order").
+        remaining_categories = sorted(c for c in category_buckets if c not in category_order)
+        for category_name in [*category_order, *remaining_categories]:
+            bucket = category_buckets.get(category_name, [])
+            for item, result in bucket:
 
-            with _seen_lock:
-                found.insert(0, entry)
-                # Ebenfalls sofort persistieren (siehe seen.json oben): ohne
-                # das würde ein Absturz nach dem seen-Save, aber vor dem
-                # bisherigen Scan-Ende-Save, den Treffer endgültig verlieren
-                # -- er gilt ja bereits als "seen" und würde beim nächsten
-                # Lauf nicht erneut ausgewertet.
-                _save_json(FOUND_FILE, found[:FOUND_MAX_ITEMS])
-
-            new_hits += 1
-
-            # Phase 7 (Schritt 7.1): Preishistorie-Datenpunkt fuer JEDEN
-            # Treffer, unabhaengig vom Notification-Gate weiter unten (das
-            # nur steuert, ob ein ntfy-Push verschickt wird -- fuer die
-            # Marktpreis-Statistik zaehlt dagegen jeder gematchte Treffer).
-            append_price_point(
-                PRICE_HISTORY_FILE,
-                make_price_point(
-                    price=item["price"],
-                    source=item["source"],
-                    model=result.price_history_model or result.rule_label or "unbekannt",
-                    category=result.category,
-                    deal_score=result.deal_score,
-                ),
-            )
-
-            # Phase 6b: Benachrichtigungs-Gate. Nur Treffer, die BEIDE
-            # Bedingungen erfüllen, werden per ntfy verschickt -- alle
-            # anderen sind bereits oben in found.json gespeichert und im
-            # Dashboard sichtbar, lösen aber keinen Push aus.
-            meets_star_gate = stars_meet_minimum(result.deal_stars or "", gate_min_stars)
-            # Kategorie-eigenes Preislimit hat Vorrang vor dem globalen
-            # gate_max_price (siehe matcher.py/rules/*.yaml "notify_max_price").
-            effective_gate_max_price = (
-                result.notify_max_price if result.notify_max_price is not None else gate_max_price
-            )
-            meets_price_gate = item["price"] <= effective_gate_max_price
-
-            if meets_star_gate and meets_price_gate:
-                emoji = emoji_for(result.deal_rating)
-                clean_title = (
-                    result.rule_label.replace("[TOP]", "").replace("[GUT]", "").replace("[OK]", "").strip()
+                # Phase 8 (Schritt 8.2): datengetriebene Top-Deal-Erkennung
+                # (unabhaengig von der regelbasierten deal_rating-Einstufung,
+                # siehe top_deal.py-Docstring). Nutzt dieselbe, oben bereits
+                # berechnete Preisstatistik -- kein zusaetzlicher Datei-Zugriff.
+                top_deal_result = evaluate_top_deal(
+                    item["price"], price_stats_by_model.get(result.price_history_model)
                 )
-                price_str = f"{item['price']:.0f} €"
 
-                send_ntfy(
-                    title=f"{emoji} {clean_title} – {price_str}",
-                    message=(
-                        f"{result.deal_rating or 'Fund'} · {result.deal_stars or ''}\n"
-                        f"{item['title']}\n"
-                        f"{price_str} · {item['source']} · {item['location']}\n"
-                        f"{item['url']}"
+                entry = {
+                    **item,
+                    "rule": result.rule_label,
+                    "category": result.category,
+                    "manufacturer": result.manufacturer_name,
+                    "deal_score": result.deal_score,
+                    "deal_stars": result.deal_stars,
+                    "is_top_deal": top_deal_result.is_top_deal,
+                    "top_deal_discount_pct": (
+                        round(top_deal_result.discount_pct, 1)
+                        if top_deal_result.discount_pct is not None
+                        else None
                     ),
-                    priority="urgent" if item["price"] <= urgent_price_threshold else "default",
-                    tags=notify_tags,
+                    "found_at": datetime.now(timezone.utc).isoformat(),
+                }
+
+                with _seen_lock:
+                    found.insert(0, entry)
+                    # Ebenfalls sofort persistieren (siehe seen.json oben): ohne
+                    # das würde ein Absturz nach dem seen-Save, aber vor dem
+                    # bisherigen Scan-Ende-Save, den Treffer endgültig verlieren
+                    # -- er gilt ja bereits als "seen" und würde beim nächsten
+                    # Lauf nicht erneut ausgewertet.
+                    _save_json(FOUND_FILE, found[:FOUND_MAX_ITEMS])
+
+                new_hits += 1
+
+                # Phase 7 (Schritt 7.1): Preishistorie-Datenpunkt fuer JEDEN
+                # Treffer, unabhaengig vom Notification-Gate weiter unten (das
+                # nur steuert, ob ein ntfy-Push verschickt wird -- fuer die
+                # Marktpreis-Statistik zaehlt dagegen jeder gematchte Treffer).
+                append_price_point(
+                    PRICE_HISTORY_FILE,
+                    make_price_point(
+                        price=item["price"],
+                        source=item["source"],
+                        model=result.price_history_model or result.rule_label or "unbekannt",
+                        category=result.category,
+                        deal_score=result.deal_score,
+                    ),
                 )
-                log.info(
-                    "BENACHRICHTIGT [%s/%s/%s] %s – %.0f € – %s",
-                    result.rule_label, result.deal_rating, result.deal_stars,
-                    item["title"], item["price"], item["url"],
+
+                # Phase 6b: Benachrichtigungs-Gate. Nur Treffer, die BEIDE
+                # Bedingungen erfüllen, werden per ntfy verschickt -- alle
+                # anderen sind bereits oben in found.json gespeichert und im
+                # Dashboard sichtbar, lösen aber keinen Push aus.
+                meets_star_gate = stars_meet_minimum(result.deal_stars or "", gate_min_stars)
+                # Kategorie-eigenes Preislimit hat Vorrang vor dem globalen
+                # gate_max_price (siehe matcher.py/rules/*.yaml "notify_max_price").
+                effective_gate_max_price = (
+                    result.notify_max_price if result.notify_max_price is not None else gate_max_price
                 )
-            else:
-                log.info(
-                    "GESPEICHERT (Gate nicht erfüllt: %s/%s) [%s/%s] %s – %.0f € – %s",
-                    result.deal_stars, f"≤{effective_gate_max_price}€" if meets_price_gate else f">{effective_gate_max_price}€",
-                    result.rule_label, result.deal_rating,
-                    item["title"], item["price"], item["url"],
-                )
+                meets_price_gate = item["price"] <= effective_gate_max_price
+
+                if meets_star_gate and meets_price_gate:
+                    emoji = emoji_for(result.deal_rating)
+                    clean_title = (
+                        result.rule_label.replace("[TOP]", "").replace("[GUT]", "").replace("[OK]", "").strip()
+                    )
+                    price_str = f"{item['price']:.0f} €"
+
+                    send_ntfy(
+                        title=f"{emoji} {clean_title} – {price_str}",
+                        message=(
+                            f"{result.deal_rating or 'Fund'} · {result.deal_stars or ''}\n"
+                            f"{item['title']}\n"
+                            f"{price_str} · {item['source']} · {item['location']}\n"
+                            f"{item['url']}"
+                        ),
+                        priority="urgent" if item["price"] <= urgent_price_threshold else "default",
+                        tags=notify_tags,
+                    )
+                    log.info(
+                        "BENACHRICHTIGT [%s/%s/%s] %s – %.0f € – %s",
+                        result.rule_label, result.deal_rating, result.deal_stars,
+                        item["title"], item["price"], item["url"],
+                    )
+                else:
+                    log.info(
+                        "GESPEICHERT (Gate nicht erfüllt: %s/%s) [%s/%s] %s – %.0f € – %s",
+                        result.deal_stars, f"≤{effective_gate_max_price}€" if meets_price_gate else f">{effective_gate_max_price}€",
+                        result.rule_label, result.deal_rating,
+                        item["title"], item["price"], item["url"],
+                    )
+
+            # Kategorieweise-Auswertung-Auftrag (Ziel 1): Kurzfazit direkt
+            # nach jeder Kategorie, unabhaengig von der Trefferzahl (auch
+            # "0 Treffer" ist eine hilfreiche Info -- zeigt, dass die
+            # Kategorie durchsucht wurde).
+            log.info("🔍 Kategorie '%s' fertig: %d Treffer", category_name, len(bucket))
 
         with _seen_lock:
             _save_json(SEEN_FILE, list(seen))
             _save_json(FOUND_FILE, found[:FOUND_MAX_ITEMS])
 
-        log.info("Scan fertig: %d neue Treffer von %d Angeboten geprüft.", new_hits, len(raw))
+        log.info(
+            "✅ Scan komplett: %d Treffer insgesamt (von %d geprüften Angeboten).",
+            new_hits, len(raw),
+        )
 
         with _status_lock:
             _scan_status["scanned_count_last_scan"] = len(raw)
@@ -467,7 +523,18 @@ def index():
     # im Legacy-Einzeldatei-Modus laeuft (dort existiert der Key nicht).
     rules_cfg = load_rules(str(Path(__file__).parent / "rules"))
     all_categories = rules_cfg.get("categories", [])
-    return render_template("index.html", found=found, all_categories=all_categories)
+    # Dashboard-Kachel-Folgeschritt: Anzeigenamen je Kategorie (YAML-Feld
+    # "label") fuers generische KPI-Kachel-Rendering im Template. get(...,
+    # {}) statt {} direkt, falls load_rules() im Legacy-Einzeldatei-Modus
+    # laeuft (dort existiert der Key nicht) -- Template faellt dann auf den
+    # internen Kategorie-Schluessel als Anzeigename zurueck.
+    category_labels = rules_cfg.get("category_labels", {})
+    return render_template(
+        "index.html",
+        found=found,
+        all_categories=all_categories,
+        category_labels=category_labels,
+    )
 
 
 @app.route("/api/found")
@@ -585,5 +652,9 @@ def api_scan_now():
 
 
 if __name__ == "__main__":
+    # Log-Aufraeumen (Ziel 3): klar erkennbares Start-Banner, damit im Log
+    # sofort sichtbar ist, dass der Bot erfolgreich hochgefahren ist und
+    # auf den naechsten Scan-Zyklus wartet.
+    log.info("🤖 [HARDWARE_DEAL] ✅ Bot läuft und lauscht auf Nachrichten...")
     threading.Thread(target=scheduler_loop, daemon=True).start()
     app.run(host="0.0.0.0", port=5000)

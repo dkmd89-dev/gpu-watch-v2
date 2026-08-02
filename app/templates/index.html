@@ -395,15 +395,16 @@
         <div class="counter-value" id="cntSaved">–</div>
         <div class="counter-label">Gespeichert gesamt</div>
       </div>
-      <div class="counter-card">
-        <div class="counter-value" id="cntOffice">–</div>
-        <div class="counter-label">Office-PCs</div>
-      </div>
-      <div class="counter-card">
-        <div class="counter-value" id="cntGaming">–</div>
-        <div class="counter-label">Gaming-PCs</div>
-      </div>
-      <div class="counter-card">
+      <!--
+        Dashboard-Kachel-Folgeschritt: hier standen bisher zwei fest
+        codierte Kacheln nur fuer "Office-PCs"/"Gaming-PCs". Werden jetzt
+        generisch per JS erzeugt (siehe ensureCategoryTile() unten) -- eine
+        Kachel pro Kategorie aus den rules/*.yaml-Dateien, unabhaengig
+        davon, welche/wie viele Kategorien existieren. topDealsCard dient
+        als fester Einfuege-Ankerpunkt (neue Kategorie-Kacheln werden davor
+        eingefuegt, Top-Deals bleibt immer die letzte Kachel).
+      -->
+      <div class="counter-card topdeal" id="topDealsCard">
         <div class="counter-value topdeal" id="cntTopDeals">–</div>
         <div class="counter-label">Top-Deals</div>
       </div>
@@ -501,6 +502,74 @@
     // Ergaenzt (nicht ersetzt) die bisherige, aus den sichtbaren Karten
     // abgeleitete Liste in initFilters() -- siehe dortiger Kommentar.
     const SERVER_CATEGORIES = {{ all_categories | tojson }};
+    // Dashboard-Kachel-Folgeschritt: Anzeigename je Kategorie (YAML-Feld
+    // "label" pro rules/*.yaml, z.B. "gaming_pc" -> "Gaming-PC"), damit
+    // die generisch erzeugten KPI-Kacheln lesbare Titel statt interner
+    // Schluessel zeigen. Additiv zu SERVER_CATEGORIES, gleiches Prinzip.
+    const SERVER_CATEGORY_LABELS = {{ category_labels | tojson }};
+
+    // Dashboard-Kachel-Folgeschritt: generisches KPI-Kachel-Rendering.
+    // Ersetzt die bisher fest codierten "Office-PCs"/"Gaming-PCs"-Kacheln
+    // -- neue Kategorien (rein per YAML ergaenzt, z.B. kuenftig "gpu"-
+    // Untertypen oder ganz neue Hardware-Kategorien) tauchen automatisch
+    // als eigene Kachel auf, ohne dass dieses Template angefasst werden
+    // muss. Kacheln werden einmalig pro Kategorie erzeugt (Set verhindert
+    // Duplikate bei jedem 5s-Polling) und danach nur noch der Zahlenwert
+    // aktualisiert.
+    const categoryTileIds = new Set();
+
+    function categorySlug(cat) {
+      // DOM-IDs duerfen nicht jedes Zeichen enthalten -- Kategorie-
+      // Schluessel aus der YAML sind zwar normalerweise bereits
+      // slug-artig (z.B. "sata_ssd"), zur Sicherheit trotzdem bereinigen.
+      return String(cat).replace(/[^a-zA-Z0-9_-]/g, "_");
+    }
+
+    function categoryLabel(cat) {
+      return (SERVER_CATEGORY_LABELS && SERVER_CATEGORY_LABELS[cat]) || cat;
+    }
+
+    function ensureCategoryTile(cat) {
+      const id = "cntCat_" + categorySlug(cat);
+      if (categoryTileIds.has(id)) return id;
+
+      const card = document.createElement("div");
+      card.className = "counter-card";
+      const valueDiv = document.createElement("div");
+      valueDiv.className = "counter-value";
+      valueDiv.id = id;
+      valueDiv.textContent = "–";
+      const labelDiv = document.createElement("div");
+      labelDiv.className = "counter-label";
+      labelDiv.textContent = categoryLabel(cat);
+      card.appendChild(valueDiv);
+      card.appendChild(labelDiv);
+
+      // Immer VOR der fest verankerten Top-Deals-Kachel einfuegen, damit
+      // Top-Deals stets die letzte Kachel bleibt.
+      document.getElementById("topDealsCard").insertAdjacentElement("beforebegin", card);
+      categoryTileIds.add(id);
+      return id;
+    }
+
+    function updateCategoryTiles(categoryCounts) {
+      // Union aus der vollstaendigen Rules-Kategorie-Liste (SERVER_CATEGORIES,
+      // zeigt auch Kategorien ohne aktuelle Treffer mit "0" an) UND den in
+      // category_counts tatsaechlich vorkommenden Schluesseln (deckt z.B.
+      // "unbekannt" bei Alt-Eintraegen ohne category-Feld ab, das nicht in
+      // den Rules steht) -- gleiches Prinzip wie beim Kategorie-Filter in
+      // initFilters() weiter unten.
+      const categories = [...new Set([
+        ...(SERVER_CATEGORIES || []),
+        ...Object.keys(categoryCounts || {}),
+      ])].sort();
+
+      categories.forEach(cat => {
+        const id = ensureCategoryTile(cat);
+        document.getElementById(id).textContent = (categoryCounts && categoryCounts[cat]) || 0;
+      });
+    }
+
     function startScan() {
       const btn = document.getElementById('scanBtn');
       btn.disabled = true;
@@ -545,8 +614,7 @@
 
           document.getElementById('cntScanned').textContent = s.scanned_count_last_scan ?? '–';
           document.getElementById('cntSaved').textContent = s.saved_count ?? '–';
-          document.getElementById('cntOffice').textContent = (s.category_counts && s.category_counts.office_pc) || 0;
-          document.getElementById('cntGaming').textContent = (s.category_counts && s.category_counts.gaming_pc) || 0;
+          updateCategoryTiles(s.category_counts);
           document.getElementById('cntTopDeals').textContent = s.top_deal_count ?? 0;
 
           updateLogBox(s.scan_log_tail);

@@ -29,6 +29,9 @@
 category: "gpu"
 label: "Grafikkarten"
 
+# Kategorieweise-Auswertung-Auftrag: GPU wird zuerst ausgewertet/geloggt.
+scan_priority: 1
+
 # Notification-Gate-Folgeschritt: eigenes Preislimit fuer den ntfy-Push.
 # Die Regel-eigenen max_price-Werte oben liegen zwischen 160€ und 350€ --
 # ein einzelnes Limit muss also einen Kompromiss zwischen "greift ueberhaupt"

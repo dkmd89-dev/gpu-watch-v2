@@ -113,6 +113,17 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
     merged_rules: list[dict] = []
     all_search_terms: set[str] = set()
     all_categories: set[str] = set()
+    # Kategorieweise-Auswertung-Auftrag: Reihenfolge, in der app.py die
+    # Treffer NACH dem Scan gruppiert auswertet/loggt (siehe run_scan()).
+    # Niedrigere Zahl = zuerst. Kategorien ohne eigene Angabe laufen danach,
+    # untereinander alphabetisch (Fallback-Wert +inf sorgt dafuer, dass sie
+    # in der finalen Sortierung ans Ende rutschen).
+    category_priorities: dict[str, float] = {}
+    # Dashboard-Kachel-Folgeschritt: Anzeigename je Kategorie (YAML-Feld
+    # "label", z.B. "Gaming-PC" statt des internen Schluessels "gaming_pc").
+    # Faellt auf den internen Schluessel zurueck, falls eine Kategorie kein
+    # "label" definiert -- volle Rueckwaertskompatibilitaet.
+    category_labels: dict[str, str] = {}
     category_files = sorted(
         f for f in rules_dir.glob("*.yaml") if f.name != "_global.yaml"
     )
@@ -120,6 +131,8 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
         cat_cfg = yaml.safe_load(cat_file.read_text(encoding="utf-8")) or {}
         category_name = cat_cfg.get("category", cat_file.stem)
         all_categories.add(category_name)
+        category_priorities[category_name] = cat_cfg.get("scan_priority", float("inf"))
+        category_labels[category_name] = cat_cfg.get("label", category_name)
         # Jede Kategorie kann eigene, kategorie-weite Ausschlussbegriffe
         # definieren (z.B. "kein komplettes PC-System" bei GPUs). Diese
         # gelten -- anders als die exclude_global-Liste -- nur für Regeln
@@ -172,6 +185,16 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
         # wurden, obwohl real weiterhin Treffer dieser Kategorie existieren
         # (siehe price_history.jsonl/gpu_watch.log).
         "categories": sorted(all_categories),
+        # Dashboard-Kachel-Folgeschritt: Anzeigename je Kategorie, damit
+        # templates/index.html die KPI-Kacheln generisch (ohne Kategorie-
+        # Namen im HTML/JS hart zu codieren) rendern kann. Additiver Key --
+        # Aufrufer, die ihn nicht kennen (aeltere app.py-Version, Legacy-
+        # Einzeldatei-Modus ohne diesen Key), bleiben unveraendert lauffaehig.
+        "category_labels": category_labels,
+        # Kategorieweise-Auswertung-Auftrag: Scan-Reihenfolge fuer app.py.
+        # Sortiert nach scan_priority (aufsteigend), Kategorien ohne eigene
+        # Angabe (Prioritaet +inf) alphabetisch dahinter.
+        "category_order": sorted(all_categories, key=lambda c: (category_priorities.get(c, float("inf")), c)),
         "notifications": notifications,
         "scoring_weights": scoring_weights,
         "manufacturer_reputation": manufacturer_reputation,
@@ -262,6 +285,31 @@ def _ram_meets_requirement(ram_gb: int | None, ram_type: str | None, requirement
     return True
 
 
+def _storage_meets_requirement(ssd_gb: int | None, requirement: dict) -> bool:
+    """Prüft die erkannte SSD-Kapazität gegen eine Mindest-/Höchstgrenze.
+
+    requirement-Format: {"min_ssd_gb": 320, "max_ssd_gb": 639} (beide
+    Grenzen optional, mind. eine muss gesetzt sein, damit der Aufrufer
+    diese Prüfung überhaupt anstößt -- siehe _evaluate_hardware_requirements).
+
+    Fehlende Kapazitätserkennung (ssd_gb is None) gilt als NICHT erfüllt,
+    analog zu _ram_meets_requirement: ohne erkennbare Größe im Titel kann
+    eine Kapazitäts-Anforderung nicht bestätigt werden.
+    """
+    if ssd_gb is None:
+        return False
+
+    min_gb = requirement.get("min_ssd_gb")
+    if min_gb is not None and ssd_gb < min_gb:
+        return False
+
+    max_gb = requirement.get("max_ssd_gb")
+    if max_gb is not None and ssd_gb > max_gb:
+        return False
+
+    return True
+
+
 def _case_meets_requirement(case_match, requirement: dict) -> bool:
     """Prüft den erkannten Gehäusetyp gegen eine Ausschluss-Anforderung.
 
@@ -325,6 +373,16 @@ def _evaluate_hardware_requirements(title_lower: str, requirements: dict) -> tup
             "type_exclude": requirements.get("ram_type_exclude", []),
         }
         if not _ram_meets_requirement(ram_gb, ram_type, ram_requirement):
+            return False, features
+
+    if "min_ssd_gb" in requirements or "max_ssd_gb" in requirements:
+        ssd_gb = detect_ssd_gb(title_lower)
+        features["ssd_gb"] = ssd_gb
+        storage_requirement = {
+            "min_ssd_gb": requirements.get("min_ssd_gb"),
+            "max_ssd_gb": requirements.get("max_ssd_gb"),
+        }
+        if not _storage_meets_requirement(ssd_gb, storage_requirement):
             return False, features
 
     if "min_cpu" in requirements:

@@ -17,6 +17,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+RULES_DIR = str(Path(__file__).resolve().parent.parent / "rules")
+
 from matcher import load_rules, evaluate, _vram_gb
 
 
@@ -32,14 +34,14 @@ def test_vram_regex_kollision_mit_ssd_kapazitaet_dokumentiert():
 
 
 def test_sata_ssd_500gb_matcht_trotz_vram_regex_kollision():
-    cfg = load_rules("rules")
+    cfg = load_rules(RULES_DIR)
     r = evaluate("Samsung 870 EVO 500GB SATA SSD 2.5 Zoll", 20.0, cfg)
     assert r.matched is True
     assert r.category == "sata_ssd"
 
 
 def test_sata_ssd_250gb_matcht():
-    cfg = load_rules("rules")
+    cfg = load_rules(RULES_DIR)
     r = evaluate("Kingston A400 250GB SATA SSD 2.5", 10.0, cfg)
     assert r.matched is True
     assert r.category == "sata_ssd"
@@ -49,7 +51,7 @@ def test_sata_ssd_sata_interface_spec_loest_keinen_fehlausschluss_aus():
     # Realistischer Titel mit SATA-III-Interface-Spezifikation ("6Gb/s"),
     # die denselben Regex-Kollisionseffekt ausloesen kann wie Kapazitaets-
     # angaben.
-    cfg = load_rules("rules")
+    cfg = load_rules(RULES_DIR)
     r = evaluate("Crucial MX500 1TB SATA SSD 6Gb/s 2.5", 35.0, cfg)
     assert r.matched is True
 
@@ -57,7 +59,7 @@ def test_sata_ssd_sata_interface_spec_loest_keinen_fehlausschluss_aus():
 def test_sata_ssd_500gb_matcht_nicht_die_1tb_regel():
     # Groessen-Trennschaerfe: ein 500GB-Titel darf nicht als 1TB-Regel
     # durchgehen (und umgekehrt) -- reine Ausschluss-Konsistenzprüfung.
-    cfg = load_rules("rules")
+    cfg = load_rules(RULES_DIR)
     r = evaluate("Crucial MX500 500GB SATA SSD 2.5", 20.0, cfg)
     assert r.matched is True
     assert "500GB" in r.rule_label
@@ -65,7 +67,7 @@ def test_sata_ssd_500gb_matcht_nicht_die_1tb_regel():
 
 
 def test_notify_max_price_kategorie_override_wird_geladen():
-    cfg = load_rules("rules")
+    cfg = load_rules(RULES_DIR)
     r = evaluate("ASUS RTX 3060 12GB ROG Strix", 200.0, cfg)
     assert r.matched is True
     assert r.category == "gpu"
@@ -76,14 +78,14 @@ def test_notify_max_price_fallback_wenn_kategorie_keins_definiert():
     # sata_ssd.yaml definiert bewusst KEIN eigenes notify_max_price ->
     # MatchResult.notify_max_price muss None sein, app.py faellt dann auf
     # das globale notifications.gate_max_price aus _global.yaml zurueck.
-    cfg = load_rules("rules")
+    cfg = load_rules(RULES_DIR)
     r = evaluate("Kingston A400 250GB SATA SSD 2.5", 10.0, cfg)
     assert r.matched is True
     assert r.notify_max_price is None
 
 
 def test_notify_max_price_unterschiedlich_pro_kategorie():
-    cfg = load_rules("rules")
+    cfg = load_rules(RULES_DIR)
     gpu = evaluate("ASUS RTX 3060 12GB ROG Strix", 200.0, cfg)
     gaming = evaluate(
         "Gaming PC Ryzen 5 4500 GTX 1650 16GB RAM 512GB SSD", 300.0, cfg
@@ -106,7 +108,7 @@ def test_load_rules_liefert_vollstaendige_kategorie_liste():
     Filter verschwanden, sobald sie von haeufigeren Treffern verdraengt
     wurden (siehe app.py index()/templates/index.html SERVER_CATEGORIES).
     """
-    cfg = load_rules("rules")
+    cfg = load_rules(RULES_DIR)
     assert "categories" in cfg
     assert set(cfg["categories"]) == {"gaming_pc", "gpu", "office_pc", "sata_ssd"}
     # Muss sortiert sein (Dropdown-Reihenfolge im Frontend)
