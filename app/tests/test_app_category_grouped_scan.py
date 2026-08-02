@@ -20,6 +20,9 @@ from unittest.mock import patch, MagicMock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+import scrapers.kleinanzeigen
+import scrapers.ebay
+
 
 def _load_app_module(data_dir: str):
     logging.root.handlers.clear()
@@ -80,8 +83,8 @@ def test_verarbeitung_gruppiert_nach_kategorie_gpu_vor_sata_ssd():
             },
         ]
 
-        with patch.object(app_mod, "search_kleinanzeigen", return_value=fake_listings), \
-             patch.object(app_mod, "search_ebay", return_value=[]), \
+        with patch.object(scrapers.kleinanzeigen, "search_kleinanzeigen", return_value=fake_listings), \
+             patch.object(scrapers.ebay, "search_ebay", return_value=[]), \
              patch.object(app_mod, "send_ntfy", MagicMock()):
             app_mod.run_scan()
 
@@ -113,8 +116,8 @@ def test_kategorie_ohne_treffer_wird_mit_0_treffer_geloggt():
         capture = _CaptureHandler()
         app_mod.log.addHandler(capture)
 
-        with patch.object(app_mod, "search_kleinanzeigen", return_value=[]), \
-             patch.object(app_mod, "search_ebay", return_value=[]), \
+        with patch.object(scrapers.kleinanzeigen, "search_kleinanzeigen", return_value=[]), \
+             patch.object(scrapers.ebay, "search_ebay", return_value=[]), \
              patch.object(app_mod, "send_ntfy", MagicMock()):
             app_mod.run_scan()
 

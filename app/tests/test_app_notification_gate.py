@@ -14,6 +14,9 @@ from unittest.mock import patch, MagicMock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+import scrapers.kleinanzeigen
+import scrapers.ebay
+
 
 def _load_app_module(data_dir: str):
     """Lädt app.py frisch mit einem isolierten DATA_DIR (Testumgebung)."""
@@ -62,8 +65,8 @@ def test_notification_gate_end_to_end():
             },
         ]
 
-        with patch.object(app_mod, "search_kleinanzeigen", return_value=fake_listings), \
-             patch.object(app_mod, "search_ebay", return_value=[]), \
+        with patch.object(scrapers.kleinanzeigen, "search_kleinanzeigen", return_value=fake_listings), \
+             patch.object(scrapers.ebay, "search_ebay", return_value=[]), \
              patch.object(app_mod, "send_ntfy") as mock_send_ntfy:
 
             app_mod.run_scan()
@@ -105,8 +108,8 @@ def test_notification_gate_niemand_benachrichtigt_wenn_alle_ueber_preisgrenze():
             },
         ]
 
-        with patch.object(app_mod, "search_kleinanzeigen", return_value=fake_listings), \
-             patch.object(app_mod, "search_ebay", return_value=[]), \
+        with patch.object(scrapers.kleinanzeigen, "search_kleinanzeigen", return_value=fake_listings), \
+             patch.object(scrapers.ebay, "search_ebay", return_value=[]), \
              patch.object(app_mod, "send_ntfy") as mock_send_ntfy:
 
             app_mod.run_scan()
@@ -141,8 +144,8 @@ def test_notification_gate_nutzt_kategorie_eigenes_preislimit_statt_globalem_fal
             },
         ]
 
-        with patch.object(app_mod, "search_kleinanzeigen", return_value=fake_listings), \
-             patch.object(app_mod, "search_ebay", return_value=[]), \
+        with patch.object(scrapers.kleinanzeigen, "search_kleinanzeigen", return_value=fake_listings), \
+             patch.object(scrapers.ebay, "search_ebay", return_value=[]), \
              patch.object(app_mod, "send_ntfy") as mock_send_ntfy:
 
             app_mod.run_scan()

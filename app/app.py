@@ -12,6 +12,7 @@ from flask import Flask, render_template, jsonify
 
 from matcher import load_rules, evaluate
 from scrapers import search_kleinanzeigen, search_ebay
+from scrapers.registry import discover_scrapers
 from notify import send_ntfy, emoji_for, rating_stars_for
 from scoring.deal_score import stars_meet_minimum
 from price_history import append_price_point, make_price_point, read_price_points
@@ -303,15 +304,11 @@ def run_scan():
                 )
                 _save_json(FOUND_FILE, found)
 
-        raw = []
-        raw += search_kleinanzeigen(
-            search_terms, defaults["location_plz"], defaults["radius_km"], global_max_price
-        )
-        raw += search_ebay(search_terms, global_max_price, defaults["location_plz"])
-
-        with _status_lock:
-            _scan_status["scan_progress_total"] = len(raw)
-
+        # Hinweis: das eigentliche Scraping (raw = [...]) findet weiter unten
+        # ueber die Plugin-Registry statt (siehe "Plugin-Registry (Schritt 2)"),
+        # NACHDEM category_order/price_stats_by_model berechnet sind -- hier
+        # nur noch Vorbereitung, kein Scraping-Aufruf mehr an dieser Stelle.
+        #
         # Phase 7 (Schritt 7.5) + Phase 8 (Schritt 8.2): Preisstatistik EINMAL
         # pro Scan aus der bisherigen Preishistorie berechnen (nicht pro Item --
         # price_history.jsonl waechst waehrend des Scans durch append_price_point()
@@ -332,6 +329,38 @@ def run_scan():
         # Suchbegriff ueber ALLE Kategorien hinweg, wie bisher. KEINE
         # Aufteilung in mehrere Scraping-Runden pro Kategorie, das wuerde
         # die Anzahl der HTTP-Requests unnoetig vervielfachen).
+        #
+        # Plugin-Registry (Schritt 2): statt zweier hartcodierter
+        # `raw += search_xxx(...)`-Zeilen wird ueber alle per Discovery
+        # gefundenen Scraper-Plugins iteriert (siehe scrapers/registry.py).
+        # _SCRAPER_CALL_ARGS ist ein UEBERGANGS-Adapter: die bestehenden
+        # Scraper haben noch unterschiedliche Parameterreihenfolgen
+        # (historisch gewachsen, siehe scrapers/base.py Scraper-Protocol-
+        # Docstring). Eine neue Quelle mit abweichender Signatur braucht
+        # aktuell noch einen Eintrag hier -- die vollstaendige
+        # Vereinheitlichung (Ziel: neue Quelle ganz ohne Codeaenderung)
+        # ist ein separater, noch nicht umgesetzter Folgeschritt.
+        raw = []
+        scraper_plugins = discover_scrapers()
+        _SCRAPER_CALL_ARGS = {
+            "kleinanzeigen": lambda: (
+                search_terms, defaults["location_plz"], defaults["radius_km"], global_max_price,
+            ),
+            "ebay": lambda: (search_terms, global_max_price, defaults["location_plz"]),
+        }
+        for scraper_name, plugin in scraper_plugins.items():
+            build_args = _SCRAPER_CALL_ARGS.get(scraper_name)
+            if build_args is None:
+                log.warning(
+                    "Scraper-Plugin '%s' hat keinen Aufruf-Adapter, wird übersprungen.",
+                    scraper_name,
+                )
+                continue
+            raw += plugin.search(*build_args())
+
+        with _status_lock:
+            _scan_status["scan_progress_total"] = len(raw)
+
         new_hits = 0
         # Treffer werden hier nur gesammelt (nach Kategorie gruppiert,
         # Reihenfolge innerhalb einer Kategorie = Scrape-Reihenfolge),

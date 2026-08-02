@@ -15,6 +15,9 @@ from unittest.mock import patch, MagicMock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+import scrapers.kleinanzeigen
+import scrapers.ebay
+
 
 def _load_app_module(data_dir: str, max_age_days: str = "7"):
     import logging
@@ -123,8 +126,8 @@ def test_run_scan_entfernt_alte_deals_aus_found_json():
         app_mod.FOUND_FILE.write_text(json.dumps(pre_existing), encoding="utf-8")
         app_mod.SEEN_FILE.write_text(json.dumps([]), encoding="utf-8")
 
-        with patch.object(app_mod, "search_kleinanzeigen", return_value=[]), \
-             patch.object(app_mod, "search_ebay", return_value=[]), \
+        with patch.object(scrapers.kleinanzeigen, "search_kleinanzeigen", return_value=[]), \
+             patch.object(scrapers.ebay, "search_ebay", return_value=[]), \
              patch.object(app_mod, "send_ntfy", MagicMock()):
             app_mod.run_scan()
 
