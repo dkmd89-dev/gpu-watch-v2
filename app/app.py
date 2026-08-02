@@ -333,30 +333,20 @@ def run_scan():
         # Plugin-Registry (Schritt 2): statt zweier hartcodierter
         # `raw += search_xxx(...)`-Zeilen wird ueber alle per Discovery
         # gefundenen Scraper-Plugins iteriert (siehe scrapers/registry.py).
-        # _SCRAPER_CALL_ARGS ist ein UEBERGANGS-Adapter: die bestehenden
-        # Scraper haben noch unterschiedliche Parameterreihenfolgen
-        # (historisch gewachsen, siehe scrapers/base.py Scraper-Protocol-
-        # Docstring). Eine neue Quelle mit abweichender Signatur braucht
-        # aktuell noch einen Eintrag hier -- die vollstaendige
-        # Vereinheitlichung (Ziel: neue Quelle ganz ohne Codeaenderung)
-        # ist ein separater, noch nicht umgesetzter Folgeschritt.
+        #
+        # Schritt 3: search_kleinanzeigen() und search_ebay() erfuellen jetzt
+        # beide exakt das Scraper-Protocol (search_terms, plz, radius_km,
+        # max_price) -- siehe scrapers/base.py. Der bisherige Uebergangs-
+        # Adapter (_SCRAPER_CALL_ARGS) entfaellt dadurch: jedes Plugin wird
+        # generisch mit denselben vier Argumenten aufgerufen. Eine neue
+        # Quelle (Phase 9), die dieses Protocol erfuellt, wird ohne jede
+        # Codeaenderung an app.py automatisch mitgescannt.
         raw = []
         scraper_plugins = discover_scrapers()
-        _SCRAPER_CALL_ARGS = {
-            "kleinanzeigen": lambda: (
-                search_terms, defaults["location_plz"], defaults["radius_km"], global_max_price,
-            ),
-            "ebay": lambda: (search_terms, global_max_price, defaults["location_plz"]),
-        }
         for scraper_name, plugin in scraper_plugins.items():
-            build_args = _SCRAPER_CALL_ARGS.get(scraper_name)
-            if build_args is None:
-                log.warning(
-                    "Scraper-Plugin '%s' hat keinen Aufruf-Adapter, wird übersprungen.",
-                    scraper_name,
-                )
-                continue
-            raw += plugin.search(*build_args())
+            raw += plugin.search(
+                search_terms, defaults["location_plz"], defaults["radius_km"], global_max_price,
+            )
 
         with _status_lock:
             _scan_status["scan_progress_total"] = len(raw)

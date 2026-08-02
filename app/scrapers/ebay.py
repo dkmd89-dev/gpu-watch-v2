@@ -65,13 +65,31 @@ def _ebay_token() -> str | None:
 
 
 # Plugin-Metadaten fuer scrapers/registry.py (Discovery statt Imports,
-# Architekturplanung "Plugin-Registry"). Rein additiv -- die Funktion
-# search_ebay() selbst ist unveraendert und bleibt weiterhin direkt
-# importierbar (`from scrapers import search_ebay`).
+# Architekturplanung "Plugin-Registry").
 SCRAPER_NAME = "ebay"
 
 
-def search_ebay(search_terms: list[str], max_price: int, plz: str) -> list[Listing]:
+def search_ebay(
+    search_terms: list[str], plz: str, radius_km: int, max_price: int
+) -> list[Listing]:
+    """Signatur vereinheitlicht (Schritt 3/3 Plugin-Registry) auf das
+    `Scraper`-Protocol aus scrapers/base.py: (search_terms, plz, radius_km,
+    max_price) -- identisch zu search_kleinanzeigen(). Vorher: (search_terms,
+    max_price, plz), kein radius_km.
+
+    BREAKING CHANGE fuer Aufrufer mit POSITIONELLEN Argumenten (Reihenfolge
+    von max_price/plz vertauscht sich). Alle bekannten Aufrufstellen im
+    Repo nutzen bereits Keyword-Argumente (siehe tests/test_scraper_ebay.py)
+    oder werden ueber die Registry per Protocol-Reihenfolge aufgerufen --
+    dort war bisher explizit ein Uebergangs-Adapter (_SCRAPER_CALL_ARGS in
+    app.py) noetig, der mit diesem Schritt entfaellt.
+
+    `plz` und `radius_km` werden von der eBay Browse API aktuell NICHT
+    unterstuetzt (keine Umkreissuche per PLZ in diesem Endpoint) und bleiben
+    daher ungenutzte Parameter -- rein fuer Signatur-Kompatibilitaet mit dem
+    Protocol/der Registry. Filterung erfolgt weiterhin nur ueber
+    itemLocationCountry:DE (siehe unten).
+    """
     token = _ebay_token()
     if not token:
         log.info("Kein eBay-Token (EBAY_CLIENT_ID/SECRET fehlt) -- eBay wird übersprungen.")

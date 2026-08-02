@@ -29,17 +29,19 @@ class Listing(TypedDict):
 
 
 class Scraper(Protocol):
-    """Zielvertrag, den jede Scraper-Quelle erfüllen soll.
+    """Vertrag, den jede Scraper-Quelle erfüllt: search_<name>(search_terms,
+    plz, radius_km, max_price) -> list[Listing].
 
-    HINWEIS (Stand dieses Schritts): search_kleinanzeigen() und
-    search_ebay() haben aktuell noch unterschiedliche Parameter-
-    reihenfolgen (historisch gewachsen) und erfüllen dieses Protocol
-    daher noch nicht exakt. Das Protocol beschreibt die Zielform für
-    neue Quellen (Phase 9/10); eine Vereinheitlichung der bestehenden
-    zwei Funktionssignaturen ist ein separater, bewusst noch nicht
-    umgesetzter Schritt, um hier nicht mehrere Dinge gleichzeitig zu
-    ändern. Da Python Protocols strukturell und nicht nominal geprüft
-    werden, wird nichts erzwungen -- rein dokumentarisch.
+    Seit Schritt 3 der Plugin-Registry erfüllen search_kleinanzeigen() UND
+    search_ebay() dieses Protocol exakt (gleiche Parameterreihenfolge).
+    Dadurch kann app.py jedes über scrapers/registry.py gefundene Plugin
+    generisch mit denselben vier Argumenten aufrufen -- der bisherige
+    Übergangs-Adapter (_SCRAPER_CALL_ARGS) entfällt. Eine neue Quelle
+    (Quoka, markt.de, ...) muss dieses Protocol ebenfalls erfüllen, dann
+    wird sie ohne jede Codeänderung an app.py automatisch mitgescannt.
+
+    Da Python Protocols strukturell und nicht nominal geprüft werden, wird
+    nichts zur Laufzeit erzwungen -- rein dokumentarisch/als Konvention.
     """
 
     def __call__(

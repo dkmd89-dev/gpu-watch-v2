@@ -80,7 +80,7 @@ def test_search_ebay_nutzt_normalisierte_url(monkeypatch):
     monkeypatch.setattr("scrapers.ebay.requests.post", fake_post)
     monkeypatch.setattr("scrapers.ebay.requests.get", fake_get)
 
-    results = search_ebay(["Gaming PC"], max_price=999, plz="76477")
+    results = search_ebay(["Gaming PC"], plz="76477", radius_km=50, max_price=999)
     assert len(results) == 1
     assert results[0]["url"] == "https://www.ebay.de/itm/1234567890"
 
