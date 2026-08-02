@@ -205,6 +205,62 @@ def test_evaluate_ohne_market_price_profit_score_ist_platzhalter_und_ohne_einflu
     assert r_ohne.deal_score == r_mit_leerem_market_prices.deal_score
 
 
+def test_evaluate_setzt_estimated_margin_felder_auf_matchresult():
+    # Reselling-/Arbitrage-Konzept (STATUS.md Abschnitt 16, Punkt b):
+    # MatchResult.estimated_margin_eur/_pct sind fuer die Dashboard-Anzeige
+    # gedacht -- unabhaengig vom "profit"-Gewicht (0 im Default).
+    cfg = {
+        "defaults": {},
+        "rules": [
+            {
+                "label": "Test-GPU",
+                "max_price": 300,
+                "deal_rating": "Okay",
+                "_category": "gpu",
+                "_category_exclude_terms": [],
+                "price_history_model": "rtx_3060_12gb",
+            }
+        ],
+        "search_terms": [],
+        "notifications": {},
+        "scoring_weights": {},
+        "fees": {"platform_fee_pct": 10.0, "payment_fee_pct": 2.5,
+                  "shipping_cost": 6.0, "packaging_cost": 1.5},
+        "_directory_mode": True,
+    }
+    r = evaluate(
+        "RTX 3060 12GB", 100.0, cfg,
+        market_prices={"rtx_3060_12gb": 250.0},
+    )
+    assert r.matched is True
+    assert r.estimated_margin_eur == 111.25
+    assert r.estimated_margin_pct == 111.25
+
+
+def test_evaluate_estimated_margin_felder_none_ohne_market_price():
+    cfg = {
+        "defaults": {},
+        "rules": [
+            {
+                "label": "Test-GPU",
+                "max_price": 300,
+                "deal_rating": "Okay",
+                "_category": "gpu",
+                "_category_exclude_terms": [],
+            }
+        ],
+        "search_terms": [],
+        "notifications": {},
+        "scoring_weights": {},
+        "fees": {},
+        "_directory_mode": True,
+    }
+    r = evaluate("RTX 3060 12GB", 100.0, cfg)
+    assert r.matched is True
+    assert r.estimated_margin_eur is None
+    assert r.estimated_margin_pct is None
+
+
 def test_evaluate_ohne_erkannten_hersteller_nutzt_platzhalter():
     cfg = {
         "defaults": {},

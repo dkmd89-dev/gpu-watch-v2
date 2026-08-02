@@ -421,6 +421,21 @@ def run_scan():
                         if top_deal_result.discount_pct is not None
                         else None
                     ),
+                    # Reselling-/Arbitrage-Konzept (STATUS.md Abschnitt 16,
+                    # Punkt b): Rohwerte fuer die Dashboard-Anzeige. None,
+                    # solange keine Preishistorie fuer dieses Modell vorliegt
+                    # -- Template blendet die Anzeige dann aus (additiv, kein
+                    # Bruch fuer aeltere found.json-Eintraege ohne dieses Feld).
+                    "estimated_margin_eur": (
+                        round(result.estimated_margin_eur, 2)
+                        if result.estimated_margin_eur is not None
+                        else None
+                    ),
+                    "estimated_margin_pct": (
+                        round(result.estimated_margin_pct, 1)
+                        if result.estimated_margin_pct is not None
+                        else None
+                    ),
                     "found_at": datetime.now(timezone.utc).isoformat(),
                 }
 

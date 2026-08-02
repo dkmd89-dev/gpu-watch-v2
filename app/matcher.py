@@ -13,6 +13,7 @@ from categories.detectors.storage import detect_ssd_gb
 from categories.detectors.psu import detect_psu_watt
 from categories.detectors.manufacturer import detect_manufacturer
 from scoring.deal_score import compute_deal_score, DEFAULT_WEIGHTS
+from scoring.profit import compute_profit
 
 # Legacy-Fallback: wird NUR noch verwendet, wenn load_rules() im alten
 # Einzeldatei-Modus (eine rules.yaml ohne Kategorie-Kontext) aufgerufen wird.
@@ -58,6 +59,16 @@ class MatchResult:
     # notifications.gate_max_price aus _global.yaml zurueck. Additives Feld
     # mit Default -- bestehender Code bleibt unveraendert lauffaehig.
     notify_max_price: float | None = None
+    # Reselling-/Arbitrage-Konzept (STATUS.md Abschnitt 16, Punkt b):
+    # geschätzte Marge in Euro/Prozent für die Dashboard-Anzeige --
+    # unabhängig vom "profit"-Score (0-100) in compute_deal_score(), der
+    # nur den GEWICHTETEN Gesamt-Score beeinflusst. Diese beiden Felder
+    # transportieren die tatsächlichen, für Menschen lesbaren Rohwerte
+    # (siehe scoring/profit.py::Profit). None, wenn kein estimated_resale_price
+    # vorliegt (z.B. noch keine Preishistorie für dieses Modell) -- additive
+    # Felder mit Default, bestehender Code bleibt unverändert lauffähig.
+    estimated_margin_eur: float | None = None
+    estimated_margin_pct: float | None = None
 
 
 def load_rules(path: str = "rules.yaml") -> dict:
@@ -616,6 +627,17 @@ def evaluate(
         # Lookup-Key fuer einen ggf. vorab berechneten Marktpreis (Schritt 7.4).
         price_history_model = rule.get("price_history_model", rule_label)
         market_price = (market_prices or {}).get(price_history_model)
+        # Reselling-/Arbitrage-Konzept (STATUS.md Abschnitt 16, Punkt b):
+        # separater compute_profit()-Aufruf fuer die Dashboard-Rohwerte
+        # (Euro/Prozent). compute_deal_score() ruft intern denselben
+        # market_price/fees-Input ebenfalls in compute_profit() ein (fuer
+        # den 0-100 "profit"-Score) -- die doppelte Berechnung ist bewusst
+        # in Kauf genommen (billige, reine Funktion ohne Seiteneffekte),
+        # um compute_deal_score()s Rueckgabewert (DealScoreResult) nicht um
+        # ein Profit-Objekt erweitern zu muessen (kein Bruch der
+        # bestehenden Signatur/des bestehenden Rueckgabewerts).
+        fees_cfg = rules_cfg.get("fees") or None
+        profit = compute_profit(price, market_price, fees_cfg)
         score_result = compute_deal_score(
             price=price,
             max_price=max_price,
@@ -633,7 +655,7 @@ def evaluate(
             # _load_rules_from_dir()), leeres/fehlendes Dict -> neutrale
             # 0-Defaults in compute_profit(), kein Crash.
             estimated_resale_price=market_price,
-            fees=rules_cfg.get("fees") or None,
+            fees=fees_cfg,
             **score_inputs,
         )
 
@@ -654,6 +676,8 @@ def evaluate(
             price_history_model=price_history_model,
             manufacturer_name=score_inputs.get("manufacturer_name"),
             notify_max_price=rule.get("_notify_max_price"),
+            estimated_margin_eur=profit.margin_abs if profit else None,
+            estimated_margin_pct=profit.margin_pct if profit else None,
         )
 
     return MatchResult(matched=False)

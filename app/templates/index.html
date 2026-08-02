@@ -222,6 +222,12 @@
     }
     .stars { color: var(--amber); font-size: 0.85rem; letter-spacing: 1px; }
     .meta { color: var(--text-muted); font-size: 0.78rem; }
+    /* Reselling-/Arbitrage-Konzept (STATUS.md Abschnitt 16, Punkt b):
+       Marge nur anzeigen, wenn ein estimated_margin_eur vorliegt (siehe
+       Template-Logik unten) -- gruen bei Gewinn, rot bei Verlust. */
+    .margin { font-size: 0.78rem; font-weight: 600; margin-top: 0.1rem; }
+    .margin.positive { color: var(--green); }
+    .margin.negative { color: var(--red); }
     /* Schritt 8.3: kleines Plattform-Icon statt reinem Text-Label --
        bewusst KEINE Original-Marken-Logos, nur generische Font-Awesome-
        Icons zur Unterscheidbarkeit. Farben je Quelle wie zuvor. */
@@ -552,6 +558,13 @@
         <span class="price">{{ "%.0f"|format(f.price) }} €</span>
       </div>
       {% if f.deal_stars %}<div class="stars">{{ f.deal_stars }}</div>{% endif %}
+      {%- if f.estimated_margin_eur is defined and f.estimated_margin_eur is not none %}
+      <div class="margin {{ 'positive' if f.estimated_margin_eur >= 0 else 'negative' }}">
+        💰 {{ "%+.0f"|format(f.estimated_margin_eur) }} €
+        {%- if f.estimated_margin_pct is not none %} ({{ "%+.0f"|format(f.estimated_margin_pct) }}%){% endif %}
+        geschätzte Marge
+      </div>
+      {%- endif %}
       <div class="meta">
         {%- set _src = f.source or 'unbekannt' -%}
         {%- set _icon = icon_map.get(_src|lower, icon_default) -%}
@@ -958,6 +971,22 @@
         ? `<div class="stars">${escapeHtml(f.deal_stars)}</div>`
         : '';
 
+      // Reselling-/Arbitrage-Konzept (STATUS.md Abschnitt 16, Punkt b):
+      // analog zum server-seitigen Jinja-Rendering oben -- nur anzeigen,
+      // wenn ein estimated_margin_eur vorliegt.
+      let marginHtml = '';
+      if (f.estimated_margin_eur !== undefined && f.estimated_margin_eur !== null) {
+        const marginEur = Number(f.estimated_margin_eur);
+        const sign = marginEur >= 0 ? '+' : '';
+        const cls = marginEur >= 0 ? 'positive' : 'negative';
+        let pctText = '';
+        if (f.estimated_margin_pct !== undefined && f.estimated_margin_pct !== null) {
+          const pct = Number(f.estimated_margin_pct);
+          pctText = ` (${pct >= 0 ? '+' : ''}${pct.toFixed(0)}%)`;
+        }
+        marginHtml = `<div class="margin ${cls}">💰 ${sign}${marginEur.toFixed(0)} €${pctText} geschätzte Marge</div>`;
+      }
+
       const metaParts = [`${escapeHtml(source)} · ${escapeHtml(f.location || '')}`];
       if (f.category) metaParts.push(escapeHtml(f.category));
       if (f.manufacturer) metaParts.push(escapeHtml(f.manufacturer));
@@ -984,6 +1013,7 @@
         <span class="price">${price.toFixed(0)} €</span>
       </div>
       ${starsHtml}
+      ${marginHtml}
       <div class="meta"><i class="platform-icon ${iconInfo.icon}" style="color: ${iconInfo.color};" title="${escapeHtml(source)}"></i>${metaParts.join(' · ')}${foundAtHtml}
       </div>
       <a href="${escapeHtml(f.url || '#')}" target="_blank">Zum Angebot →</a>
