@@ -64,6 +64,20 @@ def test_ssd_bekannte_grenze_bindestrich_dezimalzahl():
     assert detect_ssd_gb("Gaming PC 1-5TB SSD RTX 3060") == 5000
 
 
+def test_ssd_tippfehler_sdd_vor_zahl():
+    # "SDD" ist ein haeufiger Vertipper fuer "SSD" in echten Kleinanzeigen-
+    # Titeln (Schritt A) und soll gleichwertig erkannt werden.
+    assert detect_ssd_gb("Office PC SDD 256GB i5-8500") == 256
+
+
+def test_ssd_tippfehler_sdd_nach_zahl():
+    assert detect_ssd_gb("Gaming PC 512GB SDD RTX 3060") == 512
+
+
+def test_ssd_tippfehler_sdd_case_insensitive():
+    assert detect_ssd_gb("PC mit 500gb sdd speicher") == 500
+
+
 # ---------- detect_hdd_gb ----------
 
 def test_hdd_gb_direkt():

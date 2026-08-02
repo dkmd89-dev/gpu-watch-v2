@@ -16,6 +16,14 @@ search_terms:
   - "Kingston A400"
   - "Intenso SSD"
   - "Intenso Top Performance"
+  # Generische Begriffe (Schritt A): decken markenlose Angebote ab, die
+  # von den obigen markenspezifischen Suchbegriffen nicht erfasst werden.
+  - "SSD 250GB"
+  - "SSD 500GB"
+  - "SSD 1TB"
+  - "WD Blue SSD"
+  - "ADATA SSD"
+  - "Toshiba SSD"
 
 # SCORING-GEWICHTUNG
 scoring_weights:
@@ -26,11 +34,15 @@ scoring_weights:
   zustand: 0
   lieferumfang: 0
 
-# EXCLUDES – NVMe, M.2, HDD & Falschtreffer STRIKT AUSSCHLIESSEN
+# EXCLUDES – NVMe, HDD & Falschtreffer STRIKT AUSSCHLIESSEN
+# Schritt A: "m.2"/"m2" bewusst NICHT mehr pauschal ausgeschlossen -- M.2
+# ist nur ein Formfaktor, kein Interface. Es gibt reale M.2-SSDs mit
+# SATA-Interface (B+M-Key), die durch den bisherigen Blanket-Exclude
+# faelschlich verworfen wurden. Explizite NVMe-Erwaehnungen ("nvme",
+# "pcie") werden weiterhin ausgeschlossen, da NVMe zuverlaessig im Titel
+# genannt wird, wenn es sich um eine NVMe-SSD handelt.
 exclude_category:
   - "nvme"
-  - "m.2"
-  - "m2"
   - "pcie"
   - "defekt"
   - "fuer bastler"

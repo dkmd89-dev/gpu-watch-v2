@@ -2,6 +2,7 @@ import os
 import json
 import time
 import logging
+import logging.handlers
 import threading
 from dataclasses import asdict
 from pathlib import Path
@@ -34,10 +35,33 @@ PRICE_HISTORY_FILE = DATA_DIR / "price_history.jsonl"
 # Phase 7 mit price_history.jsonl als append-only Zeitreihe).
 FOUND_MAX_ITEMS = int(os.environ.get("FOUND_MAX_ITEMS", "200"))
 
+# Schritt C: Deals-Aufraeumen. found.json wurde bisher nur nach Anzahl
+# (FOUND_MAX_ITEMS) gekappt, nicht nach Alter -- ein selten scannendes
+# Setup oder eine Kategorie mit wenig Treffern konnte dadurch beliebig
+# alte, laengst nicht mehr verfuegbare Angebote im Dashboard zeigen. Bei
+# jedem Scan werden Eintraege mit found_at aelter als DEAL_MAX_AGE_DAYS
+# entfernt (Default 7, per Env-Var konfigurierbar -- analog FOUND_MAX_ITEMS).
+DEAL_MAX_AGE_DAYS = int(os.environ.get("DEAL_MAX_AGE_DAYS", "7"))
+
+# Schritt B: Log-Rotation. Ohne Rotation wuchs gpu_watch.log unbegrenzt
+# (ein Long-Running-Container ohne Log-Limit ist ein bekanntes Betriebs-
+# risiko -- volle Disk faengt irgendwann den ganzen Container ein). Grenzen
+# per Env-Var konfigurierbar, Defaults wie angefordert: 1MB pro Datei,
+# 5 Backups (gpu_watch.log.1 .. .log.5). Rueckwaertskompatibel: derselbe
+# LOG_FILE-Pfad, dasselbe Format, StreamHandler unveraendert -- nur der
+# FileHandler wird durch die rotierende Variante ersetzt.
+LOG_MAX_BYTES = int(os.environ.get("LOG_MAX_BYTES", str(1_000_000)))
+LOG_BACKUP_COUNT = int(os.environ.get("LOG_BACKUP_COUNT", "5"))
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s %(message)s",
-    handlers=[logging.FileHandler(LOG_FILE), logging.StreamHandler()],
+    handlers=[
+        logging.handlers.RotatingFileHandler(
+            LOG_FILE, maxBytes=LOG_MAX_BYTES, backupCount=LOG_BACKUP_COUNT, encoding="utf-8"
+        ),
+        logging.StreamHandler(),
+    ],
 )
 log = logging.getLogger("gpu-watch")
 
@@ -134,6 +158,45 @@ def _tail_log(path: Path, n: int) -> list[str]:
         return []
 
 
+def _cleanup_old_deals(found: list[dict], max_age_days: int) -> tuple[list[dict], int]:
+    """Entfernt Einträge aus `found`, deren `found_at` älter als max_age_days ist.
+
+    Schritt C: Bei jedem Scan aufgerufen, damit found.json nicht auf
+    Anzahl (FOUND_MAX_ITEMS) beschränkt bleibt, sondern auch veraltete
+    Angebote (typischerweise längst nicht mehr verfügbar) automatisch
+    verschwinden.
+
+    Rückwärtskompatibel: Legacy-Einträge OHNE `found_at`-Feld (aus der
+    Zeit vor dessen Einführung in Phase 8) werden bewusst NICHT entfernt
+    -- ohne Zeitstempel lässt sich ihr Alter nicht bestimmen, ein
+    Entfernen wäre eine Vermutung statt einer Tatsache (analog zum
+    dokumentierten Jinja `is defined`-Bugfix für fehlendes deal_score).
+
+    Gibt (bereinigte Liste, Anzahl entfernter Einträge) zurück.
+    """
+    cutoff = datetime.now(timezone.utc) - timedelta(days=max_age_days)
+    kept = []
+    removed = 0
+    for entry in found:
+        found_at = entry.get("found_at")
+        if not found_at:
+            kept.append(entry)
+            continue
+        try:
+            found_dt = datetime.fromisoformat(found_at)
+        except (ValueError, TypeError):
+            # Nicht parsebarer Zeitstempel -> konservativ behalten statt
+            # einen evtl. gültigen Deal versehentlich zu loeschen.
+            kept.append(entry)
+            continue
+        if found_dt >= cutoff:
+            kept.append(entry)
+        else:
+            removed += 1
+    return kept, removed
+
+
+
 def _load_price_stats(path: Path) -> dict[str, PriceStats]:
     """Berechnet die volle Preisstatistik je price_history_model.
 
@@ -207,6 +270,18 @@ def run_scan():
         with _seen_lock:
             seen = set(_load_json(SEEN_FILE, []))
             found = _load_json(FOUND_FILE, [])
+            # Schritt C: veraltete Deals (> DEAL_MAX_AGE_DAYS) vor dem
+            # Scan entfernen, damit found.json/das Dashboard nicht auf
+            # laengst nicht mehr verfuegbare Angebote hinweisen. Sofort
+            # gespeichert, unabhaengig davon ob dieser Scan neue Treffer
+            # findet (analog zum bisherigen seen.json/found.json-Muster).
+            found, removed_count = _cleanup_old_deals(found, DEAL_MAX_AGE_DAYS)
+            if removed_count:
+                log.info(
+                    "Deals-Aufräumen: %d Angebot(e) älter als %d Tage entfernt.",
+                    removed_count, DEAL_MAX_AGE_DAYS,
+                )
+                _save_json(FOUND_FILE, found)
 
         raw = []
         raw += search_kleinanzeigen(
