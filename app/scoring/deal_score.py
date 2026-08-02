@@ -88,6 +88,12 @@ _COMPONENT_KEYS = (
     "profit",
 )
 
+# Oeffentlicher Alias von _COMPONENT_KEYS: Verhandlungs-Assistent (STATUS.md
+# Abschnitt 16, Punkt 7) muss in matcher.py validieren, ob ein per YAML
+# konfigurierter "negotiation_score_component"-Wert einer echten
+# Score-Komponente entspricht. Reiner Re-Export, keine Verhaltensaenderung.
+COMPONENT_KEYS = _COMPONENT_KEYS
+
 # Kappungsgrenze fuer margin_pct in _profit_score() (Prozent). Jenseits
 # dieser Marge (positiv wie negativ) wird der Score nicht weiter
 # extremer -- verhindert, dass ein einzelner Ausreisser (z.B. sehr

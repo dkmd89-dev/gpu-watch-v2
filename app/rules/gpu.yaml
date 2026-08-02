@@ -202,6 +202,19 @@ rules:
       - "4060"
     max_price: 220
     deal_rating: "Top-Deal"
+    # Verhandlungs-Assistent (STATUS.md Abschnitt 16, Punkt 7), testweise
+    # nur an dieser Regel aktiviert: Angebote bis zu 15% ueber max_price
+    # (also bis 253€) werden nicht mehr verworfen, sondern als
+    # negotiation_candidate markiert, WENN die hardware_qualitaet-Komponente
+    # mindestens 70/100 erreicht (Top-Deal-Basis-Score ist 85, siehe
+    # scoring/deal_score.py::_hardware_qualitaet_score() -- daher hier und
+    # nicht an der "Guter Preis"-Regel, deren Basis-Score max. 65 waere und
+    # die Schwelle nie erreichen koennte). Alle anderen GPU-Regeln bleiben
+    # ohne diese drei Felder -> dort unveraendertes Verhalten (sofortiges
+    # Verwerfen bei Preis > max_price).
+    negotiation_tolerance_pct: 15.0
+    negotiation_min_score: 70
+    negotiation_score_component: "hardware_qualitaet"
 
   - label: "RTX 3060 12GB"
     match: 

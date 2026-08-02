@@ -1,5 +1,6 @@
 """Wendet die Regel-Matrix aus rules.yaml auf einen (Titel, Preis) an."""
 from __future__ import annotations
+import logging
 import re
 import yaml
 from pathlib import Path
@@ -12,8 +13,10 @@ from categories.detectors.gpu import detect_dedicated_gpu
 from categories.detectors.storage import detect_ssd_gb
 from categories.detectors.psu import detect_psu_watt
 from categories.detectors.manufacturer import detect_manufacturer
-from scoring.deal_score import compute_deal_score, DEFAULT_WEIGHTS
+from scoring.deal_score import compute_deal_score, DEFAULT_WEIGHTS, COMPONENT_KEYS
 from scoring.profit import compute_profit
+
+logger = logging.getLogger(__name__)
 
 # Legacy-Fallback: wird NUR noch verwendet, wenn load_rules() im alten
 # Einzeldatei-Modus (eine rules.yaml ohne Kategorie-Kontext) aufgerufen wird.
@@ -69,6 +72,14 @@ class MatchResult:
     # Felder mit Default, bestehender Code bleibt unverändert lauffähig.
     estimated_margin_eur: float | None = None
     estimated_margin_pct: float | None = None
+    # Verhandlungs-Assistent (STATUS.md Abschnitt 16, Punkt 7): True, wenn
+    # dieses Match NUR dank der negotiation_*-Felder der Kategorie-YAML
+    # zustande kam (Preis > max_price, aber innerhalb der konfigurierten
+    # Toleranz UND Mindest-Score erreicht) -- statt wie bisher komplett
+    # verworfen zu werden. Additives Feld mit Default False, bestehender
+    # Code bleibt unveraendert lauffaehig (regulaere Matches innerhalb von
+    # max_price setzen dieses Feld nie).
+    negotiation_candidate: bool = False
 
 
 def load_rules(path: str = "rules.yaml") -> dict:
@@ -622,8 +633,39 @@ def evaluate(
 
         # Preis-Check (gilt für beide Regel-Arten gleichermaßen)
         max_price = rule.get("max_price")
-        if max_price is not None and price > max_price:
-            continue
+        price_exceeds_max = max_price is not None and price > max_price
+
+        # Verhandlungs-Assistent (STATUS.md Abschnitt 16, Punkt 7): ein
+        # Angebot über max_price wird nicht mehr zwingend sofort verworfen,
+        # sondern kann als Verhandlungskandidat markiert werden, WENN die
+        # Kategorie-YAML alle drei negotiation_*-Felder definiert. Fehlt
+        # auch nur eines davon -> Feature fuer diese Kategorie inaktiv,
+        # bisheriges Verhalten (sofortiges Verwerfen) bleibt unveraendert.
+        # Bewusst KEIN globaler Fallback in _global.yaml (siehe Auftrag).
+        negotiation_tolerance_pct = rule.get("negotiation_tolerance_pct")
+        negotiation_min_score = rule.get("negotiation_min_score")
+        negotiation_score_component = rule.get("negotiation_score_component")
+        negotiation_configured = (
+            negotiation_tolerance_pct is not None
+            and negotiation_min_score is not None
+            and negotiation_score_component is not None
+        )
+
+        if price_exceeds_max:
+            if not negotiation_configured:
+                continue
+            tolerance_limit = max_price * (1 + negotiation_tolerance_pct / 100)
+            if price > tolerance_limit:
+                continue
+            if negotiation_score_component not in COMPONENT_KEYS:
+                logger.warning(
+                    "Ungueltiger negotiation_score_component '%s' in Regel "
+                    "'%s' -- Verhandlungs-Assistent fuer dieses Match "
+                    "deaktiviert.",
+                    negotiation_score_component,
+                    rule.get("label", "?"),
+                )
+                continue
 
         # Deal-Score (Phase 6): nutzt die bereits gesammelten Detector-
         # Ergebnisse weiter, keine doppelten Detector-Aufrufe.
@@ -683,6 +725,20 @@ def evaluate(
             **score_inputs,
         )
 
+        # Verhandlungs-Assistent (STATUS.md Abschnitt 16, Punkt 7): finale
+        # Entscheidung erst jetzt möglich, da erst hier score_result.components
+        # vorliegt. Toleranz wurde oben bereits geprüft (sonst waere hier
+        # längst "continue" ausgeloest worden) -- fehlt nur noch die
+        # Mindest-Score-Pruefung der konfigurierten Komponente.
+        negotiation_candidate = False
+        if price_exceeds_max and negotiation_configured:
+            component_score = score_result.components.get(
+                negotiation_score_component, 0
+            )
+            if component_score < negotiation_min_score:
+                continue
+            negotiation_candidate = True
+
         return MatchResult(
             matched=True,
             rule_label=rule_label,
@@ -702,6 +758,7 @@ def evaluate(
             notify_max_price=rule.get("_notify_max_price"),
             estimated_margin_eur=profit.margin_abs if profit else None,
             estimated_margin_pct=profit.margin_pct if profit else None,
+            negotiation_candidate=negotiation_candidate,
         )
 
     return MatchResult(matched=False)
