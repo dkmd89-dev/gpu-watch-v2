@@ -17,6 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import scrapers.kleinanzeigen
 import scrapers.ebay
 import scrapers.quoka
+import price_history
 
 
 def _load_app_module(data_dir: str):
@@ -39,12 +40,28 @@ def test_notification_gate_end_to_end():
         # Zwei synthetische Kleinanzeigen-Treffer: einer sollte 5 Sterne
         # UND <=150€ erreichen (benachrichtigt), der andere nicht (nur
         # gespeichert).
-        # Preis 5€ statt vormals 15€: Mit den kategoriespezifischen
-        # scoring_weights aus rules/gpu.yaml (90% Preis / 10% Hardware-
-        # qualität, siehe dortiger Kommentar) ist ★★★★★ für die GPU-
-        # Kategorie erst bei einem Preis nahe 0 erreichbar, da "Ausstattung"
-        # für einzelne Grafikkarten strukturell immer neutral bewertet wird.
-        # 15€ reichten dafür nicht mehr aus (nur ★★★★☆ bei max_price=160€).
+        # Preis 5€: Mit den kategoriespezifischen scoring_weights aus
+        # rules/gpu.yaml (70% Preis / 10% Hardwarequalität / 20% Profit,
+        # siehe dortiger Kommentar -- "profit" seit STATUS.md Abschnitt 16
+        # testweise aktiviert) ist ★★★★★ für die GPU-Kategorie ohne
+        # Preishistorie NICHT mehr erreichbar: "profit" bliebe sonst beim
+        # neutralen Platzhalter (60) und deckelt den Gesamt-Score auf
+        # rechnerisch maximal ~91 (0.7*100 + 0.1*85 + 0.2*60). Deshalb wird
+        # hier -- passend zum eigentlichen Zweck der neuen Komponente -- ein
+        # einzelner Preishistorie-Datenpunkt für "rtx_2080_ti" VOR dem Scan
+        # geseedet, sodass ein echter (statt platzhalterhafter) Marktpreis
+        # vorliegt und sowohl "price" als auch "profit" den sehr günstigen
+        # Kauf (5€ vs. Marktpreis 260€) korrekt hoch bewerten.
+        seeded_point = price_history.make_price_point(
+            price=260.0,
+            source="kleinanzeigen",
+            model="rtx_2080_ti",
+            category="gpu",
+        )
+        price_history.append_price_point(
+            Path(tmpdir) / "price_history.jsonl", seeded_point
+        )
+
         fake_listings = [
             {
                 "source": "Kleinanzeigen",

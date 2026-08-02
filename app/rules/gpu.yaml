@@ -85,14 +85,29 @@ search_terms:
 # Ausstattung/Hersteller/Zustand/Lieferumfang bleiben auf 0, da für
 # diese Kategorie kein echtes Signal existiert (kein "Fake"-Score).
 # ============================================================
+# Reselling-/Arbitrage-Konzept (STATUS.md Abschnitt 16): "profit" hier
+# TESTWEISE mit 20% aktiviert (einzige Kategorie mit Gewicht > 0 -- alle
+# anderen Kategorien bleiben unangetastet auf dem globalen Default 0.0,
+# siehe scoring/deal_score.py::DEFAULT_WEIGHTS). GPU ist absichtlich die
+# erste Testkategorie: einzelne Grafikkarten haben klare price_history_model-
+# Schlüssel je Modell (siehe "rules:" unten) und damit die beste Chance auf
+# ausreichend gesammelte Marktpreis-Datenpunkte für eine aussagekräftige
+# Marge (siehe scoring/profit.py). Ohne Preishistorie für ein Modell bleibt
+# "profit" beim neutralen Platzhalter (60) -- kein Absturz, aber auch kein
+# Signal, bis genug Daten gesammelt wurden.
+# 10 Prozentpunkte von "price" zugunsten von "profit" umgeschichtet, "hardware_
+# qualitaet" unverändert bei 0.1 belassen (bleibt einziger Tie-Breaker
+# zwischen gleich profitablen Angeboten unterschiedlicher Deal-Rating-Stufe).
+# ============================================================
 
 scoring_weights:
-  price: 0.9
+  price: 0.7
   ausstattung: 0
   hardware_qualitaet: 0.1
   hersteller: 0
   zustand: 0
   lieferumfang: 0
+  profit: 0.2
 
 # ============================================================
 # OPTIMIERTE EXCLUDES – NUR klare PCs
