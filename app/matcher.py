@@ -623,6 +623,17 @@ def evaluate(
             weights=scoring_weights,
             market_price=market_price,
             manufacturer_reputation=rules_cfg.get("manufacturer_reputation") or None,
+            # Reselling-/Arbitrage-Konzept (STATUS.md Abschnitt 16): laut
+            # Phase-1-Architekturentscheidung wird estimated_resale_price
+            # zunaechst bewusst auf denselben market_price-Wert gesetzt wie
+            # oben (siehe _price_score()) -- eine differenziertere, von der
+            # Ankaufsperspektive getrennte Verkaufspreis-Schaetzung ist ein
+            # offen gelassener Folgeschritt (siehe scoring/profit.py-
+            # Docstring). fees kommt aus rules_cfg["fees"] (siehe
+            # _load_rules_from_dir()), leeres/fehlendes Dict -> neutrale
+            # 0-Defaults in compute_profit(), kein Crash.
+            estimated_resale_price=market_price,
+            fees=rules_cfg.get("fees") or None,
             **score_inputs,
         )
 

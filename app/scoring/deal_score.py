@@ -26,6 +26,8 @@ exakt wie zuvor -- rein rückwärtskompatibel. Details siehe _price_score().
 from __future__ import annotations
 from dataclasses import dataclass, field
 
+from scoring.profit import Profit, compute_profit
+
 # Feste Stern-Schwellen (Bewertungsskala aus dem Auftrag: 95-100 / 80-94 /
 # 60-79 / 40-59 / 0-39). Bewusst als Code-Konstante statt YAML-Wert, da es
 # sich um eine feste Bewertungsskala handelt, keine Hardware- oder
@@ -62,6 +64,13 @@ DEFAULT_WEIGHTS: dict[str, float] = {
     "hersteller": 0.05,
     "zustand": 0.10,
     "lieferumfang": 0.05,
+    # Reselling-/Arbitrage-Konzept (STATUS.md Abschnitt 16): bewusst 0 als
+    # Default -- diese Komponente ist neu und soll das produktive Scoring
+    # bestehender Kategorien (GPU, Office-PC, Gaming-PC, SATA-SSD) NICHT
+    # verändern, bis eine Kategorie ihr Gewicht bewusst in ihrer YAML setzt
+    # (analog zum bisherigen Vorgehen bei "hersteller"/"zustand"/
+    # "lieferumfang" in rules/_global.yaml).
+    "profit": 0.0,
 }
 
 # Neutraler Platzhalterwert für Komponenten ohne verlässliche Datengrundlage
@@ -76,7 +85,15 @@ _COMPONENT_KEYS = (
     "hersteller",
     "zustand",
     "lieferumfang",
+    "profit",
 )
+
+# Kappungsgrenze fuer margin_pct in _profit_score() (Prozent). Jenseits
+# dieser Marge (positiv wie negativ) wird der Score nicht weiter
+# extremer -- verhindert, dass ein einzelner Ausreisser (z.B. sehr
+# duenne Preishistorie mit einem extrem hohen/niedrigen market_price)
+# die Komponente auf 0/100 "einfriert" ohne Interpretationsspielraum.
+_PROFIT_MARGIN_CAP_PCT = 50.0
 
 
 @dataclass(frozen=True)
@@ -228,6 +245,29 @@ def _hersteller_score(
     return max(0, min(100, round(value)))
 
 
+def _profit_score(profit: Profit | None) -> int:
+    """Score (0-100) auf Basis der geschätzten Wiederverkaufsmarge
+    (siehe scoring/profit.py::compute_profit()).
+
+    Symmetrisch um margin_pct == 0 (Score 50 = "kostendeckend"), analog
+    zu _market_based_price_score(): positive Marge -> höherer Score (bis
+    100 bei +50% oder mehr, siehe _PROFIT_MARGIN_CAP_PCT), negative Marge
+    (Verlustgeschäft) -> niedrigerer Score (bis 0 bei -50% oder weniger).
+
+    profit is None (kein estimated_resale_price übergeben, z.B. noch keine
+    Preishistorie für dieses Modell, oder margin_pct is None bei
+    purchase_price <= 0) -> neutraler Platzhalter, exakt wie bei den
+    anderen optionalen Komponenten (_hersteller_score() etc.) -- volle
+    Rückwärtskompatibilität, solange diese Komponente nicht aktiv genutzt
+    wird (Default-Gewicht 0, siehe DEFAULT_WEIGHTS).
+    """
+    if profit is None or profit.margin_pct is None:
+        return _PLACEHOLDER_SCORE
+
+    capped = max(-_PROFIT_MARGIN_CAP_PCT, min(_PROFIT_MARGIN_CAP_PCT, profit.margin_pct))
+    return round(50 + capped)
+
+
 def compute_deal_score(
     price: float,
     max_price: float | None,
@@ -241,6 +281,8 @@ def compute_deal_score(
     market_price: float | None = None,
     manufacturer_name: str | None = None,
     manufacturer_reputation: dict | None = None,
+    estimated_resale_price: float | None = None,
+    fees: dict | None = None,
 ) -> DealScoreResult:
     """Berechnet den gewichteten Deal-Score (0-100) und die Stern-Einstufung.
 
@@ -261,8 +303,19 @@ def compute_deal_score(
     die "hersteller"-Komponente ein (siehe _hersteller_score()). Werden
     beide nicht übergeben (Standard), verhält sich diese Funktion EXAKT
     wie zuvor (neutraler Platzhalter) -- volle Rückwärtskompatibilität.
+
+    estimated_resale_price / fees (Reselling-/Arbitrage-Konzept, STATUS.md
+    Abschnitt 16): optionaler geschätzter Wiederverkaufspreis und optionale
+    Gebührenkonfiguration (siehe scoring/profit.py::compute_profit()),
+    fließen in die neue "profit"-Komponente ein (siehe _profit_score()).
+    Werden beide nicht übergeben (Standard), ist profit=None -> neutraler
+    Platzhalter, UND das Default-Gewicht dieser Komponente ist ohnehin 0
+    (siehe DEFAULT_WEIGHTS) -- der Gesamt-Score bleibt also unverändert,
+    solange eine Kategorie kein eigenes "profit"-Gewicht > 0 setzt.
     """
     weights = weights if weights is not None else DEFAULT_WEIGHTS
+
+    profit = compute_profit(price, estimated_resale_price, fees)
 
     components: dict[str, int] = {
         "price": _price_score(price, max_price, market_price),
@@ -273,6 +326,7 @@ def compute_deal_score(
         "hersteller": _hersteller_score(manufacturer_name, manufacturer_reputation),
         "zustand": _PLACEHOLDER_SCORE,
         "lieferumfang": _PLACEHOLDER_SCORE,
+        "profit": _profit_score(profit),
     }
 
     total_weight = sum(weights.get(k, 0) for k in _COMPONENT_KEYS)

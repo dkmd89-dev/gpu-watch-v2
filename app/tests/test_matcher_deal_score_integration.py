@@ -116,6 +116,95 @@ def test_evaluate_reicht_manufacturer_reputation_bis_zum_score_durch():
     assert r.deal_score == 80
 
 
+def test_evaluate_reicht_market_price_als_estimated_resale_price_durch():
+    # Reselling-/Arbitrage-Konzept (STATUS.md Abschnitt 16): market_prices
+    # wird laut Phase-1-Entscheidung 1:1 als estimated_resale_price genutzt.
+    # Gewicht ausschliesslich auf "profit" -- prueft die vollstaendige Kette
+    # market_prices -> evaluate() -> compute_deal_score() -> profit-Score.
+    cfg = {
+        "defaults": {},
+        "rules": [
+            {
+                "label": "Test-GPU",
+                "max_price": 300,
+                "deal_rating": "Okay",
+                "_category": "gpu",
+                "_category_exclude_terms": [],
+                "_scoring_weights": {"profit": 1.0},
+                "price_history_model": "rtx_3060_12gb",
+            }
+        ],
+        "search_terms": [],
+        "notifications": {},
+        "scoring_weights": {},
+        "fees": {},
+        "_directory_mode": True,
+    }
+    r = evaluate(
+        "RTX 3060 12GB", 100.0, cfg,
+        market_prices={"rtx_3060_12gb": 200.0},  # deutliche Marge, keine fees
+    )
+    assert r.matched is True
+    # margin_pct = (200-100)/100*100 = 100%, gekappt bei 50 -> Score 100
+    assert r.deal_score == 100
+
+
+def test_evaluate_beruecksichtigt_fees_aus_rules_cfg():
+    cfg = {
+        "defaults": {},
+        "rules": [
+            {
+                "label": "Test-GPU",
+                "max_price": 300,
+                "deal_rating": "Okay",
+                "_category": "gpu",
+                "_category_exclude_terms": [],
+                "_scoring_weights": {"profit": 1.0},
+                "price_history_model": "rtx_3060_12gb",
+            }
+        ],
+        "search_terms": [],
+        "notifications": {},
+        "scoring_weights": {},
+        "fees": {"platform_fee_pct": 20.0, "shipping_cost": 10.0},
+        "_directory_mode": True,
+    }
+    r_ohne_fees = evaluate(
+        "RTX 3060 12GB", 100.0, {**cfg, "fees": {}},
+        market_prices={"rtx_3060_12gb": 150.0},
+    )
+    r_mit_fees = evaluate(
+        "RTX 3060 12GB", 100.0, cfg,
+        market_prices={"rtx_3060_12gb": 150.0},
+    )
+    assert r_mit_fees.deal_score < r_ohne_fees.deal_score
+
+
+def test_evaluate_ohne_market_price_profit_score_ist_platzhalter_und_ohne_einfluss():
+    # Default-Gewicht "profit" ist 0 (siehe DEFAULT_WEIGHTS) -- ohne
+    # market_prices darf sich am produktiven Score NICHTS aendern.
+    cfg = {
+        "defaults": {},
+        "rules": [
+            {
+                "label": "Test-GPU",
+                "max_price": 300,
+                "deal_rating": "Okay",
+                "_category": "gpu",
+                "_category_exclude_terms": [],
+            }
+        ],
+        "search_terms": [],
+        "notifications": {},
+        "scoring_weights": {},
+        "fees": {},
+        "_directory_mode": True,
+    }
+    r_ohne = evaluate("RTX 3060 12GB", 100.0, cfg)
+    r_mit_leerem_market_prices = evaluate("RTX 3060 12GB", 100.0, cfg, market_prices={})
+    assert r_ohne.deal_score == r_mit_leerem_market_prices.deal_score
+
+
 def test_evaluate_ohne_erkannten_hersteller_nutzt_platzhalter():
     cfg = {
         "defaults": {},

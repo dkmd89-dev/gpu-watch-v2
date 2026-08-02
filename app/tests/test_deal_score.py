@@ -288,11 +288,14 @@ def test_compute_deal_score_hersteller_ohne_treffer_bleibt_platzhalter():
 
 # ---------- compute_deal_score: YAML-Konfigurierbarkeit (Fortsetzung) ----------
 
-def test_components_dict_enthaelt_alle_sechs_schluessel():
+def test_components_dict_enthaelt_alle_sieben_schluessel():
+    # Reselling-/Arbitrage-Konzept (STATUS.md Abschnitt 16): "profit" als
+    # siebte Komponente ergaenzt (Default-Gewicht 0, siehe DEFAULT_WEIGHTS
+    # -- veraendert den Gesamt-Score bestehender Kategorien nicht).
     r = compute_deal_score(price=50, max_price=200, deal_rating="Okay")
     assert set(r.components.keys()) == {
         "price", "ausstattung", "hardware_qualitaet",
-        "hersteller", "zustand", "lieferumfang",
+        "hersteller", "zustand", "lieferumfang", "profit",
     }
 
 
@@ -365,6 +368,61 @@ def test_compute_deal_score_ohne_market_price_unveraendert():
     r = compute_deal_score(price=10, max_price=200, deal_rating=None, weights={"price": 1.0})
     assert r.score == 95
     assert r.stars == "★★★★★"
+
+
+# ---------- profit-Komponente (Reselling-/Arbitrage-Konzept) ----------
+
+def test_ohne_estimated_resale_price_profit_ist_platzhalter():
+    r = compute_deal_score(price=100, max_price=200, deal_rating="Okay")
+    assert r.components["profit"] == 60  # _PLACEHOLDER_SCORE
+
+
+def test_default_gewicht_profit_null_veraendert_score_nicht():
+    # Default-Gewicht fuer "profit" ist 0 -- ob estimated_resale_price
+    # uebergeben wird oder nicht, darf den Gesamt-Score NICHT beeinflussen,
+    # solange keine Kategorie das Gewicht bewusst aktiviert.
+    ohne = compute_deal_score(price=100, max_price=200, deal_rating="Okay")
+    mit = compute_deal_score(
+        price=100, max_price=200, deal_rating="Okay",
+        estimated_resale_price=300,  # sehr hohe Marge
+    )
+    assert ohne.score == mit.score
+
+
+def test_profit_gewicht_aktiv_hohe_marge_hebt_score():
+    weights = {"profit": 1.0}
+    hohe_marge = compute_deal_score(
+        price=100, max_price=200, deal_rating="Okay", weights=weights,
+        estimated_resale_price=200,  # deutliche Marge
+    )
+    niedrige_marge = compute_deal_score(
+        price=100, max_price=200, deal_rating="Okay", weights=weights,
+        estimated_resale_price=105,  # kaum Marge
+    )
+    assert hohe_marge.score > niedrige_marge.score
+
+
+def test_profit_gewicht_aktiv_verlust_senkt_score_unter_neutral():
+    weights = {"profit": 1.0}
+    verlust = compute_deal_score(
+        price=200, max_price=200, deal_rating="Okay", weights=weights,
+        estimated_resale_price=100,  # Verlustgeschaeft
+    )
+    assert verlust.score < 50
+
+
+def test_fees_werden_bei_profit_score_beruecksichtigt():
+    weights = {"profit": 1.0}
+    ohne_fees = compute_deal_score(
+        price=100, max_price=200, deal_rating="Okay", weights=weights,
+        estimated_resale_price=150,
+    )
+    mit_fees = compute_deal_score(
+        price=100, max_price=200, deal_rating="Okay", weights=weights,
+        estimated_resale_price=150,
+        fees={"platform_fee_pct": 20.0, "shipping_cost": 10.0},
+    )
+    assert mit_fees.score < ohne_fees.score
 
 
 if __name__ == "__main__":
