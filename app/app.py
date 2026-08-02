@@ -311,6 +311,19 @@ def run_scan():
 
         global_max_price = max(r.get("max_price", 220) for r in rules_cfg["rules"])
 
+        # Baustein 5 (Duplicate-/Cross-Posting-Erkennung, STATUS.md
+        # Abschnitt 16): Toleranz-%/Zeitfenster jetzt aus _global.yaml
+        # konfigurierbar (analog notify_cfg oben). Fehlende einzelne Werte
+        # (oder komplett fehlende Sektion -> dup_cfg == {}) fallen auf die
+        # Modulkonstanten in duplicate_detection.py zurueck (find_duplicate()-
+        # Parameter-Defaults) -- kein Crash, volle Rueckwaertskompatibilitaet.
+        dup_cfg = rules_cfg.get("duplicate_detection") or {}
+        duplicate_kwargs = {}
+        if "price_tolerance_pct" in dup_cfg:
+            duplicate_kwargs["price_tolerance_pct"] = dup_cfg["price_tolerance_pct"]
+        if "window_days" in dup_cfg:
+            duplicate_kwargs["window_days"] = dup_cfg["window_days"]
+
         with _seen_lock:
             seen = set(_load_json(SEEN_FILE, []))
             found = _load_json(FOUND_FILE, [])
@@ -508,6 +521,7 @@ def run_scan():
                     price=item["price"],
                     fingerprint=fingerprint,
                     existing_points=price_points_this_scan,
+                    **duplicate_kwargs,
                 )
                 if duplicate is not None:
                     log.info(

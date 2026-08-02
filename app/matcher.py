@@ -110,6 +110,7 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
     scoring_weights = {}
     manufacturer_reputation = {}
     fees = {}
+    duplicate_detection_cfg = {}
     if global_file.exists():
         global_cfg = yaml.safe_load(global_file.read_text(encoding="utf-8")) or {}
         defaults = dict(global_cfg.get("defaults", {}))
@@ -140,6 +141,13 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
         # faellt dann auf neutrale 0-Defaults je Kostenposition zurueck,
         # kein Crash (volle Rueckwaertskompatibilitaet).
         fees = global_cfg.get("fees", {})
+        # Baustein 5 (Duplicate-/Cross-Posting-Erkennung, STATUS.md
+        # Abschnitt 16): additiver Key analog zu fees/manufacturer_reputation
+        # -- leeres Dict, falls _global.yaml keine "duplicate_detection:"-
+        # Sektion definiert (aeltere Configs). app.py faellt dann auf die
+        # Modulkonstanten in duplicate_detection.py zurueck (kein Crash,
+        # volle Rueckwaertskompatibilitaet).
+        duplicate_detection_cfg = global_cfg.get("duplicate_detection", {})
 
     merged_rules: list[dict] = []
     all_search_terms: set[str] = set()
@@ -236,6 +244,11 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
         # wird. In diesem Schritt noch NICHT an evaluate()/deal_score.py
         # angebunden (folgt in einem separaten Schritt, siehe STATUS.md).
         "fees": fees,
+        # Baustein 5 (Duplicate-/Cross-Posting-Erkennung, STATUS.md
+        # Abschnitt 16): additiver Key, analog zu fees oben -- Aufrufer, die
+        # ihn nicht kennen (aeltere app.py-Version, Legacy-Einzeldatei-Modus),
+        # bleiben unveraendert lauffaehig.
+        "duplicate_detection": duplicate_detection_cfg,
         "_directory_mode": True,
     }
 

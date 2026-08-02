@@ -151,6 +151,59 @@ def test_price_history_eintrag_enthaelt_fingerprint():
         assert data["fingerprint"] == "asus rtx 3060 12gb rog strix"
 
 
+def test_konfigurierte_toleranz_aus_global_yaml_wird_angewendet():
+    """Verschaerft price_tolerance_pct in _global.yaml auf 1% (statt Default
+    5%) -- ein Preisunterschied von 2,5% darf dann NICHT mehr als Duplikat
+    gelten, obwohl Titel/Modell identisch sind."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        app_mod = _load_app_module(tmpdir)
+
+        rules_dir = Path(__file__).resolve().parent.parent / "rules"
+        global_yaml_path = rules_dir / "_global.yaml"
+        original_content = global_yaml_path.read_text(encoding="utf-8")
+        try:
+            patched = original_content.replace(
+                "duplicate_detection:\n  price_tolerance_pct: 5.0\n  window_days: 30.0\n",
+                "duplicate_detection:\n  price_tolerance_pct: 1.0\n  window_days: 30.0\n",
+            )
+            assert patched != original_content, "Marker-Text in _global.yaml nicht gefunden"
+            global_yaml_path.write_text(patched, encoding="utf-8")
+
+            listings = [
+                {
+                    "source": "Kleinanzeigen",
+                    "title": "ASUS RTX 3060 12GB ROG Strix",
+                    "price": 200.0,
+                    "url": "https://example.test/gpu-tol-a",
+                    "location": "Musterstadt",
+                    "description": "",
+                    "images": [],
+                },
+                {
+                    "source": "eBay",
+                    "title": "ASUS RTX 3060 12GB ROG Strix",
+                    "price": 205.0,  # 2.5% Abweichung -> ueber der verschaerften 1%-Toleranz
+                    "url": "https://example.test/gpu-tol-b",
+                    "location": "",
+                    "description": "",
+                    "images": [],
+                },
+            ]
+
+            with patch.object(scrapers.kleinanzeigen, "search_kleinanzeigen", return_value=listings[:1]), \
+                 patch.object(scrapers.ebay, "search_ebay", return_value=listings[1:]), \
+                 patch.object(scrapers.quoka, "search_quoka", return_value=[]), \
+                 patch.object(app_mod, "send_ntfy", MagicMock()):
+                app_mod.run_scan()
+        finally:
+            global_yaml_path.write_text(original_content, encoding="utf-8")
+
+        # Beide Datenpunkte wurden geschrieben, da die verschaerfte 1%-Toleranz
+        # unterschritten wird (2.5% Abweichung) -- kein Duplikat erkannt.
+        lines = app_mod.PRICE_HISTORY_FILE.read_text(encoding="utf-8").splitlines()
+        assert len(lines) == 2
+
+
 if __name__ == "__main__":
     import pytest
     raise SystemExit(pytest.main([__file__, "-v"]))

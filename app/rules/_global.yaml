@@ -164,3 +164,34 @@ fees:
   payment_fee_pct: 2.5
   shipping_cost: 6.0
   packaging_cost: 1.5
+
+# ============================================================
+# Duplicate-/Cross-Posting-Erkennung (Reselling-/Arbitrage-Konzept,
+# siehe STATUS.md Abschnitt 16, Baustein 5) -- genutzt von
+# duplicate_detection.py::find_duplicate() ueber app.py::run_scan().
+# ============================================================
+# Verhindert, dass mehrfach gepostete/identische Angebote (gleicher
+# Verkaeufer postet erneut, oder parallel auf mehreren Plattformen) die
+# Marktpreis-Statistik (price_history.jsonl) verzerren. Ein Angebot gilt
+# als Duplikat eines bereits erfassten Datenpunkts, wenn Modell UND
+# normalisierter Titel uebereinstimmen UND der Preis innerhalb
+# price_tolerance_pct liegt UND der bestehende Datenpunkt nicht aelter
+# als window_days ist.
+#
+# price_tolerance_pct: erlaubte prozentuale Preisabweichung, damit zwei
+#   Angebote noch als dasselbe physische Objekt gelten (z.B. leicht
+#   unterschiedliche Preise bei Cross-Posting auf verschiedenen
+#   Plattformen).
+# window_days: wie lange ein bestehender Preishistorie-Datenpunkt als
+#   moeglicher Duplikat-Partner gilt. Aeltere Datenpunkte werden nicht
+#   mehr verglichen (das Angebot koennte in der Zwischenzeit tatsaechlich
+#   erneut -- zu einem ggf. neuen Marktpreis -- angeboten worden sein).
+#
+# Fehlt diese Sektion komplett oder einzelne Werte, fallen
+# duplicate_detection.py's Modulkonstanten (DEFAULT_PRICE_TOLERANCE_PCT=5.0,
+# DEFAULT_WINDOW_DAYS=30.0) als Default ein -- kein Crash, volle
+# Rueckwaertskompatibilitaet (aeltere Configs ohne diese Sektion).
+# ============================================================
+duplicate_detection:
+  price_tolerance_pct: 5.0
+  window_days: 30.0
