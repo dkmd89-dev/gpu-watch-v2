@@ -47,6 +47,16 @@ TREND_UNBEKANNT = "unbekannt"
 class PriceStats:
     """Statistik-Zusammenfassung fuer ein `price_history_model` (z.B.
     "rtx_3060_12gb", "office_pc") ueber alle bisher gesammelten Datenpunkte.
+
+    market_price vs. estimated_resale_price (Reselling-/Arbitrage-Konzept,
+    STATUS.md Abschnitt 16, Punkt c): beide sind Naeherungen desselben
+    Preisniveaus, aber aus unterschiedlicher Perspektive berechnet -- siehe
+    Docstring von _estimated_resale_price() fuer die methodische Begruendung.
+    Kurzfassung: market_price ist ein ANKAUFS-Proxy (Basis: alle vom Bot
+    selbst gematchten, d.h. tendenziell guenstigen Angebote), waehrend
+    estimated_resale_price bewusst nur das TEURERE obere Preissegment
+    derselben Datenpunkte nutzt und damit naeher an einem realistischen
+    Wiederverkaufspreis liegt.
     """
 
     model: str
@@ -60,6 +70,11 @@ class PriceStats:
     market_price: float
     trend: str  # "steigend" / "fallend" / "stabil" / "unbekannt"
     trend_change_pct: float | None  # None, falls trend == "unbekannt"
+    # Neu (Reselling-/Arbitrage-Konzept, Punkt c). Defaults halten bestehende
+    # PriceStats(...)-Konstruktionsstellen (z.B. Tests) rueckwaertskompatibel,
+    # ohne dass sie diese beiden Felder kennen muessen.
+    percentile_75: float = 0.0
+    estimated_resale_price: float | None = None
 
 
 def group_by_model(points: list[PricePoint]) -> dict[str, list[PricePoint]]:
@@ -102,6 +117,47 @@ def _market_price(sorted_prices: list[float], p10: float, p90: float, median: fl
     trimmed = [p for p in sorted_prices if p10 <= p <= p90]
     if not trimmed:
         return median  # sollte praktisch nie vorkommen, aber sicherer Fallback
+
+    return statistics.fmean(trimmed)
+
+
+def _estimated_resale_price(
+    sorted_prices: list[float], p75: float, p90: float, max_price: float
+) -> float:
+    """Verkaufspreis-Naeherung, methodisch GETRENNT von _market_price()
+    (Reselling-/Arbitrage-Konzept, STATUS.md Abschnitt 16, Punkt c).
+
+    Methodische Einschraenkung von market_price (siehe dortiger Docstring):
+    price_history.jsonl enthaelt ausschliesslich Angebote, die der Bot
+    SELBST als Treffer gematcht hat -- also Angebote, die bereits innerhalb
+    der (bewusst eng kalibrierten) max_price-Grenzen einer Regel liegen.
+    Der Datenpool ist dadurch strukturell nach unten verzerrt: teurere,
+    aber durchaus marktuebliche Angebote oberhalb der max_price-Grenze
+    tauchen in der Preishistorie gar nicht erst auf. market_price (Trimm-
+    Mittelwert ueber P10-P90) uebernimmt diese Verzerrung 1:1 -- fuer die
+    Frage "was zahle ich beim Einkauf" ist das gewuenscht, fuer die Frage
+    "was bekomme ich beim Wiederverkauf" unterschaetzt es systematisch.
+
+    estimated_resale_price nutzt deshalb bewusst nur das OBERE Preis-
+    segment (P75-P90) derselben Datenpunkte -- die teuersten (aber noch
+    nicht als Ausreisser behandelten) beobachteten Preise sind eine naeher
+    an einem realistischen Verkaufspreis liegende Referenz als der von
+    guenstigen Treffern dominierte Gesamt-Mittelwert.
+
+    Bei zu wenigen Datenpunkten (< _MIN_SAMPLES_FOR_PERCENTILE_MARKET_PRICE,
+    derselbe Schwellwert wie bei market_price) sind Perzentile ohnehin kaum
+    tragfaehig -- dann faellt estimated_resale_price auf max_price zurueck
+    (der teuerste TATSAECHLICH beobachtete Preis), NICHT auf den Median wie
+    bei market_price: max_price ist die konservativste verfuegbare Verkaufs-
+    referenz und vermeidet, die ohnehin schon nach unten verzerrte Median-
+    Naeherung ein zweites Mal fuer eine Verkaufsschaetzung zu verwenden.
+    """
+    if len(sorted_prices) < _MIN_SAMPLES_FOR_PERCENTILE_MARKET_PRICE:
+        return max_price
+
+    trimmed = [p for p in sorted_prices if p75 <= p <= p90]
+    if not trimmed:
+        return max_price  # sollte praktisch nie vorkommen, aber sicherer Fallback
 
     return statistics.fmean(trimmed)
 
@@ -151,6 +207,7 @@ def compute_price_stats(model: str, points: list[PricePoint]) -> PriceStats | No
     p5 = _percentile(prices, 5)
     p10 = _percentile(prices, 10)
     median = statistics.median(prices)
+    p75 = _percentile(prices, 75)
     p90 = _percentile(prices, 90)
     trend, trend_change_pct = _compute_trend(points)
 
@@ -166,6 +223,8 @@ def compute_price_stats(model: str, points: list[PricePoint]) -> PriceStats | No
         market_price=_market_price(prices, p10, p90, median),
         trend=trend,
         trend_change_pct=trend_change_pct,
+        percentile_75=p75,
+        estimated_resale_price=_estimated_resale_price(prices, p75, p90, max(prices)),
     )
 
 

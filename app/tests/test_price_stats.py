@@ -78,6 +78,48 @@ def test_market_price_schliesst_ausreisser_bei_genug_daten_aus():
     assert stats.market_price < 250  # der Marktpreis bleibt beim Gros der Preise
 
 
+# ---------- estimated_resale_price (Reselling-/Arbitrage-Konzept, Punkt c) ----------
+# Methodisch GETRENNT von market_price: nutzt das obere Preissegment
+# (P75-P90) statt des gesamten P10-P90-Bereichs -- siehe
+# price_stats.py::_estimated_resale_price()-Docstring.
+
+def test_estimated_resale_price_faellt_bei_wenig_daten_auf_max_price_zurueck():
+    # Weniger als 5 Datenpunkte -> Verkaufsschaetzung faellt auf max_price
+    # zurueck (NICHT auf den Median wie market_price -- siehe Docstring:
+    # die schon nach unten verzerrte Median-Naeherung soll nicht ein
+    # zweites Mal fuer die Verkaufsseite verwendet werden).
+    prices = [100.0, 500.0, 300.0]
+    points = [_point(p, days_ago=i) for i, p in enumerate(prices)]
+    stats = compute_price_stats("rtx_3060_12gb", points)
+    assert stats.estimated_resale_price == stats.max_price == 500.0
+    assert stats.estimated_resale_price != stats.median_price
+
+
+def test_estimated_resale_price_liegt_ueber_market_price_bei_genug_daten():
+    # Bei >=5 guenstig verteilten Datenpunkten liegt das obere Preis-
+    # segment (P75-P90) strukturell ueber dem P10-P90-Trimm-Mittelwert
+    # (market_price) -- das ist der eigentliche Zweck der Trennung:
+    # market_price unterschaetzt den realistischen Verkaufspreis, weil
+    # der Bot selbst nur guenstige Angebote in die Historie schreibt.
+    prices = [190.0, 200.0, 210.0, 220.0, 230.0, 240.0, 250.0, 260.0]
+    points = [_point(p, days_ago=i) for i, p in enumerate(prices)]
+    stats = compute_price_stats("rtx_3060_12gb", points)
+    assert stats.estimated_resale_price > stats.market_price
+
+
+def test_percentile_75_liegt_zwischen_median_und_percentile_90():
+    prices = [100.0, 120.0, 150.0, 180.0, 200.0, 220.0, 250.0, 280.0, 300.0, 320.0]
+    points = [_point(p, days_ago=i) for i, p in enumerate(prices)]
+    stats = compute_price_stats("rtx_3060_12gb", points)
+    p90 = stats.max_price  # naeherungsweise, exakter Wert unten via _percentile getestet
+    assert stats.median_price <= stats.percentile_75 <= stats.max_price
+
+
+def test_estimated_resale_price_einzelner_datenpunkt_ist_dieser_wert():
+    stats = compute_price_stats("office_pc", [_point(200.0, days_ago=0, model="office_pc")])
+    assert stats.estimated_resale_price == 200.0
+
+
 # ---------- Trend ----------
 
 def test_trend_unbekannt_bei_zu_wenig_daten():

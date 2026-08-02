@@ -303,6 +303,71 @@ def test_evaluate_manufacturer_name_none_ohne_erkennbare_marke():
     assert r.manufacturer_name is None
 
 
+# ---------- resale_prices (Reselling-/Arbitrage-Konzept, Punkt c) ----------
+# estimated_resale_price kommt jetzt bevorzugt aus resale_prices, NICHT mehr
+# 1:1 aus market_prices -- siehe evaluate()-Docstring.
+
+def _cfg_profit_only(price_history_model="rtx_3060_12gb"):
+    return {
+        "defaults": {},
+        "rules": [
+            {
+                "label": "Test-GPU",
+                "max_price": 300,
+                "deal_rating": "Okay",
+                "_category": "gpu",
+                "_category_exclude_terms": [],
+                "_scoring_weights": {"profit": 1.0},
+                "price_history_model": price_history_model,
+            }
+        ],
+        "search_terms": [],
+        "notifications": {},
+        "scoring_weights": {},
+        "fees": {},
+        "_directory_mode": True,
+    }
+
+
+def test_evaluate_nutzt_resale_prices_statt_market_prices_fuer_profit():
+    cfg = _cfg_profit_only()
+    r = evaluate(
+        "RTX 3060 12GB", 100.0, cfg,
+        market_prices={"rtx_3060_12gb": 105.0},  # kaeme allein kaum Marge
+        resale_prices={"rtx_3060_12gb": 200.0},  # deutliche Marge
+    )
+    assert r.matched is True
+    # margin_pct = (200-100)/100*100 = 100%, gekappt bei 50 -> Score 100.
+    # Waere estimated_resale_price faelschlich weiter aus market_prices (105)
+    # genommen worden, waere der Score deutlich niedriger.
+    assert r.deal_score == 100
+
+
+def test_evaluate_faellt_ohne_resale_prices_eintrag_auf_market_price_zurueck():
+    # Rueckwaertskompatibilitaet: resale_prices uebergeben, aber Modell fehlt
+    # darin -> Fallback auf market_prices, exakt wie vor Punkt c.
+    cfg = _cfg_profit_only()
+    r = evaluate(
+        "RTX 3060 12GB", 100.0, cfg,
+        market_prices={"rtx_3060_12gb": 200.0},
+        resale_prices={},
+    )
+    assert r.matched is True
+    assert r.deal_score == 100
+
+
+def test_evaluate_ohne_resale_prices_param_faellt_auf_market_price_zurueck():
+    # Aeltere Aufrufer, die resale_prices gar nicht kennen (Standard None) --
+    # exakt das bisherige Verhalten vor Punkt c.
+    cfg = _cfg_profit_only()
+    r = evaluate(
+        "RTX 3060 12GB", 100.0, cfg,
+        market_prices={"rtx_3060_12gb": 200.0},
+    )
+    assert r.matched is True
+    assert r.deal_score == 100
+
+
 if __name__ == "__main__":
     import pytest
     raise SystemExit(pytest.main([__file__, "-v"]))

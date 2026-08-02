@@ -251,6 +251,28 @@ def _market_prices_from_stats(stats_by_model: dict[str, PriceStats]) -> dict[str
     }
 
 
+def _resale_prices_from_stats(stats_by_model: dict[str, PriceStats]) -> dict[str, float]:
+    """Reduziert die volle Preisstatistik auf das
+    {price_history_model: geschaetzter Verkaufspreis}-Mapping (Reselling-/
+    Arbitrage-Konzept, STATUS.md Abschnitt 16, Punkt c).
+
+    Methodisch GETRENNT von _market_prices_from_stats(): market_price ist
+    ein Ankaufs-Proxy (Basis: alle vom Bot selbst gematchten, tendenziell
+    guenstigen Angebote), estimated_resale_price nutzt bewusst nur das
+    obere Preissegment (P75-P90) derselben Daten -- siehe
+    price_stats.py::_estimated_resale_price()-Docstring fuer die
+    Begruendung. Fehlt ein Modell in der Historie (stats is None) oder
+    liefert stats.estimated_resale_price ausnahmsweise None, wird das
+    Modell hier schlicht weggelassen -- evaluate() faellt dann auf
+    market_price zurueck (siehe dortiger Docstring), kein Crash.
+    """
+    return {
+        model: stats.estimated_resale_price
+        for model, stats in stats_by_model.items()
+        if stats is not None and stats.estimated_resale_price is not None
+    }
+
+
 def run_scan():
     global _scan_running
 
@@ -319,6 +341,7 @@ def run_scan():
         # price_stats_by_model (Top-Deal-Erkennung, Schritt 8.2).
         price_stats_by_model = _load_price_stats(PRICE_HISTORY_FILE)
         market_prices = _market_prices_from_stats(price_stats_by_model)
+        resale_prices = _resale_prices_from_stats(price_stats_by_model)
 
         # Kategorieweise-Auswertung-Auftrag: Reihenfolge aus matcher.py
         # (scan_priority, siehe rules/*.yaml). Fallback auf "categories"
@@ -377,7 +400,10 @@ def run_scan():
                 # werden (siehe Phase-0-Analyse, Befund d).
                 _save_json(SEEN_FILE, list(seen))
 
-            result = evaluate(item["title"], item["price"], rules_cfg, market_prices=market_prices)
+            result = evaluate(
+                item["title"], item["price"], rules_cfg,
+                market_prices=market_prices, resale_prices=resale_prices,
+            )
             if not result.matched:
                 continue
 

@@ -532,6 +532,7 @@ def evaluate(
     price: float,
     rules_cfg: dict,
     market_prices: dict[str, float] | None = None,
+    resale_prices: dict[str, float] | None = None,
 ) -> MatchResult:
     """Wertet Titel/Preis gegen die Regel-Matrix aus.
 
@@ -543,6 +544,17 @@ def evaluate(
     berechneten Marktpreise, damit matcher.py weiterhin frei von I/O und
     einfach testbar bleibt. None (Standard) -> unveraendertes Verhalten
     wie vor Schritt 7.4 (reines max_price-Signal im Deal-Score).
+
+    resale_prices (Reselling-/Arbitrage-Konzept, STATUS.md Abschnitt 16,
+    Punkt c): optionales Mapping {price_history_model: geschaetzter
+    Verkaufspreis}, typischerweise gebaut aus
+    app._resale_prices_from_stats() (PriceStats.estimated_resale_price --
+    methodisch von market_price getrennt, siehe price_stats.py-Docstring).
+    Fehlt ein Modell in resale_prices (oder wird resale_prices gar nicht
+    uebergeben, z.B. aeltere Aufrufer/Tests), faellt die Marge-Berechnung
+    fuer dieses Modell auf market_prices zurueck -- volle Rueckwaerts-
+    kompatibilitaet zum bisherigen Verhalten (Phase-1-Platzhalter-
+    Entscheidung: estimated_resale_price == market_price).
     """
     title_l = title.lower()
     defaults = rules_cfg.get("defaults", {})
@@ -627,17 +639,29 @@ def evaluate(
         # Lookup-Key fuer einen ggf. vorab berechneten Marktpreis (Schritt 7.4).
         price_history_model = rule.get("price_history_model", rule_label)
         market_price = (market_prices or {}).get(price_history_model)
+        # Reselling-/Arbitrage-Konzept (STATUS.md Abschnitt 16, Punkt c):
+        # estimated_resale_price kommt jetzt bevorzugt aus resale_prices
+        # (PriceStats.estimated_resale_price, P75-P90-Segment -- siehe
+        # price_stats.py-Docstring), NICHT mehr aus market_price. Fehlt ein
+        # Eintrag (Modell noch nicht in resale_prices, oder resale_prices
+        # gar nicht uebergeben), Fallback auf market_price -- exakt das
+        # bisherige Phase-1-Platzhalter-Verhalten, volle Rueckwaerts-
+        # kompatibilitaet fuer aeltere Aufrufer/Tests.
+        estimated_resale_price = (resale_prices or {}).get(price_history_model)
+        if estimated_resale_price is None:
+            estimated_resale_price = market_price
         # Reselling-/Arbitrage-Konzept (STATUS.md Abschnitt 16, Punkt b):
         # separater compute_profit()-Aufruf fuer die Dashboard-Rohwerte
         # (Euro/Prozent). compute_deal_score() ruft intern denselben
-        # market_price/fees-Input ebenfalls in compute_profit() ein (fuer
-        # den 0-100 "profit"-Score) -- die doppelte Berechnung ist bewusst
-        # in Kauf genommen (billige, reine Funktion ohne Seiteneffekte),
-        # um compute_deal_score()s Rueckgabewert (DealScoreResult) nicht um
-        # ein Profit-Objekt erweitern zu muessen (kein Bruch der
-        # bestehenden Signatur/des bestehenden Rueckgabewerts).
+        # estimated_resale_price/fees-Input ebenfalls in compute_profit()
+        # ein (fuer den 0-100 "profit"-Score) -- die doppelte Berechnung
+        # ist bewusst in Kauf genommen (billige, reine Funktion ohne
+        # Seiteneffekte), um compute_deal_score()s Rueckgabewert
+        # (DealScoreResult) nicht um ein Profit-Objekt erweitern zu
+        # muessen (kein Bruch der bestehenden Signatur/des bestehenden
+        # Rueckgabewerts).
         fees_cfg = rules_cfg.get("fees") or None
-        profit = compute_profit(price, market_price, fees_cfg)
+        profit = compute_profit(price, estimated_resale_price, fees_cfg)
         score_result = compute_deal_score(
             price=price,
             max_price=max_price,
@@ -645,16 +669,16 @@ def evaluate(
             weights=scoring_weights,
             market_price=market_price,
             manufacturer_reputation=rules_cfg.get("manufacturer_reputation") or None,
-            # Reselling-/Arbitrage-Konzept (STATUS.md Abschnitt 16): laut
-            # Phase-1-Architekturentscheidung wird estimated_resale_price
-            # zunaechst bewusst auf denselben market_price-Wert gesetzt wie
-            # oben (siehe _price_score()) -- eine differenziertere, von der
-            # Ankaufsperspektive getrennte Verkaufspreis-Schaetzung ist ein
-            # offen gelassener Folgeschritt (siehe scoring/profit.py-
-            # Docstring). fees kommt aus rules_cfg["fees"] (siehe
-            # _load_rules_from_dir()), leeres/fehlendes Dict -> neutrale
-            # 0-Defaults in compute_profit(), kein Crash.
-            estimated_resale_price=market_price,
+            # estimated_resale_price kommt jetzt aus resale_prices (siehe
+            # oben), NICHT mehr 1:1 aus market_price -- die im Phase-1-
+            # Architekturentscheid dokumentierte methodische Trennung
+            # Ankauf (market_price, fliesst weiterhin in "price" ueber
+            # _price_score() ein) vs. Verkauf (estimated_resale_price,
+            # fliesst in die "profit"-Komponente ein) ist damit umgesetzt.
+            # fees kommt aus rules_cfg["fees"] (siehe _load_rules_from_dir()),
+            # leeres/fehlendes Dict -> neutrale 0-Defaults in
+            # compute_profit(), kein Crash.
+            estimated_resale_price=estimated_resale_price,
             fees=fees_cfg,
             **score_inputs,
         )
