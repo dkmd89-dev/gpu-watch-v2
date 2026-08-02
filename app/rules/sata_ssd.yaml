@@ -158,7 +158,7 @@ rules:
     requirements:
       min_ssd_gb: 60
       max_ssd_gb: 159
-    max_price: 12
+    max_price: 10
     deal_rating: "Top-Deal"
 
   - label: "~128GB SATA SSD"
@@ -166,7 +166,7 @@ rules:
     requirements:
       min_ssd_gb: 60
       max_ssd_gb: 159
-    max_price: 25
+    max_price: 17
     deal_rating: "Guter Preis"
 
   # ============================================================
@@ -177,7 +177,7 @@ rules:
     requirements:
       min_ssd_gb: 160
       max_ssd_gb: 319
-    max_price: 20
+    max_price: 26
     deal_rating: "Top-Deal"
 
   - label: "~250GB SATA SSD"
@@ -185,7 +185,7 @@ rules:
     requirements:
       min_ssd_gb: 160
       max_ssd_gb: 319
-    max_price: 45
+    max_price: 33
     deal_rating: "Guter Preis"
 
   # ============================================================
@@ -196,7 +196,7 @@ rules:
     requirements:
       min_ssd_gb: 320
       max_ssd_gb: 639
-    max_price: 35
+    max_price: 49
     deal_rating: "Top-Deal"
 
   - label: "~500GB SATA SSD"
@@ -204,7 +204,7 @@ rules:
     requirements:
       min_ssd_gb: 320
       max_ssd_gb: 639
-    max_price: 75
+    max_price: 67
     deal_rating: "Guter Preis"
 
   # ============================================================
@@ -215,7 +215,7 @@ rules:
     requirements:
       min_ssd_gb: 640
       max_ssd_gb: 1279
-    max_price: 55
+    max_price: 69
     deal_rating: "Top-Deal"
 
   - label: "~1TB SATA SSD"
@@ -223,7 +223,7 @@ rules:
     requirements:
       min_ssd_gb: 640
       max_ssd_gb: 1279
-    max_price: 110
+    max_price: 89
     deal_rating: "Guter Preis"
 
   # ============================================================
@@ -234,7 +234,7 @@ rules:
     requirements:
       min_ssd_gb: 1280
       max_ssd_gb: 2559
-    max_price: 110
+    max_price: 115
     deal_rating: "Top-Deal"
 
   - label: "~2TB SATA SSD"
@@ -242,5 +242,5 @@ rules:
     requirements:
       min_ssd_gb: 1280
       max_ssd_gb: 2559
-    max_price: 200
+    max_price: 155
     deal_rating: "Guter Preis"

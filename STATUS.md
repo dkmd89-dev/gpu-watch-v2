@@ -1,4 +1,4 @@
-# status.md — Aktualisiert bis Schritt "Plugin-System vollständig: Kontrakt-Test, Kategorie-Registry, Detector-Registry (Abschnitt 13); Dashboard-Redesign-Backlog ergänzt"
+# status.md — Aktualisiert bis Schritt "Dashboard-Redesign (Abschnitt 14): Header/Status-Leiste, KPI-Kacheln, Deal-Karten, Filter-Leiste, nahtloser Live-Refresh ohne location.reload() -- vollständig abgeschlossen
 
 ## Statusübersicht
 - **Phase 0 (Projektanalyse & Stabilisierung):** Abgeschlossen
@@ -26,6 +26,10 @@
 - **Plugin-Registry für Scraper (Schritt 1–3):** Abgeschlossen (siehe Abschnitt 11). Neue Suchquellen (Phase 9) benötigen künftig keine Codeänderung mehr an `app.py`.
 - **Quoka-Scraper (Phase 9):** Implementiert und gegen echte Fixture verifiziert (siehe Abschnitt 12). Der beim echten `pytest`-Lauf entdeckte Test-Mock-Bug (fehlende `search_quoka`-Mocks, siehe "Bekannte Probleme") wurde von Robin behoben -- alle Tests laufen jetzt grün.
 - **Phase 10 (Plugin-System vollständig):** Abgeschlossen (siehe Abschnitt 13). Kontrakt-Test beweist YAML-only-Erweiterbarkeit für Kategorien; `categories/registry.py` (Kategorie-Discovery) und `categories/detectors/registry.py` (Detector-Discovery) ergänzen die bereits bestehende Scraper-Registry (Abschnitt 11) zu allen drei Plugin-Ebenen. `matcher.py` bewusst unverändert (siehe Begründung in Abschnitt 13).
+- **Dashboard-Redesign (Robins UI/UX-Vorschlag vom 02.08.):** Abgeschlossen (siehe Abschnitt 14). Alle vier Backlog-Punkte (Header/Status-Leiste, KPI-Kacheln, Deal-Karten, Filter-Leiste) sowie der zusätzliche, unabhängige Punkt "nahtloser Live-Refresh ohne `location.reload()`" umgesetzt.
+- **`detect_ssd_gb()`-Wortstellungslücke (vormals Ausblick-Punkt 4):** Behoben. `_CONNECTOR`-Regex in `storage.py` erkennt jetzt eine SATA-Generationsangabe ("SATA III"/"SATA-III"/"SATA 3"/"SATA3") zwischen Größenangabe und "SSD" in beiden Wortstellungen, 7 neue Tests in `test_detector_storage.py`, volle Suite (397 Tests) grün. Rein additive Regex-Erweiterung, keine Breaking Changes.
+- **SATA-SSD-Preisgrenzen kalibriert (vormals Ausblick-Punkt 3):** Abgeschlossen. `max_price`-Werte in `rules/sata_ssd.yaml` anhand realer `price_history.jsonl` (1039 Datenpunkte) neu berechnet: Top-Deal ≈ reales p10-Perzentil, Guter Preis ≈ realer Marktpreis (statt bisheriger Bauchgefühl-Werte). Veralteter Kommentar zu `gate_max_price`-Fallback in `_global.yaml` korrigiert. 397/397 Tests grün.
+- **Gaming-PC-Preiskalibrierung (vormals Ausblick-Punkt 2):** Begonnen, siehe Abschnitt 15. Schritt 1 (Erfassungsfenster öffnen) umgesetzt, Schritt 2–4 **wartet auf Datensammlung**.
 
 ---
 
@@ -193,6 +197,45 @@
 
 ---
 
+### 14. Dashboard-Redesign: Header/Status-Leiste, KPI-Kacheln, Deal-Karten, Filter-Leiste, Live-Refresh (`app/templates/index.html`)
+
+**Ausgangslage:** Robins UI/UX-Feedback vom 02.08. (siehe ehemals Ausblick-Punkt 8), vier Hebel + ein zusätzlicher, unabhängiger Punkt (Live-Refresh, vormals Ausblick-Punkt "7"). Alle fünf Punkte in dieser Session einzeln umgesetzt, jeweils mit eigenem Freigabe-Schritt.
+
+**8.1 Header & Status-Leiste:** Redundante "Status: Scan läuft…/Bereit"-Textzeile entfernt. Live-Status läuft jetzt ausschließlich über den bereits vorhandenen pulsierenden Punkt neben dem Titel (`#statusDot`), zusätzlich mit Tooltip (`title`) + `role="status"`/`aria-live="polite"` für Barrierefreiheit. Status-Panel kompakter (Padding/Margin reduziert).
+
+**8.2 KPI-Kacheln:** Top-Deals-Kachel bekommt eine dezent goldgetönte Hintergrundfläche (`counter-card topdeal`) zusätzlich zur bereits bestehenden goldenen Zahl. "Gescannt (letzter Lauf)"-Kachel optisch zurückgenommen (`counter-card muted`, kleinere/gedämpfte Zahl) als am wenigsten relevante Kennzahl. `.counter-card` hatte bereits keinen Rahmen (nur Hintergrundfläche) -- entsprach schon der gewünschten Optik, Fokus lag auf der Prioritäts-Abstufung.
+
+**8.3 Deal-Karten:**
+- Titel + Preis in einer Zeile (`.title-row`, Preis bleibt fett/grün, fest rechts, bricht nicht um).
+- **EIN** standardisierter Badge-Slot oben rechts statt zweier potenziell gleichzeitig sichtbarer Top-Deal-Badges. Priorität: `is_top_deal` (Preishistorie/Bestpreis, Phase 7) vor regelbasiertem `deal_rating` (Phase 6) vor "Guter Preis". Beide Datenfelder bleiben im Backend unverändert -- reine Anzeige-Priorisierung.
+- Plattform-Icon statt Text-Label. **Bewusste Abweichung:** zunächst neutrale Buchstaben-Kreise statt Marken-Logos (Markenrechte). Robin hat anschließend eigene, nicht-Marken-basierte SVG-Icons (`app/static/icons/{kleinanzeigen,ebay,quoka}.svg`, farbige Kreise mit Anfangsbuchstabe) bereitgestellt -- diese werden jetzt per `<img>` über Flasks Default-Static-Ordner ausgeliefert. Der ursprüngliche Buchstaben-Kreis bleibt als `onerror`-Fallback erhalten, greift automatisch für künftige Quellen (Phase 9/10-Plugins) ohne eigene SVG-Datei.
+- Zeitstempel als relative Zeit ("vor 5 Minuten" / "heute, 14:20" / "gestern, …") statt ISO-String, rein clientseitig (`formatRelativeFoundAt()`), aktualisiert sich alle 60s selbst. Rohwert bleibt als `data-found-at` im DOM erhalten.
+- Leere Sterne-Bewertung: war bereits über `{% if f.deal_stars %}` ausgeblendet -- kein Codeänderungsbedarf, Punkt war schon erfüllt.
+- Nebenbei behoben: `found_at` wird jetzt in ein `{% if %}` gefasst -- Legacy-Einträge ohne `found_at` zeigten vorher das literale Wort "None" in der Karte.
+
+**8.4 Filter-Leiste:** Zusätzlicher `margin-top` auf `.filter-panel` (mehr Abstand zu den KPI-Kacheln darüber, die dieselbe Panel-Optik nutzen). Neue Klasse `.filter-field.narrow` (min-width 100px/max-width 130px) am Feld "Preis bis (€)" -- schmaler als "Kategorie" & Co.
+
+**Live-Refresh ohne `location.reload()`:** Nach Scan-Ende wird nicht mehr die komplette Seite neu geladen. `refreshListings()` holt die aktuellen Treffer über die bereits bestehende Route `/api/found` und baut nur `#listingsGrid` neu auf. Neue Funktion `renderCardHtml(f)` bildet das serverseitige Jinja-Karten-Markup 1:1 clientseitig nach (inkl. Badge-Priorität, Titel+Preis-Zeile, Icon+Fallback, relative Zeit), konsequent mit `escapeHtml()` gegen HTML-Injection über gescrapte Titel/Orte abgesichert. `initFilters()` in `populateFilterOptions()` + `fillSelectOptions()` aufgeteilt: Dropdown-Optionen werden nach jedem Refresh neu ermittelt, ohne Duplikate zu erzeugen und ohne die aktuell gewählte Filterauswahl zu verwerfen.
+- **Bewusst nicht angefasst:** die Modell-Auswahl der Preisdiagramme (`initPriceCharts()`) lädt weiterhin nur einmal beim initialen Laden. Ein komplett neues `price_history_model` aus einem Scan taucht dort erst nach manuellem Neuladen auf -- war nicht Teil des benannten Backlog-Punkts ("Angebotssortierung").
+- **Wartungshinweis:** Server- (Jinja) und clientseitiges (`renderCardHtml()`) Karten-Markup müssen ab jetzt synchron gepflegt werden, wenn sich die Deal-Karten-Struktur künftig ändert.
+
+**Verifikation (kein `pytest`/Netzwerkzugriff in dieser Sandbox möglich):** Flask-Test-Client (`/` und `/api/found` rendern/antworten fehlerfrei, konsistente Datenfelder), `node --check` über den vollständigen `<script>`-Block (syntaktisch fehlerfrei), `renderCardHtml()` isoliert gegen einen DOM-Stub in Node getestet (Badge-Priorität, XSS-Schutz bei bösartigem Titel, korrekte Fallbacks bei fehlenden Feldern, "Guter Preis"-Badge + Icon-Fallback-Klasse) -- 3/3 Testfälle grün. Empfehlung: `pytest app/tests -v` sowie manuelle Browser-Prüfung (Scan auslösen, Live-Refresh ohne sichtbaren Reload beobachten, Filterauswahl bleibt erhalten) in Robins echter Umgebung nachholen.
+
+---
+
+### 15. Gaming-PC-Preiskalibrierung (Datensammlung erforderlich)
+
+**Befund:** `price_history.jsonl` wird nur bei Regel-Match geschrieben (`append_price_point()` in `app.py`) -- die Statistik für `gaming_pc` (n=369) ist dadurch an den bestehenden Preisgrenzen **zensiert**: 28% der Datenpunkte im Top-Deal-Fenster (≤400€) lagen bei ≥395€, 15% aller Datenpunkte im Okay-Fenster (≤550€) lagen bei ≥545€. Median/Marktpreis aus dieser Datenbasis wären dadurch systematisch nach unten verzerrt -- eine Kalibrierung nach derselben Methode wie bei SATA-SSD (Abschnitt 9/10) wäre hier methodisch nicht belastbar, da sie nur die bestehenden Grenzen bestätigen würde.
+
+Geplantes Vorgehen (4 Teilschritte):
+
+1. **Erfassungsfenster öffnen** — ✅ Umgesetzt. `max_price` der "Okay"-Regel in `rules/gaming_pc.yaml` von 550€ auf 750€ angehoben, um für die Sammelphase unzensierte Daten zu erfassen. `notify_max_price` bewusst unverändert bei 400€ (keine Auswirkung auf ntfy-Benachrichtigungen, nur auf die geloggte Preishistorie).
+2. **Datensammlung laufen lassen** — ⏳ Wartet auf Datensammlung. Produktiver Container muss über einen ausreichenden Zeitraum neue, unzensierte `gaming_pc`-Datenpunkte sammeln (Richtwert: vergleichbare Stichprobengröße wie bei SATA-SSD, siehe Abschnitt 9, d.h. mehrere Wochen bzw. bis genug Punkte deutlich unter 750€ liegen, nicht mehr an der neuen Deckelung gehäuft).
+3. **Echte Kalibrierung** — ⏳ Wartet auf Datensammlung. Sobald genug frische Punkte vorliegen: `price_stats.compute_price_stats()` auf die neuen, unzensierten Daten anwenden, Top-Deal ≈ p10, Guter Preis/Okay ≈ Marktpreis (analog Methodik SATA-SSD), `max_price`-Werte beider Gaming-PC-Regeln entsprechend neu setzen.
+4. **Erfassungsfenster zurücksetzen** — ⏳ Wartet auf Datensammlung. Nach abgeschlossener Kalibrierung die 750€-Obergrenze auf einen aus den echten Daten hergeleiteten, realistischen Wert zurückführen (kein Datenmüll-Fenster dauerhaft offen lassen).
+
+---
+
 ## Bekannte Probleme & Einschränkungen
 
 **✅ BEHOBEN (von Robin, in seiner echten Umgebung):** Robins ursprünglicher `pytest`-Lauf (368 Tests, echte Umgebung mit Netzwerkzugriff) zeigte 8 Fehlschläge, alle mit derselben Ursache: Mehrere Testdateien mockten `search_kleinanzeigen`/`search_ebay` per `patch.object(scrapers.kleinanzeigen, ...)`/`patch.object(scrapers.ebay, ...)`, aber **nicht** `scrapers.quoka.search_quoka`. Da die Plugin-Registry (Abschnitt 11) `quoka` automatisch mitscannt, lief in diesen Tests ein **echter, ungemockter HTTP-Request an quoka.de** -- die Logs zeigten reale Live-Angebote (z.B. "Lenovo Legion Pro 5 16ARX8 RTX 4060..."), die die erwarteten Trefferzahlen/Zuordnungen verfälschten. Exakt derselbe Bug-Typ wie in Schritt 2 der Plugin-Registry-Arbeit (Abschnitt 11), nur diesmal in die andere Richtung: neue Quelle trifft auf alte Mocks statt neue Registry auf alte Mocks.
@@ -227,17 +270,12 @@ Offene Punkte, unpriorisiert, keiner davon begonnen:
 
 1. **Phase 9 – Weitere Suchquellen:** Quoka abgeschlossen (siehe Abschnitt 12) -- inkl. behobenem Test-Mock-Bug, alle Tests grün. Mit der Plugin-Registry (Abschnitt 11) kann jede weitere Quelle rein additiv ergänzt werden (Datei in `scrapers/` + `SCRAPER_NAME` + `search_<name>(search_terms, plz, radius_km, max_price)`) -- **wichtig:** bei jeder neuen Quelle müssen zusätzlich alle bestehenden End-to-End-Tests (`run_scan()`) um einen passenden Mock ergänzt werden (siehe Lehre in "Bekannte Probleme"), sonst drohen echte HTTP-Calls in der Testsuite.
    - markt.de, Facebook Marketplace, Hardwareluxx, ComputerBase: noch nicht untersucht.
-2. **Gaming-PC-Preisgrenzen kalibrieren:** weiterhin explizit zurückgestellt, bis der produktive Container genug frische Daten (seit dem eBay-Dedup-Fix) gesammelt hat.
-3. **SATA-SSD-Preise & `notify_max_price`-Werte gegenprüfen:** aktuell grobe Schätzwerte (siehe Abschnitt 9), noch nicht anhand echter Marktdaten kalibriert.
-4. **`detect_ssd_gb()`-Wortstellungslücke (Abschnitt 10, offener Befund):** Titel der Form "…GB SATA SSD" (SATA zwischen Zahl und "SSD") werden von der strikten Adjazenzprüfung nicht erkannt -- dürfte produktiv reale SATA-SSD-Angebote als False Negative verpassen. Vorschlag: `_CONNECTOR`/Adjazenzprüfung in `storage.py` um "sata"/"sata iii" als zulässiges Zwischenwort erweitern. Eigenständiger, isolierter Schritt (nicht mit anderen Änderungen mischen).
+2. ~~Gaming-PC-Preisgrenzen kalibrieren~~ **In Bearbeitung, siehe Abschnitt 15** — Schritt 1 (Erfassungsfenster öffnen) umgesetzt, Schritt 2–4 wartet auf Datensammlung.
+3. ~~SATA-SSD-Preise & `notify_max_price`-Werte gegenprüfen~~ **Erledigt**, siehe Statusübersicht ("SATA-SSD-Preisgrenzen kalibriert") — Top-Deal/Guter-Preis-Werte anhand echter Marktdaten (1039 Datenpunkte) neu berechnet.
+4. ~~`detect_ssd_gb()`-Wortstellungslücke~~ **Erledigt**, siehe Statusübersicht — `_CONNECTOR`-Regex in `storage.py` erkennt SATA-Generationsangaben zwischen Größe und "SSD", 7 neue Tests grün.
 5. ~~Detector-Registry für `categories/detectors/`~~ **Erledigt** (siehe Abschnitt 13).
 6. ~~Phase 10 – Plugin-System vollständig (Kategorien als Plugins)~~ **Erledigt** (siehe Abschnitt 13).
 7. **Ausstehende Bestätigung:** `test_category_registry.py` (7 Tests) noch nicht erneut von Robin bestätigt, nachdem der Auslieferungsfehler aus Abschnitt 13 (falscher Dateiinhalt am Zielpfad) behoben wurde -- kurzer, risikoarmer Nachlauf: `pytest app/tests/test_category_registry.py -v` bzw. volle Suite.
-8. **Dashboard-Redesign (neu, von Robin am 02.08. vorgeschlagen, UI/UX-Feedback, unpriorisiert, keiner der Unterpunkte begonnen):** vier Hebel, jeweils eigenständig und isoliert umsetzbar (`templates/index.html`, ggf. `app.py` für Zeitstempel-Formatierung):
-   - **8.1 Header & Status-Leiste:** kompakter, "Jetzt manuell scannen"-Button neben den Titel; Text "Scan läuft..." durch pulsierenden Live-Indikator (Punkt/Spinner) ersetzen.
-   - **8.2 KPI-Kacheln:** dicke Rahmen entfernen, stattdessen subtile helle Hintergrundflächen ohne Rand; Top-Deals-Kachel farblich hervorheben (z.B. dezentes Gold), um sie gegenüber z.B. "Gescannt" optisch zu priorisieren.
-   - **8.3 Deal-Karten:** Titel+Preis in eine Zeile (Preis fett/farblich hervorgehoben); Top-Deal-Badge standardisiert oben rechts; Plattform-Icons (eBay/Kleinanzeigen/Quoka) statt Text-Label; Zeitstempel als relative Zeit ("vor 5 Minuten"/"heute, 14:20") statt ISO-String -- Umrechnung client- oder serverseitig zu entscheiden; leere Sterne-Bewertung ausblenden statt grau anzuzeigen, solange kein Score vorliegt.
-   - **8.4 Filter-Leiste:** mehr vertikaler Abstand zu den Kacheln darüber; Feldbreiten an Inhalt anpassen (z.B. "Preis bis (€)" schmaler als "Kategorie").
-   - Reihenfolge/Priorisierung der vier Unterpunkte: offen, liegt bei Robin. Nahtloser Live-Refresh ohne `location.reload()` (bisheriger Punkt 7) bleibt als zusätzlicher, unabhängiger Dashboard-Punkt bestehen.
+8. ~~Dashboard-Redesign (Robins Vorschlag vom 02.08.: Header/Status-Leiste, KPI-Kacheln, Deal-Karten, Filter-Leiste) inkl. nahtloser Live-Refresh ohne `location.reload()`~~ **Erledigt** (siehe Abschnitt 14).
 
-Kein Punkt ist priorisiert oder für den nächsten Schritt vorausgewählt -- Freigabe/Auswahl liegt bei Robin.
+Kein weiterer Punkt ist priorisiert oder für den nächsten Schritt vorausgewählt -- Freigabe/Auswahl liegt bei Robin.

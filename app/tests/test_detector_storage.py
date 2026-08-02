@@ -78,6 +78,39 @@ def test_ssd_tippfehler_sdd_case_insensitive():
     assert detect_ssd_gb("PC mit 500gb sdd speicher") == 500
 
 
+# ---------- SATA-Generationsangabe zwischen Groesse und "SSD" (STATUS.md
+# Abschnitt 10, vormals offener Befund -- jetzt behoben) ----------
+
+def test_ssd_bloss_sata_zwischen_zahl_und_ssd():
+    # Bereits vor diesem Fix funktionierender Fall (Regressionsschutz).
+    assert detect_ssd_gb("Kingston A400 250GB SATA SSD 2.5") == 250
+
+
+def test_ssd_sata_iii_zwischen_zahl_und_ssd():
+    assert detect_ssd_gb("500GB SATA III SSD") == 500
+
+
+def test_ssd_sata_mit_bindestrich_generation():
+    assert detect_ssd_gb("500GB SATA-III SSD") == 500
+
+
+def test_ssd_sata_generation_als_ziffer_mit_leerzeichen():
+    assert detect_ssd_gb("500GB SATA 3 SSD") == 500
+
+
+def test_ssd_sata_generation_als_ziffer_ohne_leerzeichen():
+    assert detect_ssd_gb("500GB SATA3 SSD") == 500
+
+
+def test_ssd_sata_iii_case_insensitive():
+    assert detect_ssd_gb("500gb sata iii ssd") == 500
+
+
+def test_ssd_sata_iii_umgekehrte_wortstellung():
+    # SSD-Schluesselwort vor der Groessenangabe, SATA III dazwischen.
+    assert detect_ssd_gb("SSD SATA III 500GB") == 500
+
+
 # ---------- detect_hdd_gb ----------
 
 def test_hdd_gb_direkt():

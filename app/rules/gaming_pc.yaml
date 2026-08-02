@@ -33,6 +33,21 @@ label: "Gaming-PC"
 # oben und deckt damit die guenstigere Haelfte der beobachteten Treffer ab.
 # Bei Bedarf anpassen.
 notify_max_price: 400
+
+# ------------------------------------------------------------
+# DATENSAMMLUNG-MODUS (temporaer, siehe STATUS.md "Gaming-PC-Preis-
+# kalibrierung"): price_history.jsonl wird NUR bei einem Regel-Match
+# geschrieben (append_price_point() in app.py) -- die bisherige
+# "Okay"-Obergrenze von 550€ hat die Marktpreis-Statistik dadurch
+# zensiert (15% aller Datenpunkte lagen exakt an dieser Deckelung,
+# echte Preise darueber wurden nie erfasst). notify_max_price bleibt
+# bewusst bei 400€ (siehe oben) -- nur das Erfassungsfenster (max_price
+# der "Okay"-Regel unten) wird angehoben, damit fuer eine Sammelphase
+# unzensierte Daten bis 750€ geloggt werden. Sobald genug frische
+# Datenpunkte vorliegen: echte Kalibrierung (analog SATA-SSD, p5/p10/
+# Median via price_stats.compute_price_stats()) und diese Obergrenze
+# danach auf einen aus echten Daten hergeleiteten Wert zuruecksetzen.
+# ------------------------------------------------------------
 search_terms:
   - "Gaming PC"
   - "Gamer PC"
@@ -85,5 +100,9 @@ rules:
         exclude_categories:
           - "excluded"
       requires_dedicated_gpu: true
-    max_price: 550
+    # 550 -> 750: Erfassungsfenster fuer die Datensammlung geoeffnet (siehe
+    # Kommentar zu notify_max_price oben). notify_max_price bleibt bei 400€,
+    # d.h. Treffer zwischen 550-750€ werden weiterhin NUR gespeichert/im
+    # Dashboard gezeigt, loesen aber keine Benachrichtigung aus.
+    max_price: 750
     deal_rating: "Okay"

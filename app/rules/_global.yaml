@@ -66,8 +66,10 @@ exclude_global:
 # Gaming-PCs liegen typisch bei 200-550€, Office-PCs bei 130-300€,
 # ein fuer reine GPUs gedachtes Limit wuerde dort nie greifen.
 # rules/sata_ssd.yaml definiert bewusst kein eigenes notify_max_price
-# und nutzt diesen Fallback (150€ liegt ohnehin weit ueber den SSD-
-# eigenen max_price-Werten von max. 85€).
+# und nutzt diesen Fallback (150€ liegt ueber allen SSD-eigenen
+# max_price-Werten, hoechster Wert aktuell 155€ bei 2TB "Guter Preis";
+# nur die strengeren "Top-Deal"-Schwellen (<=115€) koennen ohnehin
+# ueberhaupt eine Benachrichtigung ausloesen, siehe gate_min_stars).
 # ============================================================
 notifications:
   urgent_price_threshold: 150

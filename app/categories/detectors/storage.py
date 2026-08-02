@@ -12,7 +12,7 @@ Speichergrößen, nicht 1024 GB), inkl. deutscher Dezimal-Kommaschreibweise
 from __future__ import annotations
 import re
 
-_CONNECTOR = r"[\s,:/\-()]*(?:SATA\s+)?"
+_CONNECTOR = r"[\s,:/\-()]*(?:SATA(?:[\s-]*(?:I{1,3}|[123]))?\s*)?"
 
 # Zahl (optional mit Dezimalpunkt/-komma) + Einheit (GB/TB)
 _SIZE_UNIT = r"(\d{1,4}(?:[.,]\d{1,2})?)\s*(gb|tb)"
@@ -52,6 +52,15 @@ def detect_ssd_gb(text: str) -> int | None:
     Erkennt zusätzlich den häufigen Vertipper "SDD" (statt "SSD") als
     gleichwertiges Schlüsselwort -- kommt in echten Kleinanzeigen-Titeln
     regelmäßig vor und würde sonst zu False Negatives führen.
+
+    Erkennt außerdem eine zwischen Größe und "SSD" stehende SATA-
+    Generationsangabe ("SATA", "SATA III", "SATA-III", "SATA 3", "SATA3"
+    -- Groß-/Kleinschreibung und Leerzeichen/Bindestrich beliebig), z.B.
+    "500GB SATA III SSD". Vormals eine bekannte Lücke (siehe STATUS.md
+    Abschnitt 10): die strikte Adjazenzprüfung erkannte nur bloßes
+    "SATA" zwischen Zahl und "SSD", nicht die in echten Anzeigen
+    verbreitete Generationsangabe -- dadurch wurden reale SATA-SSD-
+    Angebote dieser Wortstellung als False Negative verpasst.
 
     BEKANNTE GRENZEN:
     - Größenangaben ohne explizite Einheit (z.B. "500SSD" statt "500GB
