@@ -97,6 +97,18 @@ exclude_category:
   - "nintendo"
   - "switch"
 
+  # Handy-/Smartwatch-Zubehoer mit "curved ... display" im Titel (z.B.
+  # "Full Cover Schutzfolie ... 3D Curved Edge Display", "Smartwatch
+  # curved Display", "Display-Oeffnungswerkzeug curved") -- matchten
+  # bisher faelschlich ueber require_all_of (["curved"] + ["display"]),
+  # obwohl kein PC-Monitor. Gefunden bei der Preiskalibrierung (5 von 212
+  # price_history.jsonl-Punkten, alle unter 26€ -- verzerrten
+  # percentile_5/percentile_10 nach unten, siehe Begruendung im Chat).
+  - "folie"
+  - "spudger"
+  - "öffnungswerkzeug"
+  - "smartwatch"
+
 rules:
   # ============================================================
   # Curved Monitor (alle Groessen -- Auftrag verlangt nur "curved",
@@ -108,15 +120,23 @@ rules:
       - ["curved"]
       - ["monitor", "display", "bildschirm"]
     min_vram_gb: 0
-    # PLATZHALTER-Preisgrenzen (ANNAHME, bitte pruefen) -- es liegen noch
-    # KEINE lokalen Marktdaten fuer diese neue Kategorie vor (siehe
-    # Auftrag: ausschliesslich lokal gesammelte Daten, keine externen
-    # Preis-APIs). Sobald price_history.jsonl genug "monitor_curved"-
-    # Datenpunkte gesammelt hat, analog zur SATA-SSD-/Gaming-PC-
-    # Kalibrierung (p10 -> Top-Deal, Marktpreis -> Guter Preis) neu
-    # berechnen.
-    max_price: 100
+    # KALIBRIERT (analog Methodik SATA-SSD/Gaming-PC, siehe STATUS.md
+    # Abschnitt 15/17.2): p10-Perzentil aus price_history.jsonl (207
+    # bereinigte Datenpunkte, 5 Handy-/Smartwatch-Zubehoer-Fehltreffer
+    # ausgeklammert -- siehe exclude_category oben) = 69,59€ -> 70€.
+    # Ehemaliger Platzhalter: 100€.
+    max_price: 70
     deal_rating: "Top-Deal"
+    # Verhandlungs-Assistent (STATUS.md Abschnitt 16, Punkt 7), analog zum
+    # GPU-Muster (rules/gpu.yaml) UND aus demselben Grund bewusst NUR auf
+    # dieser Regel aktiviert, nicht auf der "Guter Preis"-Regel unten:
+    # deal_rating "Top-Deal" hat Basis-Score 85 (siehe scoring/deal_score.py
+    # ::_hardware_qualitaet_score()), "Guter Preis" nur 65 -- die Schwelle
+    # 70 waere dort nie erreichbar (kein CPU-/RAM-Headroom-Bonus bei
+    # Monitoren, hardware_qualitaet == reine Rating-Stufe ohne Bonus).
+    negotiation_tolerance_pct: 15.0
+    negotiation_min_score: 70
+    negotiation_score_component: "hardware_qualitaet"
 
   - label: "Curved Monitor"
     price_history_model: "monitor_curved"
@@ -124,5 +144,18 @@ rules:
       - ["curved"]
       - ["monitor", "display", "bildschirm"]
     min_vram_gb: 0
-    max_price: 180
+    # KALIBRIERT: Marktpreis (getrimmter Mittelwert p10-p90) aus
+    # price_history.jsonl (207 bereinigte Datenpunkte) = 120,67€ -> 121€.
+    # Ehemaliger Platzhalter: 180€.
+    #
+    # Hinweis Zensierung: 9,0% der 212 Rohdatenpunkte lagen bei >=170€,
+    # 6 davon exakt bei der alten 180€-Deckelung (max_price wird nur bei
+    # Regel-Match geschrieben -- teurere Curved-Monitore oberhalb der
+    # bisherigen Grenze wurden nie erfasst). Deutlich schwaecher als beim
+    # Gaming-PC-Fall (dort 28%/15%, siehe STATUS.md Abschnitt 15) und der
+    # Marktpreis liegt mit 121€ komfortabel unter der alten 180€-Grenze --
+    # Kalibrierung daher belastbar. estimated_resale_price (oberes
+    # Preissegment) kann trotzdem leicht unterschaetzt sein; bei der
+    # naechsten Kalibrierung erneut pruefen.
+    max_price: 121
     deal_rating: "Guter Preis"

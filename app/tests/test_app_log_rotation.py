@@ -27,6 +27,14 @@ def _load_app_module(data_dir: str, max_bytes: str = "1000000", backup_count: st
     app_path = Path(__file__).resolve().parent.parent / "app.py"
     spec = importlib.util.spec_from_file_location("app_under_test_logrotation", app_path)
     mod = importlib.util.module_from_spec(spec)
+    # Bugfix: Modul VOR exec_module in sys.modules registrieren --
+    # sonst findet Flask(__name__) intern keinen Eintrag unter dem
+    # Modulnamen und faellt auf os.getcwd() als root_path zurueck
+    # (statt auf den echten app.py-Verzeichnispfad). Funktioniert dann nur
+    # zufaellig, wenn pytest aus app/ heraus gestartet wird -- schlaegt mit
+    # "TemplateNotFound: index.html" fehl, sobald z.B. aus dem Projekt-Root
+    # gestartet wird (siehe Robins echter pytest-Lauf, 03.08.).
+    sys.modules[spec.name] = mod
     spec.loader.exec_module(mod)
     return mod
 
@@ -64,6 +72,10 @@ def test_default_rotationsgrenzen_ohne_env_override():
         app_path = Path(__file__).resolve().parent.parent / "app.py"
         spec = importlib.util.spec_from_file_location("app_under_test_logrotation_defaults", app_path)
         mod = importlib.util.module_from_spec(spec)
+        # Bugfix: siehe Kommentar in _load_app_module() oben -- Modul muss
+        # VOR exec_module in sys.modules stehen, sonst TemplateNotFound je
+        # nach Start-Arbeitsverzeichnis von pytest.
+        sys.modules[spec.name] = mod
         spec.loader.exec_module(mod)
 
         rotating = [h for h in logging.root.handlers if isinstance(h, logging.handlers.RotatingFileHandler)]

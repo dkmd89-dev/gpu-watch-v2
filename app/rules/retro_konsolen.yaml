@@ -1,0 +1,170 @@
+# ============================================================
+# Retro-Konsolen & Spiele (Nischen-/Kategorien-Erweiterung, YAML-basiert)
+# ============================================================
+# Erste von drei geplanten Nischen-Kategorien (Retro-Konsolen, Vintage-
+# Elektronik, Spielzeug-Bundles). Rein additiv -- kein Python-Code
+# geaendert, siehe categories/registry.py-Docstring: jede *.yaml in
+# rules/ (ausser _global.yaml) wird automatisch als Kategorie erkannt.
+#
+# ARCHITEKTUR-ENTSCHEIDUNG: Titel-Keyword-Matching (wie rules/gpu.yaml,
+# rules/sata_ssd.yaml), KEIN "requirements:"-Block (wie office_pc.yaml).
+# Begruendung: Fuer Retro-Konsolen existiert kein Hardware-Detector
+# (CPU/RAM/Case) -- das waere strukturell unpassend. Titel-Matching ist
+# hier das etablierte Muster fuer Kategorien ohne Hardware-Spec-Pruefung.
+#
+# min_vram_gb: 0 -- der globale VRAM-Check (_global.yaml defaults,
+# eigentlich fuer GPU-Angebote gedacht) wird hier bewusst deaktiviert.
+# Grund: _vram_gb() erkennt jede Zahl+"GB" im Titel (z.B. eine erwaehnte
+# "64GB SD-Karte" als Zubehoer) -- ohne diese Ueberschreibung koennte das
+# faelschlich als "VRAM zu niedrig" interpretiert werden und ein
+# eigentlich gueltiges Konsolen-Angebot verwerfen.
+#
+# PREISGRENZEN SIND PLATZHALTER (analog Gaming-PC/SATA-SSD vor Kalibrierung,
+# siehe STATUS.md Abschnitt 15/17.2): mangels vorhandener price_history-
+# Datenpunkte fuer diese Kategorie grob geschaetzt. Muessen nach ausreichend
+# gesammelten Scan-Daten anhand echter Marktpreise nachkalibriert werden.
+# ============================================================
+
+category: "retro_konsolen"
+label: "Retro-Konsolen & Spiele"
+
+min_vram_gb: 0
+
+notify_max_price: 120
+
+search_terms:
+  - "Nintendo 64"
+  - "N64"
+  - "GameCube"
+  - "Nintendo DS"
+  - "PlayStation 1"
+  - "PS1"
+  - "PlayStation 2"
+  - "PS2"
+  - "Retro Konsole"
+  - "Konvolut Spiele"
+
+# Kategorie-eigene Ausschluesse (zusaetzlich zu exclude_global aus
+# _global.yaml, das u.a. bereits "defekt"/"bastler"/"tausch" global
+# ausschliesst).
+exclude_category:
+  - "repro"           # Nachbau-/Bootleg-Module, kein Original
+  - "nachbau"
+  - "modul einzeln"    # einzelnes Spielmodul ohne Konsole
+  - "spiel einzeln"
+  - "nur controller"
+  - "controller only"
+  - "emulator"         # Software-Emulation, keine echte Hardware
+
+# Scoring: kein Hardware-Detector anwendbar (analog sata_ssd.yaml) --
+# Preis ist das mit Abstand aussagekraeftigste Signal. Ausstattung/
+# Hersteller/Zustand/Lieferumfang/Profit bleiben auf dem globalen
+# Default 0 (hier nicht ueberschrieben).
+scoring_weights:
+  price: 0.85
+  ausstattung: 0
+  hardware_qualitaet: 0.15
+  hersteller: 0
+  zustand: 0
+  lieferumfang: 0
+
+rules:
+  # ------------------------------------------------------------
+  # Nintendo (N64 / GameCube / DS) -- typischerweise Konsole +
+  # mind. 1 Controller/Zubehoer
+  # ------------------------------------------------------------
+  - label: "Nintendo Retro-Konsole (N64/GameCube/DS) ★ Top-Deal"
+    match:
+      - "nintendo 64"
+      - "n64"
+      - "gamecube"
+      - "nintendo ds"
+    price_history_model: "nintendo_retro_konsole"
+    max_price: 40
+    deal_rating: "Top-Deal"
+
+  - label: "Nintendo Retro-Konsole (N64/GameCube/DS) 👍 Guter Preis"
+    match:
+      - "nintendo 64"
+      - "n64"
+      - "gamecube"
+      - "nintendo ds"
+    price_history_model: "nintendo_retro_konsole"
+    max_price: 70
+    deal_rating: "Guter Preis"
+
+  - label: "Nintendo Retro-Konsole (N64/GameCube/DS) ⚠️ Okay"
+    match:
+      - "nintendo 64"
+      - "n64"
+      - "gamecube"
+      - "nintendo ds"
+    price_history_model: "nintendo_retro_konsole"
+    max_price: 100
+    deal_rating: "Okay"
+
+  # ------------------------------------------------------------
+  # Sony (PS1 / PS2)
+  # ------------------------------------------------------------
+  - label: "Sony Retro-Konsole (PS1/PS2) ★ Top-Deal"
+    match:
+      - "playstation 1"
+      - "ps1"
+      - "playstation 2"
+      - "ps2"
+    price_history_model: "sony_retro_konsole"
+    max_price: 35
+    deal_rating: "Top-Deal"
+
+  - label: "Sony Retro-Konsole (PS1/PS2) 👍 Guter Preis"
+    match:
+      - "playstation 1"
+      - "ps1"
+      - "playstation 2"
+      - "ps2"
+    price_history_model: "sony_retro_konsole"
+    max_price: 60
+    deal_rating: "Guter Preis"
+
+  - label: "Sony Retro-Konsole (PS1/PS2) ⚠️ Okay"
+    match:
+      - "playstation 1"
+      - "ps1"
+      - "playstation 2"
+      - "ps2"
+    price_history_model: "sony_retro_konsole"
+    max_price: 90
+    deal_rating: "Okay"
+
+  # ------------------------------------------------------------
+  # Konvolute (Sammlungen: Konsole + mehrere Spiele/Zubehoer)
+  # ------------------------------------------------------------
+  - label: "Retro-Konsolen-Konvolut ★ Top-Deal"
+    match:
+      - "konvolut"
+    require_all_of:
+      - ["konvolut"]
+      - ["nintendo", "playstation", "ps1", "ps2", "n64", "gamecube", "retro", "konsole"]
+    price_history_model: "retro_konvolut"
+    max_price: 60
+    deal_rating: "Top-Deal"
+
+  - label: "Retro-Konsolen-Konvolut 👍 Guter Preis"
+    match:
+      - "konvolut"
+    require_all_of:
+      - ["konvolut"]
+      - ["nintendo", "playstation", "ps1", "ps2", "n64", "gamecube", "retro", "konsole"]
+    price_history_model: "retro_konvolut"
+    max_price: 100
+    deal_rating: "Guter Preis"
+
+  - label: "Retro-Konsolen-Konvolut ⚠️ Okay"
+    match:
+      - "konvolut"
+    require_all_of:
+      - ["konvolut"]
+      - ["nintendo", "playstation", "ps1", "ps2", "n64", "gamecube", "retro", "konsole"]
+    price_history_model: "retro_konvolut"
+    max_price: 150
+    deal_rating: "Okay"

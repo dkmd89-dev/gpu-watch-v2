@@ -1,0 +1,159 @@
+# ============================================================
+# Vintage-Elektronik & Audio (Nischen-/Kategorien-Erweiterung, YAML-basiert)
+# ============================================================
+# Zweite von drei geplanten Nischen-Kategorien (siehe retro_konsolen.yaml
+# fuer die Architektur-Begruendung: reines Titel-Keyword-Matching, kein
+# Hardware-Detector anwendbar, rein additiv, kein Python-Code geaendert).
+#
+# Zwei fachlich unterschiedliche Preisklassen in einer Kategorie:
+#  - CRT-Roehrenfernseher: meist geringer Wert (Entsorgung/Umzug), AUSSER
+#    gesuchte Profi-Monitore (Sony PVM/BVM/Trinitron), die bei Retro-
+#    Gaming/Fotografie/Videokunst deutlich hoehere Preise erzielen ->
+#    eigene, hoeher angesetzte Regelgruppe.
+#  - Vintage-HiFi-Verstaerker: hoeheres Margenpotenzial, v.a. bekannte
+#    Marken (Sansui, Marantz, Pioneer, Yamaha, Kenwood, Onkyo, McIntosh)
+#    und Roehrenverstaerker.
+#
+# PREISGRENZEN SIND PLATZHALTER (mangels price_history-Daten fuer diese
+# Kategorie) -- Kalibrierung nach ausreichend gesammelten Scan-Daten
+# erforderlich, analog retro_konsolen.yaml/Gaming-PC/SATA-SSD.
+# ============================================================
+
+category: "vintage_elektronik"
+label: "Vintage-Elektronik & Audio"
+
+min_vram_gb: 0
+
+notify_max_price: 150
+
+search_terms:
+  - "Röhrenfernseher"
+  - "CRT Fernseher"
+  - "Röhren TV"
+  - "Sony Trinitron"
+  - "Sony PVM"
+  - "Sony BVM"
+  - "Vintage Verstärker"
+  - "HiFi Verstärker"
+  - "Röhrenverstärker"
+  - "Stereo Vollverstärker"
+  - "Vintage HiFi"
+
+exclude_category:
+  - "flachbildschirm"   # kein modernes Geraet faelschlich als "TV" gematcht
+  - "led fernseher"
+  - "lcd fernseher"
+  - "ersatzteile"        # bereits in exclude_global, hier zur Klarheit doppelt
+  - "nur fernbedienung"
+  - "receiver only"
+  - "nur receiver"
+
+scoring_weights:
+  price: 0.85
+  ausstattung: 0
+  hardware_qualitaet: 0.15
+  hersteller: 0
+  zustand: 0
+  lieferumfang: 0
+
+rules:
+  # ------------------------------------------------------------
+  # Profi-CRT-Monitore (Sony PVM/BVM/Trinitron) -- gesuchte
+  # Retro-Gaming-/Videokunst-Ware, deutlich hoehere Preisklasse
+  # als normale Roehrenfernseher.
+  # ------------------------------------------------------------
+  - label: "Profi-CRT-Monitor (Sony PVM/BVM/Trinitron) ★ Top-Deal"
+    match:
+      - "sony pvm"
+      - "sony bvm"
+      - "sony trinitron"
+    price_history_model: "crt_profi_monitor"
+    max_price: 80
+    deal_rating: "Top-Deal"
+
+  - label: "Profi-CRT-Monitor (Sony PVM/BVM/Trinitron) 👍 Guter Preis"
+    match:
+      - "sony pvm"
+      - "sony bvm"
+      - "sony trinitron"
+    price_history_model: "crt_profi_monitor"
+    max_price: 150
+    deal_rating: "Guter Preis"
+
+  - label: "Profi-CRT-Monitor (Sony PVM/BVM/Trinitron) ⚠️ Okay"
+    match:
+      - "sony pvm"
+      - "sony bvm"
+      - "sony trinitron"
+    price_history_model: "crt_profi_monitor"
+    max_price: 250
+    deal_rating: "Okay"
+
+  # ------------------------------------------------------------
+  # Normale Roehrenfernseher (geringerer Wert)
+  # ------------------------------------------------------------
+  - label: "Röhrenfernseher ★ Top-Deal"
+    match:
+      - "röhrenfernseher"
+      - "crt fernseher"
+      - "röhren tv"
+    exclude:
+      - "pvm"
+      - "bvm"
+      - "trinitron"
+    price_history_model: "roehrenfernseher"
+    max_price: 10
+    deal_rating: "Top-Deal"
+
+  - label: "Röhrenfernseher 👍 Guter Preis"
+    match:
+      - "röhrenfernseher"
+      - "crt fernseher"
+      - "röhren tv"
+    exclude:
+      - "pvm"
+      - "bvm"
+      - "trinitron"
+    price_history_model: "roehrenfernseher"
+    max_price: 25
+    deal_rating: "Guter Preis"
+
+  - label: "Röhrenfernseher ⚠️ Okay"
+    match:
+      - "röhrenfernseher"
+      - "crt fernseher"
+      - "röhren tv"
+    exclude:
+      - "pvm"
+      - "bvm"
+      - "trinitron"
+    price_history_model: "roehrenfernseher"
+    max_price: 45
+    deal_rating: "Okay"
+
+  # ------------------------------------------------------------
+  # Vintage-HiFi-Verstaerker (bekannte Marken + Roehrenverstaerker)
+  # ------------------------------------------------------------
+  - label: "Vintage-HiFi-Verstärker (Markenware) ★ Top-Deal"
+    require_all_of:
+      - ["verstärker", "vollverstärker", "receiver", "hifi"]
+      - ["sansui", "marantz", "pioneer", "yamaha", "kenwood", "onkyo", "mcintosh", "röhrenverstärker", "röhren"]
+    price_history_model: "vintage_hifi_verstaerker"
+    max_price: 60
+    deal_rating: "Top-Deal"
+
+  - label: "Vintage-HiFi-Verstärker (Markenware) 👍 Guter Preis"
+    require_all_of:
+      - ["verstärker", "vollverstärker", "receiver", "hifi"]
+      - ["sansui", "marantz", "pioneer", "yamaha", "kenwood", "onkyo", "mcintosh", "röhrenverstärker", "röhren"]
+    price_history_model: "vintage_hifi_verstaerker"
+    max_price: 120
+    deal_rating: "Guter Preis"
+
+  - label: "Vintage-HiFi-Verstärker (Markenware) ⚠️ Okay"
+    require_all_of:
+      - ["verstärker", "vollverstärker", "receiver", "hifi"]
+      - ["sansui", "marantz", "pioneer", "yamaha", "kenwood", "onkyo", "mcintosh", "röhrenverstärker", "röhren"]
+    price_history_model: "vintage_hifi_verstaerker"
+    max_price: 200
+    deal_rating: "Okay"

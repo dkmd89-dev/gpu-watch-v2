@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import logging
 import os
+import time
 from urllib.parse import urlsplit, urlunsplit
 
 import requests
@@ -12,6 +13,20 @@ import requests
 from .base import Listing
 
 log = logging.getLogger(__name__)
+
+# Bugfix (siehe STATUS.md): search_ebay() feuerte bisher alle Suchbegriffe
+# ohne jede Pause hintereinander an die eBay Browse API -- bei ~90
+# Suchbegriffen pro Scan wurde dadurch Sekunden-Rate-Limit von eBay sofort
+# ueberschritten (jeder einzelne Request lieferte "429 Too Many Requests",
+# siehe gpu_watch.log 2026-08-03). Analog zu scrapers/kleinanzeigen.py
+# (dort bereits `time.sleep(2)`), aber zusaetzlich per Env-Var konfigurierbar
+# (gleiches Muster wie FOUND_MAX_ITEMS/LOG_MAX_BYTES in app.py) und mit
+# gezieltem Retry-Backoff nur fuer 429, um Requests nicht unnoetig zu
+# verlangsamen, wenn eBay (noch) nicht drosselt.
+EBAY_REQUEST_DELAY_SECONDS = float(os.environ.get("EBAY_REQUEST_DELAY_SECONDS", "1.0"))
+EBAY_MAX_RETRIES_429 = int(os.environ.get("EBAY_MAX_RETRIES_429", "3"))
+EBAY_RETRY_BACKOFF_SECONDS = float(os.environ.get("EBAY_RETRY_BACKOFF_SECONDS", "2.0"))
+EBAY_CIRCUIT_BREAKER_THRESHOLD = int(os.environ.get("EBAY_CIRCUIT_BREAKER_THRESHOLD", "3"))
 
 
 def _stable_item_url(item_web_url: str) -> str:
@@ -100,24 +115,93 @@ def search_ebay(
         "Authorization": f"Bearer {token}",
         "X-EBAY-C-MARKETPLACE-ID": "EBAY_DE",
     }
-    for term in search_terms:
+    # Bugfix (Fortsetzung, siehe STATUS.md Abschnitt 20): Der Retry-mit-
+    # Backoff aus Abschnitt 19 geht von TRANSIENTEM Sekunden-Throttling aus.
+    # In der Praxis (gpu_watch.log 03.08., 06:09 Uhr) blieben 73 von 74
+    # gedrosselten Suchbegriffen trotz vollem Retry dauerhaft blockiert --
+    # vermutlich ein laenger anhaltendes Kontingent-/App-Limit, kein
+    # Sekunden-Throttle. Retry+Backoff fuer JEDEN der ~90 Suchbegriffe
+    # einzeln durchzuziehen liess einzelne Scans dadurch auf bis zu ~26
+    # Minuten anwachsen (vorher 2-6 Minuten). Circuit-Breaker: sobald
+    # EBAY_CIRCUIT_BREAKER_THRESHOLD Suchbegriffe HINTEREINANDER trotz
+    # voller Retry-Kette an 429 scheitern, wird der Rest der Suchbegriffe
+    # fuer DIESEN Scan uebersprungen (ein Log-Eintrag statt ~70 weitere
+    # sinnlose Timeouts). Naechster Scan-Durchlauf versucht es regulaer
+    # wieder -- kein dauerhaftes Abschalten von eBay.
+    consecutive_429_failures = 0
+    for i, term in enumerate(search_terms):
         params = {
             "q": term,
             "filter": f"price:[..{max_price}],priceCurrency:EUR,itemLocationCountry:DE,"
             f"conditions:{{USED|NEW}}",
             "limit": "50",
         }
-        try:
-            resp = requests.get(
-                "https://api.ebay.com/buy/browse/v1/item_summary/search",
-                headers=headers,
-                params=params,
-                timeout=20,
-            )
-            resp.raise_for_status()
-            data = resp.json()
-        except requests.RequestException as e:
-            log.warning("eBay-Suchfehler (%s): %s", term, e)
+
+        data = None
+        last_status_code = None
+        for attempt in range(EBAY_MAX_RETRIES_429 + 1):
+            try:
+                resp = requests.get(
+                    "https://api.ebay.com/buy/browse/v1/item_summary/search",
+                    headers=headers,
+                    params=params,
+                    timeout=20,
+                )
+                # getattr() statt direktem Attributzugriff: bestehende Tests
+                # (tests/test_scraper_ebay.py) mocken die Response bewusst
+                # minimal ohne status_code/headers -- soll fuer den regulaeren
+                # Erfolgsfall unveraendert funktionieren (Rueckwaertskompatibilitaet).
+                status_code = getattr(resp, "status_code", None)
+                last_status_code = status_code
+                if status_code == 429 and attempt < EBAY_MAX_RETRIES_429:
+                    # eBay drosselt -- Retry-After respektieren, falls vorhanden,
+                    # sonst exponentiellen Backoff verwenden.
+                    wait = EBAY_RETRY_BACKOFF_SECONDS * (2 ** attempt)
+                    retry_after = getattr(resp, "headers", {}).get("Retry-After")
+                    if retry_after:
+                        try:
+                            wait = max(wait, float(retry_after))
+                        except ValueError:
+                            pass
+                    log.warning(
+                        "eBay-Rate-Limit (%s): 429, Retry in %.1fs (Versuch %d/%d)",
+                        term, wait, attempt + 1, EBAY_MAX_RETRIES_429,
+                    )
+                    time.sleep(wait)
+                    continue
+                resp.raise_for_status()
+                data = resp.json()
+                break
+            except requests.RequestException as e:
+                log.warning("eBay-Suchfehler (%s): %s", term, e)
+                break
+
+        if data is not None:
+            consecutive_429_failures = 0
+        elif last_status_code == 429:
+            consecutive_429_failures += 1
+            if consecutive_429_failures >= EBAY_CIRCUIT_BREAKER_THRESHOLD:
+                skipped = len(search_terms) - (i + 1)
+                log.warning(
+                    "eBay scheint dauerhaft blockiert (%d Suchbegriffe in Folge trotz "
+                    "Retries an 429 gescheitert) -- breche verbleibende %d Suchbegriffe "
+                    "fuer diesen Scan ab. Naechster Scan versucht es wieder.",
+                    consecutive_429_failures, skipped,
+                )
+                break
+        else:
+            # Andere Fehlerursache (Timeout, DNS, ...) -- kein Hinweis auf
+            # anhaltende eBay-Drosselung, Zaehler bewusst nicht erhoehen.
+            consecutive_429_failures = 0
+
+        # Zwischen aufeinanderfolgenden Suchbegriffen bewusst pausieren, um
+        # eBays Sekunden-Rate-Limit gar nicht erst zu erreichen (siehe
+        # Kommentar zu EBAY_REQUEST_DELAY_SECONDS oben). Nicht nach dem
+        # letzten Term -- unnoetige Wartezeit am Ende des Scans vermeiden.
+        if i < len(search_terms) - 1 and EBAY_REQUEST_DELAY_SECONDS > 0:
+            time.sleep(EBAY_REQUEST_DELAY_SECONDS)
+
+        if data is None:
             continue
 
         for it in data.get("itemSummaries", []):

@@ -55,3 +55,19 @@ rules:
       requires_dedicated_gpu: false  # optional, schließt PCs MIT GPU nicht aus
     max_price: 300
     deal_rating: "Okay"
+    # Verhandlungs-Assistent (STATUS.md Abschnitt 16, Punkt 7), aktiviert
+    # analog zum GPU-Muster (rules/gpu.yaml). Bewusst NICHT
+    # "hardware_qualitaet" als Komponente: diese Regel hat deal_rating
+    # "Okay" (Basis-Score 45, siehe scoring/deal_score.py::
+    # _hardware_qualitaet_score()), max. erreichbarer Wert mit CPU-/RAM-
+    # Headroom-Bonus waere 60 -- ein Schwellenwert von 70 (wie bei GPU)
+    # waere hier NIE erreichbar (identisches Problem wie bei der GPU-
+    # "Guter Preis"-Regel, siehe Abschnitt 16). Stattdessen "ausstattung"
+    # (SSD/dedizierte GPU, siehe _ausstattung_score(), 0/50/100): passt
+    # inhaltlich besser zum Auftrag ("Optional: SSD, hochwertiges
+    # Netzteil" als Kaufargument fuer einen ueberteuerten Office-PC).
+    # Schwelle 50 = mindestens EIN Zusatzmerkmal (SSD ODER dedizierte
+    # GPU) muss vorhanden sein, sonst kein Verhandlungskandidat.
+    negotiation_tolerance_pct: 15.0
+    negotiation_min_score: 50
+    negotiation_score_component: "ausstattung"

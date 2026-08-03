@@ -1,4 +1,4 @@
-# status.md — Aktualisiert bis Schritt "Dashboard-Politur (Abschnitt 18): Badges/Buttons/Kontrast/Live-Chart-Refresh, reine templates/index.html-Änderung -- vollständig abgeschlossen
+# status.md — Aktualisiert bis Schritt "Verhandlungs-Assistent für office_pc/monitor_curved (Abschnitt 21) -- abgeschlossen"
 
 ## Statusübersicht
 - **Phase 0 (Projektanalyse & Stabilisierung):** Abgeschlossen
@@ -36,6 +36,10 @@
 - **SATA-SSD 250GB/500GB kalibriert:** Abgeschlossen (siehe Abschnitt 17). `max_price` anhand echter `price_history.jsonl`-Daten neu berechnet (250GB: 26€/33€ → 25€/32€; 500GB: 49€/67€ → 40€/56€). Bei 500GB wurde ein Burst-Cluster (33 verdächtige Duplikate, `fingerprint: null`) aus der Berechnung ausgeklammert — Wurzelursache noch offen (siehe Ausblick).
 - **Neue Kategorie „Curved Monitore" (`monitor_curved`):** Abgeschlossen (siehe Abschnitt 17). Erste Kategorie, die seit Abschluss von Phase 10 komplett neu hinzugefügt wurde — **kein Python-Code geändert**, reine YAML-Datei, beweist damit die YAML-only-Erweiterbarkeit in der Praxis (nicht nur im Kontrakt-Test).
 - **Dashboard-Politur (UI/UX-Feinschliff):** Abgeschlossen (siehe Abschnitt 18). Zwei Teilschritte: (1) Platform-Icon vergrößert, Filter-Reset-Button prominenter, Preisdiagramm lädt nach Scan-Ende automatisch neu; (2) WCAG-Kontrastprüfung inkl. Fix eines echten AA-Kontrastfehlers am Scan-Button, sichtbarere Panel-Rahmen, Fokus-Ringe für Tastaturbedienung, Karten-Hover, dunkler Log-Scrollbar. Reine `templates/index.html`-Änderung, kein Python-Code betroffen.
+- **Bugfix `burst_cleanup.py` (blockierender Importfehler):** Behoben (siehe Abschnitt 21). Relativer Import (`from .price_history import ...`) verhinderte, dass `price_stats.py` und damit `app.py` überhaupt startete — betraf auch den produktiven Docker-Container (`WORKDIR /app`, flacher Modul-Kontext). Fix: absoluter Import, konsistent mit dem Rest des Projekts. 564/564 Tests grün.
+- **Gaming-PC-/`monitor_curved`-Preiskalibrierung gegengeprüft:** Kein Handlungsbedarf — beide waren bereits vollständig kalibriert (Abschnitt 15 bzw. 17.2/17.3), nur ein veralteter Ausblick-Eintrag suggerierte offenen Bedarf. Keine Code-Änderung.
+- **Verhandlungs-Assistent auf `office_pc`/`monitor_curved` ausgeweitet:** Abgeschlossen (siehe Abschnitt 21). `monitor_curved` folgt dem GPU-Muster (`hardware_qualitaet`, Schwelle 70, nur Top-Deal-Regel). `office_pc` (bisher bewusst ausgeklammert, siehe Abschnitt 17) nutzt stattdessen die Komponente `"ausstattung"` (SSD/dedizierte GPU) mit Schwelle 50 — löst die strukturelle Schwellen-Erreichbarkeitslücke, die die Aktivierung in Abschnitt 17 verhindert hatte.
+- **Drei neue Nischen-Kategorien (Retro-Konsolen, Vintage-Elektronik & Audio, Spielzeug-Bundles):** Abgeschlossen (siehe Abschnitt 22). Rein additive YAML-Dateien (`rules/retro_konsolen.yaml`, `rules/vintage_elektronik.yaml`, `rules/spielzeug_bundles.yaml`), **kein Python-Code geändert** — weiterer Praxisbeleg der YAML-only-Erweiterbarkeit (siehe bereits `monitor_curved` in Abschnitt 17). Preisgrenzen sind Platzhalter, Kalibrierung folgt nach Datensammlung (analog aller bisherigen neuen Kategorien).
 
 ---
 
@@ -289,7 +293,9 @@ Offene Punkte, unpriorisiert, keiner davon begonnen:
 7. ~~Ausstehende Bestätigung: `test_category_registry.py` noch nicht erneut von Robin bestätigt~~ **Erledigt.** In dieser Sandbox erneut ausgeführt: 8/8 grün (Datei enthält mittlerweile 8 statt der ursprünglich dokumentierten 7 Tests -- Diskrepanz nicht weiter zurückverfolgt, siehe Statusübersicht/Abschnitt 13).
 8. ~~Dashboard-Redesign (Robins Vorschlag vom 02.08.: Header/Status-Leiste, KPI-Kacheln, Deal-Karten, Filter-Leiste) inkl. nahtloser Live-Refresh ohne `location.reload()`~~ **Erledigt** (siehe Abschnitt 14).
 
-9. **Reselling-/Arbitrage-Erweiterung (neues Konzept, siehe Abschnitt 16):** Noch nicht begonnen. Nächster Schritt: Phase-0-Analyse (`scoring/deal_score.py`, `price_stats.py`, `rules/`) im Hinblick auf Profit-Score + Gebührenmodell.
+9. ~~Reselling-/Arbitrage-Erweiterung (neues Konzept, siehe Abschnitt 16)~~ **Erledigt** — Bausteine 1–7 vollständig umgesetzt (Profit-Score, Gebührenmodell, Bundle-/Part-Out-Erkennung, Cross-Platform-Preisvergleich, Duplicate-Erkennung, Time-to-Sell, Verhandlungs-Assistent), siehe Abschnitt 16/17/21.
+10. **Reselling-Kriterien & Strategien, Punkt 1 (Einkaufs-Marge/"Golden Rule", max. 30–50% des Marktwerts):** Noch nicht begonnen — zurückgestellt zugunsten von Punkt 4 (Nischen-Kategorien), siehe Abschnitt 22.
+11. ~~Nischen-/Kategorien-Erweiterung, Punkt 4 (Retro-Konsolen, Vintage-Elektronik & Audio, Spielzeug-Bundles)~~ **Erledigt**, siehe Abschnitt 22. Preisgrenzen aller drei Kategorien sind Platzhalter — Kalibrierung anhand echter `price_history.jsonl`-Daten folgt als eigener Schritt, sobald genug Datenpunkte gesammelt wurden.
 
 Kein weiterer Punkt ist priorisiert oder für den nächsten Schritt vorausgewählt -- Freigabe/Auswahl liegt bei Robin.
 
@@ -477,10 +483,12 @@ Mit Punkt d (Abschnitt 16) vollständig abgeschlossen wurden drei unabhängige, 
 - 2 Regeln (Top-Deal/Guter Preis), `max_price` 100€/180€ sind **Platzhalter** (noch keine lokalen Marktdaten, wie im Auftrag „ausschließlich lokal gesammelte Daten" vorgeschrieben) — Kalibrierung folgt nach Datensammlung, analog zum bisherigen Muster (`netzteil.yaml`/`gaming_pc.yaml` initial). Bewusst kein Verhandlungs-Assistent in diesem Schritt (neue Kategorie ohne Erfahrungswerte).
 - **Verifikation:** `matcher.load_rules()` und `categories.registry.discover_categories()` real aufgerufen — Kategorie erscheint in beiden Discovery-Wegen identisch als `monitor_curved`, Dashboard-Label „Curved Monitore" korrekt aus `category:`/Datei-Fallback abgeleitet. 8 End-to-End-Fälle gegen echte `evaluate()` verifiziert (Top-Deal, Guter Preis, Curved-TV-Exclude, Zubehör-Exclude, Komplett-PC-Bundle-Exclude, kein „curved" im Titel → kein Match, VRAM-Regex-Bugfix, `exclude_global`-Fall „defekt"). 93/93 fixture-lose Bestandstests grün (inkl. `test_rules_category_plugin_contract.py`).
 - Dashboard zeigt die neue Kategorie automatisch (KPI-Kachel, Filter-Dropdown), da beides bereits generisch pro Kategorie implementiert ist (siehe Abschnitt 10) — keine weitere Anbindung nötig.
-
+- **Alt-Daten-Burst-Cleanup abgeschlossen:** 147 von 1556 Punkten entfernt
+  (136 durch `burst_cleanup.py`, 11 manuell, darunter der vollständige
+  71,50€-Cluster für `sata_ssd_500gb`). Datenbasis jetzt sauber (1409 Punkte).
+  Backup: `price_history.jsonl.bak-20260803-*`
 ### Ausblick / offene Punkte nach Abschnitt 17
 
-- **SATA-SSD-500GB-Burst-Cluster:** Wurzelursache (`fingerprint: null` bei 33 identischen Preis-Punkten in einem ~2-Sekunden-Fenster) noch nicht untersucht/behoben — vermutlich Alt-Daten aus der Zeit vor oder ohne den Fingerprint-Mechanismus. Sollte vor der nächsten SATA-SSD-Kalibrierung geklärt werden, da er auch andere Modelle (128GB/1TB/2TB) betreffen könnte (bisher nicht systematisch geprüft).
 - **`monitor_curved`-Preisgrenzen kalibrieren**, sobald genug `price_history.jsonl`-Datenpunkte gesammelt wurden (analog zum bewährten Muster aus Abschnitt 15/17.2).
 - **Verhandlungs-Assistent für `monitor_curved`/`office_pc`** noch nicht aktiviert — könnte nach ersten Erfahrungswerten nachgezogen werden.
 - **eBay Sold API (RapidAPI) als zweite Quelle für `estimated_resale_price`:** von Robin vorgeschlagen, aber noch nicht umgesetzt — steht im direkten Konflikt mit der ursprünglichen Auftrags-Vorgabe „ausschließlich lokal gesammelte Daten, keine externen Preis-APIs" (siehe `price_stats.py`-Docstring). Erfordert eine bewusste, explizite Freigabe zur Abkehr von diesem Prinzip, bevor mit der Umsetzung begonnen wird. Offene technische Punkte: API-Key-Verwaltung (kein Secrets-Handling im Projekt bisher vorhanden), Rate-Limits/Kosten, Fallback-Verhalten bei API-Fehlern, kein Netzwerkzugriff in der Analyse-Sandbox zur Verifikation der echten API-Antwortstruktur.
@@ -516,3 +524,117 @@ Auf Wunsch höchste Priorität: das bestehende Dashboard optisch/funktional aufp
 - Punkt a) der Analyse (KPI-Kachel „Curved Monitore") ergab keinen Handlungsbedarf — falls Robin dort dennoch einen konkreten Unterschied sieht (z. B. in einem bestimmten Browser/Zustand), bitte konkretisieren.
 
 
+
+### 19. eBay-429-Rate-Limit-Bugfix (`scrapers/ebay.py`)
+
+**Ausgangslage (per `gpu_watch.log` vom 03.08. gemeldet):** Beim produktiven Scan lieferte **jeder einzelne** eBay-API-Request `429 Too Many Requests` -- eBay war als Suchquelle faktisch komplett ausgefallen, ohne dass der Container abgestürzt oder das im Log sichtbar als "Fehler" markiert war (nur `WARNING`, kein `ERROR`).
+
+**Root Cause:** `search_ebay()` feuerte alle ~90 Suchbegriffe pro Scan ohne jede Pause hintereinander an die eBay Browse API (Timestamps im Log: ~250-950ms Abstand, reine Netzwerklatenz, kein Throttle). Im Gegensatz dazu hat `scrapers/kleinanzeigen.py` bereits ein `time.sleep(2)` zwischen den Requests -- dieses Pattern fehlte in `ebay.py` komplett.
+
+**Fix:**
+- Pause zwischen aufeinanderfolgenden Suchbegriffen (`EBAY_REQUEST_DELAY_SECONDS`, Default 1.0s, Env-Var-konfigurierbar -- gleiches Muster wie `FOUND_MAX_ITEMS`/`LOG_MAX_BYTES` in `app.py`). Keine Pause nach dem letzten Suchbegriff.
+- Gezielter Retry mit exponentiellem Backoff **nur** bei Status `429` (max. `EBAY_MAX_RETRIES_429`, Default 3 Versuche), respektiert den `Retry-After`-Header, falls eBay ihn mitschickt, sonst `EBAY_RETRY_BACKOFF_SECONDS * 2^Versuch` (Default-Basis 2.0s).
+- Nach Ausschöpfen der Retries wird der Suchbegriff wie bisher übersprungen (Log-`WARNING`, kein Absturz) -- Verhalten bei sonstigen `RequestException`s (Timeout, DNS-Fehler etc.) unverändert.
+- `getattr(resp, "status_code"/"headers", ...)` statt direktem Attributzugriff, damit die bestehenden minimalen Test-Mocks in `tests/test_scraper_ebay.py` (ohne `status_code`/`headers`) unverändert funktionieren.
+
+**Nicht geändert:** Funktionssignatur von `search_ebay()`, Rückgabeformat (`Listing`-Schema), Verhalten bei fehlendem Token, `_stable_item_url()`, alle anderen Scraper/Module.
+
+**Tests:** Neue Datei `tests/test_scraper_ebay_rate_limit.py` (4 Tests: Retry+Erfolg nach 429, `Retry-After`-Header wird respektiert, dauerhaftes 429 wird nach Max-Retries sauber übersprungen, Pause zwischen mehreren Suchbegriffen). `time.sleep` wird in allen Tests gemockt (nur gezählt, nicht real ausgeführt) -- Testsuite bleibt schnell. Volle Suite: **562/562 Tests grün** (vorher 397+ neue, siehe `pytest`-Lauf dieser Session).
+
+### 20. eBay-Circuit-Breaker bei anhaltendem 429 (Fortsetzung von Abschnitt 19)
+
+**Ausgangslage (neuer `gpu_watch.log`-Upload vom 03.08., ausgewertet ab 04:42 Uhr, d.h. nach dem Retry+Backoff-Fix aus Abschnitt 19):** Der Retry-Mechanismus geht implizit von TRANSIENTEM Sekunden-Throttling aus (kurze Pause, dann klappt's wieder). In der Praxis erholten sich aber nur **1 von 74** durch 429 betroffenen Suchbegriffen nach vollem Retry (1+2+4+8s Backoff) -- die restlichen 73 blieben dauerhaft blockiert (vermutlich ein länger anhaltendes Tages-/App-Kontingent statt Sekunden-Throttle). Folge: einzelne Scans wuchsen von vorher 2-6 Minuten auf bis zu **~26 Minuten**, weil für praktisch jeden der ~90 Suchbegriffe die komplette (sinnlose) Retry-Kette durchlaufen wurde.
+
+**Nebenbefund (unkritisch, geprüft):** Mehrfach dicht aufeinanderfolgende `Starte Scan...`-Zeilen im Log deuteten zunächst auf mögliche überlappende Scans hin. Geprüft: `app.py` hat bereits einen `_scan_lock` mit `_scan_running`-Flag -- ein zweiter Scan-Aufruf während eines laufenden Scans wird sofort mit `"Scan läuft bereits, überspringe..."` abgebrochen. Keine Änderung nötig, echte Nebenläufigkeit war nie das Problem.
+
+**Fix (`scrapers/ebay.py`):** Circuit-Breaker-Zähler `consecutive_429_failures`. Sobald `EBAY_CIRCUIT_BREAKER_THRESHOLD` (Default 3, Env-Var-konfigurierbar) Suchbegriffe **hintereinander** trotz voller Retry-Kette an 429 scheitern, werden die verbleibenden Suchbegriffe für diesen Scan-Durchlauf übersprungen (ein klarer Log-Eintrag statt ~70 weitere sinnlose Retry-Serien). Der Zähler wird bei jedem erfolgreichen Suchbegriff auf 0 zurückgesetzt (kein Übertrag über transiente Erholungsphasen hinweg) und bei sonstigen Fehlerursachen (Timeout, DNS, ...) bewusst nicht erhöht, da diese kein Hinweis auf eine anhaltende eBay-Drosselung sind. Kein dauerhaftes Abschalten -- der nächste reguläre Scan-Durchlauf (10 Min. später) probiert eBay wieder von vorn.
+
+**Nicht geändert:** Funktionssignatur, Rückgabeformat, Verhalten bei einzelnen/transienten 429ern (Abschnitt-19-Fix bleibt für den Normalfall unverändert), alle anderen Module.
+
+**Tests:** `tests/test_scraper_ebay_rate_limit.py` um 2 Tests ergänzt (Circuit-Breaker greift nach Threshold aufeinanderfolgenden Totalausfällen, wird durch einen zwischenzeitlichen Erfolg zurückgesetzt). Volle Suite: **564/564 Tests grün**.
+
+**Ausblick (nicht Teil dieses Schritts):** Die Kernursache (eBay-Kontingent/App-Limit vermutlich zu niedrig für ~90 Suchbegriffe alle 10 Minuten) ist damit nur abgefedert, nicht behoben. Sollte der Circuit-Breaker in der Praxis regelmäßig bereits zu Scan-Beginn greifen, wäre ein größerer Schritt sinnvoll: Suchbegriffe auf mehrere Scan-Zyklen verteilen (Batching) oder eBay-Tarif/-Kontingent prüfen -- bewusst nicht in diesen Bugfix gemischt.
+
+### 21. Bugfix `burst_cleanup.py` + Verhandlungs-Assistent für `office_pc`/`monitor_curved`
+
+#### 21.1 Bugfix: blockierender Importfehler in `burst_cleanup.py`
+
+**Befund:** `app/burst_cleanup.py` (Abschnitt 17.2) verwendete `from .price_history import PricePoint, read_price_points` — einen paketrelativen Import. `price_stats.py` importiert `burst_cleanup` aber absolut (`from burst_cleanup import ...`), exakt wie jedes andere Modul im Projekt (`app.py` läuft immer flach aus `WORKDIR /app`, nie als Package). Sobald `price_stats.py` geladen wurde, brach der Import mit `ImportError: attempted relative import with no known parent package` ab — transitiv auch `app.py` und drei Testmodule (`test_burst_cleanup.py`, `test_price_stats.py`, `test_top_deal.py`) betroffen. **Dieser Bug traf auch den produktiven Container**, nicht nur die Test-Sandbox.
+
+**Fix:** Import auf `from price_history import PricePoint, read_price_points` korrigiert (1 Zeile). Verifiziert: `price_stats` importiert wieder fehlerfrei, volle Suite **564/564 grün**.
+
+**Geänderte Dateien:** `app/burst_cleanup.py`.
+
+#### 21.2 Gaming-PC-/`monitor_curved`-Kalibrierung gegengeprüft — kein Handlungsbedarf
+
+Vor Umsetzung gegen den tatsächlichen Code geprüft (nicht nur gegen den `STATUS.md`-Ausblick, der hier veraltet war, siehe Prinzip "Dokumentation muss gegen Code geprüft werden", vgl. Abschnitt 16, Baustein 3): `rules/gaming_pc.yaml` enthält bereits die kalibrierten Werte aus Abschnitt 15 (Top-Deal 300€, Okay 450€), `rules/monitor_curved.yaml` bereits die kalibrierten Werte aus Abschnitt 17.3 (Top-Deal 70€, Guter Preis 121€). Datenbasis (`data/price_history.jsonl`): 418 `gaming_pc`- und 217 `monitor_curved`-Punkte, keine offenen Platzhalter gefunden. **Keine Code-Änderung.**
+
+#### 21.3 Verhandlungs-Assistent auf `office_pc`/`monitor_curved` ausgeweitet
+
+**Ausgangslage:** Abschnitt 17 hatte den Verhandlungs-Assistenten auf fast alle Kategorien ausgeweitet, `office_pc.yaml` dabei aber bewusst ausgeklammert ("einzige Regel dort hat Basis-Score <70, Mindest-Score-Schwelle strukturell nie erreichbar"). `monitor_curved.yaml` existierte zu diesem Zeitpunkt noch nicht (neu in Abschnitt 17.3) und hatte daher ebenfalls noch keine `negotiation_*`-Felder.
+
+**`monitor_curved.yaml`:** Feature exakt nach GPU-Muster aktiviert — `negotiation_tolerance_pct: 15.0`, `negotiation_min_score: 70`, `negotiation_score_component: "hardware_qualitaet"`. Bewusst **nur** an der "★ Top-Deal"-Regel (Basis-Score 85), **nicht** an der "Guter Preis"-Regel (Basis-Score 65, ohne CPU-/RAM-Headroom-Bonus bei Monitoren nie über 65 hinaus erreichbar) — identisches Argument wie bei GPU in Abschnitt 16.
+
+**`office_pc.yaml`:** Löst die in Abschnitt 17 dokumentierte Blockade, indem eine andere Score-Komponente verwendet wird: statt `hardware_qualitaet` (Basis 45 + max. 15 Headroom-Bonus = max. 60, Schwelle 70 nie erreichbar) jetzt `"ausstattung"` (`_ausstattung_score()`, 0/50/100 je nach SSD/dedizierter GPU) mit Schwelle 50 — verlangt mindestens ein Zusatzmerkmal (SSD oder dedizierte GPU) als Kaufargument für ein Angebot über `max_price`, passend zum ursprünglichen Auftrag ("Optional: SSD, hochwertiges Netzteil"). `negotiation_tolerance_pct: 15.0` (identisch zu allen anderen Kategorien).
+
+**Geänderte Dateien:** `app/rules/office_pc.yaml`, `app/rules/monitor_curved.yaml` (je +9 Zeilen, reine YAML, kein Python-Code geändert).
+
+**Verifikation:**
+- Volle Suite: **564/564 Tests grün**, keine Regression.
+- Manuell end-to-end gegen echte Regeln (`matcher.evaluate()`): Office-PC 330€ mit SSD → `negotiation_candidate=True`; Office-PC 330€ ohne SSD/GPU → weiterhin verworfen; Curved Monitor 78€ (Top-Deal-Toleranzbereich, max_price 70€ + 15% = 80,50€) → `negotiation_candidate=True`; Curved Monitor "Guter Preis" über 121€ → weiterhin verworfen (Feld dort bewusst nicht gesetzt).
+
+**Nebenwirkungen:** Mehr Treffer im Preisbereich 300–345€ (Office-PC) bzw. 70–80,50€ (Curved Monitor Top-Deal) landen künftig als 🤝-Verhandlungskandidat statt komplett verworfen zu werden — kein Einfluss auf Notification-Gate (weiterhin nur ★★★★★ + `notify_max_price`).
+
+**Noch offen:** Aus der Ausblick-Liste bleiben Punkt 1 (weitere Suchquellen), Punkt 4 (eBay-Batching als Root-Cause-Fix) und Punkt 5 (`--border`-WCAG-Vollkonformität) unpriorisiert offen.
+
+---
+
+## 22. Drei neue Nischen-Kategorien: Retro-Konsolen, Vintage-Elektronik & Audio, Spielzeug-Bundles
+
+**Ausgangslage:** Aus der Anforderung "Reselling-Kriterien & Strategien" wurde zunächst Punkt 4 (Nischen-/Kategorien-Erweiterung) freigegeben, einzeln nacheinander mit Freigabe je Kategorie. Alle drei folgen derselben Architektur-Entscheidung: reines Titel-Keyword-Matching (wie `gpu.yaml`/`sata_ssd.yaml`), **kein** `requirements:`-Block (wie `office_pc.yaml`), da kein Hardware-Detector für diese Warengruppen anwendbar ist. `categories/registry.py` bestätigt, dass jede `*.yaml` in `rules/` automatisch als Kategorie erkannt wird — **in keinem der drei Schritte wurde Python-Code geändert.**
+
+### 22.1 `rules/retro_konsolen.yaml` (neu)
+Drei Regelgruppen (je Top-Deal/Guter Preis/Okay): Nintendo (N64/GameCube/DS), Sony (PS1/PS2), Konvolute (via `require_all_of`: Bundle-Signalwort UND Konsolen-/Marken-Begriff). `min_vram_gb: 0` überschreibt den globalen GPU-VRAM-Check bewusst (verhindert Fehlausschluss durch z.B. eine im Titel erwähnte "64GB SD-Karte"). Kategorie-eigene Excludes: `repro`/`nachbau`/`modul einzeln`/`emulator` u.a.
+
+### 22.2 `rules/vintage_elektronik.yaml` (neu)
+Zwei fachlich getrennte CRT-Preisklassen (normale Röhrenfernseher vs. gesuchte Profi-Monitore Sony PVM/BVM/Trinitron, jeweils eigene, deutlich höhere Preisgrenzen) sowie Vintage-HiFi-Verstärker mit Marken-/Röhren-Gate über `require_all_of`. **Im Zuge der Verifikation gefundener und behobener Implementierungsfehler:** die drei HiFi-Regeln hatten zusätzlich ein `match: ["röhrenverstärker"]`-Feld gesetzt — `match` ist laut `matcher.py` ein zusätzliches PFLICHT-Gate vor `require_all_of` (kein Ersatz dafür), wodurch z.B. "Marantz Vollverstärker" fälschlich nicht gematcht hätte. Fix: `match`-Feld entfernt, `require_all_of` reicht als alleiniges Kriterium.
+
+### 22.3 `rules/spielzeug_bundles.yaml` (neu)
+Drei Regelgruppen (Lego, Playmobil, sonstige Marken), jeweils über `require_all_of` (Marke UND Bundle-Signalwort: Konvolut/Kiloware/Sammlung/Posten/kg) — verhindert bewusst, dass einzelne neue Sets (z.B. "Lego ... neu OVP") gematcht werden. **Bewusst kein Kilopreis-Detector** in dieser Version: eine automatische Gewichtserkennung aus dem Titel wäre ein neuer Detector und damit eine Code-Änderung — außerhalb des Rahmens dieses rein additiven YAML-Schritts. Flache Preisgrenzen als Platzhalter.
+
+### Verifikation (alle drei Kategorien)
+**Hinweis:** `pytest` konnte in dieser Sandbox nicht ausgeführt werden (kein Netzwerkzugriff zur Installation von `pytest`/Abhängigkeiten). Stattdessen wurde jede Kategorie manuell über `matcher._load_rules_from_dir()` + `matcher.evaluate()` mit realistischen Titel-/Preis-Kombinationen verifiziert (Tier-Grenzen, Excludes, `require_all_of`-Gates, VRAM-Override) — siehe Konversationsverlauf. **Vor dem nächsten produktiven Deploy sollte `pytest app/tests/` lokal gegen alle drei neuen Dateien laufen**, um die automatisierte Suite (zuletzt 564/564) gegen den Kontrakt-Test (`test_rules_category_plugin_contract.py`) zu bestätigen.
+
+**Geänderte Dateien:**
+- `app/rules/retro_konsolen.yaml` (neu)
+- `app/rules/vintage_elektronik.yaml` (neu)
+- `app/rules/spielzeug_bundles.yaml` (neu)
+- `STATUS.md` (dieser Abschnitt + Statusübersicht + Ausblick)
+
+**Mögliche Nebenwirkungen:**
+- Drei neue Kategorien erscheinen ab sofort im Dashboard-Dropdown/Scan-Log, zusätzliche `search_terms` erhöhen die Scraper-Last pro Scan-Durchlauf.
+- Alle Preisgrenzen sind Platzhalter (keine `price_history`-Daten für diese Kategorien vorhanden) — ggf. zu viele/zu wenige Treffer bis zur Kalibrierung.
+- Marken-/Modelllisten (Sansui, Marantz, Pioneer, Yamaha, Kenwood, Onkyo, McIntosh, Sony PVM/BVM) sind nicht erschöpfend, aber rein additiv erweiterbar.
+
+**Commit-Nachricht:**
+```
+feat(rules): drei neue Nischen-Kategorien (Retro-Konsolen, Vintage-Elektronik, Spielzeug-Bundles)
+
+- rules/retro_konsolen.yaml (neu): Nintendo N64/GameCube/DS, Sony PS1/PS2,
+  Konvolute -- je 3 Preis-Tiers, min_vram_gb:0 (verhindert Fehlausschluss
+  durch GB-Zahlen im Titel)
+- rules/vintage_elektronik.yaml (neu): CRT-Roehrenfernseher (Normal- vs.
+  Profi-Monitor-Preisklasse Sony PVM/BVM/Trinitron), Vintage-HiFi-
+  Verstaerker mit Marken-/Roehren-Gate
+- rules/spielzeug_bundles.yaml (neu): Lego/Playmobil/sonstige Konvolute
+  ueber require_all_of (Marke UND Bundle-Signalwort), verhindert Match
+  auf einzelne neue Sets
+- Kein Python-Code geaendert (categories/registry.py-Discovery greift
+  automatisch)
+- STATUS.md: Abschnitt 22, Statusuebersicht, Ausblick aktualisiert
+- Hinweis: pytest in dieser Sandbox nicht ausfuehrbar (kein Netzwerk),
+  Kategorien manuell ueber matcher.evaluate() verifiziert -- volle
+  Suite vor naechstem Deploy lokal bestaetigen
+```
+
+**Noch offen:** Preiskalibrierung aller drei Kategorien nach Datensammlung; Reselling-Kriterien-Punkt 1 ("Golden Rule" Einkaufs-Marge) weiterhin zurückgestellt.

@@ -36,6 +36,7 @@ from pathlib import Path
 
 from price_history import PricePoint, read_price_points
 
+
 log = logging.getLogger(__name__)
 
 # Maximale Luecke zwischen zwei aufeinanderfolgenden Punkten derselben

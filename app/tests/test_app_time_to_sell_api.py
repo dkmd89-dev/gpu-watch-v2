@@ -22,6 +22,14 @@ def _load_app_module(data_dir: str):
     app_path = Path(__file__).resolve().parent.parent / "app.py"
     spec = importlib.util.spec_from_file_location("app_under_test_tts_api", app_path)
     mod = importlib.util.module_from_spec(spec)
+    # Bugfix: Modul VOR exec_module in sys.modules registrieren --
+    # sonst findet Flask(__name__) intern keinen Eintrag unter dem
+    # Modulnamen und faellt auf os.getcwd() als root_path zurueck
+    # (statt auf den echten app.py-Verzeichnispfad). Funktioniert dann nur
+    # zufaellig, wenn pytest aus app/ heraus gestartet wird -- schlaegt mit
+    # "TemplateNotFound: index.html" fehl, sobald z.B. aus dem Projekt-Root
+    # gestartet wird (siehe Robins echter pytest-Lauf, 03.08.).
+    sys.modules[spec.name] = mod
     spec.loader.exec_module(mod)
     return mod
 
