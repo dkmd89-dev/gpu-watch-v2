@@ -412,4 +412,21 @@ Kein weiterer Punkt ist priorisiert oder für den nächsten Schritt vorausgewäh
 - Volle Suite: **528/528 grün**.
 - **Damit ist Baustein 6 (Time-to-Sell-Schätzung) vollständig abgeschlossen (Schritt 1–4).** Weiterhin offen aus Punkt d: Baustein 4 (Cross-Platform-Preisvergleich, noch nicht begonnen).
 
+**Punkt d, Baustein 4 begonnen (Cross-Platform-Preisvergleich), Schritt 1 (Berechnungslogik + Tests):**
+- **Befund:** Datengrundlage existiert bereits vollständig — jeder `PricePoint` (`price_history.py`) trägt bereits ein `source`-Feld. `price_stats.py` gruppiert bisher nur nach `model`, nicht zusätzlich nach `source` — keine neuen Scraper/Daten nötig, reine Auswertungslogik.
+- Neues Modul `cross_platform_stats.py` (analog `time_to_sell_stats.py`): `group_by_source()` gruppiert Datenpunkte eines Modells nach Quelle; `SourceStats`-Dataclass (`source`, `count`, `mean_price`, `median_price`); `CrossPlatformStats`-Dataclass (`model`, `by_source`, `cheapest_source`, `priciest_source`, `spread_pct`); `compute_cross_platform_stats()` liefert `None`, wenn Datenpunkte aus weniger als 2 verschiedenen Quellen vorliegen; `compute_all_cross_platform_stats()` berechnet den Vergleich für alle Modelle in einem Rutsch.
+- Gruppierung bewusst nach **Modell** (nicht Kategorie wie bei `time_to_sell_stats.py`) — ein Preis-Spread ist nur zwischen identischen Produkten sinnvoll vergleichbar. `spread_pct` relativ zur günstigsten Quelle definiert. Kein Mindest-Stichprobenumfang pro Quelle in diesem ersten Schritt (rein informatives Signal, kein score-relevanter Wert).
+- **Noch keine Anbindung an `app.py`/Dashboard/Deal-Score** — reine Berechnungslogik + Tests, analog zum bisherigen Vorgehen (`profit.py`, `time_to_sell_stats.py`).
+- Tests: 11 neue Tests in `tests/test_cross_platform_stats.py`. Volle Suite: **539/539 grün**.
+- **Noch offen:** Wiring (welches/welche Modul(e) `compute_all_cross_platform_stats()` aufrufen, Dashboard-Anzeige — analog zu Time-to-Sell Schritt 4).
+
+**Punkt d, Baustein 4 (Cross-Platform-Preisvergleich), Schritt 2 (Wiring: Aufrufer + Dashboard-Anzeige) — Baustein damit abgeschlossen:**
+- **Konzept:** Cross-Platform-Statistik aus Schritt 1 sichtbar im Dashboard machen — reine Anzeige/Verdrahtung, kein neuer Berechnungscode.
+- `app.py`: neue Route `/api/cross-platform` — liest `price_history.jsonl` (`read_price_points()`) und berechnet den Vergleich (`compute_all_cross_platform_stats()`, aus Schritt 1), liefert `{model: {by_source, cheapest_source, priciest_source, spread_pct}}` als JSON. Leeres Dict, solange kein Modell Daten aus ≥2 Quellen hat (kein Fehlerfall, analog `/api/time-to-sell`).
+- `templates/index.html`: neue Sektion „Cross-Platform-Preisvergleich" zwischen Time-to-Sell- und Scan-Log-Panel — pro Modell eine Kachel-Gruppe mit Quellen-Aufschlüsselung (Ø-Preis + Anzahl je Quelle, günstigste/teuerste farblich hervorgehoben) und Spread-Zeile. Eigener `cp-*`-CSS-Namensraum statt Wiederverwendung von `.chart-stat` (anders als beim Time-to-Sell-Panel), da hier zusätzlich eine Quellen-Aufschlüsselung pro Modell nötig ist, kein reiner 1:1-Kachel-Fall. Panel bleibt mit Empty-State sichtbar statt komplett verborgen, solange kein Modell ≥2 Quellen hat.
+- Wird beim initialen Laden (`initCrossPlatform()`) UND nach jedem Scan-Ende (`refreshCrossPlatform()`, gleiche Stelle wie `refreshTimeToSell()`) neu geladen.
+- Tests: 3 neue Tests in `tests/test_app_cross_platform_api.py` (leeres Dict ohne Datei, korrekte Statistik über mehrere Modelle inkl. Ausschluss von Modellen mit nur 1 Quelle via echtem Flask-`test_client()`, Panel-Markup im gerenderten Dashboard-HTML vorhanden). JS-Syntax des neuen Codes mit `node --check` verifiziert. Zusätzlich E2E gegen echte Produktionsdaten (`data/price_history.jsonl`) verifiziert: 19 Modelle mit ≥2 Quellen korrekt geliefert, Panel im gerenderten HTML vorhanden.
+- Volle Suite: **542/542 grün**.
+- **Damit ist Baustein 4 (Cross-Platform-Preisvergleich) vollständig abgeschlossen (Schritt 1–2).** Aus Punkt d ist damit nur noch Baustein 3 (Bundle-/Part-Out-Erkennung) mit offenem Folgeschritt (Dashboard-Badge — Berechnungslogik bereits vollständig umgesetzt) übrig, ansonsten sind alle Bausteine aus Punkt d abgeschlossen.
+
 

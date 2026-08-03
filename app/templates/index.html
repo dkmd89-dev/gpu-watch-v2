@@ -453,6 +453,74 @@
       margin-bottom: 0.4rem;
     }
 
+    .cp-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.2rem;
+      margin-top: 1.5rem;
+    }
+    .cp-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.8rem;
+      margin-bottom: 0.8rem;
+    }
+    .cp-header h2 {
+      font-size: 1.05rem;
+      margin: 0;
+    }
+    .cp-hint {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+    .cp-model {
+      margin-top: 0.9rem;
+    }
+    .cp-model:first-child {
+      margin-top: 0;
+    }
+    .cp-model-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+    .cp-sources {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-bottom: 0.4rem;
+    }
+    .cp-source {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.4rem 0.6rem;
+      font-size: 0.72rem;
+      min-width: 8rem;
+    }
+    .cp-source-name {
+      font-weight: 700;
+      color: var(--text);
+      text-transform: capitalize;
+    }
+    .cp-source.cheapest .cp-source-name { color: var(--green); }
+    .cp-source.priciest .cp-source-name { color: var(--red); }
+    .cp-source-value {
+      color: var(--text-muted);
+      margin-top: 0.1rem;
+    }
+    .cp-spread {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+    .cp-spread strong {
+      color: var(--text);
+    }
+
     .log-panel {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -664,6 +732,17 @@
     <div id="ttsContent"></div>
   </section>
 
+  <section class="cp-panel" id="cpPanel" style="display:none">
+    <div class="cp-header">
+      <h2>Cross-Platform-Preisvergleich</h2>
+      <span class="cp-hint">Preis-Spread zwischen Quellen, je Modell (mind. 2 Quellen nötig)</span>
+    </div>
+    <div id="cpEmptyState" class="empty-state" style="display:none">
+      Noch kein Modell mit Preisdaten aus mindestens 2 verschiedenen Quellen -- Vergleich erscheint, sobald genug Daten vorliegen.
+    </div>
+    <div id="cpContent"></div>
+  </section>
+
   <section class="log-panel">
     <div class="log-header">
       <h2>Scan-Log</h2>
@@ -815,6 +894,7 @@
             refreshListings();
             refreshPriceChartModels();
             refreshTimeToSell();
+            refreshCrossPlatform();
           }
           wasRunning = running;
         })
@@ -1443,6 +1523,72 @@
     }
 
     initTimeToSell();
+
+    // --- Baustein 4, Schritt 2: Cross-Platform-Preisvergleich je Modell ---
+    // Nutzt ausschliesslich die bestehende Route /api/cross-platform
+    // (Schritt-2-Backend, liest wiederum die in Schritt 1 gebaute
+    // cross_platform_stats.compute_all_cross_platform_stats()) -- kein
+    // neuer Berechnungscode im Frontend. Reine Anzeige, gleiches Panel-/
+    // Kachel-Grundmuster wie beim Time-to-Sell-Panel (tts-*), aber mit
+    // eigenem cp-*-Namensraum, da hier zusaetzlich eine Quellen-Aufschluesse-
+    // lung pro Modell noetig ist (kein 1:1-Wiederverwendungsfall der
+    // bestehenden .chart-stat-Kacheln).
+    function renderCrossPlatform(statsByModel) {
+      const models = Object.keys(statsByModel).sort();
+      const panel = document.getElementById('cpPanel');
+      const empty = document.getElementById('cpEmptyState');
+      const content = document.getElementById('cpContent');
+
+      panel.style.display = '';
+      if (models.length === 0) {
+        empty.style.display = '';
+        content.style.display = 'none';
+        return;
+      }
+      empty.style.display = 'none';
+      content.style.display = '';
+
+      content.innerHTML = models.map(model => {
+        const s = statsByModel[model];
+        const sourceNames = Object.keys(s.by_source).sort();
+        const sourcesHtml = sourceNames.map(src => {
+          const src_stats = s.by_source[src];
+          let cls = '';
+          if (src === s.cheapest_source) cls = ' cheapest';
+          else if (src === s.priciest_source) cls = ' priciest';
+          return `
+            <div class="cp-source${cls}">
+              <div class="cp-source-name">${src}</div>
+              <div class="cp-source-value">Ø ${src_stats.mean_price.toFixed(0)} € · ${src_stats.count}x</div>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <div class="cp-model">
+            <div class="cp-model-name">${model}</div>
+            <div class="cp-sources">${sourcesHtml}</div>
+            <div class="cp-spread">
+              Spread: <strong>${s.spread_pct.toFixed(1)}%</strong>
+              (${s.cheapest_source} günstigste, ${s.priciest_source} teuerste Quelle)
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function refreshCrossPlatform() {
+      fetch('/api/cross-platform')
+        .then(r => r.json())
+        .then(statsByModel => renderCrossPlatform(statsByModel))
+        .catch(() => {});
+    }
+
+    function initCrossPlatform() {
+      refreshCrossPlatform();
+    }
+
+    initCrossPlatform();
   </script>
 </body>
 </html>

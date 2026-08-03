@@ -23,6 +23,7 @@ from presence_tracking import (
 )
 from time_to_sell import make_time_to_sell_point, append_time_to_sell_point, read_time_to_sell_points
 from time_to_sell_stats import compute_all_time_to_sell_stats
+from cross_platform_stats import compute_all_cross_platform_stats
 from price_stats import compute_all_price_stats, compute_price_stats, PriceStats
 from top_deal import evaluate_top_deal
 
@@ -885,6 +886,29 @@ def api_time_to_sell():
     return jsonify({
         category: asdict(stats)
         for category, stats in stats_by_category.items()
+    })
+
+
+@app.route("/api/cross-platform")
+def api_cross_platform():
+    """Cross-Platform-Preisvergleich je price_history_model fürs Dashboard
+    (Baustein 4, Schritt 2) -- nutzt ausschließlich die bestehenden
+    Funktionen aus Schritt 1 (price_history.read_price_points(),
+    cross_platform_stats.compute_all_cross_platform_stats()), kein neuer
+    Berechnungscode. Analog zu /api/time-to-sell: leeres Dict, solange
+    für kein Modell Datenpunkte aus mindestens 2 verschiedenen Quellen
+    vorliegen (kein Fehlerfall, siehe compute_cross_platform_stats()-
+    Docstring).
+
+    by_source ist ein verschachteltes Dict je Quelle (SourceStats) --
+    asdict() serialisiert dataclasses rekursiv, kein manuelles Flatten
+    nötig.
+    """
+    points = read_price_points(PRICE_HISTORY_FILE)
+    stats_by_model = compute_all_cross_platform_stats(points)
+    return jsonify({
+        model: asdict(stats)
+        for model, stats in stats_by_model.items()
     })
 
 
