@@ -1,0 +1,1945 @@
+# ============================================================
+# iPhone (Nischen-/Kategorien-Erweiterung, YAML-basiert)
+# ============================================================
+# Rein additiv -- kein Python-Code geaendert (Discovery ueber
+# categories/registry.py, siehe dortiger Docstring: jede *.yaml in
+# rules/ ausser _global.yaml wird automatisch als Kategorie erkannt).
+#
+# ARCHITEKTUR-ENTSCHEIDUNG: Titel-Keyword-Matching (wie rules/gpu.yaml,
+# rules/retro_konsolen.yaml), KEIN "requirements:"-Block (wie
+# office_pc.yaml) -- fuer iPhones existiert kein Hardware-Detector.
+#
+# TEILPHRASEN-KONFLIKTE (allgemeines Matching-Prinzip, nicht nur
+# iPhone-spezifisch -- gilt analog fuer Air/Air M2, 13/13 mini,
+# 15/15 Plus etc.): werden ueber gezielte "exclude"-Begriffe je Regel
+# innerhalb der Modellhierarchie verhindert. Konkret hier: "iPhone 13
+# Pro" ist Teilphrase von "iPhone 13 Pro Max" -> die "Pro"-Regel
+# schliesst "pro max" aus; die Basis-Regel ("iPhone 13") schliesst
+# "mini"/"plus"/"pro" aus, da alle Varianten "iPhone 13" als Teilstring
+# enthalten.
+#
+# PREIS-TIER-EINHEIT: jede Regel bildet genau eine marktuebliche
+# Verkaufsvariante ab (Generation x Variante x Speicherstufe), abgebildet
+# als eigener price_history_model-Wert (z.B. "iphone_15_pro_max_512gb").
+# Nutzt die bestehende price_stats.py-Gruppierung nach "model" ohne
+# Code-Aenderung -- jede Variante erhaelt dadurch automatisch eigene
+# Marktpreis-Statistik/Trend (siehe price_history.py/price_stats.py).
+#
+# ICLOUD-/AKTIVIERUNGSSPERRE + VERTRAGSBINDUNG: kategorie-eigener
+# Ausschluss (exclude_category), da exclude_global (_global.yaml)
+# dieses Kriterium bisher nicht abdeckt und es fachlich nur fuer
+# Apple-Geraete (Wiederverkaufsrisiko) relevant ist.
+#
+# min_vram_gb: 0 -- deaktiviert den globalen VRAM-Check (_vram_gb()
+# erkennt jede "<Zahl>GB"-Angabe im Titel, hier: die Speichergroesse
+# des iPhones selbst -- ohne Override wuerde das faelschlich als
+# "VRAM zu niedrig" interpretiert und das Angebot verworfen).
+#
+# SCORING: price-dominant (analog Retro-Konsolen/Vintage-Elektronik).
+# "ausstattung" bewusst 0: _ausstattung_score() ist fest an die
+# PC-spezifischen Detector-Signale has_ssd/has_dedicated_gpu gekoppelt
+# und liefert fuer iPhones nur den neutralen Platzhalter-Wert, kein
+# echtes Differenzierungssignal. Die gewuenschte Speicher-Differenzierung
+# (z.B. 512GB vs. 128GB) erfolgt stattdessen granular ueber die
+# Preis-Tier-Struktur oben (siehe price_history_model) -- keine
+# Aenderung an _ausstattung_score() (siehe Freigabe-Entscheidung).
+#
+# PREISGRENZEN SIND PLATZHALTER (analog allen bisherigen Nischen-
+# Kategorien): mangels vorhandener price_history-Datenpunkte grob
+# geschaetzt. Muessen nach ausreichend gesammelten Scan-Daten anhand
+# echter Marktpreise nachkalibriert werden.
+# ============================================================
+
+category: "iphone"
+label: "iPhone"
+
+min_vram_gb: 0
+
+notify_max_price: 150
+
+search_terms:
+  - "iPhone 11"
+  - "iPhone 12"
+  - "iPhone 13"
+  - "iPhone 14"
+  - "iPhone 15"
+  - "iPhone 16"
+
+# Kategorie-eigene Ausschluesse (zusaetzlich zu exclude_global aus
+# _global.yaml). Wiederverkaufsrisiko: gesperrte/vertragsgebundene
+# Geraete sind fuer den Zweck dieses Bots wertlos bzw. riskant.
+exclude_category:
+  - "icloud"
+  - "aktivierungssperre"
+  - "activation lock"
+  - "mit vertrag"
+  - "vertragsgebunden"
+  - "simlock"
+  - "sim-lock"
+  - "netlock"
+  - "blacklist"
+  - "gesperrt"
+
+scoring_weights:
+  price: 0.85
+  ausstattung: 0
+  hardware_qualitaet: 0.15
+  hersteller: 0
+  zustand: 0
+  lieferumfang: 0
+
+rules:
+
+  # ------------------------------------------------------------
+  # iPhone 11
+  # ------------------------------------------------------------
+  - label: iPhone 11 (≤256GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 11
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_11_128gb
+    max_price: 70
+    deal_rating: Top-Deal
+    exclude:
+    - pro
+  - label: iPhone 11 (≤256GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 11
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_11_128gb
+    max_price: 100
+    deal_rating: Guter Preis
+    exclude:
+    - pro
+  - label: iPhone 11 (≤256GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 11
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_11_128gb
+    max_price: 130
+    deal_rating: Okay
+    exclude:
+    - pro
+  - label: iPhone 11 (≥512GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 11
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_11_512gb
+    max_price: 125
+    deal_rating: Top-Deal
+    exclude:
+    - pro
+  - label: iPhone 11 (≥512GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 11
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_11_512gb
+    max_price: 180
+    deal_rating: Guter Preis
+    exclude:
+    - pro
+  - label: iPhone 11 (≥512GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 11
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_11_512gb
+    max_price: 230
+    deal_rating: Okay
+    exclude:
+    - pro
+  - label: iPhone 11 Pro (≤256GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 11 pro
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_11_pro_128gb
+    max_price: 90
+    deal_rating: Top-Deal
+    exclude:
+    - pro max
+  - label: iPhone 11 Pro (≤256GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 11 pro
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_11_pro_128gb
+    max_price: 125
+    deal_rating: Guter Preis
+    exclude:
+    - pro max
+  - label: iPhone 11 Pro (≤256GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 11 pro
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_11_pro_128gb
+    max_price: 160
+    deal_rating: Okay
+    exclude:
+    - pro max
+  - label: iPhone 11 Pro (≥512GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 11 pro
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_11_pro_512gb
+    max_price: 145
+    deal_rating: Top-Deal
+    exclude:
+    - pro max
+  - label: iPhone 11 Pro (≥512GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 11 pro
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_11_pro_512gb
+    max_price: 205
+    deal_rating: Guter Preis
+    exclude:
+    - pro max
+  - label: iPhone 11 Pro (≥512GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 11 pro
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_11_pro_512gb
+    max_price: 260
+    deal_rating: Okay
+    exclude:
+    - pro max
+  - label: iPhone 11 Pro Max (≤256GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 11 pro max
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_11_pro_max_128gb
+    max_price: 100
+    deal_rating: Top-Deal
+  - label: iPhone 11 Pro Max (≤256GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 11 pro max
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_11_pro_max_128gb
+    max_price: 140
+    deal_rating: Guter Preis
+  - label: iPhone 11 Pro Max (≤256GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 11 pro max
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_11_pro_max_128gb
+    max_price: 180
+    deal_rating: Okay
+  - label: iPhone 11 Pro Max (≥512GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 11 pro max
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_11_pro_max_512gb
+    max_price: 155
+    deal_rating: Top-Deal
+  - label: iPhone 11 Pro Max (≥512GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 11 pro max
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_11_pro_max_512gb
+    max_price: 220
+    deal_rating: Guter Preis
+  - label: iPhone 11 Pro Max (≥512GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 11 pro max
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_11_pro_max_512gb
+    max_price: 280
+    deal_rating: Okay
+
+  # ------------------------------------------------------------
+  # iPhone 12
+  # ------------------------------------------------------------
+  - label: iPhone 12 (≤256GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 12
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_12_128gb
+    max_price: 90
+    deal_rating: Top-Deal
+    exclude:
+    - mini
+    - pro
+  - label: iPhone 12 (≤256GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 12
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_12_128gb
+    max_price: 125
+    deal_rating: Guter Preis
+    exclude:
+    - mini
+    - pro
+  - label: iPhone 12 (≤256GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 12
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_12_128gb
+    max_price: 160
+    deal_rating: Okay
+    exclude:
+    - mini
+    - pro
+  - label: iPhone 12 (≥512GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 12
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_12_512gb
+    max_price: 145
+    deal_rating: Top-Deal
+    exclude:
+    - mini
+    - pro
+  - label: iPhone 12 (≥512GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 12
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_12_512gb
+    max_price: 205
+    deal_rating: Guter Preis
+    exclude:
+    - mini
+    - pro
+  - label: iPhone 12 (≥512GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 12
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_12_512gb
+    max_price: 260
+    deal_rating: Okay
+    exclude:
+    - mini
+    - pro
+  - label: iPhone 12 mini (≤256GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 12 mini
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_12_mini_128gb
+    max_price: 75
+    deal_rating: Top-Deal
+  - label: iPhone 12 mini (≤256GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 12 mini
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_12_mini_128gb
+    max_price: 110
+    deal_rating: Guter Preis
+  - label: iPhone 12 mini (≤256GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 12 mini
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_12_mini_128gb
+    max_price: 140
+    deal_rating: Okay
+  - label: iPhone 12 mini (≥512GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 12 mini
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_12_mini_512gb
+    max_price: 130
+    deal_rating: Top-Deal
+  - label: iPhone 12 mini (≥512GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 12 mini
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_12_mini_512gb
+    max_price: 185
+    deal_rating: Guter Preis
+  - label: iPhone 12 mini (≥512GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 12 mini
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_12_mini_512gb
+    max_price: 240
+    deal_rating: Okay
+  - label: iPhone 12 Pro (≤256GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 12 pro
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_12_pro_128gb
+    max_price: 105
+    deal_rating: Top-Deal
+    exclude:
+    - pro max
+  - label: iPhone 12 Pro (≤256GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 12 pro
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_12_pro_128gb
+    max_price: 150
+    deal_rating: Guter Preis
+    exclude:
+    - pro max
+  - label: iPhone 12 Pro (≤256GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 12 pro
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_12_pro_128gb
+    max_price: 190
+    deal_rating: Okay
+    exclude:
+    - pro max
+  - label: iPhone 12 Pro (≥512GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 12 pro
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_12_pro_512gb
+    max_price: 160
+    deal_rating: Top-Deal
+    exclude:
+    - pro max
+  - label: iPhone 12 Pro (≥512GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 12 pro
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_12_pro_512gb
+    max_price: 225
+    deal_rating: Guter Preis
+    exclude:
+    - pro max
+  - label: iPhone 12 Pro (≥512GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 12 pro
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_12_pro_512gb
+    max_price: 290
+    deal_rating: Okay
+    exclude:
+    - pro max
+  - label: iPhone 12 Pro Max (≤256GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 12 pro max
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_12_pro_max_128gb
+    max_price: 120
+    deal_rating: Top-Deal
+  - label: iPhone 12 Pro Max (≤256GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 12 pro max
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_12_pro_max_128gb
+    max_price: 170
+    deal_rating: Guter Preis
+  - label: iPhone 12 Pro Max (≤256GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 12 pro max
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_12_pro_max_128gb
+    max_price: 220
+    deal_rating: Okay
+  - label: iPhone 12 Pro Max (≥512GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 12 pro max
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_12_pro_max_512gb
+    max_price: 175
+    deal_rating: Top-Deal
+  - label: iPhone 12 Pro Max (≥512GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 12 pro max
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_12_pro_max_512gb
+    max_price: 250
+    deal_rating: Guter Preis
+  - label: iPhone 12 Pro Max (≥512GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 12 pro max
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_12_pro_max_512gb
+    max_price: 320
+    deal_rating: Okay
+
+  # ------------------------------------------------------------
+  # iPhone 13
+  # ------------------------------------------------------------
+  - label: iPhone 13 (≤256GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 13
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_13_128gb
+    max_price: 120
+    deal_rating: Top-Deal
+    exclude:
+    - mini
+    - pro
+  - label: iPhone 13 (≤256GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 13
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_13_128gb
+    max_price: 170
+    deal_rating: Guter Preis
+    exclude:
+    - mini
+    - pro
+  - label: iPhone 13 (≤256GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 13
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_13_128gb
+    max_price: 220
+    deal_rating: Okay
+    exclude:
+    - mini
+    - pro
+  - label: iPhone 13 (≥512GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 13
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_13_512gb
+    max_price: 175
+    deal_rating: Top-Deal
+    exclude:
+    - mini
+    - pro
+  - label: iPhone 13 (≥512GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 13
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_13_512gb
+    max_price: 250
+    deal_rating: Guter Preis
+    exclude:
+    - mini
+    - pro
+  - label: iPhone 13 (≥512GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 13
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_13_512gb
+    max_price: 320
+    deal_rating: Okay
+    exclude:
+    - mini
+    - pro
+  - label: iPhone 13 mini (≤256GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 13 mini
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_13_mini_128gb
+    max_price: 105
+    deal_rating: Top-Deal
+  - label: iPhone 13 mini (≤256GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 13 mini
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_13_mini_128gb
+    max_price: 150
+    deal_rating: Guter Preis
+  - label: iPhone 13 mini (≤256GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 13 mini
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_13_mini_128gb
+    max_price: 190
+    deal_rating: Okay
+  - label: iPhone 13 mini (≥512GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 13 mini
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_13_mini_512gb
+    max_price: 160
+    deal_rating: Top-Deal
+  - label: iPhone 13 mini (≥512GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 13 mini
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_13_mini_512gb
+    max_price: 225
+    deal_rating: Guter Preis
+  - label: iPhone 13 mini (≥512GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 13 mini
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_13_mini_512gb
+    max_price: 290
+    deal_rating: Okay
+  - label: iPhone 13 Pro (≤256GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 13 pro
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_13_pro_128gb
+    max_price: 155
+    deal_rating: Top-Deal
+    exclude:
+    - pro max
+  - label: iPhone 13 Pro (≤256GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 13 pro
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_13_pro_128gb
+    max_price: 220
+    deal_rating: Guter Preis
+    exclude:
+    - pro max
+  - label: iPhone 13 Pro (≤256GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 13 pro
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_13_pro_128gb
+    max_price: 280
+    deal_rating: Okay
+    exclude:
+    - pro max
+  - label: iPhone 13 Pro (≥512GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 13 pro
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_13_pro_512gb
+    max_price: 210
+    deal_rating: Top-Deal
+    exclude:
+    - pro max
+  - label: iPhone 13 Pro (≥512GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 13 pro
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_13_pro_512gb
+    max_price: 295
+    deal_rating: Guter Preis
+    exclude:
+    - pro max
+  - label: iPhone 13 Pro (≥512GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 13 pro
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_13_pro_512gb
+    max_price: 380
+    deal_rating: Okay
+    exclude:
+    - pro max
+  - label: iPhone 13 Pro Max (≤256GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 13 pro max
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_13_pro_max_128gb
+    max_price: 175
+    deal_rating: Top-Deal
+  - label: iPhone 13 Pro Max (≤256GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 13 pro max
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_13_pro_max_128gb
+    max_price: 250
+    deal_rating: Guter Preis
+  - label: iPhone 13 Pro Max (≤256GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 13 pro max
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_13_pro_max_128gb
+    max_price: 320
+    deal_rating: Okay
+  - label: iPhone 13 Pro Max (≥512GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 13 pro max
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_13_pro_max_512gb
+    max_price: 230
+    deal_rating: Top-Deal
+  - label: iPhone 13 Pro Max (≥512GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 13 pro max
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_13_pro_max_512gb
+    max_price: 330
+    deal_rating: Guter Preis
+  - label: iPhone 13 Pro Max (≥512GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 13 pro max
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_13_pro_max_512gb
+    max_price: 420
+    deal_rating: Okay
+
+  # ------------------------------------------------------------
+  # iPhone 14
+  # ------------------------------------------------------------
+  - label: iPhone 14 (≤256GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 14
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_14_128gb
+    max_price: 155
+    deal_rating: Top-Deal
+    exclude:
+    - plus
+    - pro
+  - label: iPhone 14 (≤256GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 14
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_14_128gb
+    max_price: 220
+    deal_rating: Guter Preis
+    exclude:
+    - plus
+    - pro
+  - label: iPhone 14 (≤256GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 14
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_14_128gb
+    max_price: 280
+    deal_rating: Okay
+    exclude:
+    - plus
+    - pro
+  - label: iPhone 14 (≥512GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 14
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_14_512gb
+    max_price: 210
+    deal_rating: Top-Deal
+    exclude:
+    - plus
+    - pro
+  - label: iPhone 14 (≥512GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 14
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_14_512gb
+    max_price: 295
+    deal_rating: Guter Preis
+    exclude:
+    - plus
+    - pro
+  - label: iPhone 14 (≥512GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 14
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_14_512gb
+    max_price: 380
+    deal_rating: Okay
+    exclude:
+    - plus
+    - pro
+  - label: iPhone 14 Plus (≤256GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 14 plus
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_14_plus_128gb
+    max_price: 165
+    deal_rating: Top-Deal
+  - label: iPhone 14 Plus (≤256GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 14 plus
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_14_plus_128gb
+    max_price: 235
+    deal_rating: Guter Preis
+  - label: iPhone 14 Plus (≤256GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 14 plus
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_14_plus_128gb
+    max_price: 300
+    deal_rating: Okay
+  - label: iPhone 14 Plus (≥512GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 14 plus
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_14_plus_512gb
+    max_price: 220
+    deal_rating: Top-Deal
+  - label: iPhone 14 Plus (≥512GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 14 plus
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_14_plus_512gb
+    max_price: 310
+    deal_rating: Guter Preis
+  - label: iPhone 14 Plus (≥512GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 14 plus
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_14_plus_512gb
+    max_price: 400
+    deal_rating: Okay
+  - label: iPhone 14 Pro (≤256GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 14 pro
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_14_pro_128gb
+    max_price: 210
+    deal_rating: Top-Deal
+    exclude:
+    - pro max
+  - label: iPhone 14 Pro (≤256GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 14 pro
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_14_pro_128gb
+    max_price: 295
+    deal_rating: Guter Preis
+    exclude:
+    - pro max
+  - label: iPhone 14 Pro (≤256GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 14 pro
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_14_pro_128gb
+    max_price: 380
+    deal_rating: Okay
+    exclude:
+    - pro max
+  - label: iPhone 14 Pro (≥512GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 14 pro
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_14_pro_512gb
+    max_price: 265
+    deal_rating: Top-Deal
+    exclude:
+    - pro max
+  - label: iPhone 14 Pro (≥512GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 14 pro
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_14_pro_512gb
+    max_price: 375
+    deal_rating: Guter Preis
+    exclude:
+    - pro max
+  - label: iPhone 14 Pro (≥512GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 14 pro
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_14_pro_512gb
+    max_price: 480
+    deal_rating: Okay
+    exclude:
+    - pro max
+  - label: iPhone 14 Pro Max (≤256GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 14 pro max
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_14_pro_max_128gb
+    max_price: 230
+    deal_rating: Top-Deal
+  - label: iPhone 14 Pro Max (≤256GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 14 pro max
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_14_pro_max_128gb
+    max_price: 330
+    deal_rating: Guter Preis
+  - label: iPhone 14 Pro Max (≤256GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 14 pro max
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_14_pro_max_128gb
+    max_price: 420
+    deal_rating: Okay
+  - label: iPhone 14 Pro Max (≥512GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 14 pro max
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_14_pro_max_512gb
+    max_price: 285
+    deal_rating: Top-Deal
+  - label: iPhone 14 Pro Max (≥512GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 14 pro max
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_14_pro_max_512gb
+    max_price: 405
+    deal_rating: Guter Preis
+  - label: iPhone 14 Pro Max (≥512GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 14 pro max
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_14_pro_max_512gb
+    max_price: 520
+    deal_rating: Okay
+
+  # ------------------------------------------------------------
+  # iPhone 15
+  # ------------------------------------------------------------
+  - label: iPhone 15 (≤256GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 15
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_15_128gb
+    max_price: 210
+    deal_rating: Top-Deal
+    exclude:
+    - plus
+    - pro
+  - label: iPhone 15 (≤256GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 15
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_15_128gb
+    max_price: 295
+    deal_rating: Guter Preis
+    exclude:
+    - plus
+    - pro
+  - label: iPhone 15 (≤256GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 15
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_15_128gb
+    max_price: 380
+    deal_rating: Okay
+    exclude:
+    - plus
+    - pro
+  - label: iPhone 15 (≥512GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 15
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_15_512gb
+    max_price: 265
+    deal_rating: Top-Deal
+    exclude:
+    - plus
+    - pro
+  - label: iPhone 15 (≥512GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 15
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_15_512gb
+    max_price: 375
+    deal_rating: Guter Preis
+    exclude:
+    - plus
+    - pro
+  - label: iPhone 15 (≥512GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 15
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_15_512gb
+    max_price: 480
+    deal_rating: Okay
+    exclude:
+    - plus
+    - pro
+  - label: iPhone 15 Plus (≤256GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 15 plus
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_15_plus_128gb
+    max_price: 220
+    deal_rating: Top-Deal
+  - label: iPhone 15 Plus (≤256GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 15 plus
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_15_plus_128gb
+    max_price: 310
+    deal_rating: Guter Preis
+  - label: iPhone 15 Plus (≤256GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 15 plus
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_15_plus_128gb
+    max_price: 400
+    deal_rating: Okay
+  - label: iPhone 15 Plus (≥512GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 15 plus
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_15_plus_512gb
+    max_price: 275
+    deal_rating: Top-Deal
+  - label: iPhone 15 Plus (≥512GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 15 plus
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_15_plus_512gb
+    max_price: 390
+    deal_rating: Guter Preis
+  - label: iPhone 15 Plus (≥512GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 15 plus
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_15_plus_512gb
+    max_price: 500
+    deal_rating: Okay
+  - label: iPhone 15 Pro (≤256GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 15 pro
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_15_pro_128gb
+    max_price: 265
+    deal_rating: Top-Deal
+    exclude:
+    - pro max
+  - label: iPhone 15 Pro (≤256GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 15 pro
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_15_pro_128gb
+    max_price: 375
+    deal_rating: Guter Preis
+    exclude:
+    - pro max
+  - label: iPhone 15 Pro (≤256GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 15 pro
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_15_pro_128gb
+    max_price: 480
+    deal_rating: Okay
+    exclude:
+    - pro max
+  - label: iPhone 15 Pro (≥512GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 15 pro
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_15_pro_512gb
+    max_price: 320
+    deal_rating: Top-Deal
+    exclude:
+    - pro max
+  - label: iPhone 15 Pro (≥512GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 15 pro
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_15_pro_512gb
+    max_price: 450
+    deal_rating: Guter Preis
+    exclude:
+    - pro max
+  - label: iPhone 15 Pro (≥512GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 15 pro
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_15_pro_512gb
+    max_price: 580
+    deal_rating: Okay
+    exclude:
+    - pro max
+  - label: iPhone 15 Pro Max (≤256GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 15 pro max
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_15_pro_max_128gb
+    max_price: 300
+    deal_rating: Top-Deal
+  - label: iPhone 15 Pro Max (≤256GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 15 pro max
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_15_pro_max_128gb
+    max_price: 430
+    deal_rating: Guter Preis
+  - label: iPhone 15 Pro Max (≤256GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 15 pro max
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_15_pro_max_128gb
+    max_price: 550
+    deal_rating: Okay
+  - label: iPhone 15 Pro Max (≥512GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 15 pro max
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_15_pro_max_512gb
+    max_price: 360
+    deal_rating: Top-Deal
+  - label: iPhone 15 Pro Max (≥512GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 15 pro max
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_15_pro_max_512gb
+    max_price: 505
+    deal_rating: Guter Preis
+  - label: iPhone 15 Pro Max (≥512GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 15 pro max
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_15_pro_max_512gb
+    max_price: 650
+    deal_rating: Okay
+
+  # ------------------------------------------------------------
+  # iPhone 16
+  # ------------------------------------------------------------
+  - label: iPhone 16 (≤256GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 16
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_16_128gb
+    max_price: 275
+    deal_rating: Top-Deal
+    exclude:
+    - plus
+    - pro
+  - label: iPhone 16 (≤256GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 16
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_16_128gb
+    max_price: 390
+    deal_rating: Guter Preis
+    exclude:
+    - plus
+    - pro
+  - label: iPhone 16 (≤256GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 16
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_16_128gb
+    max_price: 500
+    deal_rating: Okay
+    exclude:
+    - plus
+    - pro
+  - label: iPhone 16 (≥512GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 16
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_16_512gb
+    max_price: 330
+    deal_rating: Top-Deal
+    exclude:
+    - plus
+    - pro
+  - label: iPhone 16 (≥512GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 16
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_16_512gb
+    max_price: 470
+    deal_rating: Guter Preis
+    exclude:
+    - plus
+    - pro
+  - label: iPhone 16 (≥512GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 16
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_16_512gb
+    max_price: 600
+    deal_rating: Okay
+    exclude:
+    - plus
+    - pro
+  - label: iPhone 16 Plus (≤256GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 16 plus
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_16_plus_128gb
+    max_price: 290
+    deal_rating: Top-Deal
+  - label: iPhone 16 Plus (≤256GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 16 plus
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_16_plus_128gb
+    max_price: 415
+    deal_rating: Guter Preis
+  - label: iPhone 16 Plus (≤256GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 16 plus
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_16_plus_128gb
+    max_price: 530
+    deal_rating: Okay
+  - label: iPhone 16 Plus (≥512GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 16 plus
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_16_plus_512gb
+    max_price: 345
+    deal_rating: Top-Deal
+  - label: iPhone 16 Plus (≥512GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 16 plus
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_16_plus_512gb
+    max_price: 490
+    deal_rating: Guter Preis
+  - label: iPhone 16 Plus (≥512GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 16 plus
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_16_plus_512gb
+    max_price: 630
+    deal_rating: Okay
+  - label: iPhone 16 Pro (≤256GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 16 pro
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_16_pro_128gb
+    max_price: 360
+    deal_rating: Top-Deal
+    exclude:
+    - pro max
+  - label: iPhone 16 Pro (≤256GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 16 pro
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_16_pro_128gb
+    max_price: 505
+    deal_rating: Guter Preis
+    exclude:
+    - pro max
+  - label: iPhone 16 Pro (≤256GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 16 pro
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_16_pro_128gb
+    max_price: 650
+    deal_rating: Okay
+    exclude:
+    - pro max
+  - label: iPhone 16 Pro (≥512GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 16 pro
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_16_pro_512gb
+    max_price: 415
+    deal_rating: Top-Deal
+    exclude:
+    - pro max
+  - label: iPhone 16 Pro (≥512GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 16 pro
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_16_pro_512gb
+    max_price: 585
+    deal_rating: Guter Preis
+    exclude:
+    - pro max
+  - label: iPhone 16 Pro (≥512GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 16 pro
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_16_pro_512gb
+    max_price: 750
+    deal_rating: Okay
+    exclude:
+    - pro max
+  - label: iPhone 16 Pro Max (≤256GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 16 pro max
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_16_pro_max_128gb
+    max_price: 415
+    deal_rating: Top-Deal
+  - label: iPhone 16 Pro Max (≤256GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 16 pro max
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_16_pro_max_128gb
+    max_price: 585
+    deal_rating: Guter Preis
+  - label: iPhone 16 Pro Max (≤256GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 16 pro max
+    - - 64gb
+      - 64 gb
+      - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+    price_history_model: iphone_16_pro_max_128gb
+    max_price: 750
+    deal_rating: Okay
+  - label: iPhone 16 Pro Max (≥512GB) ★ Top-Deal
+    require_all_of:
+    - - iphone 16 pro max
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_16_pro_max_512gb
+    max_price: 470
+    deal_rating: Top-Deal
+  - label: iPhone 16 Pro Max (≥512GB) 👍 Guter Preis
+    require_all_of:
+    - - iphone 16 pro max
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_16_pro_max_512gb
+    max_price: 665
+    deal_rating: Guter Preis
+  - label: iPhone 16 Pro Max (≥512GB) ⚠️ Okay
+    require_all_of:
+    - - iphone 16 pro max
+    - - 512gb
+      - 512 gb
+      - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: iphone_16_pro_max_512gb
+    max_price: 850
+    deal_rating: Okay

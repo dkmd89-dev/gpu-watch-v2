@@ -1,0 +1,869 @@
+# ============================================================
+# MacBook (Nischen-/Kategorien-Erweiterung, YAML-basiert)
+# ============================================================
+# Rein additiv -- kein Python-Code geaendert (Discovery ueber
+# categories/registry.py). Gleiche Architektur wie iphone.yaml.
+#
+# CHIP-GENERATION STATT PRO/MAX-DIFFERENZIERUNG: der Auftrag verlangt
+# "Intel vs. M1-M4" als Preis-Tier-Dimension -- NICHT die zusaetzliche
+# Unterscheidung M1/M1 Pro/M1 Max innerhalb einer Chip-Generation. Ein
+# "MacBook Pro M1 Max"-Titel matcht daher bewusst unter der "M1"-Stufe.
+# Falls die feinere Pro/Max-Differenzierung spaeter gewuenscht ist, ist
+# das rein additiv (weitere require_all_of-Gruppen je Chip) moeglich.
+#
+# TEILPHRASEN-KONFLIKTE: "MacBook Air" und "MacBook Pro" sind disjunkte
+# Phrasen (keine Teilphrase der jeweils anderen) -- kein zusaetzlicher
+# exclude noetig, anders als bei iPhone Pro/Pro-Max.
+#
+# INTEL-ERKENNUNG: kein "Ix"-Chipname wie bei Apple Silicon -- stattdessen
+# ueber "intel"/"i5"/"i7"/"i9" im Titel erkannt (uebliche Verkaeufer-
+# Formulierung fuer die Vor-2020/2021-Generation). Titel ohne einen
+# dieser Begriffe UND ohne "m1"-"m4" fallen durch keine Regel (bewusste
+# Einschraenkung, kein Crash) -- kann bei Bedarf ergaenzt werden.
+#
+# PREIS-TIER-EINHEIT: wie bei iphone.yaml -- jede Regel = eigener
+# price_history_model-Wert (z.B. "macbook_pro_m3_1tb"), nutzt die
+# bestehende price_stats.py-Gruppierung ohne Code-Aenderung.
+#
+# ICLOUD-/AKTIVIERUNGSSPERRE ("Find My Mac"): gleiche Problematik wie
+# bei iPhone (Wiederverkaufsrisiko) -- kategorie-eigener Ausschluss.
+#
+# min_vram_gb: 0 -- Speichergroessen-Zahlen ("512GB") sollen nicht
+# faelschlich als zu niedriger VRAM-Wert interpretiert werden.
+#
+# SCORING: price-dominant, "ausstattung: 0" -- identische Begruendung
+# wie bei iphone.yaml (_ausstattung_score() ist an PC-Detector-Signale
+# gekoppelt, keine Aenderung daran, siehe Freigabe-Entscheidung).
+#
+# PREISGRENZEN SIND PLATZHALTER, muessen nach Datensammlung kalibriert
+# werden (analog allen bisherigen Nischen-Kategorien).
+# ============================================================
+
+category: "macbook"
+label: "MacBook"
+
+min_vram_gb: 0
+
+notify_max_price: 150
+
+search_terms:
+  - "MacBook Air"
+  - "MacBook Pro"
+
+# Kategorie-eigene Ausschluesse (zusaetzlich zu exclude_global aus
+# _global.yaml). Identische Begruendung wie bei iphone.yaml.
+exclude_category:
+  - "icloud"
+  - "aktivierungssperre"
+  - "activation lock"
+  - "find my mac"
+  - "mit vertrag"
+  - "vertragsgebunden"
+  - "blacklist"
+  - "gesperrt"
+
+scoring_weights:
+  price: 0.85
+  ausstattung: 0
+  hardware_qualitaet: 0.15
+  hersteller: 0
+  zustand: 0
+  lieferumfang: 0
+
+rules:
+
+  # ------------------------------------------------------------
+  # MacBook Air Intel
+  # ------------------------------------------------------------
+  - label: MacBook Air Intel (≤512GB) ★ Top-Deal
+    require_all_of:
+    - - macbook air
+    - - intel
+      - i5
+      - i7
+      - i9
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_air_intel_512gb
+    max_price: 140
+    deal_rating: Top-Deal
+  - label: MacBook Air Intel (≤512GB) 👍 Guter Preis
+    require_all_of:
+    - - macbook air
+    - - intel
+      - i5
+      - i7
+      - i9
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_air_intel_512gb
+    max_price: 195
+    deal_rating: Guter Preis
+  - label: MacBook Air Intel (≤512GB) ⚠️ Okay
+    require_all_of:
+    - - macbook air
+    - - intel
+      - i5
+      - i7
+      - i9
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_air_intel_512gb
+    max_price: 250
+    deal_rating: Okay
+  - label: MacBook Air Intel (≥1TB) ★ Top-Deal
+    require_all_of:
+    - - macbook air
+    - - intel
+      - i5
+      - i7
+      - i9
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_air_intel_1tb
+    max_price: 220
+    deal_rating: Top-Deal
+  - label: MacBook Air Intel (≥1TB) 👍 Guter Preis
+    require_all_of:
+    - - macbook air
+    - - intel
+      - i5
+      - i7
+      - i9
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_air_intel_1tb
+    max_price: 310
+    deal_rating: Guter Preis
+  - label: MacBook Air Intel (≥1TB) ⚠️ Okay
+    require_all_of:
+    - - macbook air
+    - - intel
+      - i5
+      - i7
+      - i9
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_air_intel_1tb
+    max_price: 400
+    deal_rating: Okay
+
+  # ------------------------------------------------------------
+  # MacBook Air M1
+  # ------------------------------------------------------------
+  - label: MacBook Air M1 (≤512GB) ★ Top-Deal
+    require_all_of:
+    - - macbook air
+    - - m1
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_air_m1_512gb
+    max_price: 250
+    deal_rating: Top-Deal
+  - label: MacBook Air M1 (≤512GB) 👍 Guter Preis
+    require_all_of:
+    - - macbook air
+    - - m1
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_air_m1_512gb
+    max_price: 350
+    deal_rating: Guter Preis
+  - label: MacBook Air M1 (≤512GB) ⚠️ Okay
+    require_all_of:
+    - - macbook air
+    - - m1
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_air_m1_512gb
+    max_price: 450
+    deal_rating: Okay
+  - label: MacBook Air M1 (≥1TB) ★ Top-Deal
+    require_all_of:
+    - - macbook air
+    - - m1
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_air_m1_1tb
+    max_price: 330
+    deal_rating: Top-Deal
+  - label: MacBook Air M1 (≥1TB) 👍 Guter Preis
+    require_all_of:
+    - - macbook air
+    - - m1
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_air_m1_1tb
+    max_price: 470
+    deal_rating: Guter Preis
+  - label: MacBook Air M1 (≥1TB) ⚠️ Okay
+    require_all_of:
+    - - macbook air
+    - - m1
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_air_m1_1tb
+    max_price: 600
+    deal_rating: Okay
+
+  # ------------------------------------------------------------
+  # MacBook Air M2
+  # ------------------------------------------------------------
+  - label: MacBook Air M2 (≤512GB) ★ Top-Deal
+    require_all_of:
+    - - macbook air
+    - - m2
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_air_m2_512gb
+    max_price: 300
+    deal_rating: Top-Deal
+  - label: MacBook Air M2 (≤512GB) 👍 Guter Preis
+    require_all_of:
+    - - macbook air
+    - - m2
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_air_m2_512gb
+    max_price: 430
+    deal_rating: Guter Preis
+  - label: MacBook Air M2 (≤512GB) ⚠️ Okay
+    require_all_of:
+    - - macbook air
+    - - m2
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_air_m2_512gb
+    max_price: 550
+    deal_rating: Okay
+  - label: MacBook Air M2 (≥1TB) ★ Top-Deal
+    require_all_of:
+    - - macbook air
+    - - m2
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_air_m2_1tb
+    max_price: 385
+    deal_rating: Top-Deal
+  - label: MacBook Air M2 (≥1TB) 👍 Guter Preis
+    require_all_of:
+    - - macbook air
+    - - m2
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_air_m2_1tb
+    max_price: 545
+    deal_rating: Guter Preis
+  - label: MacBook Air M2 (≥1TB) ⚠️ Okay
+    require_all_of:
+    - - macbook air
+    - - m2
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_air_m2_1tb
+    max_price: 700
+    deal_rating: Okay
+
+  # ------------------------------------------------------------
+  # MacBook Air M3
+  # ------------------------------------------------------------
+  - label: MacBook Air M3 (≤512GB) ★ Top-Deal
+    require_all_of:
+    - - macbook air
+    - - m3
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_air_m3_512gb
+    max_price: 360
+    deal_rating: Top-Deal
+  - label: MacBook Air M3 (≤512GB) 👍 Guter Preis
+    require_all_of:
+    - - macbook air
+    - - m3
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_air_m3_512gb
+    max_price: 505
+    deal_rating: Guter Preis
+  - label: MacBook Air M3 (≤512GB) ⚠️ Okay
+    require_all_of:
+    - - macbook air
+    - - m3
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_air_m3_512gb
+    max_price: 650
+    deal_rating: Okay
+  - label: MacBook Air M3 (≥1TB) ★ Top-Deal
+    require_all_of:
+    - - macbook air
+    - - m3
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_air_m3_1tb
+    max_price: 440
+    deal_rating: Top-Deal
+  - label: MacBook Air M3 (≥1TB) 👍 Guter Preis
+    require_all_of:
+    - - macbook air
+    - - m3
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_air_m3_1tb
+    max_price: 625
+    deal_rating: Guter Preis
+  - label: MacBook Air M3 (≥1TB) ⚠️ Okay
+    require_all_of:
+    - - macbook air
+    - - m3
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_air_m3_1tb
+    max_price: 800
+    deal_rating: Okay
+
+  # ------------------------------------------------------------
+  # MacBook Air M4
+  # ------------------------------------------------------------
+  - label: MacBook Air M4 (≤512GB) ★ Top-Deal
+    require_all_of:
+    - - macbook air
+    - - m4
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_air_m4_512gb
+    max_price: 415
+    deal_rating: Top-Deal
+  - label: MacBook Air M4 (≤512GB) 👍 Guter Preis
+    require_all_of:
+    - - macbook air
+    - - m4
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_air_m4_512gb
+    max_price: 585
+    deal_rating: Guter Preis
+  - label: MacBook Air M4 (≤512GB) ⚠️ Okay
+    require_all_of:
+    - - macbook air
+    - - m4
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_air_m4_512gb
+    max_price: 750
+    deal_rating: Okay
+  - label: MacBook Air M4 (≥1TB) ★ Top-Deal
+    require_all_of:
+    - - macbook air
+    - - m4
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_air_m4_1tb
+    max_price: 495
+    deal_rating: Top-Deal
+  - label: MacBook Air M4 (≥1TB) 👍 Guter Preis
+    require_all_of:
+    - - macbook air
+    - - m4
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_air_m4_1tb
+    max_price: 700
+    deal_rating: Guter Preis
+  - label: MacBook Air M4 (≥1TB) ⚠️ Okay
+    require_all_of:
+    - - macbook air
+    - - m4
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_air_m4_1tb
+    max_price: 900
+    deal_rating: Okay
+
+  # ------------------------------------------------------------
+  # MacBook Pro Intel
+  # ------------------------------------------------------------
+  - label: MacBook Pro Intel (≤512GB) ★ Top-Deal
+    require_all_of:
+    - - macbook pro
+    - - intel
+      - i5
+      - i7
+      - i9
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_pro_intel_512gb
+    max_price: 220
+    deal_rating: Top-Deal
+  - label: MacBook Pro Intel (≤512GB) 👍 Guter Preis
+    require_all_of:
+    - - macbook pro
+    - - intel
+      - i5
+      - i7
+      - i9
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_pro_intel_512gb
+    max_price: 310
+    deal_rating: Guter Preis
+  - label: MacBook Pro Intel (≤512GB) ⚠️ Okay
+    require_all_of:
+    - - macbook pro
+    - - intel
+      - i5
+      - i7
+      - i9
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_pro_intel_512gb
+    max_price: 400
+    deal_rating: Okay
+  - label: MacBook Pro Intel (≥1TB) ★ Top-Deal
+    require_all_of:
+    - - macbook pro
+    - - intel
+      - i5
+      - i7
+      - i9
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_pro_intel_1tb
+    max_price: 300
+    deal_rating: Top-Deal
+  - label: MacBook Pro Intel (≥1TB) 👍 Guter Preis
+    require_all_of:
+    - - macbook pro
+    - - intel
+      - i5
+      - i7
+      - i9
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_pro_intel_1tb
+    max_price: 430
+    deal_rating: Guter Preis
+  - label: MacBook Pro Intel (≥1TB) ⚠️ Okay
+    require_all_of:
+    - - macbook pro
+    - - intel
+      - i5
+      - i7
+      - i9
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_pro_intel_1tb
+    max_price: 550
+    deal_rating: Okay
+
+  # ------------------------------------------------------------
+  # MacBook Pro M1
+  # ------------------------------------------------------------
+  - label: MacBook Pro M1 (≤512GB) ★ Top-Deal
+    require_all_of:
+    - - macbook pro
+    - - m1
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_pro_m1_512gb
+    max_price: 330
+    deal_rating: Top-Deal
+  - label: MacBook Pro M1 (≤512GB) 👍 Guter Preis
+    require_all_of:
+    - - macbook pro
+    - - m1
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_pro_m1_512gb
+    max_price: 470
+    deal_rating: Guter Preis
+  - label: MacBook Pro M1 (≤512GB) ⚠️ Okay
+    require_all_of:
+    - - macbook pro
+    - - m1
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_pro_m1_512gb
+    max_price: 600
+    deal_rating: Okay
+  - label: MacBook Pro M1 (≥1TB) ★ Top-Deal
+    require_all_of:
+    - - macbook pro
+    - - m1
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_pro_m1_1tb
+    max_price: 415
+    deal_rating: Top-Deal
+  - label: MacBook Pro M1 (≥1TB) 👍 Guter Preis
+    require_all_of:
+    - - macbook pro
+    - - m1
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_pro_m1_1tb
+    max_price: 585
+    deal_rating: Guter Preis
+  - label: MacBook Pro M1 (≥1TB) ⚠️ Okay
+    require_all_of:
+    - - macbook pro
+    - - m1
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_pro_m1_1tb
+    max_price: 750
+    deal_rating: Okay
+
+  # ------------------------------------------------------------
+  # MacBook Pro M2
+  # ------------------------------------------------------------
+  - label: MacBook Pro M2 (≤512GB) ★ Top-Deal
+    require_all_of:
+    - - macbook pro
+    - - m2
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_pro_m2_512gb
+    max_price: 415
+    deal_rating: Top-Deal
+  - label: MacBook Pro M2 (≤512GB) 👍 Guter Preis
+    require_all_of:
+    - - macbook pro
+    - - m2
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_pro_m2_512gb
+    max_price: 585
+    deal_rating: Guter Preis
+  - label: MacBook Pro M2 (≤512GB) ⚠️ Okay
+    require_all_of:
+    - - macbook pro
+    - - m2
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_pro_m2_512gb
+    max_price: 750
+    deal_rating: Okay
+  - label: MacBook Pro M2 (≥1TB) ★ Top-Deal
+    require_all_of:
+    - - macbook pro
+    - - m2
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_pro_m2_1tb
+    max_price: 495
+    deal_rating: Top-Deal
+  - label: MacBook Pro M2 (≥1TB) 👍 Guter Preis
+    require_all_of:
+    - - macbook pro
+    - - m2
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_pro_m2_1tb
+    max_price: 700
+    deal_rating: Guter Preis
+  - label: MacBook Pro M2 (≥1TB) ⚠️ Okay
+    require_all_of:
+    - - macbook pro
+    - - m2
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_pro_m2_1tb
+    max_price: 900
+    deal_rating: Okay
+
+  # ------------------------------------------------------------
+  # MacBook Pro M3
+  # ------------------------------------------------------------
+  - label: MacBook Pro M3 (≤512GB) ★ Top-Deal
+    require_all_of:
+    - - macbook pro
+    - - m3
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_pro_m3_512gb
+    max_price: 495
+    deal_rating: Top-Deal
+  - label: MacBook Pro M3 (≤512GB) 👍 Guter Preis
+    require_all_of:
+    - - macbook pro
+    - - m3
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_pro_m3_512gb
+    max_price: 700
+    deal_rating: Guter Preis
+  - label: MacBook Pro M3 (≤512GB) ⚠️ Okay
+    require_all_of:
+    - - macbook pro
+    - - m3
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_pro_m3_512gb
+    max_price: 900
+    deal_rating: Okay
+  - label: MacBook Pro M3 (≥1TB) ★ Top-Deal
+    require_all_of:
+    - - macbook pro
+    - - m3
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_pro_m3_1tb
+    max_price: 580
+    deal_rating: Top-Deal
+  - label: MacBook Pro M3 (≥1TB) 👍 Guter Preis
+    require_all_of:
+    - - macbook pro
+    - - m3
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_pro_m3_1tb
+    max_price: 820
+    deal_rating: Guter Preis
+  - label: MacBook Pro M3 (≥1TB) ⚠️ Okay
+    require_all_of:
+    - - macbook pro
+    - - m3
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_pro_m3_1tb
+    max_price: 1050
+    deal_rating: Okay
+
+  # ------------------------------------------------------------
+  # MacBook Pro M4
+  # ------------------------------------------------------------
+  - label: MacBook Pro M4 (≤512GB) ★ Top-Deal
+    require_all_of:
+    - - macbook pro
+    - - m4
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_pro_m4_512gb
+    max_price: 605
+    deal_rating: Top-Deal
+  - label: MacBook Pro M4 (≤512GB) 👍 Guter Preis
+    require_all_of:
+    - - macbook pro
+    - - m4
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_pro_m4_512gb
+    max_price: 860
+    deal_rating: Guter Preis
+  - label: MacBook Pro M4 (≤512GB) ⚠️ Okay
+    require_all_of:
+    - - macbook pro
+    - - m4
+    - - 128gb
+      - 128 gb
+      - 256gb
+      - 256 gb
+      - 512gb
+      - 512 gb
+    price_history_model: macbook_pro_m4_512gb
+    max_price: 1100
+    deal_rating: Okay
+  - label: MacBook Pro M4 (≥1TB) ★ Top-Deal
+    require_all_of:
+    - - macbook pro
+    - - m4
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_pro_m4_1tb
+    max_price: 690
+    deal_rating: Top-Deal
+  - label: MacBook Pro M4 (≥1TB) 👍 Guter Preis
+    require_all_of:
+    - - macbook pro
+    - - m4
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_pro_m4_1tb
+    max_price: 975
+    deal_rating: Guter Preis
+  - label: MacBook Pro M4 (≥1TB) ⚠️ Okay
+    require_all_of:
+    - - macbook pro
+    - - m4
+    - - 1tb
+      - 1 tb
+      - 2tb
+      - 2 tb
+    price_history_model: macbook_pro_m4_1tb
+    max_price: 1250
+    deal_rating: Okay
