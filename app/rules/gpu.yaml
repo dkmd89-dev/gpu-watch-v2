@@ -246,6 +246,9 @@ rules:
       - "4060"
     max_price: 220
     deal_rating: "Top-Deal"
+    negotiation_tolerance_pct: 15.0
+    negotiation_min_score: 70
+    negotiation_score_component: "hardware_qualitaet"
 
   - label: "RTX 3060 Ti"
     match: 
@@ -276,6 +279,9 @@ rules:
       - "3090"
     max_price: 250
     deal_rating: "Top-Deal"
+    negotiation_tolerance_pct: 15.0
+    negotiation_min_score: 70
+    negotiation_score_component: "hardware_qualitaet"
 
   - label: "RTX 3070"
     match: 
@@ -306,6 +312,9 @@ rules:
       - "6900"
     max_price: 240
     deal_rating: "Top-Deal"
+    negotiation_tolerance_pct: 15.0
+    negotiation_min_score: 70
+    negotiation_score_component: "hardware_qualitaet"
 
   - label: "RX 6700 XT"
     match: 
@@ -334,6 +343,9 @@ rules:
       - "6900"
     max_price: 250
     deal_rating: "Top-Deal"
+    negotiation_tolerance_pct: 15.0
+    negotiation_min_score: 70
+    negotiation_score_component: "hardware_qualitaet"
 
   - label: "RX 6750 XT"
     match: 
@@ -361,6 +373,9 @@ rules:
       - "6800m"
     max_price: 290
     deal_rating: "Top-Deal"
+    negotiation_tolerance_pct: 15.0
+    negotiation_min_score: 70
+    negotiation_score_component: "hardware_qualitaet"
 
   - label: "RX 6800"
     match: 
@@ -388,6 +403,9 @@ rules:
       - "4080"
     max_price: 240
     deal_rating: "Top-Deal"
+    negotiation_tolerance_pct: 15.0
+    negotiation_min_score: 70
+    negotiation_score_component: "hardware_qualitaet"
 
   - label: "RTX 4060"
     match: 
@@ -415,6 +433,9 @@ rules:
       - "7900"
     max_price: 180
     deal_rating: "Top-Deal"
+    negotiation_tolerance_pct: 15.0
+    negotiation_min_score: 70
+    negotiation_score_component: "hardware_qualitaet"
 
   - label: "RX 7600 XT"
     match: 
@@ -443,6 +464,9 @@ rules:
       - "7800"
     max_price: 160
     deal_rating: "Top-Deal"
+    negotiation_tolerance_pct: 15.0
+    negotiation_min_score: 70
+    negotiation_score_component: "hardware_qualitaet"
 
   - label: "RX 7600"
     match: 
@@ -471,6 +495,9 @@ rules:
       - "2060"
     max_price: 220
     deal_rating: "Top-Deal"
+    negotiation_tolerance_pct: 15.0
+    negotiation_min_score: 70
+    negotiation_score_component: "hardware_qualitaet"
 
   - label: "RTX 2080 Ti"
     match: 

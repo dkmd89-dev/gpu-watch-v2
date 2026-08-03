@@ -85,6 +85,9 @@ rules:
     # p10 = 300€ -> Top-Deal-Grenze. Vorher 400€ (Bauchgefuehl-Wert).
     max_price: 300
     deal_rating: "Top-Deal"
+    negotiation_tolerance_pct: 15.0
+    negotiation_min_score: 70
+    negotiation_score_component: "hardware_qualitaet"
 
   - label: "Gaming-PC (Mindestanforderung erfüllt)"
     price_history_model: "gaming_pc"

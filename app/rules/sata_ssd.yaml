@@ -160,6 +160,9 @@ rules:
       max_ssd_gb: 159
     max_price: 10
     deal_rating: "Top-Deal"
+    negotiation_tolerance_pct: 15.0
+    negotiation_min_score: 20
+    negotiation_score_component: "profit"
 
   - label: "~128GB SATA SSD"
     price_history_model: "sata_ssd_128gb"
@@ -179,6 +182,9 @@ rules:
       max_ssd_gb: 319
     max_price: 26
     deal_rating: "Top-Deal"
+    negotiation_tolerance_pct: 15.0
+    negotiation_min_score: 20
+    negotiation_score_component: "profit"
 
   - label: "~250GB SATA SSD"
     price_history_model: "sata_ssd_250gb"
@@ -198,6 +204,9 @@ rules:
       max_ssd_gb: 639
     max_price: 49
     deal_rating: "Top-Deal"
+    negotiation_tolerance_pct: 15.0
+    negotiation_min_score: 20
+    negotiation_score_component: "profit"
 
   - label: "~500GB SATA SSD"
     price_history_model: "sata_ssd_500gb"
@@ -217,6 +226,9 @@ rules:
       max_ssd_gb: 1279
     max_price: 69
     deal_rating: "Top-Deal"
+    negotiation_tolerance_pct: 15.0
+    negotiation_min_score: 20
+    negotiation_score_component: "profit"
 
   - label: "~1TB SATA SSD"
     price_history_model: "sata_ssd_1tb"
@@ -236,6 +248,9 @@ rules:
       max_ssd_gb: 2559
     max_price: 115
     deal_rating: "Top-Deal"
+    negotiation_tolerance_pct: 15.0
+    negotiation_min_score: 20
+    negotiation_score_component: "profit"
 
   - label: "~2TB SATA SSD"
     price_history_model: "sata_ssd_2tb"

@@ -130,6 +130,9 @@ rules:
     # Marktpreis, siehe STATUS.md) neu berechnen.
     max_price: 20
     deal_rating: "Top-Deal"
+    negotiation_tolerance_pct: 15.0
+    negotiation_min_score: 70
+    negotiation_score_component: "hardware_qualitaet"
 
   - label: "~550-649W Netzteil"
     price_history_model: "netzteil_550w"
@@ -149,6 +152,9 @@ rules:
       max_psu_watt: 749
     max_price: 30
     deal_rating: "Top-Deal"
+    negotiation_tolerance_pct: 15.0
+    negotiation_min_score: 70
+    negotiation_score_component: "hardware_qualitaet"
 
   - label: "~650-749W Netzteil"
     price_history_model: "netzteil_650w"
@@ -167,6 +173,9 @@ rules:
       min_psu_watt: 750
     max_price: 40
     deal_rating: "Top-Deal"
+    negotiation_tolerance_pct: 15.0
+    negotiation_min_score: 70
+    negotiation_score_component: "hardware_qualitaet"
 
   - label: "750W+ Netzteil"
     price_history_model: "netzteil_750w_plus"
