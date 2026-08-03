@@ -82,7 +82,7 @@ def _load_cfg():
 
 def test_e2e_550w_netzteil_matcht_netzteil_kategorie():
     cfg = _load_cfg()
-    r = evaluate("be quiet Pure Power 11 550W Netzteil 80 Plus Gold", 35, cfg)
+    r = evaluate("be quiet Pure Power 11 550W Netzteil 80 Plus Gold", 10, cfg)
     assert r.matched is True
     assert r.category == "netzteil"
     assert r.price_history_model == "netzteil_550w"
@@ -90,7 +90,7 @@ def test_e2e_550w_netzteil_matcht_netzteil_kategorie():
 
 def test_e2e_750w_netzteil_faellt_in_750w_plus_bucket():
     cfg = _load_cfg()
-    r = evaluate("Corsair RM750 750W Netzteil modular", 55, cfg)
+    r = evaluate("Corsair RM750 750W Netzteil modular", 25, cfg)
     assert r.matched is True
     assert r.category == "netzteil"
     assert r.price_history_model == "netzteil_750w_plus"

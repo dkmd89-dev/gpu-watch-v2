@@ -128,7 +128,7 @@ rules:
     # price_history.jsonl genug "netzteil_*"-Datenpunkte gesammelt hat,
     # analog zur SATA-SSD-Kalibrierung (Top-Deal ≈ p10, Guter Preis ≈
     # Marktpreis, siehe STATUS.md) neu berechnen.
-    max_price: 20
+    max_price: 13
     deal_rating: "Top-Deal"
     negotiation_tolerance_pct: 15.0
     negotiation_min_score: 70
@@ -139,7 +139,7 @@ rules:
     requirements:
       min_psu_watt: 550
       max_psu_watt: 649
-    max_price: 40
+    max_price: 28
     deal_rating: "Guter Preis"
 
   # ============================================================
@@ -150,7 +150,7 @@ rules:
     requirements:
       min_psu_watt: 650
       max_psu_watt: 749
-    max_price: 30
+    max_price: 20
     deal_rating: "Top-Deal"
     negotiation_tolerance_pct: 15.0
     negotiation_min_score: 70
@@ -161,7 +161,7 @@ rules:
     requirements:
       min_psu_watt: 650
       max_psu_watt: 749
-    max_price: 50
+    max_price: 38
     deal_rating: "Guter Preis"
 
   # ============================================================
@@ -171,7 +171,7 @@ rules:
     price_history_model: "netzteil_750w_plus"
     requirements:
       min_psu_watt: 750
-    max_price: 40
+    max_price: 30
     deal_rating: "Top-Deal"
     negotiation_tolerance_pct: 15.0
     negotiation_min_score: 70
@@ -181,5 +181,5 @@ rules:
     price_history_model: "netzteil_750w_plus"
     requirements:
       min_psu_watt: 750
-    max_price: 65
+    max_price: 50
     deal_rating: "Guter Preis"

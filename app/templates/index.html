@@ -10,11 +10,23 @@
       --bg: #0e0f12;
       --surface: #1a1c20;
       --surface-2: #22252a;
-      --border: #2c2f36;
+      /* Dashboard-Politur: von #2c2f36 (nur 1.27:1 Kontrast zu --surface)
+         auf #363b44 angehoben (1.52:1) -- Panel-/Karten-Raender waren im
+         Dark Mode kaum erkennbar. Wird global verwendet (Karten, Panels,
+         Inputs), daher bewusst nur eine kleine, unauffaellige Erhoehung
+         statt eines harten Umbruchs im bestehenden Look. */
+      --border: #363b44;
       --text: #eaeaea;
       --text-muted: #9aa0a8;
       --accent: #5b8cff;
       --accent-soft: rgba(91, 140, 255, 0.15);
+      /* Dashboard-Politur: dediziertes, dunkleres Blau NUR fuer Flaechen
+         mit weissem Text (aktuell button.scan-btn). Berechneter WCAG-
+         Kontrast von weissem Text auf --accent war 3.16:1 (faellt AA fuer
+         normalen Text, braucht 4.5:1) -- auf --accent-strong 5.47:1.
+         --accent selbst bleibt unveraendert (wird u.a. als Textfarbe auf
+         dunklem Grund verwendet, dort bereits ausreichend Kontrast). */
+      --accent-strong: #3a63cc;
       --green: #4fd67a;
       --amber: #ffb454;
       --red: #ff6b6b;
@@ -70,7 +82,7 @@
     }
 
     button.scan-btn {
-      background: var(--accent);
+      background: var(--accent-strong);
       color: white;
       border: none;
       padding: 0.6rem 1.1rem;
@@ -78,9 +90,23 @@
       cursor: pointer;
       font-size: 0.9rem;
       font-weight: 600;
+      transition: filter 0.15s ease, transform 0.1s ease;
     }
-    button.scan-btn:hover { filter: brightness(1.1); }
+    button.scan-btn:hover { filter: brightness(1.15); }
+    button.scan-btn:active { transform: translateY(1px); }
     button.scan-btn:disabled { opacity: 0.6; cursor: default; }
+
+    /* Dashboard-Politur: einheitlicher, sichtbarer Fokus-Ring fuer
+       Tastatur-Navigation (bisher kein :focus-Stil -- Browser-Default
+       im Dark Mode kaum sichtbar/inkonsistent). Nur :focus-visible statt
+       :focus, damit Maus-Klicks weiterhin keinen Ring zeigen. */
+    button:focus-visible,
+    select:focus-visible,
+    input:focus-visible,
+    a:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
 
     .status-panel {
       background: var(--surface);
@@ -171,6 +197,15 @@
       flex-direction: column;
       gap: 0.4rem;
       position: relative;
+      /* Dashboard-Politur: dezente Hover-Anhebung + hellerer Rahmen --
+         signalisiert, dass die Karte klickbar ist (Link "Zum Angebot"
+         liegt unten), ohne aufdringlich zu wirken. */
+      transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
     }
 
     .card-top {
@@ -251,13 +286,26 @@
        (kein onerror-Fallback mehr nötig -- Font Awesome liefert für
        unbekannte/künftige Quellen automatisch das generische
        Marktplatz-Icon, siehe ICON_MAP/ICON_DEFAULT weiter unten). */
+    /* Dashboard-Optimierung: Icon war bei 1.05rem/normaler Meta-Groesse
+       kaum als eigenes Element wahrnehmbar. Jetzt spuerbar groesser als
+       der Fliesstext (1.05rem, +50%) und mit dezentem Farb-Tint-Kreis
+       hinterlegt, damit die Quelle auf einen Blick erkennbar ist, statt
+       im Text unterzugehen. Farbe pro Quelle bleibt unveraendert (aus
+       ICON_MAP/icon_map), nur Groesse/Traeger sind neu. */
     .platform-icon {
-      display: inline-block;
-      width: 1.05rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.5rem;
+      height: 1.5rem;
+      border-radius: 50%;
+      background: currentColor;
+      font-size: 0.72rem;
       text-align: center;
-      vertical-align: -1px;
-      margin-right: 0.3rem;
+      vertical-align: -6px;
+      margin-right: 0.4rem;
     }
+    .platform-icon::before { color: var(--surface); }
     .card a {
       color: var(--accent);
       font-size: 0.85rem;
@@ -317,20 +365,43 @@
       border-radius: var(--radius-sm);
       padding: 0.45rem 0.6rem;
       font-size: 0.85rem;
+      transition: border-color 0.15s ease;
+    }
+    .filter-field select:hover,
+    .filter-field input:hover {
+      border-color: var(--text-muted);
+    }
+    /* Dashboard-Politur: expliziter Placeholder-Kontrast statt
+       Browser-Default (im Dark Mode je nach Browser sehr blass/kaum
+       lesbar) -- gleicher Ton wie --text-muted, den der Rest des
+       Dashboards fuer sekundaeren Text verwendet. */
+    .filter-field input::placeholder {
+      color: var(--text-muted);
+      opacity: 1;
     }
     .filter-reset {
       margin-left: auto;
     }
+    /* Dashboard-Optimierung: bisher reiner Ghost-Button (gleiche
+       gedaempfte Farbe wie inaktive Felder) -- ging in der Filter-Leiste
+       optisch unter. Jetzt mit Akzentfarbe als Standardzustand (statt
+       erst beim Hover) und dezentem Icon, damit die Funktion "Filter
+       zuruecksetzen" sofort erkennbar ist, ohne wie ein Haupt-Button
+       (scan-btn) zu wirken. */
     button.reset-btn {
       background: transparent;
-      border: 1px solid var(--border);
-      color: var(--text-muted);
+      border: 1px solid var(--accent);
+      color: var(--accent);
       padding: 0.45rem 0.9rem;
       border-radius: var(--radius-sm);
       cursor: pointer;
       font-size: 0.82rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
     }
-    button.reset-btn:hover { color: var(--text); border-color: var(--accent); }
+    button.reset-btn:hover { background: var(--accent-soft); }
     .filter-count {
       margin-top: 0.6rem;
       font-size: 0.78rem;
@@ -556,7 +627,20 @@
       white-space: pre-wrap;
       word-break: break-word;
       margin: 0;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) var(--surface-2);
     }
+    /* Dashboard-Politur: die einzige scrollbare Flaeche im Dashboard
+       zeigte bisher die helle Standard-Browser-Scrollbar -- im Dark
+       Mode ein deutlicher Stilbruch. scrollbar-color (oben) deckt
+       Firefox ab, die folgenden Regeln WebKit/Chromium. */
+    .log-box::-webkit-scrollbar { width: 8px; }
+    .log-box::-webkit-scrollbar-track { background: var(--surface-2); }
+    .log-box::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+    .log-box::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
     .log-line-error { color: var(--red); }
     .log-line-warning { color: var(--amber); }
     .log-line-info { color: var(--text-muted); }
@@ -630,7 +714,7 @@
         <input type="number" id="filterMaxPrice" min="0" placeholder="z.B. 300">
       </div>
       <div class="filter-field filter-reset">
-        <button class="reset-btn" id="resetFilters" onclick="resetFilters()">Filter zurücksetzen</button>
+        <button class="reset-btn" id="resetFilters" onclick="resetFilters()"><i class="fa-solid fa-rotate-left"></i> Filter zurücksetzen</button>
       </div>
     </div>
     <div class="filter-count" id="filterCount"></div>
@@ -1295,17 +1379,28 @@
       return true;
     }
 
-    // Live-Refresh-Ergaenzung (siehe STATUS.md Abschnitt 14, "bewusst
-    // nicht angefasst"): haelt die Modell-Auswahl der Preisdiagramme
-    // nach jedem Scan-Ende synchron, ohne die aktuelle Auswahl des
-    // Nutzers zu verwerfen oder das aktuell angezeigte Diagramm
-    // ungefragt neu zu laden. Bislang tauchte ein komplett NEUES
+    // Live-Refresh-Ergaenzung (siehe STATUS.md Abschnitt 14, urspruenglich
+    // "bewusst nicht angefasst"): haelt die Modell-Auswahl der
+    // Preisdiagramme nach jedem Scan-Ende synchron. Ein komplett NEUES
     // price_history_model (z.B. die erste Preishistorie einer bis dahin
-    // unbeobachteten Kategorie) erst nach manuellem Seiten-Reload auf.
+    // unbeobachteten Kategorie) tauchte bislang erst nach manuellem
+    // Seiten-Reload auf.
+    //
+    // Dashboard-Optimierung: zusaetzlich wird jetzt, sofern der Nutzer
+    // bereits ein Modell ausgewaehlt hat, GENAU dieses Diagramm mit den
+    // frischen Daten neu geladen (loadModelChart ruft ohnehin nur die
+    // Serie/Statistik des ausgewaehlten Modells ab und ersetzt sie 1:1 --
+    // kein Sprung zu einem anderen Modell, keine verworfene Auswahl).
+    // Ohne Auswahl (leerer Modell-Dropdown-Wert) bleibt das Verhalten wie
+    // zuvor unveraendert.
     function refreshPriceChartModels() {
       fetch('/api/price-history')
         .then(r => r.json())
-        .then(models => applyPriceChartModelOptions(models))
+        .then(models => {
+          if (!applyPriceChartModelOptions(models)) return;
+          const select = document.getElementById('modelSelect');
+          if (select.value) loadModelChart(select.value);
+        })
         .catch(() => {});
     }
 

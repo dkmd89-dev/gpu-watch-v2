@@ -110,7 +110,7 @@ def test_load_rules_liefert_vollstaendige_kategorie_liste():
     """
     cfg = load_rules(RULES_DIR)
     assert "categories" in cfg
-    assert set(cfg["categories"]) == {"gaming_pc", "gpu", "office_pc", "sata_ssd", "netzteil"}
+    assert set(cfg["categories"]) == {"gaming_pc", "gpu", "office_pc", "sata_ssd", "netzteil", "monitor_curved"}
     # Muss sortiert sein (Dropdown-Reihenfolge im Frontend)
     assert cfg["categories"] == sorted(cfg["categories"])
 

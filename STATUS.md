@@ -1,4 +1,4 @@
-# status.md — Aktualisiert bis Schritt "Neue Kategorie Curved-Monitore (Abschnitt 17): rules/monitor_curved.yaml, kein Code geändert -- vollständig abgeschlossen
+# status.md — Aktualisiert bis Schritt "Dashboard-Politur (Abschnitt 18): Badges/Buttons/Kontrast/Live-Chart-Refresh, reine templates/index.html-Änderung -- vollständig abgeschlossen
 
 ## Statusübersicht
 - **Phase 0 (Projektanalyse & Stabilisierung):** Abgeschlossen
@@ -35,6 +35,7 @@
 - **Verhandlungs-Assistent auf alle Kategorien ausgeweitet:** Abgeschlossen (siehe Abschnitt 17). `negotiation_*`-Felder von der einen GPU-Testregel auf alle sinnvollen Top-Deal-Regeln in `gpu.yaml` (9 weitere), `gaming_pc.yaml` (1), `sata_ssd.yaml` (5, Komponente `profit` statt `hardware_qualitaet`) und `netzteil.yaml` (3) ausgeweitet. `office_pc.yaml` bewusst ausgeklammert (einzige Regel dort hat Basis-Score <70, Mindest-Score-Schwelle strukturell nie erreichbar).
 - **SATA-SSD 250GB/500GB kalibriert:** Abgeschlossen (siehe Abschnitt 17). `max_price` anhand echter `price_history.jsonl`-Daten neu berechnet (250GB: 26€/33€ → 25€/32€; 500GB: 49€/67€ → 40€/56€). Bei 500GB wurde ein Burst-Cluster (33 verdächtige Duplikate, `fingerprint: null`) aus der Berechnung ausgeklammert — Wurzelursache noch offen (siehe Ausblick).
 - **Neue Kategorie „Curved Monitore" (`monitor_curved`):** Abgeschlossen (siehe Abschnitt 17). Erste Kategorie, die seit Abschluss von Phase 10 komplett neu hinzugefügt wurde — **kein Python-Code geändert**, reine YAML-Datei, beweist damit die YAML-only-Erweiterbarkeit in der Praxis (nicht nur im Kontrakt-Test).
+- **Dashboard-Politur (UI/UX-Feinschliff):** Abgeschlossen (siehe Abschnitt 18). Zwei Teilschritte: (1) Platform-Icon vergrößert, Filter-Reset-Button prominenter, Preisdiagramm lädt nach Scan-Ende automatisch neu; (2) WCAG-Kontrastprüfung inkl. Fix eines echten AA-Kontrastfehlers am Scan-Button, sichtbarere Panel-Rahmen, Fokus-Ringe für Tastaturbedienung, Karten-Hover, dunkler Log-Scrollbar. Reine `templates/index.html`-Änderung, kein Python-Code betroffen.
 
 ---
 
@@ -483,5 +484,35 @@ Mit Punkt d (Abschnitt 16) vollständig abgeschlossen wurden drei unabhängige, 
 - **`monitor_curved`-Preisgrenzen kalibrieren**, sobald genug `price_history.jsonl`-Datenpunkte gesammelt wurden (analog zum bewährten Muster aus Abschnitt 15/17.2).
 - **Verhandlungs-Assistent für `monitor_curved`/`office_pc`** noch nicht aktiviert — könnte nach ersten Erfahrungswerten nachgezogen werden.
 - **eBay Sold API (RapidAPI) als zweite Quelle für `estimated_resale_price`:** von Robin vorgeschlagen, aber noch nicht umgesetzt — steht im direkten Konflikt mit der ursprünglichen Auftrags-Vorgabe „ausschließlich lokal gesammelte Daten, keine externen Preis-APIs" (siehe `price_stats.py`-Docstring). Erfordert eine bewusste, explizite Freigabe zur Abkehr von diesem Prinzip, bevor mit der Umsetzung begonnen wird. Offene technische Punkte: API-Key-Verwaltung (kein Secrets-Handling im Projekt bisher vorhanden), Rate-Limits/Kosten, Fallback-Verhalten bei API-Fehlern, kein Netzwerkzugriff in der Analyse-Sandbox zur Verifikation der echten API-Antwortstruktur.
+
+---
+
+## 18. Dashboard-Politur (UI/UX-Feinschliff)
+
+Auf Wunsch höchste Priorität: das bestehende Dashboard optisch/funktional aufpolieren, ohne Backend/Scoring anzufassen. Zwei einzeln freigegebene Teilschritte, beide **ausschließlich** `templates/index.html` (CSS + minimales JS), kein Python-Code geändert.
+
+### 18.1 Erster Teilschritt: Badges, Buttons, Live-Chart-Refresh
+
+- **KPI-Kachel „Curved Monitore":** bei der Analyse geprüft — nutzt bereits dieselbe generische `.counter-card`-Klasse wie alle anderen Kategorie-Kacheln (`ensureCategoryTile()`, siehe Abschnitt 10). Keine abweichende Formatierung gefunden → bewusst **keine Änderung** vorgenommen.
+- **Platform-Icon:** `.platform-icon` von 1.05rem auf 1.5rem vergrößert, Farb-Tint-Kreis statt reinem Text-Icon-Zeichen (Kreisfläche in Quellfarbe, Glyph in `--surface`) — Icon ging zuvor im Meta-Fließtext unter.
+- **Filter-Reset-Button:** `.reset-btn` von reinem Ghost-Stil (nur Hover farbig) auf durchgehende Akzentfarbe umgestellt, plus Reset-Icon (`fa-rotate-left`) im Markup — Funktion war zuvor kaum auffindbar.
+- **Preisdiagramm-Live-Refresh:** `refreshPriceChartModels()` lädt nach Scan-Ende jetzt zusätzlich das aktuell ausgewählte Diagramm neu (`loadModelChart(select.value)`), sofern eines ausgewählt ist. Schließt die bisher bewusst offen gelassene Lücke (siehe Abschnitt 14, „ohne das aktuell angezeigte Diagramm ungefragt neu zu laden") — Nutzerauswahl bleibt dabei erhalten, kein Modellwechsel.
+- **Verifikation:** manuell gegen echten Flask-`test_client()` (Status 200, neues Markup vorhanden, bestehende Elemente unverändert). Kein `pytest` in der Sandbox installierbar (kein Netzwerkzugriff).
+
+### 18.2 Zweiter Teilschritt: Dark-Mode-Kontrastprüfung + weitere Politur
+
+- **WCAG-Kontrastberechnung** (relative Luminanz nach WCAG 2.x-Formel) für alle zentralen Farbpaare des Dashboards durchgeführt, um "sieht professionell aus" objektiv statt nur nach Gefühl zu bewerten.
+- **Echter Kontrastfehler gefunden und behoben:** weißer Text auf `--accent` (`button.scan-btn`, der Haupt-CTA-Button) hatte nur **3.16:1** — WCAG AA verlangt für normalen Text mindestens 4.5:1. Neue, nur für Volltonflächen mit weißem Text verwendete Variable `--accent-strong: #3a63cc` eingeführt (5.47:1) — `--accent` selbst bleibt unverändert (wird an vielen anderen Stellen als Textfarbe auf dunklem Grund verwendet, dort bereits ausreichend Kontrast, siehe Berechnung unten).
+- **`--border` von `#2c2f36` auf `#363b44` angehoben** (Kontrast zu `--surface` von 1.27:1 auf 1.52:1) — Panel-/Karten-Ränder waren im Dark Mode kaum erkennbar. Bewusst nur eine kleine, unauffällige Erhöhung statt eines harten Kontrastsprungs, um den bestehenden Look nicht zu brechen (echte 3:1-WCAG-Konformität für Nicht-Text-Elemente hätte einen deutlich helleren, stilbrechenden Rahmen erfordert — als offener Punkt im Ausblick festgehalten statt einer riskanten Rewrite-Entscheidung ohne Rückfrage).
+- **Fokus-Ringe für Tastaturbedienung:** globale `:focus-visible`-Regel für Buttons/Selects/Inputs/Links ergänzt (`outline: 2px solid var(--accent)`) — bisher kein einheitlicher, im Dark Mode sichtbarer Fokus-Stil vorhanden.
+- **Karten-Hover:** Deal-Karten heben sich beim Hover dezent an (Rahmenfarbe → Akzent, leichte Anhebung, Schatten) — signalisiert Klickbarkeit, da der eigentliche Link („Zum Angebot →") unten in der Karte liegt und sonst leicht übersehen wird.
+- **Placeholder-Kontrast** im Preisfilter (`filterMaxPrice`) explizit auf `--text-muted` gesetzt statt Browser-Default (im Dark Mode je nach Browser sehr blass).
+- **Dunkler Scrollbar-Stil** für das Scan-Log-Panel (`scrollbar-color` für Firefox, `::-webkit-scrollbar*` für Chromium) — einzige scrollbare Fläche im Dashboard zeigte zuvor die helle Standard-Browser-Scrollbar, ein deutlicher Stilbruch im Dark Mode.
+- **Verifikation:** WCAG-Kontrastwerte vorher/nachher per Python-Skript (relative Luminanz/Kontrastformel) berechnet und dokumentiert. Rendering gegen echten Flask-`test_client()` geprüft (Status 200, alle neuen CSS-Klassen/Regeln im HTML vorhanden). Volle Suite mit einem eigens gebauten Minimal-Test-Runner ausgeführt (kein `pytest` in dieser Sandbox installierbar, kein Netzwerkzugriff — gleiche Einschränkung wie in den Abschnitten 15–17 dokumentiert): **553 von 558 Tests grün**, die 5 verbleibenden Fehlschläge sind nachweislich Artefakte des selbstgebauten Runners (vereinfachte `monkeypatch.setattr()`-Pfadauflösung kommt mit mehrfach verschachtelten Modulpfaden wie `scrapers.ebay.requests.post` nicht zurecht — betrifft ausschließlich `test_scraper_ebay.py`/`test_scraper_quoka.py`, beide Dateien wurden in diesem Schritt nicht angefasst). Da ausschließlich `templates/index.html` geändert wurde und kein einziger der 5 Fehlschläge mit dieser Datei zusammenhängt, ist keine Regression zu erwarten — **bitte trotzdem in einer echten Umgebung mit `pytest tests/` gegenprüfen.**
+
+### Ausblick / offene Punkte nach Abschnitt 18
+
+- **`--border`-Kontrast erreicht noch nicht die volle WCAG-1.4.11-Konformität (3:1) für Nicht-Text-UI-Elemente** — bewusst nur eine moderate Anhebung, da eine vollständige Konformität einen spürbar helleren Rahmen und damit eine größere optische Umstellung bedeutet hätte. Falls gewünscht, als eigener, einzeln freizugebender Schritt möglich.
+- Punkt a) der Analyse (KPI-Kachel „Curved Monitore") ergab keinen Handlungsbedarf — falls Robin dort dennoch einen konkreten Unterschied sieht (z. B. in einem bestimmten Browser/Zustand), bitte konkretisieren.
 
 
