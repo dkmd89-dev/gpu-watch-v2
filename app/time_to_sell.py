@@ -108,3 +108,30 @@ def append_time_to_sell_point(path: Path, point: TimeToSellPoint) -> None:
             f.write(json.dumps(asdict(point), ensure_ascii=False) + "\n")
     except Exception:
         log.exception("Time-to-Sell-Datenpunkt konnte nicht geschrieben werden")
+
+
+def read_time_to_sell_points(path: Path) -> list[TimeToSellPoint]:
+    """Liest alle Datenpunkte aus `path` (eine Zeile = ein TimeToSellPoint).
+
+    Fehlende Datei -> leere Liste (noch kein Delisting erkannt). Einzelne
+    kaputte Zeilen werden uebersprungen und geloggt statt den kompletten
+    Lesevorgang abzubrechen -- analog price_history.read_price_points().
+    """
+    if not path.exists():
+        return []
+
+    points: list[TimeToSellPoint] = []
+    with path.open("r", encoding="utf-8") as f:
+        for line_no, line in enumerate(f, start=1):
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                data = json.loads(line)
+                points.append(TimeToSellPoint(**data))
+            except (json.JSONDecodeError, TypeError) as e:
+                log.warning(
+                    "Ueberspringe kaputte Time-to-Sell-Zeile %d in %s: %s",
+                    line_no, path, e,
+                )
+    return points

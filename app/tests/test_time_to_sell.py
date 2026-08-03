@@ -6,7 +6,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from time_to_sell import TimeToSellPoint, append_time_to_sell_point, make_time_to_sell_point
+from time_to_sell import TimeToSellPoint, append_time_to_sell_point, make_time_to_sell_point, read_time_to_sell_points
 
 
 def test_make_time_to_sell_point_berechnet_tage_korrekt():
@@ -108,6 +108,34 @@ def test_append_time_to_sell_point_wirft_bei_schreibfehler_nicht(tmp_path, monke
     monkeypatch.setattr(Path, "mkdir", boom)
 
     append_time_to_sell_point(path, point)  # darf keine Exception werfen
+
+
+def test_read_time_to_sell_points_fehlende_datei_ergibt_leere_liste(tmp_path):
+    assert read_time_to_sell_points(tmp_path / "nicht_vorhanden.jsonl") == []
+
+
+def test_read_time_to_sell_points_liest_geschriebene_punkte_zurueck(tmp_path):
+    path = tmp_path / "time_to_sell.jsonl"
+    p1 = TimeToSellPoint(days=1.0, first_seen="a", last_seen="b", model="m1", category="gpu", detected_at="d1")
+    p2 = TimeToSellPoint(days=2.5, first_seen="c", last_seen="d", model="m2", category="office_pc", detected_at="d2")
+    append_time_to_sell_point(path, p1)
+    append_time_to_sell_point(path, p2)
+
+    points = read_time_to_sell_points(path)
+
+    assert points == [p1, p2]
+
+
+def test_read_time_to_sell_points_ueberspringt_kaputte_zeile(tmp_path):
+    path = tmp_path / "time_to_sell.jsonl"
+    good = TimeToSellPoint(days=1.0, first_seen="a", last_seen="b", model="m1", category="gpu", detected_at="d1")
+    append_time_to_sell_point(path, good)
+    with path.open("a", encoding="utf-8") as f:
+        f.write("{kaputtes json\n")
+
+    points = read_time_to_sell_points(path)
+
+    assert points == [good]
 
 
 if __name__ == "__main__":

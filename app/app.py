@@ -21,7 +21,8 @@ from presence_tracking import (
     migrate_seen_data, mark_seen, mark_matched, detect_newly_delisted,
     DEFAULT_DELISTING_THRESHOLD_SCANS,
 )
-from time_to_sell import make_time_to_sell_point, append_time_to_sell_point
+from time_to_sell import make_time_to_sell_point, append_time_to_sell_point, read_time_to_sell_points
+from time_to_sell_stats import compute_all_time_to_sell_stats
 from price_stats import compute_all_price_stats, compute_price_stats, PriceStats
 from top_deal import evaluate_top_deal
 
@@ -866,6 +867,24 @@ def api_price_history_detail(model):
             }
             for p in model_points
         ],
+    })
+
+
+@app.route("/api/time-to-sell")
+def api_time_to_sell():
+    """Time-to-Sell-Statistik je Kategorie fürs Dashboard (Baustein 6,
+    Schritt 4) -- nutzt ausschließlich die bestehenden Funktionen aus
+    Schritt 3 (time_to_sell.read_time_to_sell_points(),
+    time_to_sell_stats.compute_all_time_to_sell_stats()), kein neuer
+    Berechnungscode. Analog zu /api/price-history: leeres Dict, solange
+    noch kein Delisting erkannt wurde (kein Fehlerfall, siehe
+    read_time_to_sell_points()-Docstring).
+    """
+    points = read_time_to_sell_points(TIME_TO_SELL_FILE)
+    stats_by_category = compute_all_time_to_sell_stats(points)
+    return jsonify({
+        category: asdict(stats)
+        for category, stats in stats_by_category.items()
     })
 
 

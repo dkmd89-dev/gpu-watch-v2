@@ -417,6 +417,42 @@
     .trend-down { color: var(--green); }
     .trend-stable { color: var(--text-muted); }
 
+    .tts-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.2rem;
+      margin-top: 1.5rem;
+    }
+    .tts-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.8rem;
+      margin-bottom: 0.8rem;
+    }
+    .tts-header h2 {
+      font-size: 1.05rem;
+      margin: 0;
+    }
+    .tts-hint {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+    .tts-category {
+      margin-top: 0.9rem;
+    }
+    .tts-category:first-child {
+      margin-top: 0;
+    }
+    .tts-category-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+
     .log-panel {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -617,6 +653,17 @@
     </div>
   </section>
 
+  <section class="tts-panel" id="ttsPanel" style="display:none">
+    <div class="tts-header">
+      <h2>Verweildauer (Time-to-Sell)</h2>
+      <span class="tts-hint">Median-Tage bis ein Angebot aus dem Markt verschwindet, je Kategorie</span>
+    </div>
+    <div id="ttsEmptyState" class="empty-state" style="display:none">
+      Noch keine Delisting-Ereignisse erfasst -- Statistik erscheint, sobald Angebote aus dem Markt verschwinden.
+    </div>
+    <div id="ttsContent"></div>
+  </section>
+
   <section class="log-panel">
     <div class="log-header">
       <h2>Scan-Log</h2>
@@ -767,6 +814,7 @@
           if (wasRunning && !running) {
             refreshListings();
             refreshPriceChartModels();
+            refreshTimeToSell();
           }
           wasRunning = running;
         })
@@ -1328,6 +1376,73 @@
     }
 
     initPriceCharts();
+
+    // --- Baustein 6, Schritt 4: Time-to-Sell-Statistik je Kategorie ---
+    // Nutzt ausschliesslich die bestehende Route /api/time-to-sell
+    // (Schritt 4-Backend, liest wiederum die in Schritt 3 gebaute
+    // time_to_sell_stats.compute_all_time_to_sell_stats()) -- kein neuer
+    // Berechnungscode im Frontend. Reine Anzeige (Kacheln je Kategorie,
+    // gleiches .chart-stat-Muster wie beim Preisdiagramm), KEIN Chart --
+    // fuer eine Verweildauer-Verteilung ueber viele Kategorien waere ein
+    // Liniendiagramm (wie beim Preisverlauf EINES Modells) nicht sinnvoll
+    // interpretierbar; ein Zeitreihen-Chart ist ein moeglicher
+    // Folgeschritt.
+    function renderTimeToSell(statsByCategory) {
+      const categories = Object.keys(statsByCategory).sort();
+      const panel = document.getElementById('ttsPanel');
+      const empty = document.getElementById('ttsEmptyState');
+      const content = document.getElementById('ttsContent');
+
+      panel.style.display = '';
+      if (categories.length === 0) {
+        empty.style.display = '';
+        content.style.display = 'none';
+        return;
+      }
+      empty.style.display = 'none';
+      content.style.display = '';
+
+      content.innerHTML = categories.map(cat => {
+        const s = statsByCategory[cat];
+        const label = categoryLabel(cat);
+        return `
+          <div class="tts-category">
+            <div class="tts-category-name">${label}</div>
+            <div class="chart-stats">
+              <div class="chart-stat">
+                <div class="chart-stat-value">${s.median_days.toFixed(1)}</div>
+                <div class="chart-stat-label">Median (Tage)</div>
+              </div>
+              <div class="chart-stat">
+                <div class="chart-stat-value">${s.mean_days.toFixed(1)}</div>
+                <div class="chart-stat-label">Mittelwert (Tage)</div>
+              </div>
+              <div class="chart-stat">
+                <div class="chart-stat-value">${s.min_days.toFixed(1)} – ${s.max_days.toFixed(1)}</div>
+                <div class="chart-stat-label">Min – Max (Tage)</div>
+              </div>
+              <div class="chart-stat">
+                <div class="chart-stat-value">${s.count}</div>
+                <div class="chart-stat-label">Datenpunkte</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function refreshTimeToSell() {
+      fetch('/api/time-to-sell')
+        .then(r => r.json())
+        .then(statsByCategory => renderTimeToSell(statsByCategory))
+        .catch(() => {});
+    }
+
+    function initTimeToSell() {
+      refreshTimeToSell();
+    }
+
+    initTimeToSell();
   </script>
 </body>
 </html>
