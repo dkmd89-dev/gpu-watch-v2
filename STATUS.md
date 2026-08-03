@@ -40,6 +40,7 @@
 - **Gaming-PC-/`monitor_curved`-Preiskalibrierung gegengeprüft:** Kein Handlungsbedarf — beide waren bereits vollständig kalibriert (Abschnitt 15 bzw. 17.2/17.3), nur ein veralteter Ausblick-Eintrag suggerierte offenen Bedarf. Keine Code-Änderung.
 - **Verhandlungs-Assistent auf `office_pc`/`monitor_curved` ausgeweitet:** Abgeschlossen (siehe Abschnitt 21). `monitor_curved` folgt dem GPU-Muster (`hardware_qualitaet`, Schwelle 70, nur Top-Deal-Regel). `office_pc` (bisher bewusst ausgeklammert, siehe Abschnitt 17) nutzt stattdessen die Komponente `"ausstattung"` (SSD/dedizierte GPU) mit Schwelle 50 — löst die strukturelle Schwellen-Erreichbarkeitslücke, die die Aktivierung in Abschnitt 17 verhindert hatte.
 - **Drei neue Nischen-Kategorien (Retro-Konsolen, Vintage-Elektronik & Audio, Spielzeug-Bundles):** Abgeschlossen (siehe Abschnitt 22). Rein additive YAML-Dateien (`rules/retro_konsolen.yaml`, `rules/vintage_elektronik.yaml`, `rules/spielzeug_bundles.yaml`), **kein Python-Code geändert** — weiterer Praxisbeleg der YAML-only-Erweiterbarkeit (siehe bereits `monitor_curved` in Abschnitt 17). Preisgrenzen sind Platzhalter, Kalibrierung folgt nach Datensammlung (analog aller bisherigen neuen Kategorien).
+- **Zwei neue Kategorien iPhone & MacBook (`rules/iphone.yaml`, `rules/macbook.yaml`):** Abgeschlossen (siehe Abschnitt 23). Fein granulare Preis-Tiers je marktüblicher Verkaufsvariante (Modell/Chip × Speicherstufe × Top-Deal/Guter Preis/Okay) über je einen eigenen `price_history_model`-Wert — nutzt die bestehende `price_stats.py`-Gruppierung ohne Code-Änderung. iCloud-/Aktivierungssperre + Vertragsbindung als kategorie-eigene Excludes. **Kein Python-Code geändert**, `_ausstattung_score()` bewusst unverändert gelassen (Gewicht `ausstattung: 0` in beiden Kategorien).
 
 ---
 
@@ -296,6 +297,7 @@ Offene Punkte, unpriorisiert, keiner davon begonnen:
 9. ~~Reselling-/Arbitrage-Erweiterung (neues Konzept, siehe Abschnitt 16)~~ **Erledigt** — Bausteine 1–7 vollständig umgesetzt (Profit-Score, Gebührenmodell, Bundle-/Part-Out-Erkennung, Cross-Platform-Preisvergleich, Duplicate-Erkennung, Time-to-Sell, Verhandlungs-Assistent), siehe Abschnitt 16/17/21.
 10. **Reselling-Kriterien & Strategien, Punkt 1 (Einkaufs-Marge/"Golden Rule", max. 30–50% des Marktwerts):** Noch nicht begonnen — zurückgestellt zugunsten von Punkt 4 (Nischen-Kategorien), siehe Abschnitt 22.
 11. ~~Nischen-/Kategorien-Erweiterung, Punkt 4 (Retro-Konsolen, Vintage-Elektronik & Audio, Spielzeug-Bundles)~~ **Erledigt**, siehe Abschnitt 22. Preisgrenzen aller drei Kategorien sind Platzhalter — Kalibrierung anhand echter `price_history.jsonl`-Daten folgt als eigener Schritt, sobald genug Datenpunkte gesammelt wurden.
+12. ~~iPhone & MacBook als eigenständige Kategorien~~ **Erledigt**, siehe Abschnitt 23. Preisgrenzen (198 Regeln insgesamt) sind Platzhalter — Kalibrierung anhand echter `price_history.jsonl`-Daten folgt als eigener Schritt. Offen: feinere Pro/Max-Differenzierung innerhalb der MacBook-Chip-Generationen M1–M4 (bewusst zurückgestellt, siehe Abschnitt 23), weitere iPhone-Modelle (SE, X/XR/XS, 6/7/8).
 
 Kein weiterer Punkt ist priorisiert oder für den nächsten Schritt vorausgewählt -- Freigabe/Auswahl liegt bei Robin.
 
@@ -638,3 +640,62 @@ feat(rules): drei neue Nischen-Kategorien (Retro-Konsolen, Vintage-Elektronik, S
 ```
 
 **Noch offen:** Preiskalibrierung aller drei Kategorien nach Datensammlung; Reselling-Kriterien-Punkt 1 ("Golden Rule" Einkaufs-Marge) weiterhin zurückgestellt.
+
+---
+
+## 23. Zwei neue Kategorien: iPhone & MacBook
+
+**Ausgangslage:** Nischen-/Kategorien-Erweiterung um Apple-Endgeräte (Reselling-Zielgruppe), einzeln nacheinander mit Freigabe je Kategorie (erst Phase 0/1-Planung gemeinsam, dann `iphone.yaml`, dann `macbook.yaml`). Gleiche Architektur-Entscheidung wie Abschnitt 22: reines Titel-Keyword-Matching, kein `requirements:`-Block, kein neuer Detector. **In keinem der beiden Schritte wurde Python-Code geändert.**
+
+### 23.1 `rules/iphone.yaml` (neu, 138 Regeln)
+6 Generationen (11–16) × verfügbare Varianten je Generation (Basis/mini/Plus/Pro/Pro Max) × 2 Speicherstufen (≤256GB/≥512GB) × 3 Preis-Tiers. Programmatisch generiert (Hilfsskript, nicht Teil der Pipeline) statt von Hand, um Teilphrasen-Fehler von vornherein zu vermeiden. **Designentscheidung (mit Robin abgestimmt):** Teilphrasen-Konflikte (z.B. "iPhone 13 Pro" als Substring von "iPhone 13 Pro Max") werden als allgemeines Matching-Prinzip über gezielte `exclude`-Begriffe je Regel gelöst, nicht als Einzelfall-Patch. Jede Regel bildet über ein eigenes `price_history_model` (z.B. `iphone_15_pro_max_512gb`) genau eine marktübliche Verkaufsvariante ab — nutzt die bestehende `price_stats.py`-Gruppierung nach `model` ohne Code-Änderung. iCloud-/Aktivierungssperre + Vertragsbindung als kategorie-eigener Exclude (Wiederverkaufsrisiko, von `exclude_global` bisher nicht abgedeckt).
+
+### 23.2 `rules/macbook.yaml` (neu, 60 Regeln)
+2 Linien (Air/Pro) × 5 Chip-Generationen (Intel, M1–M4) × 2 Speicherstufen (≤512GB/≥1TB) × 3 Preis-Tiers. Gleiches Muster wie iPhone. **Bewusste Vereinfachung:** Chip-Generation ohne Pro/Max-Differenzierung innerhalb einer Apple-Silicon-Generation (Auftrag verlangte nur "Intel vs. M1–M4") — ein "MacBook Pro M1 Max"-Titel fällt daher unter die "M1"-Stufe, nicht als eigene Preis-Tier-Stufe. Air/Pro sind disjunkte Phrasen, kein zusätzlicher Teilphrasen-Exclude nötig. Intel-Erkennung über `intel`/`i5`/`i7`/`i9` (kein "Ix"-Chipname wie bei Apple Silicon). Gleiche iCloud-/Vertrags-Excludes wie iPhone, ergänzt um "find my mac".
+
+### Designentscheidung: `ausstattung`-Score bewusst bei 0 belassen
+Für beide Kategorien wurde geprüft, ob `ausstattung > 0` (z.B. für höhere Speichergrößen) sinnvoll wäre. Ergebnis: `_ausstattung_score()` ist im Code fest an zwei PC-spezifische Detector-Signale gekoppelt (`has_ssd`, `has_dedicated_gpu`) und liefert für Apple-Geräte ohne Code-Änderung nur den neutralen Platzhalterwert — kein echtes Differenzierungssignal. Die gewünschte Speicher-/Chip-Differenzierung erfolgt stattdessen granular über die Preis-Tier-Struktur (Punkt 23.1/23.2). **Explizite Freigabe-Entscheidung: keine Code-Änderung an `_ausstattung_score()`.**
+
+### Verifikation (beide Kategorien)
+**Hinweis:** `pytest` in dieser Sandbox weiterhin nicht ausführbar (kein Netzwerkzugriff). Beide Kategorien manuell gegen die echte `matcher.evaluate()`-Funktion verifiziert (Preis-Tier-Grenzen, Pro/Pro-Max- bzw. Air/Pro-Trennung, Speicherstufen-Trennung, iCloud-/Vertrags-/Find-My-Mac-Excludes, globaler `defekt`-Exclude) — alle Testfälle korrekt. **Vor dem nächsten produktiven Deploy sollte `pytest app/tests/` lokal laufen**, insbesondere `test_rules_category_plugin_contract.py` gegen beide neuen Dateien.
+
+**Geänderte Dateien:**
+- `app/rules/iphone.yaml` (neu, 138 Regeln)
+- `app/rules/macbook.yaml` (neu, 60 Regeln)
+- `STATUS.md` (dieser Abschnitt + Statusübersicht + Ausblick)
+
+**Mögliche Nebenwirkungen:**
+- 198 neue Regeln insgesamt erscheinen ab sofort im Dashboard-Dropdown/Scan-Log, zusätzliche `search_terms` erhöhen die Scraper-Last pro Scan-Durchlauf spürbar (mehr als jede bisherige Kategorie-Erweiterung).
+- Alle Preisgrenzen sind Platzhalter (keine `price_history`-Daten für diese Kategorien vorhanden) — ggf. zu viele/zu wenige Treffer bis zur Kalibrierung.
+- iPhone-Modell-Liste ist nicht vollständig (SE, X/XR/XS, 6/7/8 fehlen), rein additiv erweiterbar.
+- MacBook-Titel ohne Intel-Begriff und ohne M1–M4 (sehr alte Modelle, generisches "MacBook 12 inch") matchen aktuell keine Regel — dokumentierte, bewusste Einschränkung.
+- `exclude_category: "gesperrt"` (beide Kategorien) ist ein breiter Substring-Match — kann in seltenen Fällen unbedenkliche Formulierungen wie "nicht gesperrt" fälschlich ausschließen (bestehendes Muster im Projekt, analog `defekt` in `exclude_global`).
+
+**Commit-Nachricht:**
+```
+feat(rules): zwei neue Kategorien iPhone & MacBook
+
+- rules/iphone.yaml (neu, 138 Regeln): 6 Generationen (11-16) x
+  Varianten (Basis/mini/Plus/Pro/Pro Max) x 2 Speicherstufen x
+  3 Preis-Tiers. Teilphrasen-Konflikte (Pro vs. Pro Max) ueber
+  gezielte exclude-Begriffe geloest. iCloud-/Aktivierungssperre +
+  Vertragsbindung als Exclude.
+- rules/macbook.yaml (neu, 60 Regeln): 2 Linien (Air/Pro) x 5
+  Chip-Generationen (Intel, M1-M4) x 2 Speicherstufen x 3 Preis-
+  Tiers. M1-M4 bewusst ohne Pro/Max-Unterdifferenzierung.
+- Jede Regel einer eigenen Verkaufsvariante zugeordnet ueber
+  price_history_model (z.B. iphone_15_pro_max_512gb,
+  macbook_pro_m3_1tb) -- nutzt bestehende price_stats.py-
+  Gruppierung ohne Code-Aenderung.
+- ausstattung-Score bewusst bei 0 belassen: _ausstattung_score()
+  ist an PC-spezifische Detector-Signale gekoppelt, keine
+  Aenderung daran (Freigabe-Entscheidung).
+- Kein Python-Code geaendert (categories/registry.py-Discovery
+  greift automatisch)
+- STATUS.md: Abschnitt 23, Statusuebersicht, Ausblick aktualisiert
+- Hinweis: pytest in dieser Sandbox nicht ausfuehrbar (kein
+  Netzwerk), beide Kategorien manuell ueber matcher.evaluate()
+  verifiziert -- volle Suite vor naechstem Deploy lokal bestaetigen
+```
+
+**Noch offen:** Preiskalibrierung beider Kategorien nach Datensammlung; feinere Pro/Max-Differenzierung innerhalb MacBook-Chip-Generationen (zurückgestellt); weitere iPhone-Modelle (SE, X/XR/XS, 6/7/8); Reselling-Kriterien-Punkt 1 ("Golden Rule" Einkaufs-Marge) weiterhin zurückgestellt.
