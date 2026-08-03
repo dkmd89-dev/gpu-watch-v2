@@ -1,0 +1,128 @@
+# ============================================================
+# Curved-Monitor Regel-Matrix
+# ============================================================
+# Auftrag: neue Kategorie "Monitore", aber bewusst NUR Curved-Monitore
+# (keine Flat-Monitore). Nutzt denselben Titel-Matching-Mechanismus wie
+# rules/gpu.yaml (require_all_of/exclude/max_price) statt der
+# Requirements-Detector-Logik von office_pc/gaming_pc/sata_ssd/netzteil --
+# "curved" ist ein einfaches Titel-Stichwort, keine strukturierte
+# Hardware-Eigenschaft (Kapazitaet/Watt/RAM), fuer die ein eigener
+# Detector noetig waere. Reine YAML-Ergaenzung, KEIN Python-Code
+# geaendert (siehe Phase 2/10-Auftrag: neue Kategorien nur ueber YAML).
+#
+# require_all_of statt "match": eine Gruppe ["curved"] UND eine Gruppe
+# ["monitor","display","bildschirm"] muessen JEWEILS mindestens einen
+# Treffer liefern -- verhindert, dass z.B. "Curved Soundbar" oder
+# "Monitorarm" allein schon matchen (siehe exclude weiter unten fuer
+# die haeufigsten Fehltreffer-Quellen).
+#
+# min_vram_gb: 0 -- WICHTIGER Bugfix aus vorheriger Session (siehe
+# STATUS.md Abschnitt 6/rules/sata_ssd.yaml): matcher.py's generische
+# VRAM-Check-Heuristik (Regex \d{1,2}\s*gb) wuerde sonst Angaben wie
+# "HDMI 2.1 48Gbps" faelschlich als "0GB VRAM" interpretieren und das
+# Match verwerfen. Deaktiviert den GPU-spezifischen Check fuer diese
+# Kategorie, exakt wie bei sata_ssd.yaml.
+# ============================================================
+
+category: "monitor_curved"
+label: "Curved Monitore"
+
+search_terms:
+  - "Curved Monitor"
+  - "Curved Gaming Monitor"
+  - "Curved Display"
+  - "Curved Bildschirm"
+  - "Samsung Curved Monitor"
+  - "LG Curved Monitor"
+  - "AOC Curved Monitor"
+  - "MSI Curved Monitor"
+  - "Curved 27 Zoll"
+  - "Curved 32 Zoll"
+  - "Curved 34 Zoll"
+  - "Curved Ultrawide"
+
+# SCORING-GEWICHTUNG
+# Analog zu sata_ssd.yaml/netzteil.yaml: ein Monitor ist eine einzelne,
+# austauschbare Komponente ohne CPU/RAM/GPU-Ausstattungsmerkmale --
+# Preis dominiert, hardware_qualitaet (hier: Deal-Rating-Stufe als grober
+# Tie-Breaker) fliesst leicht mit ein. hersteller bleibt bei 0: die
+# vorhandene manufacturer_reputation-Tabelle deckt PC-OEM-Marken ab
+# (Dell, HP, ...), nicht Monitor-Hersteller (Samsung, LG, AOC, ...) --
+# eine Aktivierung wuerde hier nur den globalen _default-Wert liefern.
+scoring_weights:
+  price: 0.8
+  ausstattung: 0
+  hardware_qualitaet: 0.2
+  hersteller: 0
+  zustand: 0
+  lieferumfang: 0
+
+# EXCLUDES – Fehltreffer-Quellen STRIKT AUSSCHLIESSEN
+# "defekt"/"bastler"/"ersatzteil" etc. NICHT hier dupliziert -- bereits
+# ueber exclude_global in _global.yaml fuer ALLE Kategorien abgedeckt.
+exclude_category:
+  # Curved TVs sind KEINE PC-Monitore (anderer Markt, andere Preisklasse,
+  # wuerden die Suche sonst fluten) -- wichtigster Ausschluss dieser Kategorie.
+  - "curved tv"
+  - "curved fernseher"
+  - "fernseher"
+  - "smart tv"
+
+  # Zubehoer/Peripherie mit "curved" im Titel, aber kein Monitor
+  - "curved soundbar"
+  - "curved tastatur"
+  - "curved keyboard"
+  - "curved maus"
+
+  # Nur Zubehoer, kein Geraet
+  - "monitorarm"
+  - "monitorhalterung"
+  - "monitor halterung"
+  - "standfuß"
+  - "vesa halterung"
+  - "nur halterung"
+  - "nur standfuß"
+
+  # Komplette PCs/Laptops (Monitor nur als Bundle-Beilage erwaehnt)
+  - "gaming pc"
+  - "gaming-pc"
+  - "komplett pc"
+  - "pc komplett"
+  - "laptop"
+  - "notebook"
+
+  # Konsolen
+  - "playstation"
+  - "xbox"
+  - "nintendo"
+  - "switch"
+
+rules:
+  # ============================================================
+  # Curved Monitor (alle Groessen -- Auftrag verlangt nur "curved",
+  # keine weitere Segmentierung nach Zoll/Aufloesung/Hz)
+  # ============================================================
+  - label: "Curved Monitor ★ Top-Deal"
+    price_history_model: "monitor_curved"
+    require_all_of:
+      - ["curved"]
+      - ["monitor", "display", "bildschirm"]
+    min_vram_gb: 0
+    # PLATZHALTER-Preisgrenzen (ANNAHME, bitte pruefen) -- es liegen noch
+    # KEINE lokalen Marktdaten fuer diese neue Kategorie vor (siehe
+    # Auftrag: ausschliesslich lokal gesammelte Daten, keine externen
+    # Preis-APIs). Sobald price_history.jsonl genug "monitor_curved"-
+    # Datenpunkte gesammelt hat, analog zur SATA-SSD-/Gaming-PC-
+    # Kalibrierung (p10 -> Top-Deal, Marktpreis -> Guter Preis) neu
+    # berechnen.
+    max_price: 100
+    deal_rating: "Top-Deal"
+
+  - label: "Curved Monitor"
+    price_history_model: "monitor_curved"
+    require_all_of:
+      - ["curved"]
+      - ["monitor", "display", "bildschirm"]
+    min_vram_gb: 0
+    max_price: 180
+    deal_rating: "Guter Preis"

@@ -180,7 +180,10 @@ rules:
     requirements:
       min_ssd_gb: 160
       max_ssd_gb: 319
-    max_price: 26
+    # Kalibriert anhand 31 realer price_history.jsonl-Datenpunkte (03.08.2026):
+    # p10 = 25€ -> Top-Deal-Grenze. Vorher 26€ (grober Schaetzwert, minimale
+    # Differenz -- keine Zensierungs-/Duplikat-Auffaelligkeiten in den Daten).
+    max_price: 25
     deal_rating: "Top-Deal"
     negotiation_tolerance_pct: 15.0
     negotiation_min_score: 20
@@ -191,7 +194,9 @@ rules:
     requirements:
       min_ssd_gb: 160
       max_ssd_gb: 319
-    max_price: 33
+    # Kalibriert: Marktpreis (getrimmter Mittelwert p10-p90) = 32,43€ ->
+    # gerundet 32€. Vorher 33€ (grober Schaetzwert).
+    max_price: 32
     deal_rating: "Guter Preis"
 
   # ============================================================
@@ -202,7 +207,15 @@ rules:
     requirements:
       min_ssd_gb: 320
       max_ssd_gb: 639
-    max_price: 49
+    # Kalibriert anhand 44 (von 77) realer price_history.jsonl-Datenpunkte
+    # (03.08.2026): p10 = 40,30€ -> gerundet 40€. Vorher 49€ (grober
+    # Schaetzwert). ACHTUNG: 33 der 77 Rohdatenpunkte (alle exakt 71,50€,
+    # eBay, alle im selben ~2-Sekunden-Fenster, fingerprint=null) wurden
+    # bewusst NICHT in die Kalibrierung einbezogen -- vermutlicher
+    # Duplicate-Detection-Blindspot bei Alt-Daten ohne Fingerprint. Ohne
+    # Bereinigung waere p10 faelschlich bei 47,40€ gelandet. Ursache noch
+    # nicht behoben, folgt als eigener, spaeter freizugebender Schritt.
+    max_price: 40
     deal_rating: "Top-Deal"
     negotiation_tolerance_pct: 15.0
     negotiation_min_score: 20
@@ -213,7 +226,9 @@ rules:
     requirements:
       min_ssd_gb: 320
       max_ssd_gb: 639
-    max_price: 67
+    # Kalibriert (siehe Kommentar oben, gleiche bereinigte Datenbasis):
+    # Marktpreis = 56,03€ -> gerundet 56€. Vorher 67€ (grober Schaetzwert).
+    max_price: 56
     deal_rating: "Guter Preis"
 
   # ============================================================
