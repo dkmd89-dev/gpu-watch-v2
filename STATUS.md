@@ -429,4 +429,11 @@ Kein weiterer Punkt ist priorisiert oder für den nächsten Schritt vorausgewäh
 - Volle Suite: **542/542 grün**.
 - **Damit ist Baustein 4 (Cross-Platform-Preisvergleich) vollständig abgeschlossen (Schritt 1–2).** Aus Punkt d ist damit nur noch Baustein 3 (Bundle-/Part-Out-Erkennung) mit offenem Folgeschritt (Dashboard-Badge — Berechnungslogik bereits vollständig umgesetzt) übrig, ansonsten sind alle Bausteine aus Punkt d abgeschlossen.
 
+**Punkt d, Baustein 3 (Bundle-/Part-Out-Erkennung) — Dokumentationslücke geschlossen, Baustein damit vollständig abgeschlossen:**
+- **Befund bei Code-Verifikation (Prinzip "Dokumentation muss gegen Code geprüft werden", siehe oben):** Der Dashboard-Badge (🧩 „Part-Out-Kandidat") war zum Zeitpunkt dieser Freigabe bereits **vollständig im Code implementiert** (`app.py`: `is_part_out_candidate`/`part_out_gpu_value`/`part_out_ratio_pct` additiv im `found`-Eintrag; `templates/index.html`: Badge in beiden Render-Pfaden + CSS `.badge.part-out`) — dieser Schritt war in einer früheren Session bereits umgesetzt, aber **nie in STATUS.md dokumentiert worden** (Abschnitt 16 sprang direkt von Baustein 3/Schritt 2 zu „noch offen: Bausteine 3, 4, 6"). Es wurde also nichts Neues implementiert, sondern eine reine Dokumentations-/Test-Lücke geschlossen.
+- **Zusätzlicher Befund:** Anders als bei margin/negotiation (`test_app_margin_field.py`/`test_app_negotiation_field.py`) fehlte ein dedizierter App-Level-Test, der `is_part_out_candidate` end-to-end über einen echten `run_scan()` verifiziert (nur `test_matcher_part_out.py` auf `evaluate()`-Ebene vorhanden) — diese Lücke wurde geschlossen.
+- **Geänderte Dateien:** `app/tests/test_app_part_out_field.py` (neu) — 4 Tests (Kandidat bei hohem GPU-Wert-Anteil, kein Kandidat unter Schwelle, Felder `None` ohne Preishistorie, Badge-Markup im gerenderten Dashboard-HTML). `app.py`/`templates/index.html` **nicht verändert** (bereits korrekt).
+- Volle Suite: **546/546 grün**.
+- **Damit ist Baustein 3 (Bundle-/Part-Out-Erkennung) vollständig abgeschlossen (Schritt 1–3, inkl. Dashboard-Badge).** Punkt d ist damit **vollständig abgeschlossen** (Bausteine 3, 4, 5, 6 alle fertig).
+
 
