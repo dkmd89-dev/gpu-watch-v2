@@ -184,6 +184,53 @@ def test_compute_all_price_stats_leere_eingabe_liefert_leeres_dict():
     assert compute_all_price_stats([]) == {}
 
 
+# ---------- Burst-Collapsing-Integration (Schritt 2, "strukturelle Loesung") ----------
+
+def _burst_point(price: float, seconds_offset: float, model: str = "sata_ssd_500gb",
+                  source: str = "eBay") -> PricePoint:
+    date = (datetime.now(timezone.utc) + timedelta(seconds=seconds_offset)).isoformat()
+    return PricePoint(price=price, date=date, source=source, model=model,
+                       category="sata_ssd", deal_score=None)
+
+
+def test_compute_price_stats_reduziert_dichten_alt_daten_burst_automatisch():
+    # 20 Punkte, alle Millisekunden auseinander, alle ohne fingerprint --
+    # genau das Muster aus dem sata_ssd_500gb-Fund. Ohne Collapsing wuerde
+    # count faelschlich auf 20 stehen, market_price waere exakt 71.5.
+    burst = [_burst_point(71.5, seconds_offset=0.01 * i) for i in range(20)]
+    stats = compute_price_stats("sata_ssd_500gb", burst)
+    assert stats.count == 1
+
+
+def test_compute_price_stats_collapse_bursts_false_erhaelt_rohdaten():
+    burst = [_burst_point(71.5, seconds_offset=0.01 * i) for i in range(20)]
+    stats = compute_price_stats("sata_ssd_500gb", burst, collapse_bursts=False)
+    assert stats.count == 20
+
+
+def test_compute_price_stats_burst_faellt_nicht_unter_echte_gestreute_daten():
+    # Echte, ueber Tage verteilte Datenpunkte werden vom Collapsing nicht
+    # angefasst (Regressionsschutz: Kernverhalten bleibt unveraendert).
+    prices = [100.0, 150.0, 200.0, 250.0, 300.0]
+    points = [_point(p, days_ago=i) for i, p in enumerate(prices)]
+    stats = compute_price_stats("rtx_3060_12gb", points)
+    assert stats.count == 5
+
+
+def test_compute_all_price_stats_reicht_collapse_bursts_durch():
+    burst = [_burst_point(71.5, seconds_offset=0.01 * i) for i in range(10)]
+    normal = [_point(200.0, days_ago=0, model="office_pc", category="office_pc")]
+    all_stats = compute_all_price_stats(burst + normal)
+    assert all_stats["sata_ssd_500gb"].count == 1
+    assert all_stats["office_pc"].count == 1
+
+
+def test_compute_all_price_stats_collapse_bursts_false_reicht_ebenfalls_durch():
+    burst = [_burst_point(71.5, seconds_offset=0.01 * i) for i in range(10)]
+    all_stats = compute_all_price_stats(burst, collapse_bursts=False)
+    assert all_stats["sata_ssd_500gb"].count == 10
+
+
 if __name__ == "__main__":
     import pytest
     raise SystemExit(pytest.main([__file__, "-v"]))

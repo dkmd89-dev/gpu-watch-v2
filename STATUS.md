@@ -1,4 +1,4 @@
-# status.md — Aktualisiert bis Schritt "Verhandlungs-Assistent (Abschnitt 16, Punkt d, Baustein 7): negotiation_*-YAML-Felder, matcher.py-Toleranzlogik, 🤝-Dashboard-Badge -- vollständig abgeschlossen
+# status.md — Aktualisiert bis Schritt "Neue Kategorie Curved-Monitore (Abschnitt 17): rules/monitor_curved.yaml, kein Code geändert -- vollständig abgeschlossen
 
 ## Statusübersicht
 - **Phase 0 (Projektanalyse & Stabilisierung):** Abgeschlossen
@@ -31,7 +31,10 @@
 - **SATA-SSD-Preisgrenzen kalibriert (vormals Ausblick-Punkt 3):** Abgeschlossen. `max_price`-Werte in `rules/sata_ssd.yaml` anhand realer `price_history.jsonl` (1039 Datenpunkte) neu berechnet: Top-Deal ≈ reales p10-Perzentil, Guter Preis ≈ realer Marktpreis (statt bisheriger Bauchgefühl-Werte). Veralteter Kommentar zu `gate_max_price`-Fallback in `_global.yaml` korrigiert. 397/397 Tests grün.
 - **Gaming-PC-Preiskalibrierung (vormals Ausblick-Punkt 2):** Abgeschlossen, siehe Abschnitt 15. Alle 4 Schritte umgesetzt: `rules/gaming_pc.yaml` `max_price`-Werte anhand 416 realer Datenpunkte kalibriert (Top-Deal 400€→300€, Okay 750€→450€), Erfassungsfenster zurückgesetzt.
 - **Reselling-/Arbitrage-Erweiterung (neues Konzept):** In Bearbeitung, siehe Abschnitt 16. Schritt 1 (fees-Konfiguration + `scoring/profit.py`) **abgeschlossen**. Schritt 2 (Anbindung `profit`-Komponente an `scoring/deal_score.py`) **abgeschlossen**. Schritt 3 (Anbindung an `app.py`/`matcher.py`) **abgeschlossen**. **Punkt b (Marge im Dashboard anzeigen) abgeschlossen** — `found.json`-Einträge enthalten jetzt `estimated_margin_eur`/`estimated_margin_pct`, Dashboard zeigt sie als 💰-Zeile (grün/rot je nach Vorzeichen). Produktives Scoring-Verhalten (deal_score/deal_stars) weiterhin unverändert (Default-Gewicht `profit` = 0 in allen Kategorien).
-- **Verhandlungs-Assistent (Punkt 7 aus Abschnitt 16, Punkt d):** Abgeschlossen (siehe unten, Abschnitt 16). Neue `negotiation_*`-Felder pro Kategorie-Regel erlauben Angebote leicht über `max_price`, wenn Ausstattung/Score gut genug ist (statt komplettem Verwerfen) — testweise nur an einer GPU-Regel aktiviert. Dashboard zeigt 🤝-Badge. Punkte 3–6 aus Punkt d weiterhin offen.
+- **Verhandlungs-Assistent (Punkt 7 aus Abschnitt 16, Punkt d):** Abgeschlossen (siehe unten, Abschnitt 16). Neue `negotiation_*`-Felder pro Kategorie-Regel erlauben Angebote leicht über `max_price`, wenn Ausstattung/Score gut genug ist (statt komplettem Verwerfen) — testweise nur an einer GPU-Regel aktiviert. Dashboard zeigt 🤝-Badge. **Punkt d (Bausteine 3, 4, 5, 6) inzwischen vollständig abgeschlossen** (siehe Einträge oben in Abschnitt 16).
+- **Verhandlungs-Assistent auf alle Kategorien ausgeweitet:** Abgeschlossen (siehe Abschnitt 17). `negotiation_*`-Felder von der einen GPU-Testregel auf alle sinnvollen Top-Deal-Regeln in `gpu.yaml` (9 weitere), `gaming_pc.yaml` (1), `sata_ssd.yaml` (5, Komponente `profit` statt `hardware_qualitaet`) und `netzteil.yaml` (3) ausgeweitet. `office_pc.yaml` bewusst ausgeklammert (einzige Regel dort hat Basis-Score <70, Mindest-Score-Schwelle strukturell nie erreichbar).
+- **SATA-SSD 250GB/500GB kalibriert:** Abgeschlossen (siehe Abschnitt 17). `max_price` anhand echter `price_history.jsonl`-Daten neu berechnet (250GB: 26€/33€ → 25€/32€; 500GB: 49€/67€ → 40€/56€). Bei 500GB wurde ein Burst-Cluster (33 verdächtige Duplikate, `fingerprint: null`) aus der Berechnung ausgeklammert — Wurzelursache noch offen (siehe Ausblick).
+- **Neue Kategorie „Curved Monitore" (`monitor_curved`):** Abgeschlossen (siehe Abschnitt 17). Erste Kategorie, die seit Abschluss von Phase 10 komplett neu hinzugefügt wurde — **kein Python-Code geändert**, reine YAML-Datei, beweist damit die YAML-only-Erweiterbarkeit in der Praxis (nicht nur im Kontrakt-Test).
 
 ---
 
@@ -435,5 +438,50 @@ Kein weiterer Punkt ist priorisiert oder für den nächsten Schritt vorausgewäh
 - **Geänderte Dateien:** `app/tests/test_app_part_out_field.py` (neu) — 4 Tests (Kandidat bei hohem GPU-Wert-Anteil, kein Kandidat unter Schwelle, Felder `None` ohne Preishistorie, Badge-Markup im gerenderten Dashboard-HTML). `app.py`/`templates/index.html` **nicht verändert** (bereits korrekt).
 - Volle Suite: **546/546 grün**.
 - **Damit ist Baustein 3 (Bundle-/Part-Out-Erkennung) vollständig abgeschlossen (Schritt 1–3, inkl. Dashboard-Badge).** Punkt d ist damit **vollständig abgeschlossen** (Bausteine 3, 4, 5, 6 alle fertig).
+
+---
+
+## 17. Verhandlungs-Assistent ausgeweitet + SATA-SSD-Kalibrierung + neue Kategorie Curved-Monitore
+
+Mit Punkt d (Abschnitt 16) vollständig abgeschlossen wurden drei unabhängige, einzeln freigegebene Schritte umgesetzt: Ausweitung des Verhandlungs-Assistenten auf alle sinnvollen Kategorien, Kalibrierung der SATA-SSD-Preisgrenzen für 250GB/500GB, sowie die erste komplett neue Kategorie seit Phase 10.
+
+### 17.1 Verhandlungs-Assistent auf GPU/Gaming-PC/SATA-SSD/Netzteil ausgeweitet
+
+- **Ausgangslage:** `negotiation_tolerance_pct`/`negotiation_min_score`/`negotiation_score_component` waren bisher nur an einer einzigen Regel aktiv (`rules/gpu.yaml`, „RTX 3060 12GB ★ Top-Deal", siehe Abschnitt 16). `matcher.py` war dabei bereits vollständig generisch — die Ausweitung erforderte **keine Code-Änderung**, nur YAML-Ergänzungen.
+- **`rules/gpu.yaml`:** alle 9 verbleibenden Top-Deal-Regeln (RTX 3060 Ti, RTX 3070, RX 6700 XT, RX 6750 XT, RX 6800, RTX 4060, RX 7600 XT, RX 7600, RTX 2080 Ti) um dieselben Werte wie die bestehende Testregel ergänzt: `negotiation_tolerance_pct: 15.0`, `negotiation_min_score: 70`, `negotiation_score_component: "hardware_qualitaet"`.
+- **`rules/gaming_pc.yaml`:** Regel „Gaming-PC (Top-Deal, bevorzugte GPU)" — gleiche Werte (`hardware_qualitaet`, 70).
+- **`rules/sata_ssd.yaml`:** alle 5 Top-Deal-Regeln (128GB/250GB/500GB/1TB/2TB) — abweichend `negotiation_score_component: "profit"`, `negotiation_min_score: 20` (Robins eigener Vorschlag: bei einzelnen SSDs ist die Marge aussagekräftiger als „Hardwarequalität", die bei einer einzelnen SSD kaum differenzierbar ist).
+- **`rules/netzteil.yaml`:** alle 3 Top-Deal-Regeln (550-649W/650-749W/750W+) — `hardware_qualitaet`, 70.
+- **`rules/office_pc.yaml` bewusst ausgeklammert:** die einzige Regel dort hat einen Basis-Score von ~45–65 (analog zur ursprünglichen Begründung, warum die GPU-Testregel an der Top-Deal- statt der Guter-Preis-Variante hängt) — `negotiation_min_score: 70` wäre strukturell nie erreichbar gewesen.
+- **Verifikation:** `matcher.load_rules("rules")` real aufgerufen (Kategorienliste unverändert), `evaluate()` end-to-end für je einen Verhandlungs-Kandidaten pro Batch getestet (GPU/SATA-SSD/Netzteil/Gaming-PC — Match nur innerhalb Toleranz + Score-Schwelle, sonst korrekt verworfen bzw. Fallback auf „Guter Preis"), `office_pc` zur Kontrolle unverändert bestätigt. 99/99 fixture-lose Bestandstests (`test_matcher_negotiation`, `test_app_negotiation_field`, `test_matcher_part_out`, `test_app_part_out_field`, `test_deal_score`, `test_matcher_deal_score_integration`) grün. Kein `pytest` in der Analyse-Sandbox installierbar (kein Netzwerkzugriff) — bitte in Robins Umgebung mit echtem `pytest` gegenprüfen.
+- **Keine Änderung an:** `matcher.py`, `app.py`, Dashboard, Notification-Gate.
+
+### 17.2 SATA-SSD 250GB/500GB kalibriert
+
+- **Ausgangslage:** die 250GB-/500GB-`max_price`-Werte in `rules/sata_ssd.yaml` waren seit ihrer Einführung (Abschnitt 6) grobe Schätzwerte, nie gegen echte `price_history.jsonl`-Daten geprüft.
+- **250GB:** unauffällige Daten (31 Datenpunkte), p10 = 25,00€, Marktpreis = 32,43€ — nur minimale Nachjustierung: Top-Deal 26€ → **25€**, Guter Preis 33€ → **32€**.
+- **500GB — wichtiger Befund:** von 77 Rohdatenpunkten waren **33 (43%) ein verdächtiger Preis-Cluster**: exakt 71,50€, alle von eBay, alle innerhalb eines ~2-Sekunden-Fensters entstanden, alle mit `fingerprint: null`. Das deutet auf einen **Duplicate-Detection-Blindspot bei Alt-Daten** hin (Punkte aus der Zeit vor oder ohne den Fingerprint-Mechanismus aus Baustein 5, Abschnitt 16) — vermutlich kein echter Preis-Datenpunkt 33-mal, sondern ein Cross-Posting-/Scraping-Artefakt. Unbereinigt hätte die Kalibrierung p10 = 47,40€/Marktpreis = 64,46€ ergeben (nahe an den bisherigen Bauchgefühl-Werten — kein Zufall, sondern Bestätigung, dass diese Werte bereits durch denselben Effekt verzerrt gewesen sein könnten).
+- **Kalibrierung auf den bereinigten 44 Datenpunkten** (Cluster ausgeklammert, nicht gelöscht — nur von der Berechnung ausgenommen): p10 = 40,30€, Marktpreis = 56,03€ → Top-Deal 49€ → **40€**, Guter Preis 67€ → **56€**.
+- **Wurzelursache des Clusters bewusst NICHT in diesem Schritt behoben** (wie mit Robin abgestimmt) — eigener, separat freizugebender Folgeschritt, in der YAML als Kommentar dokumentiert.
+- **Verifikation:** `evaluate()` end-to-end für beide Kapazitätsklassen mit mehreren Preispunkten getestet (Top-Deal/Guter Preis/Verhandlungs-Toleranz/Ablehnung korrekt), 110/110 fixture-lose Bestandstests grün, betroffene Bestandstests mit alten Preisen (12€/22€) liegen unter allen neuen Grenzen — keine Kollision.
+
+### 17.3 Neue Kategorie „Curved Monitore" (`monitor_curved`)
+
+- **Auftrag:** neue Kategorie „Monitore", aber bewusst nur Curved-Monitore (keine Flat-Monitore).
+- **`rules/monitor_curved.yaml` (neu) — reine YAML-Datei, kein Python-Code geändert.** Erste komplett neue Kategorie seit Abschluss von Phase 10 (Plugin-System) — bestätigt die YAML-only-Erweiterbarkeit erstmals nicht nur im Kontrakt-Test (`test_rules_category_plugin_contract.py`), sondern in der Praxis.
+- Nutzt dieselbe Titel-Match-Architektur wie `gpu.yaml` (`require_all_of`/`exclude`/`max_price`), **nicht** die Requirements-Detector-Logik von office_pc/gaming_pc/sata_ssd/netzteil — „curved" ist ein einfaches Titel-Stichwort, kein struktureller Hardware-Wert, für den ein neuer Detector nötig wäre.
+- `require_all_of: [["curved"], ["monitor","display","bildschirm"]]` — verhindert Fehltreffer wie „Curved Soundbar" allein durch das Wort „curved".
+- **Wichtigster Exclude-Fund:** Curved-**TVs** sind ein anderer Markt als Curved-**Monitore** und wären ohne expliziten Ausschluss (`"curved tv"`, `"fernseher"`, `"smart tv"`, ...) die größte Fehltreffer-Quelle gewesen.
+- **`min_vram_gb: 0` proaktiv gesetzt:** derselbe VRAM-Regex-Bug, der bei `sata_ssd.yaml` bereits real aufgetreten war (`matcher.py`s generische VRAM-Heuristik `\d{1,2}\s*gb` matcht fälschlich in Zahlen wie „48Gbps" HDMI-Bandbreitenangaben), wurde hier vorab vermieden statt erst nach einem Produktivfehler behoben.
+- 2 Regeln (Top-Deal/Guter Preis), `max_price` 100€/180€ sind **Platzhalter** (noch keine lokalen Marktdaten, wie im Auftrag „ausschließlich lokal gesammelte Daten" vorgeschrieben) — Kalibrierung folgt nach Datensammlung, analog zum bisherigen Muster (`netzteil.yaml`/`gaming_pc.yaml` initial). Bewusst kein Verhandlungs-Assistent in diesem Schritt (neue Kategorie ohne Erfahrungswerte).
+- **Verifikation:** `matcher.load_rules()` und `categories.registry.discover_categories()` real aufgerufen — Kategorie erscheint in beiden Discovery-Wegen identisch als `monitor_curved`, Dashboard-Label „Curved Monitore" korrekt aus `category:`/Datei-Fallback abgeleitet. 8 End-to-End-Fälle gegen echte `evaluate()` verifiziert (Top-Deal, Guter Preis, Curved-TV-Exclude, Zubehör-Exclude, Komplett-PC-Bundle-Exclude, kein „curved" im Titel → kein Match, VRAM-Regex-Bugfix, `exclude_global`-Fall „defekt"). 93/93 fixture-lose Bestandstests grün (inkl. `test_rules_category_plugin_contract.py`).
+- Dashboard zeigt die neue Kategorie automatisch (KPI-Kachel, Filter-Dropdown), da beides bereits generisch pro Kategorie implementiert ist (siehe Abschnitt 10) — keine weitere Anbindung nötig.
+
+### Ausblick / offene Punkte nach Abschnitt 17
+
+- **SATA-SSD-500GB-Burst-Cluster:** Wurzelursache (`fingerprint: null` bei 33 identischen Preis-Punkten in einem ~2-Sekunden-Fenster) noch nicht untersucht/behoben — vermutlich Alt-Daten aus der Zeit vor oder ohne den Fingerprint-Mechanismus. Sollte vor der nächsten SATA-SSD-Kalibrierung geklärt werden, da er auch andere Modelle (128GB/1TB/2TB) betreffen könnte (bisher nicht systematisch geprüft).
+- **`monitor_curved`-Preisgrenzen kalibrieren**, sobald genug `price_history.jsonl`-Datenpunkte gesammelt wurden (analog zum bewährten Muster aus Abschnitt 15/17.2).
+- **Verhandlungs-Assistent für `monitor_curved`/`office_pc`** noch nicht aktiviert — könnte nach ersten Erfahrungswerten nachgezogen werden.
+- **eBay Sold API (RapidAPI) als zweite Quelle für `estimated_resale_price`:** von Robin vorgeschlagen, aber noch nicht umgesetzt — steht im direkten Konflikt mit der ursprünglichen Auftrags-Vorgabe „ausschließlich lokal gesammelte Daten, keine externen Preis-APIs" (siehe `price_stats.py`-Docstring). Erfordert eine bewusste, explizite Freigabe zur Abkehr von diesem Prinzip, bevor mit der Umsetzung begonnen wird. Offene technische Punkte: API-Key-Verwaltung (kein Secrets-Handling im Projekt bisher vorhanden), Rate-Limits/Kosten, Fallback-Verhalten bei API-Fehlern, kein Netzwerkzugriff in der Analyse-Sandbox zur Verifikation der echten API-Antwortstruktur.
 
 

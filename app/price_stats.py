@@ -16,6 +16,7 @@ from zoneinfo import ZoneInfo
 
 now = datetime.now(ZoneInfo("Europe/Berlin"))
 
+from burst_cleanup import DEFAULT_MAX_GAP_SECONDS, find_burst_duplicates
 from price_history import PricePoint
 
 # Ab dieser Datenpunkt-Anzahl gelten Perzentile als statistisch tragfaehig
@@ -193,15 +194,37 @@ def _compute_trend(points: list[PricePoint]) -> tuple[str, float | None]:
     return TREND_STABIL, change_pct
 
 
-def compute_price_stats(model: str, points: list[PricePoint]) -> PriceStats | None:
+def compute_price_stats(
+    model: str,
+    points: list[PricePoint],
+    *,
+    collapse_bursts: bool = True,
+    burst_max_gap_seconds: float = DEFAULT_MAX_GAP_SECONDS,
+) -> PriceStats | None:
     """Berechnet die vollstaendige Statistik fuer EIN price_history_model.
 
     Gibt None zurueck, wenn `points` leer ist (keine Datengrundlage) --
     absichtlich kein Platzhalter-Objekt mit Nullen, da das leicht mit einer
     echten 0€-Statistik verwechselt werden koennte.
+
+    collapse_bursts (Default True): wendet burst_cleanup.find_burst_duplicates()
+    auf `points` an, BEVOR die Statistik berechnet wird (siehe STATUS.md
+    Ausblick "SATA-SSD-500GB-Burst-Cluster", burst_cleanup.py Schritt 1).
+    Wirkt NUR auf diese Berechnung -- price_history.jsonl selbst bleibt
+    unveraendert, das bleibt Aufgabe des expliziten burst_cleanup.py-Skripts
+    fuer bereits bekannte Faelle. Hier geht es um kuenftige/noch unentdeckte
+    Alt-Daten-Bursts in beliebigen Modellen: die Statistik neutralisiert sie
+    automatisch bei JEDER Berechnung, ohne dass jemand manuell ein Skript
+    ausfuehren muss. Abschaltbar (collapse_bursts=False) fuer Tests/Debugging,
+    die bewusst die Rohdaten unveraendert sehen wollen.
     """
     if not points:
         return None
+
+    if collapse_bursts:
+        points = find_burst_duplicates(points, max_gap_seconds=burst_max_gap_seconds).kept
+        if not points:
+            return None
 
     prices = sorted(p.price for p in points)
     p5 = _percentile(prices, 5)
@@ -228,14 +251,26 @@ def compute_price_stats(model: str, points: list[PricePoint]) -> PriceStats | No
     )
 
 
-def compute_all_price_stats(points: list[PricePoint]) -> dict[str, PriceStats | None]:
+def compute_all_price_stats(
+    points: list[PricePoint],
+    *,
+    collapse_bursts: bool = True,
+    burst_max_gap_seconds: float = DEFAULT_MAX_GAP_SECONDS,
+) -> dict[str, PriceStats | None]:
     """Berechnet die Statistik fuer JEDES vorkommende price_history_model.
 
     Nimmt bereits eingelesene Datenpunkte entgegen (z.B. aus
     price_history.read_price_points()), statt selbst die Datei zu lesen --
     haelt dieses Modul unabhaengig von Dateipfaden und leicht testbar.
+
+    collapse_bursts/burst_max_gap_seconds: siehe compute_price_stats(),
+    wird 1:1 an jede Modell-Berechnung durchgereicht.
     """
     return {
-        model: compute_price_stats(model, model_points)
+        model: compute_price_stats(
+            model, model_points,
+            collapse_bursts=collapse_bursts,
+            burst_max_gap_seconds=burst_max_gap_seconds,
+        )
         for model, model_points in group_by_model(points).items()
     }
