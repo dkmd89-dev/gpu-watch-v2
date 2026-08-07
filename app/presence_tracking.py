@@ -40,6 +40,7 @@ konsequent bei der Time-to-Sell-Berechnung (siehe time_to_sell.py).
 """
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from dataclasses import dataclass, asdict
 from typing import Any
 
@@ -169,3 +170,53 @@ def detect_newly_delisted(
             entry["delisted"] = True
             newly_delisted.append(url)
     return newly_delisted
+
+
+def prune_delisted_entries(
+    entries: dict[str, dict], max_age_days: int,
+) -> tuple[dict[str, dict], int]:
+    """Entfernt bereits DELISTETE Einträge, deren `last_seen` älter als
+    `max_age_days` ist -- Fix für das unbegrenzte Wachstum von seen.json
+    (Produktions-Vorfall, siehe app.py::SEEN_DELISTED_MAX_AGE_DAYS).
+
+    Nur `delisted == True`-Einträge kommen infrage: für sie wurde der
+    Time-to-Sell-Datenpunkt bereits in detect_newly_delisted() erzeugt
+    (siehe time_to_sell.py) -- die Historie wird danach nur noch für die
+    Delisting-Erkennung selbst gebraucht (verhindert erneutes Zählen), die
+    nach dem Setzen von `delisted=True` aber bereits abgeschlossen ist.
+
+    Noch aktive (nicht delistete) Einträge bleiben UNABHÄNGIG vom Alter
+    erhalten -- deren Entfernung würde den `missed_scans`-Zähler verlieren
+    und beim nächsten Sehen fälschlich `first_seen` zurücksetzen.
+
+    Migrierte Alt-Einträge ohne `last_seen` (None, siehe migrate_seen_data())
+    werden bei delisted=True ebenfalls entfernt -- ihr Alter ist nicht
+    bestimmbar, sie enthalten aber ohnehin keine verwertbare Historie mehr.
+
+    Gibt (bereinigtes Dict, Anzahl entfernter Einträge) zurück. Erstellt
+    ein neues Dict statt in-place zu mutieren, um Seiteneffekte auf vom
+    Aufrufer evtl. noch parallel referenzierte Objekte zu vermeiden.
+    """
+    now = datetime.now(timezone.utc)
+    kept: dict[str, dict] = {}
+    removed = 0
+    for url, entry in entries.items():
+        if not entry.get("delisted"):
+            kept[url] = entry
+            continue
+        last_seen = entry.get("last_seen")
+        if last_seen:
+            try:
+                last_seen_dt = datetime.fromisoformat(last_seen)
+                if last_seen_dt.tzinfo is None:
+                    last_seen_dt = last_seen_dt.replace(tzinfo=timezone.utc)
+                age_days = (now - last_seen_dt).total_seconds() / 86400
+            except ValueError:
+                age_days = None
+        else:
+            age_days = None
+        if age_days is None or age_days > max_age_days:
+            removed += 1
+            continue
+        kept[url] = entry
+    return kept, removed

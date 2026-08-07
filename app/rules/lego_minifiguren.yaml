@@ -1,0 +1,505 @@
+# ============================================================
+# LEGO Minifiguren – Sammler-/Seltenheits-Watcher
+# ============================================================
+# Zweck:
+#   Suche gezielt nach LEGO-Minifiguren mit möglichem Sammlerwert.
+#
+# Fokus:
+#   - Ninjago
+#   - Star Wars
+#   - Marvel / DC
+#   - Collectible Minifigures (CMF)
+#   - Castle / Pirates / Space / Fantasy
+#   - Promo-, Exclusive- und seltene Figuren
+#   - Figuren-Konvolute und Sammlungen
+#
+# WICHTIG:
+#   Die Preisgrenzen sind bewusst als DEAL-FILTER gedacht und nicht
+#   als garantierte Marktwerte. Ein tatsächlicher Wert hängt u.a. von
+#   Figur, Variante, Zustand, Zubehör und Originalität ab.
+#
+# ARCHITEKTUR:
+#   Rein YAML-basiert wie die bisherige Spielzeug-Bundle-Kategorie.
+#   Kein neuer Python-Detector erforderlich.
+#
+# Priorität:
+#   Die spezifischeren Regeln stehen vor den allgemeinen Regeln.
+#   Dadurch können besonders interessante Figuren mit niedrigeren
+#   Deal-Grenzen zuerst erkannt werden.
+# ============================================================
+
+category: "lego_minifiguren"
+label: "LEGO Minifiguren – Sammlerwert"
+
+min_vram_gb: 0
+
+# Obergrenze für allgemeine Benachrichtigungen.
+# Spezifische Regeln besitzen eigene max_price-Werte.
+notify_max_price: 100
+
+search_terms:
+  # Allgemein
+  - "LEGO Minifigur"
+  - "LEGO Minifiguren"
+  - "LEGO Figur"
+  - "LEGO Figuren"
+  - "LEGO Figuren Sammlung"
+  - "LEGO Minifiguren Sammlung"
+  - "LEGO Figuren Konvolut"
+  - "LEGO Minifiguren Konvolut"
+  - "LEGO Figuren Posten"
+
+  # Ninjago
+  - "LEGO Ninjago Minifigur"
+  - "LEGO Ninjago Figur"
+  - "Ninjago Minifiguren"
+  - "Ninjago Figur Sammlung"
+  - "Ninjago Figuren Konvolut"
+
+  # Star Wars
+  - "LEGO Star Wars Minifigur"
+  - "LEGO Star Wars Figur"
+  - "Star Wars Minifiguren"
+  - "Star Wars Figuren Sammlung"
+  - "Star Wars Figuren Konvolut"
+  - "LEGO Clone Wars Minifigur"
+  - "LEGO Clone Trooper"
+  - "LEGO Phase 2 Clone Trooper"
+
+  # CMF
+  - "LEGO CMF"
+  - "LEGO Sammelfigur"
+  - "LEGO Collectible Minifigures"
+  - "LEGO Serie Minifiguren"
+
+  # Weitere Sammlerbereiche
+  - "LEGO Castle Minifigur"
+  - "LEGO Pirates Minifigur"
+  - "LEGO Space Minifigur"
+  - "LEGO Marvel Minifigur"
+  - "LEGO DC Minifigur"
+  - "LEGO Herr der Ringe Minifigur"
+  - "LEGO Hobbit Minifigur"
+  - "LEGO Harry Potter Minifigur"
+  - "LEGO Monster Fighters Minifigur"
+  - "LEGO Fantasy Minifigur"
+  - "LEGO Promo Minifigur"
+  - "LEGO Exclusive Minifigur"
+  - "LEGO Limited Edition Minifigur"
+
+exclude_category:
+  # Keine Bücher / Medien
+  - "buch"
+  - "bücher"
+  - "roman"
+  - "comic"
+  - "magazin"
+  - "hörspiel"
+  - "dvd"
+  - "blu-ray"
+  - "spiel"
+  - "videospiel"
+
+  # Keine digitalen Artikel
+  - "digital"
+  - "download"
+  - "code"
+
+  # Keine offensichtlichen Nicht-Figuren-Angebote
+  - "nur steine"
+  - "nur bausteine"
+  - "kiloware"
+  - "lego steine"
+  - "lego teile"
+  - "ersatzteile"
+
+  # Defekt / Repro möglichst vermeiden
+  - "defekt"
+  - "kaputt"
+  - "beschädigt"
+  - "repro"
+  - "replik"
+  - "fake"
+  - "nachbau"
+  - "custom"          # verhindert viele nicht originale Custom-Figuren
+
+scoring_weights:
+  price: 0.70
+  ausstattung: 0
+  hardware_qualitaet: 0
+  hersteller: 0.10
+  zustand: 0.10
+  lieferumfang: 0.10
+
+rules:
+
+  # ============================================================
+  # STAR WARS – besonders interessante/seltene Figuren
+  # ============================================================
+
+  - label: "LEGO Star Wars – Darth Revan ★ Top-Deal"
+    require_all_of:
+      - ["lego", "star wars"]
+      - ["darth revan", "revan"]
+    price_history_model: "lego_sw_rare"
+    max_price: 40
+    deal_rating: "Top-Deal"
+
+  - label: "LEGO Star Wars – Darth Revan 👍 Guter Preis"
+    require_all_of:
+      - ["lego", "star wars"]
+      - ["darth revan", "revan"]
+    price_history_model: "lego_sw_rare"
+    max_price: 60
+    deal_rating: "Guter Preis"
+
+  - label: "LEGO Star Wars – Darth Revan ⚠️ Interessant"
+    require_all_of:
+      - ["lego", "star wars"]
+      - ["darth revan", "revan"]
+    price_history_model: "lego_sw_rare"
+    max_price: 80
+    deal_rating: "Interessant"
+
+  - label: "LEGO Star Wars – Clone Wars ★ Top-Deal"
+    require_all_of:
+      - ["lego", "star wars"]
+      - ["clone wars", "clone trooper", "clone", "501st", "phase 2", "phase ii"]
+    price_history_model: "lego_sw_clone"
+    max_price: 20
+    deal_rating: "Top-Deal"
+
+  - label: "LEGO Star Wars – Clone Wars 👍 Guter Preis"
+    require_all_of:
+      - ["lego", "star wars"]
+      - ["clone wars", "clone trooper", "clone", "501st", "phase 2", "phase ii"]
+    price_history_model: "lego_sw_clone"
+    max_price: 35
+    deal_rating: "Guter Preis"
+
+  - label: "LEGO Star Wars – Clone Wars ⚠️ Interessant"
+    require_all_of:
+      - ["lego", "star wars"]
+      - ["clone wars", "clone trooper", "clone", "501st", "phase 2", "phase ii"]
+    price_history_model: "lego_sw_clone"
+    max_price: 50
+    deal_rating: "Interessant"
+
+  - label: "LEGO Star Wars – seltene Figur ★ Top-Deal"
+    require_all_of:
+      - ["lego", "star wars"]
+      - ["minifigur", "minifig", "figur"]
+      - ["rar", "selten", "exclusive", "exklusiv", "limited", "sammler"]
+    price_history_model: "lego_sw_rare"
+    max_price: 15
+    deal_rating: "Top-Deal"
+
+  - label: "LEGO Star Wars – seltene Figur 👍 Guter Preis"
+    require_all_of:
+      - ["lego", "star wars"]
+      - ["minifigur", "minifig", "figur"]
+      - ["rar", "selten", "exclusive", "exklusiv", "limited", "sammler"]
+    price_history_model: "lego_sw_rare"
+    max_price: 30
+    deal_rating: "Guter Preis"
+
+  - label: "LEGO Star Wars – seltene Figur ⚠️ Interessant"
+    require_all_of:
+      - ["lego", "star wars"]
+      - ["minifigur", "minifig", "figur"]
+      - ["rar", "selten", "exclusive", "exklusiv", "limited", "sammler"]
+    price_history_model: "lego_sw_rare"
+    max_price: 50
+    deal_rating: "Interessant"
+
+
+  # ============================================================
+  # NINJAGO – ältere / seltene / exklusive Figuren
+  # ============================================================
+
+  - label: "LEGO Ninjago – seltene Figur ★ Top-Deal"
+    require_all_of:
+      - ["lego", "ninjago"]
+      - ["minifigur", "minifig", "figur"]
+      - ["rar", "selten", "exclusive", "exklusiv", "limited", "sammler", "alt"]
+    price_history_model: "lego_ninjago_rare"
+    max_price: 10
+    deal_rating: "Top-Deal"
+
+  - label: "LEGO Ninjago – seltene Figur 👍 Guter Preis"
+    require_all_of:
+      - ["lego", "ninjago"]
+      - ["minifigur", "minifig", "figur"]
+      - ["rar", "selten", "exclusive", "exklusiv", "limited", "sammler", "alt"]
+    price_history_model: "lego_ninjago_rare"
+    max_price: 20
+    deal_rating: "Guter Preis"
+
+  - label: "LEGO Ninjago – seltene Figur ⚠️ Interessant"
+    require_all_of:
+      - ["lego", "ninjago"]
+      - ["minifigur", "minifig", "figur"]
+      - ["rar", "selten", "exclusive", "exklusiv", "limited", "sammler", "alt"]
+    price_history_model: "lego_ninjago_rare"
+    max_price: 35
+    deal_rating: "Interessant"
+
+  - label: "LEGO Ninjago – Figuren-Konvolut ★ Top-Deal"
+    require_all_of:
+      - ["lego", "ninjago"]
+      - ["figuren", "minifiguren", "minifigs"]
+      - ["konvolut", "sammlung", "posten", "lot"]
+    price_history_model: "lego_ninjago_bundle"
+    max_price: 20
+    deal_rating: "Top-Deal"
+
+  - label: "LEGO Ninjago – Figuren-Konvolut 👍 Guter Preis"
+    require_all_of:
+      - ["lego", "ninjago"]
+      - ["figuren", "minifiguren", "minifigs"]
+      - ["konvolut", "sammlung", "posten", "lot"]
+    price_history_model: "lego_ninjago_bundle"
+    max_price: 40
+    deal_rating: "Guter Preis"
+
+  - label: "LEGO Ninjago – Figuren-Konvolut ⚠️ Interessant"
+    require_all_of:
+      - ["lego", "ninjago"]
+      - ["figuren", "minifiguren", "minifigs"]
+      - ["konvolut", "sammlung", "posten", "lot"]
+    price_history_model: "lego_ninjago_bundle"
+    max_price: 70
+    deal_rating: "Interessant"
+
+
+  # ============================================================
+  # COLLECTIBLE MINIFIGURES / CMF
+  # ============================================================
+
+  - label: "LEGO CMF / Sammelfigur ★ Top-Deal"
+    require_all_of:
+      - ["lego"]
+      - ["cmf", "collectible minifigure", "sammelfigur", "minifigur"]
+      - ["rar", "selten", "exclusive", "exklusiv", "series", "serie", "sammler"]
+    price_history_model: "lego_cmf"
+    max_price: 8
+    deal_rating: "Top-Deal"
+
+  - label: "LEGO CMF / Sammelfigur 👍 Guter Preis"
+    require_all_of:
+      - ["lego"]
+      - ["cmf", "collectible minifigure", "sammelfigur", "minifigur"]
+      - ["rar", "selten", "exclusive", "exklusiv", "series", "serie", "sammler"]
+    price_history_model: "lego_cmf"
+    max_price: 15
+    deal_rating: "Guter Preis"
+
+  - label: "LEGO CMF / Sammelfigur ⚠️ Interessant"
+    require_all_of:
+      - ["lego"]
+      - ["cmf", "collectible minifigure", "sammelfigur", "minifigur"]
+      - ["rar", "selten", "exclusive", "exklusiv", "series", "serie", "sammler"]
+    price_history_model: "lego_cmf"
+    max_price: 25
+    deal_rating: "Interessant"
+
+
+  # ============================================================
+  # PROMO / EXCLUSIVE / LIMITED
+  # ============================================================
+
+  - label: "LEGO Promo/Exclusive Minifigur ★ Top-Deal"
+    require_all_of:
+      - ["lego"]
+      - ["minifigur", "minifig", "figur"]
+      - ["promo", "exclusive", "exklusiv", "limited", "limitiert", "sdcc", "comic con"]
+    price_history_model: "lego_promo"
+    max_price: 15
+    deal_rating: "Top-Deal"
+
+  - label: "LEGO Promo/Exclusive Minifigur 👍 Guter Preis"
+    require_all_of:
+      - ["lego"]
+      - ["minifigur", "minifig", "figur"]
+      - ["promo", "exclusive", "exklusiv", "limited", "limitiert", "sdcc", "comic con"]
+    price_history_model: "lego_promo"
+    max_price: 30
+    deal_rating: "Guter Preis"
+
+  - label: "LEGO Promo/Exclusive Minifigur ⚠️ Interessant"
+    require_all_of:
+      - ["lego"]
+      - ["minifigur", "minifig", "figur"]
+      - ["promo", "exclusive", "exklusiv", "limited", "limitiert", "sdcc", "comic con"]
+    price_history_model: "lego_promo"
+    max_price: 50
+    deal_rating: "Interessant"
+
+
+  # ============================================================
+  # MARVEL / DC
+  # ============================================================
+
+  - label: "LEGO Marvel/DC – seltene Minifigur ★ Top-Deal"
+    require_all_of:
+      - ["lego"]
+      - ["marvel", "dc", "batman", "spider-man", "spiderman", "iron man"]
+      - ["minifigur", "minifig", "figur"]
+      - ["rar", "selten", "exclusive", "exklusiv", "limited", "sammler"]
+    price_history_model: "lego_superhero_rare"
+    max_price: 15
+    deal_rating: "Top-Deal"
+
+  - label: "LEGO Marvel/DC – seltene Minifigur 👍 Guter Preis"
+    require_all_of:
+      - ["lego"]
+      - ["marvel", "dc", "batman", "spider-man", "spiderman", "iron man"]
+      - ["minifigur", "minifig", "figur"]
+      - ["rar", "selten", "exclusive", "exklusiv", "limited", "sammler"]
+    price_history_model: "lego_superhero_rare"
+    max_price: 30
+    deal_rating: "Guter Preis"
+
+  - label: "LEGO Marvel/DC – seltene Minifigur ⚠️ Interessant"
+    require_all_of:
+      - ["lego"]
+      - ["marvel", "dc", "batman", "spider-man", "spiderman", "iron man"]
+      - ["minifigur", "minifig", "figur"]
+      - ["rar", "selten", "exclusive", "exklusiv", "limited", "sammler"]
+    price_history_model: "lego_superhero_rare"
+    max_price: 50
+    deal_rating: "Interessant"
+
+
+  # ============================================================
+  # HARRY POTTER / HERR DER RINGE / HOBBIT
+  # ============================================================
+
+  - label: "LEGO Harry Potter / LOTR – seltene Figur ★ Top-Deal"
+    require_all_of:
+      - ["lego"]
+      - ["harry potter", "herr der ringe", "lord of the rings", "lotr", "hobbit"]
+      - ["minifigur", "minifig", "figur"]
+      - ["rar", "selten", "exclusive", "exklusiv", "limited", "sammler", "alt"]
+    price_history_model: "lego_fantasy_rare"
+    max_price: 15
+    deal_rating: "Top-Deal"
+
+  - label: "LEGO Harry Potter / LOTR – seltene Figur 👍 Guter Preis"
+    require_all_of:
+      - ["lego"]
+      - ["harry potter", "herr der ringe", "lord of the rings", "lotr", "hobbit"]
+      - ["minifigur", "minifig", "figur"]
+      - ["rar", "selten", "exclusive", "exklusiv", "limited", "sammler", "alt"]
+    price_history_model: "lego_fantasy_rare"
+    max_price: 30
+    deal_rating: "Guter Preis"
+
+  - label: "LEGO Harry Potter / LOTR – seltene Figur ⚠️ Interessant"
+    require_all_of:
+      - ["lego"]
+      - ["harry potter", "herr der ringe", "lord of the rings", "lotr", "hobbit"]
+      - ["minifigur", "minifig", "figur"]
+      - ["rar", "selten", "exclusive", "exklusiv", "limited", "sammler", "alt"]
+    price_history_model: "lego_fantasy_rare"
+    max_price: 50
+    deal_rating: "Interessant"
+
+
+  # ============================================================
+  # CASTLE / PIRATES / SPACE – RETRO-SAMMLER
+  # ============================================================
+
+  - label: "LEGO Classic Castle/Pirates/Space – selten ★ Top-Deal"
+    require_all_of:
+      - ["lego"]
+      - ["castle", "ritter", "pirates", "pirat", "classic space", "space", "weltraum"]
+      - ["minifigur", "minifig", "figur"]
+      - ["rar", "selten", "alt", "vintage", "retro", "sammler"]
+    price_history_model: "lego_retro_rare"
+    max_price: 15
+    deal_rating: "Top-Deal"
+
+  - label: "LEGO Classic Castle/Pirates/Space – selten 👍 Guter Preis"
+    require_all_of:
+      - ["lego"]
+      - ["castle", "ritter", "pirates", "pirat", "classic space", "space", "weltraum"]
+      - ["minifigur", "minifig", "figur"]
+      - ["rar", "selten", "alt", "vintage", "retro", "sammler"]
+    price_history_model: "lego_retro_rare"
+    max_price: 30
+    deal_rating: "Guter Preis"
+
+  - label: "LEGO Classic Castle/Pirates/Space – selten ⚠️ Interessant"
+    require_all_of:
+      - ["lego"]
+      - ["castle", "ritter", "pirates", "pirat", "classic space", "space", "weltraum"]
+      - ["minifigur", "minifig", "figur"]
+      - ["rar", "selten", "alt", "vintage", "retro", "sammler"]
+    price_history_model: "lego_retro_rare"
+    max_price: 50
+    deal_rating: "Interessant"
+
+
+  # ============================================================
+  # ALLGEMEINE LEGO FIGUREN – SAMMLUNG / KONVOLUT
+  # ============================================================
+
+  - label: "LEGO Minifiguren-Sammlung ★ Top-Deal"
+    require_all_of:
+      - ["lego"]
+      - ["minifiguren", "minifiguren", "figuren", "minifigs"]
+      - ["sammlung", "konvolut", "posten", "lot"]
+    price_history_model: "lego_minifig_bundle"
+    max_price: 15
+    deal_rating: "Top-Deal"
+
+  - label: "LEGO Minifiguren-Sammlung 👍 Guter Preis"
+    require_all_of:
+      - ["lego"]
+      - ["minifiguren", "figuren", "minifigs"]
+      - ["sammlung", "konvolut", "posten", "lot"]
+    price_history_model: "lego_minifig_bundle"
+    max_price: 35
+    deal_rating: "Guter Preis"
+
+  - label: "LEGO Minifiguren-Sammlung ⚠️ Interessant"
+    require_all_of:
+      - ["lego"]
+      - ["minifiguren", "figuren", "minifigs"]
+      - ["sammlung", "konvolut", "posten", "lot"]
+    price_history_model: "lego_minifig_bundle"
+    max_price: 60
+    deal_rating: "Interessant"
+
+
+  # ============================================================
+  # GENERISCHER SAMMLER-FANG – NUR LEGO + FIGUR + SAMMLER-SIGNAL
+  # ============================================================
+
+  - label: "LEGO Sammler-Minifigur ★ Top-Deal"
+    require_all_of:
+      - ["lego"]
+      - ["minifigur", "minifig", "figur"]
+      - ["rar", "selten", "sammler", "exclusive", "exklusiv", "limited", "limitiert", "vintage", "retro"]
+    price_history_model: "lego_collector_generic"
+    max_price: 10
+    deal_rating: "Top-Deal"
+
+  - label: "LEGO Sammler-Minifigur 👍 Guter Preis"
+    require_all_of:
+      - ["lego"]
+      - ["minifigur", "minifig", "figur"]
+      - ["rar", "selten", "sammler", "exclusive", "exklusiv", "limited", "limitiert", "vintage", "retro"]
+    price_history_model: "lego_collector_generic"
+    max_price: 20
+    deal_rating: "Guter Preis"
+
+  - label: "LEGO Sammler-Minifigur ⚠️ Interessant"
+    require_all_of:
+      - ["lego"]
+      - ["minifigur", "minifig", "figur"]
+      - ["rar", "selten", "sammler", "exclusive", "exklusiv", "limited", "limitiert", "vintage", "retro"]
+    price_history_model: "lego_collector_generic"
+    max_price: 35
+    deal_rating: "Interessant"

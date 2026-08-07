@@ -6,6 +6,7 @@ import yaml
 from pathlib import Path
 from dataclasses import dataclass
 
+from categories.registry import discover_categories
 from categories.detectors.cpu import detect_cpu, CpuMatch
 from categories.detectors.ram import detect_ram_gb, detect_ram_type
 from categories.detectors.case import detect_case_type
@@ -214,12 +215,16 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
     # Faellt auf den internen Schluessel zurueck, falls eine Kategorie kein
     # "label" definiert -- volle Rueckwaertskompatibilitaet.
     category_labels: dict[str, str] = {}
-    category_files = sorted(
-        f for f in rules_dir.glob("*.yaml") if f.name != "_global.yaml"
-    )
-    for cat_file in category_files:
-        cat_cfg = yaml.safe_load(cat_file.read_text(encoding="utf-8")) or {}
-        category_name = cat_cfg.get("category", cat_file.stem)
+    # Migration auf die Plugin-Registry (categories/registry.py): liefert
+    # dieselbe Datei-Menge/Reihenfolge wie der vorherige manuelle Glob hier
+    # (identischer Ausschluss "_global.yaml", identischer Namens-Fallback
+    # "category"-Feld -> Dateiname), zusaetzlich robust gegen einzelne
+    # defekte YAML-Dateien (Warnung + Skip statt Absturz der gesamten
+    # Rule-Ladung, siehe discover_categories()-Docstring). Ersetzt die
+    # bisherige Duplizierung derselben Discovery-Logik an zwei Stellen.
+    for plugin in discover_categories(rules_dir).values():
+        cat_cfg = plugin.config
+        category_name = plugin.name
         all_categories.add(category_name)
         category_priorities[category_name] = cat_cfg.get("scan_priority", float("inf"))
         category_labels[category_name] = cat_cfg.get("label", category_name)

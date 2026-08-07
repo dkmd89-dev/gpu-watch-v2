@@ -110,7 +110,14 @@ def test_load_rules_liefert_vollstaendige_kategorie_liste():
     """
     cfg = load_rules(RULES_DIR)
     assert "categories" in cfg
-    assert set(cfg["categories"]) == {"gaming_pc", "gpu", "office_pc", "sata_ssd", "netzteil", "monitor_curved"}
+    # Dynamisch aus den tatsaechlich vorhandenen rules/*.yaml-Dateien
+    # abgeleitet statt hartcodiert -- eine feste Menge widerspricht dem
+    # Plugin-Prinzip "neue Kategorie = nur YAML, kein Test-Update noetig"
+    # und brach bereits mehrfach bei neuen Kategorien (siehe STATUS.md).
+    expected_categories = {
+        f.stem for f in Path(RULES_DIR).glob("*.yaml") if f.name != "_global.yaml"
+    }
+    assert set(cfg["categories"]) == expected_categories
     # Muss sortiert sein (Dropdown-Reihenfolge im Frontend)
     assert cfg["categories"] == sorted(cfg["categories"])
 

@@ -31,7 +31,18 @@ exclude_global:
   - verpackung
   - "nur karton"
   - "leerbox"
-  - "kabel"
+
+  # Zubehör-only (nur Kabel, kein eigentliches Gerät) -- bewusst als
+  # mehrwortige Phrasen statt des Einzelworts "kabel" (siehe STATUS.md
+  # Abschnitt 24, Nebenbefund): das Einzelwort schloss auch legitime
+  # Geräte-Bundles aus, die Kabel nur als Zubehör erwähnen (z.B.
+  # "PS1 mit Kabel und Controller", "Monitor inkl. HDMI Kabel").
+  - "nur kabel"
+  - "nur das kabel"
+  - "diverse kabel"
+  - "diverses kabel"
+  - "kabel konvolut"
+  - "kabelsalat"
 
   # Gesuche, Tausch & Mietschrott
   - tausch

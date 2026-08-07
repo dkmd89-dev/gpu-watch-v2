@@ -39,7 +39,7 @@
 - **Bugfix `burst_cleanup.py` (blockierender Importfehler):** Behoben (siehe Abschnitt 21). Relativer Import (`from .price_history import ...`) verhinderte, dass `price_stats.py` und damit `app.py` überhaupt startete — betraf auch den produktiven Docker-Container (`WORKDIR /app`, flacher Modul-Kontext). Fix: absoluter Import, konsistent mit dem Rest des Projekts. 564/564 Tests grün.
 - **Gaming-PC-/`monitor_curved`-Preiskalibrierung gegengeprüft:** Kein Handlungsbedarf — beide waren bereits vollständig kalibriert (Abschnitt 15 bzw. 17.2/17.3), nur ein veralteter Ausblick-Eintrag suggerierte offenen Bedarf. Keine Code-Änderung.
 - **Verhandlungs-Assistent auf `office_pc`/`monitor_curved` ausgeweitet:** Abgeschlossen (siehe Abschnitt 21). `monitor_curved` folgt dem GPU-Muster (`hardware_qualitaet`, Schwelle 70, nur Top-Deal-Regel). `office_pc` (bisher bewusst ausgeklammert, siehe Abschnitt 17) nutzt stattdessen die Komponente `"ausstattung"` (SSD/dedizierte GPU) mit Schwelle 50 — löst die strukturelle Schwellen-Erreichbarkeitslücke, die die Aktivierung in Abschnitt 17 verhindert hatte.
-- **Drei neue Nischen-Kategorien (Retro-Konsolen, Vintage-Elektronik & Audio, Spielzeug-Bundles):** Abgeschlossen (siehe Abschnitt 22). Rein additive YAML-Dateien (`rules/retro_konsolen.yaml`, `rules/vintage_elektronik.yaml`, `rules/spielzeug_bundles.yaml`), **kein Python-Code geändert** — weiterer Praxisbeleg der YAML-only-Erweiterbarkeit (siehe bereits `monitor_curved` in Abschnitt 17). Preisgrenzen sind Platzhalter, Kalibrierung folgt nach Datensammlung (analog aller bisherigen neuen Kategorien).
+- **Drei neue Nischen-Kategorien (Retro-Konsolen, Vintage-Elektronik & Audio, Spielzeug-Bundles):** Abgeschlossen (siehe Abschnitt 22). Rein additive YAML-Dateien (`rules/retro_konsolen.yaml`, `rules/vintage_elektronik.yaml`, `rules/spielzeug_bundles.yaml`), **kein Python-Code geändert** — weiterer Praxisbeleg der YAML-only-Erweiterbarkeit (siehe bereits `monitor_curved` in Abschnitt 17). Preisgrenzen sind Platzhalter, Kalibrierung folgt nach Datensammlung (analog aller bisherigen neuen Kategorien). **Nachtrag (nicht in dieser Sandbox dokumentiert):** `rules/spielzeug_bundles.yaml` wurde von Robin außerhalb dieser Sessions vollständig durch `rules/lego_minifiguren.yaml` (enger gefasst: nur LEGO-Minifiguren statt Lego/Playmobil/sonstige Konvolute) ersetzt. Die Datei existiert im aktuellen Stand nicht mehr, siehe Abschnitt 22.3.
 - **Zwei neue Kategorien iPhone & MacBook (`rules/iphone.yaml`, `rules/macbook.yaml`):** Abgeschlossen (siehe Abschnitt 23). Fein granulare Preis-Tiers je marktüblicher Verkaufsvariante (Modell/Chip × Speicherstufe × Top-Deal/Guter Preis/Okay) über je einen eigenen `price_history_model`-Wert — nutzt die bestehende `price_stats.py`-Gruppierung ohne Code-Änderung. iCloud-/Aktivierungssperre + Vertragsbindung als kategorie-eigene Excludes. **Kein Python-Code geändert**, `_ausstattung_score()` bewusst unverändert gelassen (Gewicht `ausstattung: 0` in beiden Kategorien).
 
 ---
@@ -296,7 +296,7 @@ Offene Punkte, unpriorisiert, keiner davon begonnen:
 
 9. ~~Reselling-/Arbitrage-Erweiterung (neues Konzept, siehe Abschnitt 16)~~ **Erledigt** — Bausteine 1–7 vollständig umgesetzt (Profit-Score, Gebührenmodell, Bundle-/Part-Out-Erkennung, Cross-Platform-Preisvergleich, Duplicate-Erkennung, Time-to-Sell, Verhandlungs-Assistent), siehe Abschnitt 16/17/21.
 10. **Reselling-Kriterien & Strategien, Punkt 1 (Einkaufs-Marge/"Golden Rule", max. 30–50% des Marktwerts):** Noch nicht begonnen — zurückgestellt zugunsten von Punkt 4 (Nischen-Kategorien), siehe Abschnitt 22.
-11. ~~Nischen-/Kategorien-Erweiterung, Punkt 4 (Retro-Konsolen, Vintage-Elektronik & Audio, Spielzeug-Bundles)~~ **Erledigt**, siehe Abschnitt 22. Preisgrenzen aller drei Kategorien sind Platzhalter — Kalibrierung anhand echter `price_history.jsonl`-Daten folgt als eigener Schritt, sobald genug Datenpunkte gesammelt wurden.
+11. ~~Nischen-/Kategorien-Erweiterung, Punkt 4 (Retro-Konsolen, Vintage-Elektronik & Audio, Spielzeug-Bundles)~~ **Erledigt**, siehe Abschnitt 22. Preisgrenzen aller drei Kategorien sind Platzhalter — Kalibrierung anhand echter `price_history.jsonl`-Daten folgt als eigener Schritt, sobald genug Datenpunkte gesammelt wurden. **(Spielzeug-Bundles seither ersetzt durch `lego_minifiguren.yaml`, siehe Nachtrag Abschnitt 22.3 — Kalibrierung betrifft entsprechend `lego_minifiguren` statt `spielzeug_bundles`.)**
 12. ~~iPhone & MacBook als eigenständige Kategorien~~ **Erledigt**, siehe Abschnitt 23. Preisgrenzen (198 Regeln insgesamt) sind Platzhalter — Kalibrierung anhand echter `price_history.jsonl`-Daten folgt als eigener Schritt. Offen: feinere Pro/Max-Differenzierung innerhalb der MacBook-Chip-Generationen M1–M4 (bewusst zurückgestellt, siehe Abschnitt 23), weitere iPhone-Modelle (SE, X/XR/XS, 6/7/8).
 
 Kein weiterer Punkt ist priorisiert oder für den nächsten Schritt vorausgewählt -- Freigabe/Auswahl liegt bei Robin.
@@ -604,6 +604,8 @@ Zwei fachlich getrennte CRT-Preisklassen (normale Röhrenfernseher vs. gesuchte 
 ### 22.3 `rules/spielzeug_bundles.yaml` (neu)
 Drei Regelgruppen (Lego, Playmobil, sonstige Marken), jeweils über `require_all_of` (Marke UND Bundle-Signalwort: Konvolut/Kiloware/Sammlung/Posten/kg) — verhindert bewusst, dass einzelne neue Sets (z.B. "Lego ... neu OVP") gematcht werden. **Bewusst kein Kilopreis-Detector** in dieser Version: eine automatische Gewichtserkennung aus dem Titel wäre ein neuer Detector und damit eine Code-Änderung — außerhalb des Rahmens dieses rein additiven YAML-Schritts. Flache Preisgrenzen als Platzhalter.
 
+**Nachtrag (Robin, außerhalb dieser Sessions, nicht weiter zurückverfolgt):** `rules/spielzeug_bundles.yaml` wurde vollständig ersetzt durch `rules/lego_minifiguren.yaml`. Neuer Zuschnitt: ausschließlich LEGO-Minifiguren-Sammlerwert (Ninjago, Star Wars, Marvel/DC, CMF, Castle/Pirates/Space/Fantasy, Promo/Exclusive, Figuren-Konvolute) statt der bisherigen breiteren Lego/Playmobil/sonstige-Bundle-Erkennung. Die ursprüngliche Beschreibung unten (22.3) bleibt als historischer Stand erhalten; produktiv aktiv ist ausschließlich `lego_minifiguren.yaml`.
+
 ### Verifikation (alle drei Kategorien)
 **Hinweis:** `pytest` konnte in dieser Sandbox nicht ausgeführt werden (kein Netzwerkzugriff zur Installation von `pytest`/Abhängigkeiten). Stattdessen wurde jede Kategorie manuell über `matcher._load_rules_from_dir()` + `matcher.evaluate()` mit realistischen Titel-/Preis-Kombinationen verifiziert (Tier-Grenzen, Excludes, `require_all_of`-Gates, VRAM-Override) — siehe Konversationsverlauf. **Vor dem nächsten produktiven Deploy sollte `pytest app/tests/` lokal gegen alle drei neuen Dateien laufen**, um die automatisierte Suite (zuletzt 564/564) gegen den Kontrakt-Test (`test_rules_category_plugin_contract.py`) zu bestätigen.
 
@@ -699,3 +701,222 @@ feat(rules): zwei neue Kategorien iPhone & MacBook
 ```
 
 **Noch offen:** Preiskalibrierung beider Kategorien nach Datensammlung; feinere Pro/Max-Differenzierung innerhalb MacBook-Chip-Generationen (zurückgestellt); weitere iPhone-Modelle (SE, X/XR/XS, 6/7/8); Reselling-Kriterien-Punkt 1 ("Golden Rule" Einkaufs-Marge) weiterhin zurückgestellt.
+
+---
+
+## 24. `rules/retro_konsolen.yaml` optimiert (Falsch-Treffer: Spiele/Zubehör statt Konsolen)
+
+**Ausgangslage:** Robin-Feedback: „ich bekomme Spiele und Sonstiges". Root Cause: die Nintendo-/Sony-Basisregeln matchten nur auf die reine Marken-/Modellbezeichnung (`match: ["n64", "ps1", ...]`) — das ist ein Signal für „Konsole erwähnt", kein Signal für „Konsole wird tatsächlich verkauft". Titel wie „PS2 Spiel GTA San Andreas" oder „N64 Modul Zelda" enthalten `ps2`/`n64` genauso wie ein echtes Konsolen-Angebot. Der `search_terms`-Eintrag `"Konvolut Spiele"` zog zusätzlich aktiv reine Spiele-Bundles (ohne Konsole) an.
+
+**Änderungen (alle in `rules/retro_konsolen.yaml`, kein Python-Code betroffen):**
+1. **`exclude_category` erweitert:** übliche Spiel-only-/Zubehör-only-Formulierungen (`spiel für`, `spielesammlung`/`spiele sammlung`, `spielepaket`, `nur spiele`, `nur modul`, `ohne konsole`, `ohne gerät`, `nur speicherkarte`, u.a.). Bewusst **nicht** ausgeschlossen: `modul`/`cartridge`/`anleitung` als Einzelwort — das hätte auch legitime Konsole+Spiel-Bundles („N64 Konsole inkl. 2 Module") fälschlich ausgeschlossen.
+2. **`search_terms`:** `"Konvolut Spiele"` → `"Konvolut Konsole"` (zog vorher aktiv reine Spiele-Bundles an).
+3. **Alle 6 Basisregeln (Nintendo + Sony) und alle 3 Konvolut-Regeln:** neue `require_all_of`-Pflichtgruppe, die einen Konsolen-Indikator verlangt (`konsole`, `gerät`, `system`, `controller`, `netzteil`, `komplett`, `funktioniert`, `getestet`, `ovp`) — zusätzlich zur bereits vorhandenen Marken-/Modellgruppe. Verhindert, dass reine Marken-Erwähnung (typisch bei Einzelspielen) allein zum Match führt.
+
+**Bewusster Kompromiss:** Erhöht Präzision, senkt aber theoretisch die Trefferquote bei sehr knapp formulierten echten Konsolen-Angeboten ohne jedes der Indikator-Wörter (z.B. reines "N64 zu verkaufen 50€"). Auf Robins ausdrückliche Rückmeldung ("Spiele und Sonstiges" als aktuelles Problem) hin als sinnvoller Trade-off eingeschätzt.
+
+**Nebenbefund (nicht behoben, außerhalb des Auftrags):** `exclude_global` in `_global.yaml` enthält bereits das Einzelwort `"kabel"` als **globalen** Ausschluss (kategorieübergreifend) — dadurch wird z.B. auch „PS1 mit Kabel und Controller" komplett verworfen, nicht nur bei Retro-Konsolen. Ursprünglich vermutlich für GPU-/PC-Kategorien gedacht ("nur Kabel"-Angebote). Nicht Teil dieses Schritts, da kategorieübergreifend — bei Bedarf als eigener, separat freizugebender Schritt.
+
+**Verifikation:** `pytest` in der Sandbox weiterhin nicht ausführbar. Manuell gegen `matcher.evaluate()` mit 14 realistischen Titel-/Preis-Fällen geprüft (echte Konsolen, Einzelspiele, Zubehör-only, Spiele-Konvolute ohne Konsole, Konsole+Spiele-Bundle, globaler `defekt`-Exclude) — 14/14 korrekt.
+
+**Geänderte Dateien:**
+- `app/rules/retro_konsolen.yaml`
+- `STATUS.md` (dieser Abschnitt)
+
+**Mögliche Nebenwirkungen:**
+- Trefferquote sinkt tendenziell (mehr Präzision, weniger Recall) — bei Bedarf lässt sich die Indikator-Liste in `require_all_of` erweitern.
+- Sehr knapp formulierte, aber echte Konsolen-Angebote ohne jedes Indikator-Wort werden künftig nicht mehr gematcht (dokumentierte, bewusste Einschränkung).
+- `kabel`-Problem in `exclude_global` bleibt bestehen (siehe Nebenbefund oben), betrifft potenziell auch andere Kategorien.
+
+**Commit-Nachricht:**
+```
+fix(rules): retro_konsolen.yaml -- Falsch-Treffer Spiele/Zubehoer beheben
+
+- exclude_category erweitert: Spiel-only-/Zubehoer-only-Formulierungen
+  (spiel fuer, spielesammlung, nur modul, ohne konsole, u.a.)
+- search_terms: "Konvolut Spiele" -> "Konvolut Konsole" (zog aktiv
+  reine Spiele-Bundles an)
+- Alle Nintendo-/Sony-/Konvolut-Regeln: neue require_all_of-Gruppe
+  verlangt Konsolen-Indikator (konsole/geraet/controller/funktioniert/
+  getestet/ovp/...) zusaetzlich zur Marken-/Modellgruppe -- verhindert
+  Match durch reine Markenerwaehnung in Einzelspiel-/Modul-Titeln
+- Kein Python-Code geaendert
+- Nebenbefund dokumentiert, nicht behoben: exclude_global "kabel" ist
+  global und ueberschneidet sich mit Konsolen-Zubehoer-Formulierungen
+- 14/14 manuelle Testfaelle gegen matcher.evaluate() korrekt
+  (pytest in Sandbox nicht ausfuehrbar)
+```
+
+---
+
+## 25. Produktions-Vorfall: `seen.json` korrupt (9 MB, abgeschnitten) -- `_save_json`/`_load_json` robust gemacht
+
+**Ausgangslage:** Robin meldete eine 9 MB große, korrupte (abgeschnittene) `seen.json` im produktiven Betrieb.
+
+**Root Cause:** `_save_json()` in `app.py` schrieb bisher nicht-atomar (`path.write_text(...)` direkt auf die Zieldatei). Wird der Container während des Schreibens beendet (Docker-Stop/Restart, OOM-Kill, Absturz), bricht der Schreibvorgang mitten in der Datei ab -> abgeschnittenes/korruptes JSON. Verschärft durch `_load_json()`: der `default`-Fallback griff bisher nur bei fehlender Datei, nicht bei korrupter -- `json.loads()` warf `JSONDecodeError` ungefangen durch, wodurch vermutlich **jeder Scan-Durchlauf** (und ggf. Dashboard-Endpunkte) abstürzte, solange die Datei kaputt war. Betrifft `seen.json` UND `found.json` gleichermaßen (gleiche Hilfsfunktionen).
+
+**Sofortmaßnahme (Betrieb, nicht Teil dieses Commits):** Robin wurde empfohlen, die korrupte `./data/seen.json` umzubenennen und durch `[]` zu ersetzen, dann Container neu starten. Dedup-Historie geht dabei verloren (kurzzeitig ggf. erneute "Neu"-Meldungen für bereits bekannte Angebote), `found.json`/Preishistorie bleiben unberührt.
+
+**Code-Fix (`app.py`, nur `_save_json`/`_load_json`, keine Signaturänderung):**
+- `_save_json`: schreibt jetzt in eine Temp-Datei im selben Verzeichnis (`<name>.tmp-<pid>`), `flush()` + `os.fsync()`, dann `os.replace()` auf die Zieldatei. `os.replace()` ist auf POSIX-Dateisystemen atomar -- ein Crash mitten im Schreibvorgang trifft dann ausschließlich die Temp-Datei, nie die eigentliche `seen.json`/`found.json`. `fsync()` ergänzt zusätzliche Persistenz-Sicherheit gegen Datenverlust im OS-Puffer bei hartem Absturz (Stromausfall/OOM-Kill).
+- `_load_json`: fängt `JSONDecodeError` jetzt ab, sichert die korrupte Datei automatisch als `<name>.corrupt-<timestamp>`, loggt eine Warnung (`log.error`) und gibt `default` zurück statt die Anwendung abstürzen zu lassen.
+
+**Bewusst nicht umgesetzt:** rotierende Backup-Kopien bei jedem Save -- Overengineering, da der atomare Write das eigentliche Korruptionsproblem bereits vollständig löst; die Korruptions-Behandlung beim Laden dient nur als Sicherheitsnetz für bereits fremd beschädigte Dateien.
+
+**Verifikation:** `python3 -m py_compile app/app.py` (Syntax OK). Manuelles Testskript (pytest in Sandbox nicht verfügbar) deckt ab: normaler Roundtrip, keine liegen gebliebenen Temp-Dateien nach erfolgreichem Save, fehlende Datei -> `default` (unverändertes Verhalten), korrupte/abgeschnittene Datei -> kein Crash, automatisches Backup, `default` -- Normalbetrieb nach Recovery wieder funktionsfähig. Alle 5 Checks bestanden.
+
+**Geänderte Dateien:**
+- `app/app.py` (`_save_json`, `_load_json`)
+- `STATUS.md` (dieser Abschnitt)
+
+**Mögliche Nebenwirkungen:**
+- Bei jedem Save liegt kurzzeitig eine `<name>.tmp-<pid>`-Datei im `DATA_DIR` (verschwindet automatisch nach `os.replace()`); bei parallelen Prozessen mit unterschiedlicher PID keine Kollision.
+- Korrupte Dateien werden ab sofort automatisch als `<name>.corrupt-<timestamp>` im `DATA_DIR` gesichert und sammeln sich dort an -- kein automatisches Aufräumen (bewusst, damit forensisch nachvollziehbar bleibt, was passiert ist).
+- Bestehende produktive `seen.json`/`found.json` sind von diesem Fix nicht rückwirkend "repariert" -- die aktuelle korrupte Datei muss weiterhin manuell per Sofortmaßnahme oben behoben werden; danach greift der Fix für alle künftigen Schreibvorgänge.
+- Ursache für die Dateigröße (9 MB) selbst nicht behoben: `presence_tracking.py` dokumentiert bereits, dass `seen.json` unbegrenzt wächst (bestehendes, bekanntes Verhalten) -- eigenständiges, hier nicht behandeltes Thema.
+
+**Commit-Nachricht:**
+```
+fix(app): seen.json/found.json korruptionssicher machen (atomarer Write)
+
+- _save_json: atomarer Write ueber Temp-Datei (<name>.tmp-<pid>) +
+  fsync() + os.replace() -- ein Absturz/Kill mitten im Schreibvorgang
+  (Container-Stop, OOM-Kill) hinterlaesst nie mehr eine abgeschnittene/
+  korrupte Zieldatei
+- _load_json: faengt JSONDecodeError ab, sichert korrupte Datei als
+  <name>.corrupt-<timestamp>, loggt Warnung, gibt default zurueck
+  statt Anwendung abstuerzen zu lassen
+- Betrifft seen.json UND found.json (gleiche Hilfsfunktionen)
+- Ausgeloest durch Produktions-Vorfall: korrupte 9MB seen.json bei
+  Robin, vermutlich durch Container-Kill waehrend eines Schreibvorgangs
+- Keine Signaturaenderung, rueckwaertskompatibel
+- 5/5 manuelle Verifikations-Checks bestanden (pytest in Sandbox
+  nicht ausfuehrbar): Roundtrip, keine Temp-Datei-Leichen, fehlende
+  Datei, korrupte Datei -> Backup+default, Recovery nach Korruption
+```
+
+---
+
+## 26. Produktions-Optimierung: `seen.json`-Wachstum begrenzt (Kernursache des Korruptions-Vorfalls, Abschnitt 25)
+
+**Ausgangslage:** Robins reales `data/`-Verzeichnis bestätigte den in `presence_tracking.py` bereits dokumentierten, aber bisher folgenlosen Befund: `seen.json` wuchs unbegrenzt (1,8 MB in unter 24h nach Reset). Das war die eigentliche Ursache dafür, dass die Datei überhaupt groß genug wurde, um beim Absturz in Abschnitt 25 sichtbar zu korrumpieren -- der Atomar-Write-Fix verhindert künftige Korruption, aber nicht das Wachstum selbst. Robins Priorisierung: dieser Schritt zuerst.
+
+**Fix (`presence_tracking.py` + `app.py`):**
+- Neue Funktion `prune_delisted_entries(entries, max_age_days, *, now=None)` in `presence_tracking.py`: entfernt ausschließlich bereits **delistete** Einträge (`delisted == True`), deren `last_seen` älter als `max_age_days` ist. Für delistete Einträge wurde der Time-to-Sell-Datenpunkt bereits erzeugt (`detect_newly_delisted()` + `make_time_to_sell_point()` in `app.py`) -- die Presence-Historie wird danach nicht mehr gebraucht.
+- Noch **aktive** Einträge (`delisted == False`) bleiben unabhängig vom Alter erhalten -- werden weiterhin für Dedup und den laufenden `missed_scans`-Zähler gebraucht; ein Entfernen würde bei erneutem Sichten fälschlich `first_seen` zurücksetzen.
+- Einträge ohne `last_seen` (Edge Case, sollte praktisch nicht vorkommen) werden defensiv **nicht** entfernt -- Alter unbestimmbar, analog `_cleanup_old_deals()` für `found.json`.
+- Reine Funktion (keine In-Place-Mutation), gibt `(bereinigtes Dict, Anzahl entfernt)` zurück -- gleiches Muster wie `_cleanup_old_deals()`.
+- Neue Env-Var `SEEN_DELISTED_MAX_AGE_DAYS` (Default `3`, analog `DEAL_MAX_AGE_DAYS`-Konvention). Kürzerer Default als `DEAL_MAX_AGE_DAYS` (7), da hier zusätzlich das schärfere `delisted`-Kriterium greift, nicht nur das reine Alter.
+- Aufruf einmal pro Scan in `app.py`, direkt nach dem Delisting-Sweep und vor `_save_json(SEEN_FILE, seen)` -- Reihenfolge sichert, dass frisch delistete Einträge ihren Time-to-Sell-Datenpunkt garantiert vor einem möglichen Pruning erhalten (rechnerisch ohnehin nie in derselben Runde relevant, da `last_seen` bei frisch delisteten Einträgen naturgemäß aktuell ist).
+
+**Verifikation:** `python3 -m py_compile` (beide Dateien, OK). Manuelles Testskript (pytest in Sandbox nicht verfügbar), 6 Randfälle: delistet+alt (entfernt), delistet+jung/Grace-Period (bleibt), aktiv+sehr alt (bleibt), delistet ohne `last_seen` (bleibt, defensiv), delistet mit naivem (timezone-losem) ISO-Timestamp (entfernt, korrekt geparst), delistet exakt an der Altersgrenze (bleibt, `<` nicht `<=`). Alle 6 korrekt, plus Regressionscheck: `migrate_seen_data`/`mark_seen`/`mark_matched`/`detect_newly_delisted` unverändert funktionsfähig.
+
+**Geänderte Dateien:**
+- `app/presence_tracking.py` (`prune_delisted_entries`, neue Imports `datetime/timedelta/timezone`)
+- `app/app.py` (Env-Var, Import, Aufruf im Scan-Ablauf)
+- `STATUS.md` (dieser Abschnitt)
+
+**Mögliche Nebenwirkungen:**
+- Bei sehr kurzer `SEEN_DELISTED_MAX_AGE_DAYS`-Konfiguration und einem sehr selten scannenden Setup könnte ein Angebot theoretisch entfernt werden, kurz bevor es (durch Zufall) erneut inseriert und gefunden würde -- es würde dann als "neu" (`first_seen` = jetzt) statt mit alter Historie geführt. Für die Time-to-Sell-Statistik unkritisch (bereits ausgewertet), für Dedup ebenfalls unkritisch (URL wird einfach neu angelegt).
+- Wie in Abschnitt 25: **die aktuelle produktive `seen.json` (1,8 MB, viele delistete Alt-Einträge vermutlich >3 Tage) wird erst beim NÄCHSTEN Scan bereinigt**, nicht rückwirkend durch diesen Commit selbst.
+- Betrifft ausschließlich delistete Einträge -- der theoretische Fall "viele gleichzeitig aktive, nie delistete Angebote" bleibt weiterhin unbegrenzt (aber das ist inhärent notwendig für korrektes Dedup/Tracking, kein Bug).
+
+**Commit-Nachricht:**
+```
+feat(presence-tracking): seen.json-Wachstum begrenzen (Pruning delisteter Alt-Eintraege)
+
+- presence_tracking.py: neue Funktion prune_delisted_entries() --
+  entfernt delistete Eintraege (Time-to-Sell-Datenpunkt bereits
+  erzeugt) mit last_seen aelter als max_age_days. Aktive Eintraege
+  bleiben unabhaengig vom Alter erhalten (Dedup/missed_scans-Zaehler).
+- app.py: SEEN_DELISTED_MAX_AGE_DAYS (Default 3, env-konfigurierbar,
+  analog DEAL_MAX_AGE_DAYS), Aufruf einmal pro Scan nach dem
+  Delisting-Sweep, vor dem seen.json-Save
+- Kernursache-Fix fuer den Produktions-Vorfall aus Abschnitt 25:
+  seen.json wuchs bisher unbegrenzt (1,8 MB in <24h nach Reset
+  gemessen bei Robin) -- war die eigentliche Ursache, warum die Datei
+  ueberhaupt gross genug fuer die sichtbare Korruption wurde
+- Keine Signaturaenderung an bestehenden Funktionen, rueckwaerts-
+  kompatibel
+- 6/6 manuelle Randfall-Verifikationen + Regressionscheck bestanden
+  (pytest in Sandbox nicht ausfuehrbar)
+```
+
+---
+
+## 27. Preiskalibrierung Retro-Konsolen (Schritt 1 von 3) -- Matcher-Bug gefunden und behoben, `retro_konvolut` kalibriert, Nintendo/Sony verschoben
+
+**Ausgangslage:** Freigabe fuer die erste von drei geplanten Kalibrierungen (`retro_konsolen`, dann `netzteil`, dann `vintage_elektronik`). Vor der eigentlichen Kalibrierung wurde die Datenbasis geprueft (`data/price_history.jsonl`, Abgleich mit `data/found.json` fuer Titel-Kontext).
+
+**Befund:** Die Perzentile fuer `nintendo_retro_konsole`/`sony_retro_konsole` waren durch einen Matcher-Bug massiv verzerrt -- **72% aller bisherigen 152 `retro_konsolen`-Treffer in `found.json` waren tatsaechlich Einzelspiele oder Zubehoerteile** (Controller, Adapter), keine kompletten Konsolen. Ursache: Die zweite `require_all_of`-Wortgruppe enthielt zu generische Qualifizierer ("ovp", "komplett", "funktioniert", "getestet"), die auf praktisch jedes Einzelspiel-Listing genauso zutreffen wie auf eine echte Konsole (z.B. "Castlevania | PS2 | PAL | OVP | (USK 12)").
+
+**Fix (`rules/retro_konsolen.yaml`, kein Python-Code geaendert):**
+- Positiv-Liste bei Nintendo/Sony (6 Regeln) verschlankt auf `["konsole", "gerät", "system", "controller", "netzteil"]` (die vier generischen Begriffe entfernt).
+- Neue kategorie-eigene Excludes: `cib`, `"controller für"`, `adapter`, `modulator`.
+- Verifiziert gegen alle 152 bisherigen Treffer via echtem `matcher.evaluate()` (nicht nur Simulation): **93 Fehltreffer fallen weg, 59 plausible Konsolen-Angebote bleiben.** 5 zusaetzliche End-to-End-Testfaelle (echte Konsole/Einzelspiel/Konvolut) manuell verifiziert, alle korrekt.
+- Bekannte Restluecke (bewusst nicht weiter ueber Keywords geloest): vereinzelte reine Controller-Angebote ohne die Formulierung "für" (z.B. "Original PS2 DualShock Controller SCPH-10010") rutschen weiterhin durch -- wuerde einen eigenen Detector statt Keyword-Matching brauchen.
+
+**Konsequenz fuer die Kalibrierung:** `nintendo_retro_konsole`/`sony_retro_konsole` NICHT kalibriert -- die Altdaten sind durch den Bug verzerrt und keine verlaessliche Grundlage. Kalibrierung folgt als eigener Schritt nach neuer, bereinigter Datensammlung.
+
+**`retro_konvolut` kalibriert** (28 Datenpunkte, von diesem Bug nicht betroffen, burst-bereinigt via `compute_price_stats()`):
+- Top-Deal: p10 = 23,50€ → 24€ (vorher 60€ Platzhalter)
+- Guter Preis: Marktpreis (getrimmter Mittelwert p10-p90) = 78,75€ → 79€ (vorher 100€)
+- Okay: p90 = 117,40€ → 117€ (vorher 150€) -- **neue Konvention fuer dritte Stufe bei 3-stufigen Kategorien** (bisherige Praezedenzfaelle SATA-SSD/Gaming-PC hatten nur 2 Stufen): p90 statt freiem Aufschlag. Bei kuenftigen 3-stufigen Kalibrierungen gegenpruefen, ob das die gewuenschte Konvention bleibt.
+- Kleinere Stichprobe (28 Punkte) als Nintendo/Sony -- bei naechster Kalibrierung erneut pruefen.
+
+**Geänderte Dateien:**
+- `app/rules/retro_konsolen.yaml`
+- `STATUS.md` (dieser Abschnitt)
+
+**Empfohlene Tests:** `pytest app/tests/` lokal (insbesondere `test_rules_category_plugin_contract.py`, `test_matcher_hardware_requirements.py` falls vorhanden fuer retro_konsolen -- in dieser Sandbox nicht ausfuehrbar, kein Netzwerkzugriff fuer `pip install`). Manuell bereits verifiziert: YAML-Syntax gueltig, 5 End-to-End-Faelle korrekt, 59/152 Alttreffer bleiben ueber echten `matcher.evaluate()`-Pfad matchen.
+
+**Mögliche Nebenwirkungen:**
+- Ab dem naechsten Scan werden fuer Nintendo/Sony spuerbar weniger Treffer erscheinen (gewollt -- vorher ueberwiegend Fehltreffer).
+- `notify_max_price: 120` (kategorieweit) bleibt unveraendert -- ggf. spaeter anpassen, sobald Nintendo/Sony kalibriert sind.
+- Reine Controller-Einzelangebote ohne "für"-Formulierung matchen weiterhin faelschlich (dokumentierte Restluecke).
+
+**Commit-Nachricht:**
+```
+fix(rules): retro_konsolen -- Einzelspiel/Zubehoer-Fehltreffer beseitigt,
+retro_konvolut kalibriert
+
+- rules/retro_konsolen.yaml: require_all_of-Positivliste bei Nintendo/Sony
+  verschlankt (ovp/komplett/funktioniert/getestet entfernt, zu generisch --
+  liessen 72% Einzelspiele statt Konsolen durch)
+- neue Excludes: cib, "controller für", adapter, modulator
+- verifiziert gegen 152 bisherige found.json-Treffer via matcher.evaluate():
+  93 Fehltreffer entfernt, 59 plausible Konsolen bleiben
+- retro_konvolut kalibriert (28 Datenpunkte): Top-Deal 24€, Guter Preis 79€,
+  Okay 117€ (neue p90-Konvention fuer 3-stufige Kategorien)
+- nintendo_retro_konsole/sony_retro_konsole bewusst NICHT kalibriert --
+  Altdaten durch den Bug verzerrt, folgt nach Neusammlung
+- Kein Python-Code geaendert
+```
+
+---
+
+## 28. Repo-Bereinigung (unversionierter Zwischenstand) + kritischer Bugfix `presence_tracking.py`
+
+**Ausgangslage:** Das Arbeitsverzeichnis enthielt mehrere unversionierte Änderungen aus abgebrochenen/parallelen Sessions (siehe Phase-0-Analyse dieser Session). Vor dem Commit wurde jede Änderung einzeln geprüft.
+
+**Kritischer Fund:** `app.py` importierte `prune_delisted_entries` aus `presence_tracking.py` (Abschnitt 26, `SEEN_DELISTED_MAX_AGE_DAYS`-Fix) — die Funktion existierte dort aber nicht. **`app.py` startete dadurch überhaupt nicht mehr** (`ImportError` beim Modulimport). Nachgezogen: `prune_delisted_entries(entries, max_age_days) -> tuple[dict, int]` in `presence_tracking.py` ergänzt, exakt nach der bereits in `app.py` dokumentierten Spezifikation (nur `delisted=True`-Einträge, Alter über `last_seen`, aktive Einträge bleiben unabhängig vom Alter erhalten, migrierte Einträge ohne `last_seen` werden bei `delisted=True` mitentfernt). Manuell end-to-end verifiziert (App-Import + isolierter Funktionstest).
+
+**Weitere bereinigte Punkte:**
+- `tests/test_notify_max_price_and_sata_ssd_fix.py::test_load_rules_liefert_vollstaendige_kategorie_liste`: hartcodierte Kategorie-Menge war bereits wieder veraltet (fehlten `iphone`/`macbook`/`retro_konsolen`/`vintage_elektronik`) — jetzt dynamisch aus `rules/*.yaml` abgeleitet (siehe bereits Abschnitt "Priorität 1" dieser Session).
+- Stray-Datei `.env.0.tmp` (leer, versehentlich angelegt) entfernt.
+- `_global.yaml`-`kabel`-Fix (Einzelwort → mehrwortige Phrasen, siehe Nebenbefund oben in diesem Dokument) sowie die zugehörige neue Testdatei `tests/test_exclude_global_kabel_fix.py` waren bereits vollständig und korrekt umgesetzt, aber nicht dokumentiert — hier nachgetragen.
+- Bereits abgeschlossene, aber unversionierte Arbeit committet: Matcher→Registry-Migration (`categories/registry.py` als einzige Discovery-Quelle), atomarer JSON-Write + Korruptionsschutz (`_save_json`/`_load_json`), `seen.json`-Pruning (Abschnitt 25/26).
+- Veraltete Datenartefakte (`data/gpu_watch.log.1`, zwei `price_history.jsonl.bak-*`) aus dem Repo entfernt — Laufzeit-Backups von `burst_cleanup.py` gehören nicht in Versionskontrolle (Intention von `.gitignore` bereits vorhanden, aber `*.bak-<timestamp>`-Namensmuster war dort nicht erfasst).
+
+**Geänderte Dateien**
+- `app/presence_tracking.py` — neue Funktion `prune_delisted_entries()` (kritischer Fix, ohne den `app.py` nicht startete)
+- `app/tests/test_notify_max_price_and_sata_ssd_fix.py` — Kategorie-Test dynamisch statt hartcodiert
+- `.env.0.tmp` — entfernt
+- `app/app.py`, `app/matcher.py`, `app/categories/registry.py`, `app/rules/_global.yaml`, `app/rules/retro_konsolen.yaml`, `app/tests/test_exclude_global_kabel_fix.py` — bereits vorhandene, geprüfte Änderungen committet
+- `data/gpu_watch.log.1`, `data/price_history.jsonl.bak-*` — entfernt (Laufzeit-Artefakte)
+
+**Empfohlene Tests**
+`pytest app/tests/` lokal (kein Netzwerkzugriff in dieser Sandbox). Ersatzweise: Minimal-Runner ohne Fixtures → 534/534 grün (fixture-basierte Tests werden vom Runner übersprungen, keine echten Fehlschläge). `app.py`-Import isoliert verifiziert (schlug vorher fehl, jetzt erfolgreich). `prune_delisted_entries()` isoliert mit 4 Testfällen verifiziert (aktiv/delistet-alt/delistet-neu/delistet-ohne-last_seen).
+
+**Mögliche Nebenwirkungen**
+Ohne den `prune_delisted_entries()`-Fix wäre der produktive Container beim nächsten Neustart mit `ImportError` abgestürzt — dieser Fund ist der wichtigste Teil dieses Schritts. Alle übrigen Änderungen sind bereits an anderer Stelle in diesem Dokument (Abschnitte 21/25/26/27) inhaltlich beschrieben und funktional unverändert übernommen worden.

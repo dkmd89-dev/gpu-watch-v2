@@ -42,7 +42,7 @@ search_terms:
   - "PlayStation 2"
   - "PS2"
   - "Retro Konsole"
-  - "Konvolut Spiele"
+  - "Konvolut Konsole"
 
 # Kategorie-eigene Ausschluesse (zusaetzlich zu exclude_global aus
 # _global.yaml, das u.a. bereits "defekt"/"bastler"/"tausch" global
@@ -55,6 +55,54 @@ exclude_category:
   - "nur controller"
   - "controller only"
   - "emulator"         # Software-Emulation, keine echte Hardware
+  # Optimierung (Robin-Feedback: "ich bekomme Spiele und Sonstiges"):
+  # die o.g. Excludes griffen nur bei exakter Wortkombination, nicht bei
+  # den in der Praxis ueblichen freien Formulierungen fuer Spiel-only-
+  # bzw. Zubehoer-only-Angebote (Marken-Treffer wie "ps2"/"n64" steckt
+  # in "PS2 Spiel GTA" oder "N64 Modul Mario Kart" genauso wie in einem
+  # echten Konsolen-Angebot).
+  - "spiel für"
+  - "spiele für"
+  - "spielesammlung"
+  - "spiele sammlung"
+  - "spielepaket"
+  - "spiele paket"
+  - "spielebundle"
+  - "nur spiele"
+  - "nur spiel"
+  - "spiele konvolut"
+  - "spielekonvolut"
+  - "nur modul"
+  - "ohne konsole"      # deckt auch "modul/spiele ... ohne Konsole" ab
+  - "ohne gerät"
+  - "nur anleitung"
+  - "hülle ohne"
+  - "nur hülle"
+  - "nur speicherkarte"
+  # Bewusst NICHT ausgeschlossen: "modul"/"cartridge"/"anleitung" als
+  # Einzelwort -- das wuerde auch legitime Konsole+Spiel-Bundles
+  # ("N64 Konsole inkl. 2 Module") faelschlich ausschliessen. Die
+  # spezifischeren Varianten oben ("nur modul", "modul ohne konsole")
+  # decken die eigentlichen Spiel-only-Angebote ab.
+
+  # Nachtrag: Matcher-Fix Einzelspiel-/Zubehoer-Fehltreffer (siehe unten,
+  # "Positiv-Liste verschlankt"). Gegen 152 bisherige Treffer aus found.json
+  # verifiziert: reduziert Fehltreffer von 152 auf 59 verbleibende Treffer,
+  # 93 Einzelspiele/Zubehoer fallen weg.
+  - "cib"               # "Complete In Box" -- Sammler-Begriff fast
+                         # ausschliesslich fuer Einzelspiele, nicht Konsolen
+  - "controller für"     # Zubehoer-Verkaufsformulierung ("Controller FUER
+                         # PS2"), keine Konsole -- anders als "mit Controller"
+                         # (Bundle-Formulierung), die weiterhin matcht
+  - "adapter"            # z.B. RF-Adapter/Netzteil-Adapter als Einzelteil
+  - "modulator"          # z.B. RF-Modulator als Einzelteil
+  # Bekannte Restluecke (bewusst nicht weiter ueber Keywords geloest, siehe
+  # STATUS.md-Nachtrag): vereinzelte Angebote, die NUR einen Controller
+  # verkaufen, aber ohne die Formulierung "für"/"fuer" (z.B. "Original PS2
+  # DualShock Controller SCPH-10010") rutschen weiterhin durch. Eine
+  # zuverlaessige Unterscheidung "Konsole" vs. "loser Controller" wuerde
+  # hier einen eigenen Detector statt Keyword-Matching brauchen -- ausserhalb
+  # des Rahmens dieses rein additiven YAML-Fixes.
 
 # Scoring: kein Hardware-Detector anwendbar (analog sata_ssd.yaml) --
 # Preis ist das mit Abstand aussagekraeftigste Signal. Ausstattung/
@@ -68,6 +116,25 @@ scoring_weights:
   zustand: 0
   lieferumfang: 0
 
+# ------------------------------------------------------------
+# NACHTRAG (Matcher-Fix, Freigabe "Option A"): Die urspruengliche zweite
+# require_all_of-Wortgruppe bei Nintendo/Sony enthielt zusaetzlich "ovp",
+# "komplett", "funktioniert", "getestet" -- diese Begriffe sind ZU generisch
+# (jedes einzelne Spiel/Zubehoerteil kann "OVP"/"komplett"/"getestet" sein),
+# und haben in der Praxis mehrheitlich EINZELSPIELE statt Konsolen
+# durchgelassen (Fund: 72% aller bisherigen Treffer waren tatsaechlich
+# Spiele/Zubehoer, siehe found.json-Stichprobe). Entfernt -- verbleibende
+# Positiv-Begriffe ("konsole"/"gerät"/"system"/"controller"/"netzteil")
+# sind zwar auch nicht perfekt, aber deutlich seltener in Einzelspiel-Titeln.
+# Ergaenzend: neue Excludes unten (cib/"controller für"/adapter/modulator).
+# Verifiziert gegen alle 152 bisherigen retro_konsolen-Treffer aus
+# found.json: 93 Fehltreffer (Spiele/Zubehoer) fallen weg, 59 plausible
+# Konsolen-Angebote bleiben. Preiskalibrierung fuer nintendo_retro_konsole/
+# sony_retro_konsole bewusst VERSCHOBEN (naechster Schritt, nach neuer,
+# bereinigter Datensammlung) -- die bisherige price_history.jsonl ist durch
+# die Fehltreffer verzerrt und keine verlaessliche Kalibrierungsgrundlage.
+# ------------------------------------------------------------
+
 rules:
   # ------------------------------------------------------------
   # Nintendo (N64 / GameCube / DS) -- typischerweise Konsole +
@@ -79,6 +146,15 @@ rules:
       - "n64"
       - "gamecube"
       - "nintendo ds"
+    # Optimierung: Konsolen-Indikator zwingend erforderlich (require_all_of
+    # zusaetzlich zu "match"), sonst matchen auch Einzelspiele/Zubehoer,
+    # die die Konsole nur im Titel erwaehnen ("PS2 Spiel GTA", "N64 Modul
+    # Zelda"). "match" bleibt als OR-Vorfilter bestehen (Konsolenname
+    # muss ohnehin vorkommen), require_all_of ergaenzt die zusaetzliche
+    # UND-Bedingung.
+    require_all_of:
+      - ["nintendo 64", "n64", "gamecube", "nintendo ds"]
+      - ["konsole", "gerät", "system", "controller", "netzteil"]
     price_history_model: "nintendo_retro_konsole"
     max_price: 40
     deal_rating: "Top-Deal"
@@ -89,6 +165,15 @@ rules:
       - "n64"
       - "gamecube"
       - "nintendo ds"
+    # Optimierung: Konsolen-Indikator zwingend erforderlich (require_all_of
+    # zusaetzlich zu "match"), sonst matchen auch Einzelspiele/Zubehoer,
+    # die die Konsole nur im Titel erwaehnen ("PS2 Spiel GTA", "N64 Modul
+    # Zelda"). "match" bleibt als OR-Vorfilter bestehen (Konsolenname
+    # muss ohnehin vorkommen), require_all_of ergaenzt die zusaetzliche
+    # UND-Bedingung.
+    require_all_of:
+      - ["nintendo 64", "n64", "gamecube", "nintendo ds"]
+      - ["konsole", "gerät", "system", "controller", "netzteil"]
     price_history_model: "nintendo_retro_konsole"
     max_price: 70
     deal_rating: "Guter Preis"
@@ -99,6 +184,15 @@ rules:
       - "n64"
       - "gamecube"
       - "nintendo ds"
+    # Optimierung: Konsolen-Indikator zwingend erforderlich (require_all_of
+    # zusaetzlich zu "match"), sonst matchen auch Einzelspiele/Zubehoer,
+    # die die Konsole nur im Titel erwaehnen ("PS2 Spiel GTA", "N64 Modul
+    # Zelda"). "match" bleibt als OR-Vorfilter bestehen (Konsolenname
+    # muss ohnehin vorkommen), require_all_of ergaenzt die zusaetzliche
+    # UND-Bedingung.
+    require_all_of:
+      - ["nintendo 64", "n64", "gamecube", "nintendo ds"]
+      - ["konsole", "gerät", "system", "controller", "netzteil"]
     price_history_model: "nintendo_retro_konsole"
     max_price: 100
     deal_rating: "Okay"
@@ -112,6 +206,10 @@ rules:
       - "ps1"
       - "playstation 2"
       - "ps2"
+    # Optimierung: siehe Nintendo-Block oben (identische Begruendung).
+    require_all_of:
+      - ["playstation 1", "ps1", "playstation 2", "ps2"]
+      - ["konsole", "gerät", "system", "controller", "netzteil"]
     price_history_model: "sony_retro_konsole"
     max_price: 35
     deal_rating: "Top-Deal"
@@ -122,6 +220,10 @@ rules:
       - "ps1"
       - "playstation 2"
       - "ps2"
+    # Optimierung: siehe Nintendo-Block oben (identische Begruendung).
+    require_all_of:
+      - ["playstation 1", "ps1", "playstation 2", "ps2"]
+      - ["konsole", "gerät", "system", "controller", "netzteil"]
     price_history_model: "sony_retro_konsole"
     max_price: 60
     deal_rating: "Guter Preis"
@@ -132,6 +234,10 @@ rules:
       - "ps1"
       - "playstation 2"
       - "ps2"
+    # Optimierung: siehe Nintendo-Block oben (identische Begruendung).
+    require_all_of:
+      - ["playstation 1", "ps1", "playstation 2", "ps2"]
+      - ["konsole", "gerät", "system", "controller", "netzteil"]
     price_history_model: "sony_retro_konsole"
     max_price: 90
     deal_rating: "Okay"
@@ -145,8 +251,16 @@ rules:
     require_all_of:
       - ["konvolut"]
       - ["nintendo", "playstation", "ps1", "ps2", "n64", "gamecube", "retro", "konsole"]
+      # Optimierung: Konsolen-Indikator zwingend erforderlich, sonst
+      # matchen auch reine Spiele-Konvolute (kein Geraet dabei).
+      - ["konsole", "gerät", "system", "controller"]
     price_history_model: "retro_konvolut"
-    max_price: 60
+    # Kalibriert anhand 28 realer price_history.jsonl-Datenpunkte
+    # (04.08.2026, burst-bereinigt): p10 = 23,50€ -> Top-Deal-Grenze.
+    # Vorher 60€ (grober Schaetzwert). Kleinere Stichprobe als bei
+    # Nintendo/Sony (28 statt >250 Punkte) -- bei naechster Kalibrierung
+    # erneut pruefen, sobald mehr Daten vorliegen.
+    max_price: 24
     deal_rating: "Top-Deal"
 
   - label: "Retro-Konsolen-Konvolut 👍 Guter Preis"
@@ -155,8 +269,13 @@ rules:
     require_all_of:
       - ["konvolut"]
       - ["nintendo", "playstation", "ps1", "ps2", "n64", "gamecube", "retro", "konsole"]
+      # Optimierung: Konsolen-Indikator zwingend erforderlich, sonst
+      # matchen auch reine Spiele-Konvolute (kein Geraet dabei).
+      - ["konsole", "gerät", "system", "controller"]
     price_history_model: "retro_konvolut"
-    max_price: 100
+    # Kalibriert: Marktpreis (getrimmter Mittelwert p10-p90) = 78,75€ ->
+    # gerundet 79€. Vorher 100€ (grober Schaetzwert).
+    max_price: 79
     deal_rating: "Guter Preis"
 
   - label: "Retro-Konsolen-Konvolut ⚠️ Okay"
@@ -165,6 +284,18 @@ rules:
     require_all_of:
       - ["konvolut"]
       - ["nintendo", "playstation", "ps1", "ps2", "n64", "gamecube", "retro", "konsole"]
+      # Optimierung: Konsolen-Indikator zwingend erforderlich, sonst
+      # matchen auch reine Spiele-Konvolute (kein Geraet dabei).
+      - ["konsole", "gerät", "system", "controller"]
     price_history_model: "retro_konvolut"
-    max_price: 150
+    # Kalibriert: p90 = 117,40€ -> gerundet 117€. Vorher 150€ (grober
+    # Schaetzwert). NEUE KONVENTION fuer die dritte ("Okay")-Stufe bei
+    # 3-stufigen Kategorien (bisherige Praezedenzfaelle SATA-SSD/Gaming-PC
+    # hatten nur 2 Stufen): p90 statt eines frei gewaehlten Aufschlags --
+    # nutzt einen bereits in price_stats.py berechneten, konsistenten
+    # Perzentil-Wert (auch Grenze des market_price-Trimmbereichs) statt
+    # eines weiteren Bauchgefuehl-Werts. Bitte gegenpruefen, ob das fuer
+    # kuenftige 3-stufige Kalibrierungen (z.B. Nintendo/Sony nach
+    # Neusammlung) ebenfalls die gewuenschte Konvention ist.
+    max_price: 117
     deal_rating: "Okay"

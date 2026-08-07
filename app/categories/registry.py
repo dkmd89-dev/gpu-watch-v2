@@ -7,15 +7,13 @@ in `rules/` (ausser `_global.yaml`) wird eingelesen, gemergt und ausgewertet,
 OHNE dass dafuer Python-Code geaendert werden muss (siehe
 tests/test_rules_category_plugin_contract.py, das genau das beweist).
 
-Dieses Modul liefert lediglich die Discovery-Infrastruktur explizit und
-symmetrisch zum Scraper-Pendant -- fuer Konsistenz/Testbarkeit und als
-klar benannter Anlaufpunkt fuer kuenftige Plugin-Tooling (z.B. eine
-"welche Kategorien sind aktuell aktiv?"-Uebersicht). `matcher.py` nutzt
-dieses Modul BEWUSST NOCH NICHT (analog zu Schritt 1 der Scraper-Registry,
-siehe dortiger Docstring) -- die produktive Merge-Logik (defaults, globale
-Ausschluesse, scoring_weights-Fallback, category_order, ...) bleibt
-unveraendert in `_load_rules_from_dir()`. Eine Umstellung von matcher.py
-auf diese Registry waere ein eigener, separat freizugebender Schritt.
+Seit der Matcher-Registry-Migration nutzt `matcher._load_rules_from_dir()`
+dieses Modul als EINZIGE Quelle fuer die Kategorie-Discovery (welche
+*.yaml-Dateien gibt es, wie heisst die Kategorie). Die anschliessende
+produktive Merge-Logik (defaults, globale Ausschluesse, scoring_weights-
+Fallback, category_order, Notify-Preis-Override, ...) bleibt unveraendert
+in `_load_rules_from_dir()` -- nur die vorher doppelt vorhandene
+Datei-Scan-/Parse-Logik wurde zusammengefuehrt.
 
 Rueckwaertskompatibilitaet: reine Ergaenzung, keine bestehende Datei wird
 veraendert.

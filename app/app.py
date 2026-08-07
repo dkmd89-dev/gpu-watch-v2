@@ -19,7 +19,7 @@ from price_history import append_price_point, make_price_point, read_price_point
 from duplicate_detection import find_duplicate, normalize_title
 from presence_tracking import (
     migrate_seen_data, mark_seen, mark_matched, detect_newly_delisted,
-    DEFAULT_DELISTING_THRESHOLD_SCANS,
+    prune_delisted_entries, DEFAULT_DELISTING_THRESHOLD_SCANS,
 )
 from time_to_sell import make_time_to_sell_point, append_time_to_sell_point, read_time_to_sell_points
 from time_to_sell_stats import compute_all_time_to_sell_stats
@@ -55,6 +55,19 @@ FOUND_MAX_ITEMS = int(os.environ.get("FOUND_MAX_ITEMS", "200"))
 # jedem Scan werden Eintraege mit found_at aelter als DEAL_MAX_AGE_DAYS
 # entfernt (Default 7, per Env-Var konfigurierbar -- analog FOUND_MAX_ITEMS).
 DEAL_MAX_AGE_DAYS = int(os.environ.get("DEAL_MAX_AGE_DAYS", "7"))
+
+# Kernursache-Fix (Produktions-Vorfall: seen.json auf 9 MB angewachsen und
+# korrumpiert, siehe STATUS.md Abschnitt 26): seen.json wuchs bisher
+# unbegrenzt (presence_tracking.py dokumentierte das bereits als bekanntes
+# Verhalten). Bei jedem Scan werden bereits DELISTETE Eintraege entfernt,
+# deren last_seen aelter als SEEN_DELISTED_MAX_AGE_DAYS ist -- fuer sie
+# wurde der Time-to-Sell-Datenpunkt bereits erzeugt, die Historie wird
+# danach nicht mehr gebraucht (siehe prune_delisted_entries()-Docstring).
+# Noch aktive (nicht delistete) Eintraege bleiben unabhaengig vom Alter
+# erhalten. Kurzer Default (3 Tage) statt DEAL_MAX_AGE_DAYS-Default (7),
+# da hier bereits das staerkere "delisted"-Kriterium greift, nicht nur
+# das Alter allein.
+SEEN_DELISTED_MAX_AGE_DAYS = int(os.environ.get("SEEN_DELISTED_MAX_AGE_DAYS", "3"))
 
 # Schritt B: Log-Rotation. Ohne Rotation wuchs gpu_watch.log unbegrenzt
 # (ein Long-Running-Container ohne Log-Limit ist ein bekanntes Betriebs-
@@ -165,13 +178,43 @@ NOTIFY_GATE_MAX_PRICE = 150
 
 
 def _load_json(path: Path, default):
-    if path.exists():
+    """Laedt JSON aus path. Bei fehlender Datei: default. Bei korrupter
+    (z.B. durch einen Absturz waehrend eines fruehen, nicht-atomaren
+    Schreibvorgangs abgeschnittenen) Datei: die korrupte Datei wird als
+    '<name>.corrupt-<timestamp>' gesichert, eine Warnung geloggt und
+    default zurueckgegeben, statt die Anwendung abstuerzen zu lassen."""
+    if not path.exists():
+        return default
+    try:
         return json.loads(path.read_text())
-    return default
+    except json.JSONDecodeError as exc:
+        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        backup_path = path.with_name(f"{path.name}.corrupt-{timestamp}")
+        try:
+            path.rename(backup_path)
+        except OSError:
+            backup_path = None
+        log.error(
+            "Korrupte JSON-Datei %s konnte nicht gelesen werden (%s) -- "
+            "als %s gesichert, starte mit Standardwert neu.",
+            path, exc, backup_path,
+        )
+        return default
 
 
 def _save_json(path: Path, data) -> None:
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2))
+    """Schreibt data als JSON nach path -- atomar ueber eine Temp-Datei
+    im selben Verzeichnis + os.replace(), damit ein Absturz/Kill mitten
+    im Schreibvorgang (z.B. Container-Stop) niemals eine abgeschnittene/
+    korrupte Zieldatei hinterlaesst: entweder der alte oder der neue
+    vollstaendige Inhalt ist vorhanden, nie ein Zwischenzustand."""
+    tmp_path = path.with_name(f"{path.name}.tmp-{os.getpid()}")
+    text = json.dumps(data, ensure_ascii=False, indent=2)
+    with open(tmp_path, "w", encoding="utf-8") as f:
+        f.write(text)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(tmp_path, path)
 
 
 def _tail_log(path: Path, n: int) -> list[str]:
@@ -700,6 +743,13 @@ def run_scan():
                 )
 
         with _seen_lock:
+            seen, pruned_count = prune_delisted_entries(seen, SEEN_DELISTED_MAX_AGE_DAYS)
+            if pruned_count:
+                log.info(
+                    "🧹 seen.json bereinigt: %d delistete Alt-Eintraege "
+                    "(> %d Tage) entfernt.",
+                    pruned_count, SEEN_DELISTED_MAX_AGE_DAYS,
+                )
             _save_json(SEEN_FILE, seen)
             _save_json(FOUND_FILE, found[:FOUND_MAX_ITEMS])
 
