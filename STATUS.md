@@ -920,3 +920,50 @@ retro_konvolut kalibriert
 
 **Mögliche Nebenwirkungen**
 Ohne den `prune_delisted_entries()`-Fix wäre der produktive Container beim nächsten Neustart mit `ImportError` abgestürzt — dieser Fund ist der wichtigste Teil dieses Schritts. Alle übrigen Änderungen sind bereits an anderer Stelle in diesem Dokument (Abschnitte 21/25/26/27) inhaltlich beschrieben und funktional unverändert übernommen worden.
+
+---
+
+## 29. Phase 0 (verifizierte Projektanalyse) + Phase 1 (Architekturdokumentation) — neue Session, keine Code-Änderungen
+
+**Ausgangslage:** Neue Session, Auftrag "Hardware Deal Finder" (V2, PC-Fokus). Zwei mitgelieferte Dokumente (`Phase_0_aktueller_stand.txt` sowie eine bereits im Repo liegende, nie getrackte Datei `PHASE_0_ANALYSE_VERIFIZIERT.md`) behaupteten bereits erledigte Arbeit — u. a. erfundene Commit-Hashes (`66982c7`/`6b9abae`, existieren nicht in `git log --all`) und eine falsche Testzahl. Keiner dieser Texte wurde übernommen; stattdessen wurde der reale Zustand unabhängig neu erhoben (Dateisystem, `git log`/`status`, echter `pytest`-Lauf).
+
+**Phase 0 — verifizierte Fakten:**
+- `pytest app/tests/`: **569 passed**, 43 s, keine Fehler.
+- App-Code (ohne Tests): 5.269 Zeilen Python, 53 Testdateien.
+- Repo-Zustand zu Sessionbeginn: `main`, 4 Commits vor `origin/main`, letzter Commit `ac09d06`. Uncommittet: `.env.0.tmp` (gelöscht), `data/time_to_sell.jsonl` (Laufzeitdaten verändert).
+- 12 Regeldateien in `rules/` (11 Kategorien + `_global.yaml`) bestätigt.
+
+**Phase 1 — Architektur dokumentiert, zentrale Erkenntnis:** Die Auftragsvorgabe "neue Kategorien nur über YAML, kein Python-Code nötig" gilt **nachweislich nur für die Kategorie-Ebene** (`categories/registry.py::discover_categories()`, durch `tests/test_rules_category_plugin_contract.py` aktiv bewiesen). Die **Detector-Ebene** (`categories/detectors/registry.py`) ist zwar als Plugin-Discovery gebaut, wird von `matcher.py` aber laut eigenem Docstring bewusst **nicht** generisch genutzt — Detectors werden weiterhin statisch importiert und gezielt aufgerufen. Eine neue Kategorie, die ein bislang unbekanntes Hardware-Merkmal braucht (z. B. Mainboard-Chipsatz), erfordert also zusätzlich einen neuen Detector in Python — kein reiner YAML-Vorgang.
+
+**Kategorie-Abgleich Auftrag vs. Ist:** Office-PC, Gaming-PC, Grafikkarten, Netzteile bereits vollständig umgesetzt. RAM, Mainboard, CPU (eigene Kategorie) fehlen komplett; SSD (nur SATA, kein NVMe) und Monitor (nur Curved) nur teilweise; Notebook fehlt (nur `macbook.yaml`, anderer Scope). Zusätzlich fünf Kategorien außerhalb des PC-Scopes vorhanden (iPhone, MacBook, Retro-Konsolen, Vintage-Elektronik, LEGO) sowie umfangreiche, produktiv laufende Reselling-Zusatzlogik (Profit-Score, Part-Out-Erkennung, Duplicate-/Cross-Posting-Erkennung, Cross-Platform-Vergleich, Time-to-Sell, Burst-Cleanup, Verhandlungs-Assistent) — im Auftrag nicht erwähnt, aber bereits getestet und im Einsatz.
+
+**8 offene Punkte identifiziert (L1–L8), priorisiert:** fehlende Hardware-Kategorien (L1, hoch), Detector-Ebene nicht codefrei (L2, hoch, architektonische Grundsatzfrage), uncommittete Reste (L3, niedrig), verwaistes Datenduplikat `data/price_history (Kopie).txt` (L4, niedrig), unbegrenztes Wachstum von `seen.json`/`found.json` (L5, mittel), Scope-Drift Nicht-PC-Kategorien (L6, Entscheidung nötig), `app.py`-Monolith 977 Zeilen (L7, niedrig), drei von sechs Deal-Score-Komponenten ungenutzt mangels Detector (L8, mittel).
+
+**Geänderte Dateien**
+- `PHASE_0_ANALYSE_VERIFIZIERT.md` (neu geschrieben, ersetzt die untergeschobene Fremd-Version)
+- `PROJEKTSTAND_KOMPLETT.md` (neu) — vollständige Architektur-/Lücken-/Plan-Referenz für künftige Sessions
+- `STATUS.md` (dieser Abschnitt)
+
+**Empfohlene Tests**
+Keine Code-Änderung in diesem Schritt — `pytest app/tests/` unverändert bei 569/569 grün (bereits während der Analyse real ausgeführt, nicht nur behauptet).
+
+**Mögliche Nebenwirkungen**
+Keine. Reine Dokumentation. Die 2 uncommitteten Reste aus Abschnitt 28 (`.env.0.tmp`, `time_to_sell.jsonl`) bestehen weiterhin und sind als Punkt 1 des Plans in `PROJEKTSTAND_KOMPLETT.md` vorgemerkt.
+
+**Commit-Nachricht**
+```
+docs: verifizierte Phase-0-Analyse + PROJEKTSTAND_KOMPLETT.md (Phase 1)
+
+Zwei mitgelieferte Dokumente enthielten erfundene Angaben (Commit-Hashes,
+Testzahl) und wurden nicht uebernommen -- stattdessen realer Zustand neu
+erhoben (git log/status, echter pytest-Lauf: 569/569 gruen).
+
+Zentraler Befund Phase 1: categories/registry.py macht Kategorien
+nachweislich codefrei erweiterbar, categories/detectors/registry.py wird
+von matcher.py aber bewusst NICHT generisch genutzt -- Detectors bleiben
+statisch importiert. Neue Kategorien mit neuem Hardware-Merkmal brauchen
+daher weiterhin Python-Code, nicht nur YAML.
+
+8 offene Punkte (L1-L8) in PROJEKTSTAND_KOMPLETT.md priorisiert, inkl.
+Umsetzungsplan. Kein Code geaendert.
+```
