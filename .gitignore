@@ -19,3 +19,4 @@ STATUS.md
 .idea/
 data/price_history.jsonl
 *.backup
+.env.*.tmp
