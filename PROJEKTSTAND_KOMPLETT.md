@@ -551,6 +551,71 @@ eigener, bewusst als "neue Abstraktion" (nicht "reine Verschiebung")
 gekennzeichneter Schritt mit eigener Freigabe — z. B. über 2–3
 Dataclasses zur Bündelung der 46 Abhängigkeiten.
 
-Phase 3 gilt damit als abgeschlossen. Warte auf Freigabe für den nächsten
-Schritt (`roadmap.md` Phase 4 – Persistenz analysieren, oder ein anderer
-offener Punkt nach Wahl).
+Phase 3 gilt damit als abgeschlossen.
+
+---
+
+## 11. `roadmap.md` Phase 4 (Persistenz analysieren und verbessern) — ABGESCHLOSSEN
+
+**Analyse (erst messen, dann entscheiden — kein Vorgriff):** Real gemessenes
+Lade-/Schreib-Benchmark für `seen.json` (atomarer Pfad via
+`persistence.json_store`):
+
+| Einträge | Größe | Schreiben | Lesen |
+|---|---|---|---|
+| 10.000 | 2,5 MB | 161 ms | 16 ms |
+| 46.062 (letzter bekannter Produktivstand) | 11,7 MB | 737 ms | 77 ms |
+| 100.000 | 25,5 MB | 1.437 ms | 176 ms |
+| 200.000 | 51 MB | 2.634 ms | 378 ms |
+
+`time_to_sell.jsonl` (echte Produktivdaten, 7.761 Zeilen/1,71 MB): Lesen
+48 ms — unkritisch. Crash-Sicherheit bereits gelöst (atomarer Schreibpfad,
+Schritt 3.1). Nebenläufigkeit: Single-Process-Deployment (`python app.py`,
+kein gunicorn/mehrere Worker) — bestehende `threading.Lock`-Objekte
+ausreichend, kein Multi-Prozess-Zugriffsschutz nötig.
+
+**Kritischer Befund (während der Analyse entdeckt, nicht gesucht):**
+`SEEN_MAX_ITEMS`/`enforce_max_size()` — laut STATUS.md Abschnitt 31 als
+"L5 abgeschlossen" dokumentiert — waren im tatsächlichen Code NICHT mehr
+verdrahtet. Ursache: der unmittelbar folgende, thematisch unabhängige
+Commit `00bd8e8` hatte `app.py` überschrieben und die Verdrahtung dabei
+still entfernt (`enforce_max_size()` blieb als toter Code liegen,
+weiterhin von `test_presence_tracking.py` unit-getestet, aber nie aus
+`app.py` heraus aufgerufen). `seen.json` wuchs seitdem wieder unbegrenzt.
+
+**Sofort-Fix (freigegeben, umgesetzt):** `SEEN_MAX_ITEMS`
+(Env-Var, Default 50000) + `enforce_max_size()`-Aufruf erneut in `app.py`
+verdrahtet, exakt an der ursprünglich freigegebenen Stelle. Zusätzlich ein
+End-to-End-Regressionstest ergänzt (`test_seen_json_wird_bei_ueberschreitung_
+von_seen_max_items_gekappt`), der `run_scan()` selbst prüft — nicht nur
+`enforce_max_size()` isoliert. Per Gegenprobe verifiziert: Fix temporär
+entfernt → Test wird rot → Fix wiederhergestellt → Test grün. Dieser Test
+hätte die ursprüngliche Regression erkannt; reine Funktions-Unit-Tests
+tun das nicht, wenn die Verdrahtung selbst verloren geht.
+
+**Entscheidung Option A vs. B:** **Option A — JSON beibehalten.** Bei
+aktueller/absehbarer Größenordnung (≤200k Einträge, Schreibzeit <3s) steht
+eine SQLite-Migration (Option B) in keinem Verhältnis zum Nutzen, sobald
+der Sofort-Fix das unbegrenzte Wachstum verhindert. Re-Evaluation nur
+falls `seen.json` trotz `SEEN_MAX_ITEMS` erneut zum Problem wird.
+
+**Nebenbei behoben (außerhalb dieser Session, vom Auftraggeber selbst):**
+`.gitignore`-Lücke (`data/time_to_sell.jsonl` war nicht von den
+bestehenden `data/*.json`/`data/*.log`/`data/*.txt`-Mustern erfasst,
+weshalb es trotz vorheriger "Hygiene"-Behauptung in Abschnitt 9c weiter
+committet wurde) — behoben.
+
+**Teststand:** `pytest app/tests/` → **616 passed, 0 failed** (615 + 1
+neuer Regressionstest).
+
+**Lehre für spätere Sessions:** Eine als "abgeschlossen" dokumentierte
+Änderung ist nicht automatisch dauerhaft — ein späterer, thematisch
+unabhängiger Commit kann sie versehentlich rückgängig machen, wenn kein
+Test die *Verdrahtung* (nicht nur die Funktion selbst) prüft. Bei
+sicherheits-/stabilitätsrelevanten Fixes künftig immer einen
+End-to-End-Test ergänzen, der die tatsächliche Anbindung in `app.py`
+verifiziert, nicht nur die isolierte Funktion.
+
+Phase 4 gilt damit als abgeschlossen. Warte auf Freigabe für den nächsten
+Schritt (`roadmap.md` Phase 5 – Price-History/Resale-Confidence, oder ein
+anderer offener Punkt nach Wahl).
