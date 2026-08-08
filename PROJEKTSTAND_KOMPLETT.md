@@ -172,7 +172,7 @@ behandelt werden, nicht als etwas, das "neu geplant" werden muss.
 
 | # | Lücke | Auswirkung | Vorschlag Priorität |
 |---|---|---|---|
-| L1 | Noch 2 offene Teilbereiche (NVMe-SSD als eigene Kategorie, allgemeine Monitor-Kategorie über Curved hinaus). CPU/Mainboard/RAM/Notebook seit dieser Session erledigt (`cpu_mainboard_bundle.yaml`, `ram.yaml`, `notebook_resell.yaml`) — CPU/Mainboard bewusst kombiniert statt getrennt (Robins Vorgabe), dokumentiert als Abweichung von der ursprünglichen Auftrags-Zielliste | Auftragsziel "modularer Hardware Deal Finder" größtenteils erfüllt | Mittel — Rest ist Ausbau, kein Kernrisiko mehr |
+| L1 | **Abgeschlossen (siehe Abschnitt 9c)** — Robin verzichtet bewusst auf NVMe-SSD- und allgemeine Monitor-Kategorie, bestehende `sata_ssd.yaml`/`monitor_curved.yaml` reichen aus | — | Erledigt |
 | L2 | Detector-Ebene ist NICHT codefrei erweiterbar (Abschnitt 5) | Neue Kategorien mit neuem Hardware-Merkmal brauchen Python-Änderung | **Entschieden (siehe Abschnitt 9a)** — bewusst kontrolliert bei statischen Imports geblieben |
 | L5 | `seen.json`/`found.json` wachsen unbegrenzt (14 MB / 2,1 MB) | Perf./Speicher langfristig | Mittel |
 | L6 | Scope-Drift: 5 Nicht-PC-Kategorien | Klärungsbedarf, kein Bug | **Entschieden (siehe Abschnitt 9b)** — bewusst behalten, unabhängig weiterlaufen lassen |
@@ -250,6 +250,24 @@ gesammelte Daten ohne technischen Grund verworfen bzw. stillgelegt.
 **Konsequenz:** Keine weitere Aktion nötig. Künftige Kategorie-Arbeit
 (Punkt 3) fokussiert sich ausschließlich auf die PC-Zielliste des
 Auftrags, ohne die bestehenden 5 Kategorien anzufassen.
+
+### 9c. Abschluss L1 — ENTSCHIEDEN (kein Code geändert)
+
+**Entscheidung:** Robin verzichtet bewusst auf die zwei verbleibenden
+Teilbereiche der ursprünglichen Auftrags-Zielliste — NVMe-SSD als eigene
+Kategorie und eine allgemeine Monitor-Kategorie über das Curved-Segment
+hinaus. `sata_ssd.yaml`/`monitor_curved.yaml` decken den tatsächlichen
+Bedarf ausreichend ab. L1 gilt damit als abgeschlossen, keine weitere
+Kategorie-Arbeit in diesem Bereich vorgesehen.
+
+**Konsequenz:** Punkt 3 des Umsetzungsplans (Kategorien nacheinander
+ergänzen) ist damit vollständig beendet. Kategorie-Abdeckung final:
+Office-PC, Gaming-PC, Grafikkarten, RAM, Netzteile, SATA-SSD (statt
+NVMe), Curved-Monitor (statt allgemein), CPU+Mainboard-Bundle (statt
+getrennt), Notebook-Reselling — plus die 5 unabhängigen Nicht-PC-
+Kategorien (Abschnitt 9b). Offene Punkte reduzieren sich auf L5
+(Datenrotation), L7 (`app.py`-Monolith) und L8 (Scoring-Komponenten ohne
+Detector), keiner davon blockierend.
 
 
 
