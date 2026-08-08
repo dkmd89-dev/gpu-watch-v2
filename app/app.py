@@ -1,4 +1,5 @@
 import os
+import json
 import time
 import logging
 import logging.handlers
@@ -10,7 +11,6 @@ from datetime import datetime, timedelta, timezone
 from flask import Flask, render_template, jsonify
 
 from matcher import load_rules, evaluate
-from persistence.json_store import _load_json, _save_json, _tail_log
 from scrapers import search_kleinanzeigen, search_ebay
 from scrapers.registry import discover_scrapers
 from notify import send_ntfy, emoji_for, rating_stars_for
@@ -24,12 +24,11 @@ from presence_tracking import (
 from time_to_sell import make_time_to_sell_point, append_time_to_sell_point, read_time_to_sell_points
 from time_to_sell_stats import compute_all_time_to_sell_stats
 from cross_platform_stats import compute_all_cross_platform_stats
-from price_stats import compute_all_price_stats, compute_price_stats
-from services.statistics_service import (
-    _load_price_stats,
-    _load_resale_stats_by_group,
-    _market_prices_from_stats,
-    _resale_prices_from_stats,
+from price_stats import (
+    compute_all_price_stats,
+    compute_price_stats,
+    compute_resale_stats_by_group,
+    PriceStats,
 )
 from top_deal import (
     evaluate_top_deal,
@@ -205,6 +204,63 @@ NOTIFY_GATE_MIN_STARS = "★★☆☆☆"
 NOTIFY_GATE_MAX_PRICE = 150
 
 
+def _load_json(path: Path, default):
+    """Laedt JSON aus path. Bei fehlender Datei: default. Bei korrupter
+    (z.B. durch einen Absturz waehrend eines fruehen, nicht-atomaren
+    Schreibvorgangs abgeschnittenen) Datei: die korrupte Datei wird als
+    '<name>.corrupt-<timestamp>' gesichert, eine Warnung geloggt und
+    default zurueckgegeben, statt die Anwendung abstuerzen zu lassen."""
+    if not path.exists():
+        return default
+    try:
+        return json.loads(path.read_text())
+    except json.JSONDecodeError as exc:
+        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        backup_path = path.with_name(f"{path.name}.corrupt-{timestamp}")
+        try:
+            path.rename(backup_path)
+        except OSError:
+            backup_path = None
+        log.error(
+            "Korrupte JSON-Datei %s konnte nicht gelesen werden (%s) -- "
+            "als %s gesichert, starte mit Standardwert neu.",
+            path, exc, backup_path,
+        )
+        return default
+
+
+def _save_json(path: Path, data) -> None:
+    """Schreibt data als JSON nach path -- atomar ueber eine Temp-Datei
+    im selben Verzeichnis + os.replace(), damit ein Absturz/Kill mitten
+    im Schreibvorgang (z.B. Container-Stop) niemals eine abgeschnittene/
+    korrupte Zieldatei hinterlaesst: entweder der alte oder der neue
+    vollstaendige Inhalt ist vorhanden, nie ein Zwischenzustand."""
+    tmp_path = path.with_name(f"{path.name}.tmp-{os.getpid()}")
+    text = json.dumps(data, ensure_ascii=False, indent=2)
+    with open(tmp_path, "w", encoding="utf-8") as f:
+        f.write(text)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(tmp_path, path)
+
+
+def _tail_log(path: Path, n: int) -> list[str]:
+    """Liest die letzten `n` Zeilen aus der Log-Datei fürs Dashboard.
+
+    Fehlt die Datei (z.B. ganz frischer Container-Start) -> leere Liste,
+    kein Fehler. Ein Lesefehler wird geloggt statt die Status-Route zum
+    Absturz zu bringen (Dashboard-Zusatzinfo, kein kritischer Pfad).
+    """
+    if not path.exists():
+        return []
+    try:
+        lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+        return lines[-n:]
+    except OSError as e:
+        log.error("Scan-Log konnte nicht gelesen werden: %s", e, exc_info=True)
+        return []
+
+
 def _cleanup_old_deals(found: list[dict], max_age_days: int) -> tuple[list[dict], int]:
     """Entfernt Einträge aus `found`, deren `found_at` älter als max_age_days ist.
 
@@ -242,6 +298,131 @@ def _cleanup_old_deals(found: list[dict], max_age_days: int) -> tuple[list[dict]
             removed += 1
     return kept, removed
 
+
+
+def _load_price_stats(path: Path) -> dict[str, PriceStats]:
+    """Berechnet die volle Preisstatistik je price_history_model.
+
+    Gemeinsame Basis für zwei Verwendungszwecke:
+    - Marktpreise fürs Deal-Score-Scoring (Schritt 7.5, siehe
+      _market_prices_from_stats() unten)
+    - Top-Deal-Erkennung (Schritt 8.2, siehe evaluate_top_deal() in run_scan())
+
+    Ein Fehler beim Statistik-Aufbau darf den Scan nicht abbrechen --
+    Preisstatistik ist eine Zusatzfunktion, kein kritischer Pfad (analog zu
+    append_price_point() in price_history.py).
+    """
+    try:
+        points = read_price_points(path)
+        return compute_all_price_stats(points)
+    except Exception as e:
+        log.error("Preisstatistik konnte nicht berechnet werden: %s", e, exc_info=True)
+        return {}
+
+
+def _load_resale_stats_by_group(
+    path: Path, model_to_group: dict[str, str]
+) -> dict[str, PriceStats]:
+    """Wie _load_price_stats(), aber gruppiert nach der groeberen Resale-
+    Price-Gruppe (Option 2, STATUS.md Abschnitt 33b) statt nach dem exakten
+    price_history_model. GETRENNT von _load_price_stats() -- market_prices
+    und die Top-Deal-Erkennung nutzen weiterhin ausschliesslich
+    _load_price_stats()/compute_all_price_stats(), unveraendert.
+
+    model_to_group leer (aeltere Configs / Legacy-Einzeldatei-Modus ohne
+    "resale_price_groups"-Key) -> jedes Modell bildet seine eigene Gruppe,
+    identisches Ergebnis zu _load_price_stats() (volle Rueckwaertskompatibilitaet).
+
+    Fehler bei der Berechnung duerfen den Scan nicht abbrechen (analog
+    _load_price_stats()) -- reine Zusatzfunktion.
+    """
+    try:
+        points = read_price_points(path)
+        return compute_resale_stats_by_group(points, model_to_group)
+    except Exception as e:
+        log.error(
+            "Resale-Gruppen-Preisstatistik konnte nicht berechnet werden: %s",
+            e, exc_info=True,
+        )
+        return {}
+
+
+def _market_prices_from_stats(stats_by_model: dict[str, PriceStats]) -> dict[str, float]:
+    """Reduziert die volle Preisstatistik (siehe _load_price_stats()) auf das
+    {price_history_model: Marktpreis}-Mapping, das evaluate() erwartet
+    (Schritt 7.4/7.5). None (kein Modell in der Historie) -> unveraendertes
+    Verhalten wie vor Schritt 7.4 (reines regelbasiertes max_price-Signal).
+    """
+    return {
+        model: stats.market_price
+        for model, stats in stats_by_model.items()
+        if stats is not None
+    }
+
+
+def _resale_prices_from_stats(
+    stats_by_model: dict[str, PriceStats],
+    stats_by_resale_group: dict[str, PriceStats] | None = None,
+    model_to_group: dict[str, str] | None = None,
+) -> dict[str, float | None]:
+    """Reduziert die volle Preisstatistik auf das
+    {price_history_model: geschaetzter Verkaufspreis}-Mapping (Reselling-/
+    Arbitrage-Konzept, STATUS.md Abschnitt 16, Punkt c).
+
+    Methodisch GETRENNT von _market_prices_from_stats(): market_price ist
+    ein Ankaufs-Proxy (Basis: alle vom Bot selbst gematchten, tendenziell
+    guenstigen Angebote), estimated_resale_price nutzt bewusst nur das
+    obere Preissegment (P75-P90) derselben Daten -- siehe
+    price_stats.py::_estimated_resale_price()-Docstring fuer die
+    Begruendung.
+
+    Option 2 ("Flip-Kandidaten-Logik optimieren", STATUS.md Abschnitt 33b):
+    stats_by_resale_group/model_to_group sind optional (Default None ->
+    identisches Verhalten zu vorher, volle Rueckwaertskompatibilitaet fuer
+    aeltere Aufrufer/Tests). Sind beide gesetzt, wird estimated_resale_price
+    NICHT mehr aus stats_by_model[model] gelesen, sondern aus der
+    (potenziell groeberen) Gruppe stats_by_resale_group[model_to_group[model]]
+    -- nur fuer Kategorien mit eigenem "resale_price_group" je Regel macht
+    das ueberhaupt einen Unterschied (Default-Gruppe == Modell selbst).
+    market_price/deal_score/Notification-Gate bleiben davon unberuehrt,
+    die nutzen weiterhin ausschliesslich stats_by_model.
+
+    Fehlt ein Modell komplett in der Historie (stats is None, noch kein
+    einziger Datenpunkt gesammelt), wird das Modell hier weggelassen --
+    evaluate() faellt dann weiterhin auf market_price zurueck (siehe
+    dortiger Docstring), unveraendertes Verhalten.
+
+    "Flip-Kandidaten-Logik optimieren", Schritt B (Option 1, STATUS.md
+    Abschnitt 33b): liegt fuer ein Modell zwar eine PriceStats-Instanz vor,
+    aber estimated_resale_price ist None (zu duenne Preishistorie, siehe
+    price_stats.py::_estimated_resale_price()), wird das Modell hier
+    BEWUSST MIT dem Wert None ins Mapping aufgenommen, statt komplett
+    weggelassen zu werden. Der Unterschied ist entscheidend: ein fehlender
+    Modell-Key bedeutet fuer matcher.py "Modell unbekannt -> Fallback auf
+    market_price", waehrend ein vorhandener Key mit Wert None bedeutet
+    "Modell bekannt, aber Verkaufspreis-Schaetzung aktuell nicht
+    belastbar genug -> keine Marge/kein Flip-Kandidat berechnen" (matcher.py
+    faellt in diesem Fall NICHT auf market_price zurueck). Ohne diese
+    Unterscheidung wuerde ein einfaches Weglassen die alte, zu optimistische
+    max_price-Naeherung ueber den market_price-Fallback wieder einschleusen.
+    """
+    if not stats_by_resale_group or not model_to_group:
+        return {
+            model: stats.estimated_resale_price
+            for model, stats in stats_by_model.items()
+            if stats is not None
+        }
+
+    result: dict[str, float | None] = {}
+    for model, stats in stats_by_model.items():
+        if stats is None:
+            continue
+        group = model_to_group.get(model, model)
+        group_stats = stats_by_resale_group.get(group)
+        result[model] = (
+            group_stats.estimated_resale_price if group_stats is not None else None
+        )
+    return result
 
 
 def run_scan():
