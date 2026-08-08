@@ -616,6 +616,56 @@ sicherheits-/stabilitätsrelevanten Fixes künftig immer einen
 End-to-End-Test ergänzen, der die tatsächliche Anbindung in `app.py`
 verifiziert, nicht nur die isolierte Funktion.
 
-Phase 4 gilt damit als abgeschlossen. Warte auf Freigabe für den nächsten
-Schritt (`roadmap.md` Phase 5 – Price-History/Resale-Confidence, oder ein
+Phase 4 gilt damit als abgeschlossen.
+
+---
+
+## 12. `roadmap.md` Phase 5 (Price-History/Resale-Confidence) — ABGESCHLOSSEN
+
+**Umsetzung (Schritt 5.1, einziger Schritt dieser Phase):** `PriceStats`
+um vier rein informative Felder erweitert: `percentile_25`,
+`percentile_90` (P90 wurde intern bereits berechnet, jetzt zusätzlich
+gespeichert), `data_age_days` (Tage seit dem jüngsten Datenpunkt der
+Gruppe), `confidence` (`"LOW"`/`"MEDIUM"`/`"HIGH"`). Alle vier mit
+Defaults — rückwärtskompatibel zu bestehenden `PriceStats(...)`-
+Konstruktionsstellen (`test_top_deal.py`, `test_app_resale_price_groups.py`
+— beide nutzen ausschließlich Keyword-Argumente, kein Regressionsrisiko
+durch die neuen Felder am Ende der Dataclass).
+
+**Confidence-Klassifizierung:** ausschließlich an der Datenpunkt-Anzahl
+festgemacht (`count`), bewusst NICHT zusätzlich mit `data_age_days`
+verknüpft — zwei überlagerte Schwellen in einem Label wären weniger
+nachvollziehbar. `LOW` deckt sich mit der bestehenden
+`_MIN_SAMPLES_FOR_PERCENTILE_MARKET_PRICE`-Schwelle (5) — dort ist
+`estimated_resale_price` ohnehin bereits `None`. `MEDIUM`: 5–14.
+`HIGH`: ab 15 (Platzhalter-Schwelle, Robins Freigabe, mangels echter
+Kalibrierungsdaten für dieses neue Feld).
+
+**Bestehende Regel "< 5 Datenpunkte → kein Flip-Kandidat" nicht
+verschlechtert** (roadmap.md-Vorgabe): `_estimated_resale_price()` selbst
+wurde nicht angefasst, die neuen Felder sind rein additiv und beeinflussen
+`market_price`/`estimated_resale_price`/Deal-Score/Notification-Gate
+NICHT — per eigenem Regressionstest abgesichert
+(`test_confidence_und_neue_perzentile_sind_rein_informativ`).
+
+**`resale_price_group`-Konzept:** automatisch mit abgedeckt, ohne
+eigenen Code — `compute_resale_stats_by_group()` (Abschnitt 33b, Option 2)
+ruft intern dieselbe `compute_price_stats()`-Funktion auf, liefert also
+für jede Resale-Gruppe dieselben neuen Felder (P25/P90/Datenalter/
+Confidence) wie für einzelne Modelle.
+
+**Dashboard-Anbindung:** `PriceStats` wird per `asdict()` in
+`/api/price-history` serialisiert (Schritt 3.3) — die neuen Felder stehen
+damit automatisch im Backend zur Verfügung, ohne `api/history.py`
+anzufassen. Tatsächliche Dashboard-Darstellung (Confidence-Badge o.ä.)
+ist Teil von Phase 8, nicht dieser Phase.
+
+**Geänderte Dateien:** `app/price_stats.py` (+45 Zeilen: 370 → 415),
+`app/tests/test_price_stats.py` (+9 Tests).
+
+**Teststand:** `pytest app/tests/` → **625 passed, 0 failed** (616 + 9
+neue).
+
+Phase 5 gilt damit als abgeschlossen. Warte auf Freigabe für den nächsten
+Schritt (`roadmap.md` Phase 6 – Deal-Score vervollständigen, oder ein
 anderer offener Punkt nach Wahl).
