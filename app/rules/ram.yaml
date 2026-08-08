@@ -125,59 +125,59 @@ rules:
   - label: "8GB DDR4 RAM ★ Top-Deal"
     price_history_model: "ram_ddr4_8gb"
     require_all_of:
-      - ["8gb"]
-      - ["ddr4"]
+      - ["8gb", "8 g", "8gb"]
+      - ["ddr4", "ddr 4"]
     min_vram_gb: 0
-    max_price: 10
+    max_price: 15
     deal_rating: "Top-Deal"
 
   - label: "8GB DDR4 RAM"
     price_history_model: "ram_ddr4_8gb"
     require_all_of:
-      - ["8gb"]
-      - ["ddr4"]
+      - ["8gb", "8 g", "8gb"]
+      - ["ddr4", "ddr 4"]
     min_vram_gb: 0
-    max_price: 15
+    max_price: 22
     deal_rating: "Guter Preis"
 
   # ============================================================
-  # 16GB DDR4
+  # 16GB DDR4 (Der absolute Gaming-Standard - fängt auch 2x8GB ab)
   # ============================================================
   - label: "16GB DDR4 RAM ★ Top-Deal"
     price_history_model: "ram_ddr4_16gb"
     require_all_of:
-      - ["16gb"]
-      - ["ddr4"]
+      - ["16gb", "16 g", "16gb", "2x8gb", "2x8 gb", "2x 8gb"]
+      - ["ddr4", "ddr 4"]
     min_vram_gb: 0
-    max_price: 20
+    max_price: 25
     deal_rating: "Top-Deal"
 
   - label: "16GB DDR4 RAM"
     price_history_model: "ram_ddr4_16gb"
     require_all_of:
-      - ["16gb"]
-      - ["ddr4"]
+      - ["16gb", "16 g", "16gb", "2x8gb", "2x8 gb", "2x 8gb"]
+      - ["ddr4", "ddr 4"]
     min_vram_gb: 0
-    max_price: 28
+    max_price: 38
     deal_rating: "Guter Preis"
 
   # ============================================================
-  # 32GB DDR4
+  # 32GB DDR4 (Für extremes Multitasking - fängt auch 2x16GB ab)
   # ============================================================
   - label: "32GB DDR4 RAM ★ Top-Deal"
     price_history_model: "ram_ddr4_32gb"
     require_all_of:
-      - ["32gb"]
-      - ["ddr4"]
+      - ["32gb", "32 g", "32gb", "2x16gb", "2x16 gb", "2x 16gb"]
+      - ["ddr4", "ddr 4"]
     min_vram_gb: 0
-    max_price: 35
+    max_price: 45
     deal_rating: "Top-Deal"
 
   - label: "32GB DDR4 RAM"
     price_history_model: "ram_ddr4_32gb"
     require_all_of:
-      - ["32gb"]
-      - ["ddr4"]
+      - ["32gb", "32 g", "32gb", "2x16gb", "2x16 gb", "2x 16gb"]
+      - ["ddr4", "ddr 4"]
     min_vram_gb: 0
-    max_price: 48
+    max_price: 60
     deal_rating: "Guter Preis"

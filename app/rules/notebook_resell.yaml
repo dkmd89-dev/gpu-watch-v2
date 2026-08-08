@@ -1,0 +1,108 @@
+category: "notebook_resell"
+label: "Notebooks (Reselling)"
+scan_priority: 6
+notify_max_price: 650
+
+search_terms:
+  - "ThinkPad Ryzen"
+  - "Lenovo Legion"
+  - "ASUS ROG"
+  - "ASUS TUF Gaming"
+  - "Acer Nitro 5"
+  - "HP Omen"
+  - "Gaming Laptop"
+  - "Gaming Notebook"
+
+scoring_weights:
+  price: 0.50
+  ausstattung: 0
+  hardware_qualitaet: 0.15
+  hersteller: 0
+  zustand: 0.10
+  lieferumfang: 0
+  profit: 0.25
+
+exclude_category:
+  # defekt/bastler/kaputt/ohne funktion/ersatzteil/leerkarton bereits über
+  # exclude_global (_global.yaml) für ALLE Kategorien abgedeckt -- hier
+  # nicht dupliziert (siehe Begründung im Chat-Output).
+  - "für teile"
+  - "displayschaden"
+  - "not tested"
+  # "netzteil"/"ladekabel"/"tasche"/"hülle"/"karton"/"ovp" bewusst NICHT
+  # als bare-word-Exclude: würde auch legitime Notebook-Angebote treffen,
+  # die ihr Zubehör als Kaufargument im Titel nennen (z.B. "inkl.
+  # Netzteil und Tasche") -- verifiziert, siehe Test unten. Stattdessen
+  # präzise auf Einzelteil-Angebote eingegrenzt (kein Notebook dabei).
+  - "nur netzteil"
+  - "nur ladekabel"
+  - "nur tasche"
+  - "nur hülle"
+  - "i3"
+  - "celeron"
+  - "pentium"
+  - "atom"
+  - "core 2 duo"
+  - "amd a4"
+  - "amd a6"
+  - "amd a8"
+
+rules:
+  - label: "ThinkPad T14/X13 (Ryzen/Modern) ★ Resell-Top"
+    price_history_model: "thinkpad_modern"
+    require_all_of:
+      - ["thinkpad", "think pad"]
+      - ["t14", "t490", "x13", "x390", "l14"]
+    exclude:
+      - "t420"
+      - "t430"
+      - "t440"
+      - "t450"
+      - "t460"
+    min_vram_gb: 0
+    max_price: 180
+    deal_rating: "Top-Deal"
+
+  - label: "ThinkPad T14/X13 (Ryzen/Modern)"
+    price_history_model: "thinkpad_modern"
+    require_all_of:
+      - ["thinkpad", "think pad"]
+      - ["t14", "t490", "x13", "x390", "l14"]
+    exclude:
+      - "t420"
+      - "t430"
+      - "t440"
+      - "t450"
+      - "t460"
+    min_vram_gb: 0
+    max_price: 240
+    deal_rating: "Guter Preis"
+
+  - label: "Gaming Laptop (RTX 3060) ★ Resell-Top"
+    price_history_model: "gaming_laptop_rtx3060"
+    require_all_of:
+      - ["rtx 3060", "3060m", "3060 gtx"]
+      - ["laptop", "notebook", "gaming"]
+    min_vram_gb: 0
+    max_price: 400
+    deal_rating: "Top-Deal"
+    negotiation_tolerance_pct: 15.0
+
+  - label: "Gaming Laptop (RTX 3060)"
+    price_history_model: "gaming_laptop_rtx3060"
+    require_all_of:
+      - ["rtx 3060", "3060m", "3060 gtx"]
+      - ["laptop", "notebook", "gaming"]
+    min_vram_gb: 0
+    max_price: 490
+    deal_rating: "Guter Preis"
+
+  - label: "Gaming Laptop (RTX 4060) ★ Resell-Top"
+    price_history_model: "gaming_laptop_rtx4060"
+    require_all_of:
+      - ["rtx 4060", "4060m"]
+      - ["laptop", "notebook", "gaming"]
+    min_vram_gb: 0
+    max_price: 550
+    deal_rating: "Top-Deal"
+    negotiation_tolerance_pct: 12.0

@@ -1,0 +1,172 @@
+# ============================================================
+# CPU + Mainboard Bundle (Phase 5 – Erweiterung, Robins Vorgabe)
+# ============================================================
+# Kombinierte Kategorie (KEINE separaten CPU-/Mainboard-Kategorien) --
+# gesucht werden ausschließlich Angebote, bei denen CPU + Board
+# zusammen als Bundle/Set angeboten werden. Reines Titel-Keyword-
+# Matching (require_all_of/match), analog zu ram.yaml/monitor_curved.yaml
+# -- es gibt keinen Chipsatz-Detector in categories/detectors/, daher
+# kein "requirements:"-Block wie bei office_pc.yaml/gaming_pc.yaml.
+#
+# ANFORDERUNG (Robin): Bundle muss BESSER sein als sein aktuelles System
+# (siehe Meine_Hardware_Komponenten.txt: Intel i5-8400, Sockel LGA1151,
+# 16GB DDR4). Alle drei Combos unten sind ein klarer Sprung nach oben:
+#   - Ryzen 5 5600 + B550/B450 (Zen 3, 5000er-Serie)
+#   - Intel i5-12400F + B660/B760/H610 DDR4 (12. Generation)
+#   - Ryzen 5 3600 + B450/B550/A320 (Zen 2, 3000er-Serie -- Robins
+#     Einstiegs-Tipp; Multi-Core klar über i5-8400, Single-Core auf
+#     Augenhöhe -- als "Guter Preis"-Tier bewusst NICHT als Top-Deal
+#     geführt, siehe deal_rating unten)
+# "i5 8400"/"i5-8400" sowie "lga 1151" stehen explizit im Ausschluss,
+# damit Robins eigenes System nie versehentlich als "Deal" auftaucht.
+#
+# ABWEICHUNGEN von Robins Beispiel-cpu_bundle.yaml (siehe Begründung im
+# Chat-Output nach diesem Schritt):
+#   1. notify_max_price ist in matcher.py NUR ein Kategorie-Feld
+#      (cat_cfg.get("notify_max_price"), siehe _load_rules_from_dir()),
+#      kein per-Regel-Feld -- ein "notify_max_price:" auf Regel-Ebene
+#      würde von evaluate() schlicht ignoriert. Daher hier EIN
+#      Kategorie-weiter Wert statt sechs stillschweigend wirkungslosen
+#      Einzelwerten.
+#   2. "defekt"/"bastler" aus exclude_category entfernt -- bereits in
+#      _global.yaml::exclude_global für ALLE Kategorien abgedeckt
+#      (doppelte Pflege vermeiden).
+#   3. "ovp"/"box"/"kühler" aus exclude_category entfernt -- als
+#      Einzelwort hätten diese auch legitime Bundles ausgeschlossen,
+#      die z.B. "inkl. Box-Kühler"/"in OVP" im Titel erwähnen (matcher.
+#      _contains_term() prüft nur Wortgrenzen, keine Negation). Leere
+#      Karton-/Verpackungs-Angebote fängt bereits exclude_global
+#      ("nur ovp", "leerkarton") ab.
+#   4. min_vram_gb: 0 ergänzt (wie bei ram.yaml/sata_ssd.yaml) --
+#      matcher._vram_gb() liest jede "\d{1,2}gb"-Zahl im Titel; ohne
+#      diesen Override würde z.B. "16GB DDR4" im Bundle-Titel
+#      fälschlich als "16GB VRAM" interpretiert und mangels dediziertem
+#      GPU-Kontext nicht weiter stören, aber sauberer ist der explizite
+#      Override analog zu allen anderen Nicht-GPU-Kategorien.
+#   5. price_history_model pro Combo (nicht pro Kategorie) vergeben --
+#      analog zu gpu.yaml (Einzelmodelle) statt gaming_pc.yaml (ein
+#      gemeinsamer Bucket), da die drei Combos hardwaremäßig eigene
+#      Produkte mit eigener Marktpreis-Entwicklung sind.
+# ============================================================
+
+category: "cpu_mainboard_bundle"
+label: "CPU + Mainboard Bundle"
+
+# gpu:1, sata_ssd:2, netzteil:3, ram:4 bereits vergeben.
+scan_priority: 5
+
+# Kategorie-weites Preislimit für ntfy-Push (siehe Abweichung 1 oben).
+# Höchster "Guter Preis"-Schwellwert unten (i5-12400F-Combo) = 130€ --
+# das eigentliche Qualitäts-Gate läuft über gate_min_stars (_global.yaml,
+# aktuell ★★★☆☆) und den je nach deal_rating unterschiedlichen
+# Preis-Score, nicht über dieses Limit allein.
+notify_max_price: 130
+
+search_terms:
+  - "Ryzen 5 5600 Mainboard"
+  - "Ryzen 5 5600 Bundle"
+  - "i5-12400F Mainboard"
+  - "i5 12400F Bundle"
+  - "Ryzen 5 3600 Mainboard"
+  - "Ryzen 5 3600 Bundle"
+  - "CPU Mainboard Bundle"
+  - "CPU Mainboard Kombi"
+
+# Globaler Ausschluss (defekt/bastler/...) deckt Standard-Fälle bereits ab
+# -- hier nur kategorie-spezifische Begriffe.
+exclude_category:
+  - "xeon"
+  - "intel core 2"
+  - "ddr3"
+  - "lga 1151"        # Robins aktueller Sockel -- nie als Deal melden
+  - "i5 8400"          # Robins aktuelle CPU -- nie als Deal melden
+  - "i5-8400"
+  - "nur cpu"
+  - "ohne mainboard"
+  - "ohne board"
+  - "nur mainboard"
+  - "nur board"
+
+rules:
+  # ============================================================
+  # AMD RYZEN 5 5600 + B550/B450
+  # ============================================================
+  - label: "Ryzen 5 5600 + B550 Bundle ★ Top-Deal"
+    price_history_model: "cpu_bundle_ryzen5600_b550"
+    require_all_of:
+      - ["ryzen 5 5600", "r5 5600"]
+      - ["b550", "b450", "mainboard", "board", "bundle", "set", "kombi"]
+    exclude:
+      - "1600"
+      - "2600"
+      - "3600"
+    min_vram_gb: 0
+    max_price: 90
+    deal_rating: "Top-Deal"
+    negotiation_tolerance_pct: 15.0
+
+  - label: "Ryzen 5 5600 + B550 Bundle ★ Guter Preis"
+    price_history_model: "cpu_bundle_ryzen5600_b550"
+    require_all_of:
+      - ["ryzen 5 5600", "r5 5600"]
+      - ["b550", "b450", "mainboard", "board", "bundle", "set", "kombi"]
+    exclude:
+      - "1600"
+      - "2600"
+      - "3600"
+    min_vram_gb: 0
+    max_price: 120
+    deal_rating: "Guter Preis"
+
+  # ============================================================
+  # INTEL i5-12400F + B660/B760/H610 DDR4
+  # ============================================================
+  - label: "Intel i5 12400F DDR4 Bundle ★ Top-Deal"
+    price_history_model: "cpu_bundle_i5_12400f_b660"
+    require_all_of:
+      - ["12400f", "i5 12400"]
+      - ["b660", "b760", "h610", "mainboard", "board", "bundle", "set", "kombi"]
+    exclude:
+      - "ddr5"
+    min_vram_gb: 0
+    max_price: 100
+    deal_rating: "Top-Deal"
+    negotiation_tolerance_pct: 15.0
+
+  - label: "Intel i5 12400F DDR4 Bundle ★ Guter Preis"
+    price_history_model: "cpu_bundle_i5_12400f_b660"
+    require_all_of:
+      - ["12400f", "i5 12400"]
+      - ["b660", "b760", "h610", "mainboard", "board", "bundle", "set", "kombi"]
+    exclude:
+      - "ddr5"
+    min_vram_gb: 0
+    max_price: 130
+    deal_rating: "Guter Preis"
+
+  # ============================================================
+  # AMD RYZEN 5 3600 + B450/B550/A320 (Einstiegs-Tipp)
+  # ============================================================
+  - label: "Ryzen 5 3600 + B450 Bundle ★ Top-Deal"
+    price_history_model: "cpu_bundle_ryzen3600_b450"
+    require_all_of:
+      - ["ryzen 5 3600", "r5 3600"]
+      - ["b450", "b550", "a320", "mainboard", "board", "bundle", "set", "kombi"]
+    exclude:
+      - "1600"
+      - "2600"
+    min_vram_gb: 0
+    max_price: 55
+    deal_rating: "Top-Deal"
+
+  - label: "Ryzen 5 3600 + B450 Bundle ★ Guter Preis"
+    price_history_model: "cpu_bundle_ryzen3600_b450"
+    require_all_of:
+      - ["ryzen 5 3600", "r5 3600"]
+      - ["b450", "b550", "a320", "mainboard", "board", "bundle", "set", "kombi"]
+    exclude:
+      - "1600"
+      - "2600"
+    min_vram_gb: 0
+    max_price: 75
+    deal_rating: "Guter Preis"

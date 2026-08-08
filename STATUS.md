@@ -1039,3 +1039,59 @@ daher weiterhin Python-Code, nicht nur YAML.
 8 offene Punkte (L1-L8) in PROJEKTSTAND_KOMPLETT.md priorisiert, inkl.
 Umsetzungsplan. Kein Code geaendert.
 ```
+
+---
+
+## 30. Drei neue Kategorien: RAM, CPU+Mainboard-Bundle, Notebook (Reselling) — Chat-Batch, Doku einmalig aktualisiert
+
+**Ausgangslage:** Freigabe für drei aufeinanderfolgende Kategorie-Ergänzungen erteilt, mit der Vorgabe, `STATUS.md`/`PROJEKTSTAND_KOMPLETT.md` nicht nach jeder einzelnen, sondern erst einmalig nach allen drei zu aktualisieren. SSD/Monitor bewusst übersprungen (bereits vorhanden bzw. bekannte Teilabdeckung, kein Auftrag in diesem Batch).
+
+**30.1 RAM (`rules/ram.yaml`)** — DDR4-only, 3 Kapazitätsstufen (8/16/32GB) × 2 Preisstufen. Titel-Keyword-Matching statt `min_ram_gb`-Requirement, da letzteres kein Obergrenzen-Pendant kennt (siehe YAML-Kommentar für Details). Reines YAML, kein Code-Change.
+
+**30.2 CPU + Mainboard Bundle (`rules/cpu_mainboard_bundle.yaml`)** — Auf Robins expliziten Wunsch **eine kombinierte** Kategorie statt separater CPU-/Mainboard-Kategorien (Abweichung von der ursprünglichen Auftrags-Zielliste, dokumentiert in `PROJEKTSTAND_KOMPLETT.md` Abschnitt 6). 3 Hardware-Combos (Ryzen 5 5600+B550, i5-12400F+B660/B760, Ryzen 5 3600+B450), alle nachweislich besser als Robins eigenes System (i5-8400/LGA1151, siehe `Meine_Hardware_Komponenten.txt`) — dessen Sockel/CPU-Modell explizit in `exclude_category`. Ausgehend von Robins eigenem YAML-Entwurf, mit 5 verifizierten Korrekturen gegen echten Code:
+1. `notify_max_price` ist in `matcher.py` nur ein Kategorie-Feld, kein Regel-Feld — sechs Einzelwerte im Entwurf wären wirkungslos gewesen, jetzt ein Kategorie-Wert (130€).
+2. `defekt`/`bastler` aus `exclude_category` entfernt — bereits über `exclude_global` abgedeckt.
+3. `ovp`/`box`/`kühler` aus `exclude_category` entfernt — als Einzelwort hätten diese auch legitime Bundles mit Zubehör-Erwähnung ausgeschlossen.
+4. `min_vram_gb: 0` ergänzt (Standardmuster für Nicht-GPU-Kategorien, verhindert Fehlinterpretation von "16GB DDR4" als VRAM).
+5. `price_history_model` pro Combo statt pro Kategorie (wie `gpu.yaml`) — drei eigenständige Produkte.
+
+**30.3 Notebook Reselling (`rules/notebook_resell.yaml`)** — ThinkPad (modern: T14/T490/X13/X390/L14) + Gaming-Notebooks (RTX 3060/4060), 5 Regeln. Ausgehend von Robins Entwurf (`notebook.yaml`), mit 3 verifizierten Korrekturen:
+1. **Kritisch:** Dateiname `notebook.yaml` vs. `category: "notebook_resell"` verletzte die durch `tests/test_notify_max_price_and_sata_ssd_fix.py::test_load_rules_liefert_vollstaendige_kategorie_liste` abgesicherte Konvention (Dateiname == category-Feld) — Test schlug real fehl (`AssertionError`, verifiziert). Datei umbenannt zu `notebook_resell.yaml` (category-Feld unverändert, da als interne ID an anderer Stelle referenziert).
+2. `defekt`/`bastler`/`kaputt`/`ohne funktion`/`ersatzteil`/`leerkarton` aus `exclude_category` entfernt — bereits über `exclude_global` abgedeckt.
+3. `netzteil`/`ladekabel`/`tasche`/`hülle`/`karton`/`ovp` als bare-word-Excludes entfernt und durch präzise Phrasen (`"nur netzteil"` etc.) ersetzt — Regressionstest zeigte real, dass der ursprüngliche Entwurf ein valides Angebot ("Gaming Laptop RTX 3060 inkl. Netzteil und Tasche") fälschlich verworfen hätte.
+
+Erstmalige Aktivierung des `profit`-Scoring-Gewichts (`0.25`) in `notebook_resell.yaml` — bisher projektweit `0.0`. Verifiziert rückwärtskompatibel: ohne gesammelte `price_history`-Daten für die neuen `price_history_model`-Schlüssel fällt `compute_profit()` auf den neutralen Platzhalter-Score (60) zurück, siehe `scoring/deal_score.py::_profit_score()`. Keine Verzerrung bestehender Kategorien.
+
+**Geänderte Dateien**
+- `app/rules/ram.yaml` (neu)
+- `app/rules/cpu_mainboard_bundle.yaml` (neu)
+- `app/rules/notebook_resell.yaml` (neu, umbenannt von Robins `notebook.yaml`-Entwurf)
+- `PROJEKTSTAND_KOMPLETT.md` (Abschnitt 6 + L1 aktualisiert)
+- `STATUS.md` (dieser Abschnitt)
+
+**Empfohlene Tests**
+`pytest app/tests/` → **569 passed**, keine Regressionen. Zusätzlich manuell gegen echten `matcher.evaluate()` verifiziert: alle Match-/Ausschluss-Fälle je Kategorie (inkl. der beiden über Excludes gefundenen Fehlerfälle vor Korrektur).
+
+**Mögliche Nebenwirkungen**
+Keine bei bestehenden Kategorien. `notebook_resell.yaml` ist die erste Kategorie mit aktivem `profit`-Gewicht — sobald für die dortigen `price_history_model`-Schlüssel echte Preishistorie vorliegt, beeinflusst das Profit-Signal den Deal-Score dieser Kategorie tatsächlich (gewünscht, aber zur Kenntnis: Kalibrierung nach Datensammlung nötig, analog zum bisherigen Muster bei neuen Kategorien).
+
+**Commit-Nachricht**
+```
+feat(rules): drei neue Kategorien (ram, cpu_mainboard_bundle, notebook_resell)
+
+- ram.yaml: DDR4-only, 3 Kapazitaetsstufen, Titel-Keyword-Matching
+- cpu_mainboard_bundle.yaml: kombinierte CPU+Mainboard-Kategorie (Robins
+  Vorgabe, Abweichung von der urspruenglichen Auftrags-Zielliste),
+  schliesst Robins eigenes System (i5-8400/LGA1151) explizit aus
+- notebook_resell.yaml: ThinkPad (modern) + Gaming-Notebooks RTX 3060/4060,
+  erste Kategorie mit aktivem profit-Scoring-Gewicht (rueckwaertskompatibel
+  via Placeholder-Score ohne Marktdaten)
+- Fix: notebook.yaml -> notebook_resell.yaml umbenannt (Dateiname musste
+  category-Feld entsprechen, sonst brach test_load_rules_liefert_
+  vollstaendige_kategorie_liste)
+- Diverse Exclude-Bereinigungen in allen drei Dateien (Redundanzen zu
+  exclude_global entfernt, zu breite bare-word-Excludes durch praezise
+  Phrasen ersetzt, real gegen matcher.evaluate() verifiziert)
+- PROJEKTSTAND_KOMPLETT.md einmalig aktualisiert (Abschnitt 6 + L1)
+- Kein Python-Code geaendert, 569/569 Tests gruen
+```

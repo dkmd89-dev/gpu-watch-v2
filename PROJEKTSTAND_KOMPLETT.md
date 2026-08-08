@@ -123,17 +123,25 @@ Punkt (siehe Lücken-Liste, Abschnitt 8).
 | Office-PC | ✅ implementiert (`office_pc.yaml`), inkl. CPU-Tier/Generation-Muster statt Modell-Whitelist (bewusste Interpretation, dokumentiert in der YAML) |
 | Gaming-PC | ✅ implementiert (`gaming_pc.yaml`) |
 | Grafikkarten | ✅ implementiert (`gpu.yaml`) — bereits vor der V2-Anforderung vorhanden |
-| CPUs (eigene Kategorie) | ❌ fehlt — Detector `cpu.py` existiert, aber keine eigenständige CPU-Kategorie-YAML |
-| Mainboards | ❌ fehlt — kein Detector, keine YAML |
-| RAM (eigene Kategorie) | ❌ fehlt — Detector `ram.py` existiert (für PC-Anforderungsprüfung), keine eigenständige RAM-Kategorie |
-| SSDs | ⚠️ teilweise — `sata_ssd.yaml` existiert (SATA-SSD als Einzelkategorie), NVMe als eigene Kategorie fehlt |
+| CPUs (eigene Kategorie) | ⚠️ abweichend umgesetzt — auf Robins expliziten Wunsch KEINE separate CPU-Kategorie, sondern kombiniert mit Mainboard (`cpu_mainboard_bundle.yaml`, reines Titel-Keyword-Matching, kein Chipsatz-Detector nötig) |
+| Mainboards | ⚠️ abweichend umgesetzt — s. o., nur als Bestandteil von `cpu_mainboard_bundle.yaml`, keine eigenständige Mainboard-Kategorie |
+| RAM (eigene Kategorie) | ✅ implementiert (`ram.yaml`) — DDR4-only, 3 Kapazitätsstufen (8/16/32GB), Titel-Keyword-Matching (Begründung: `min_ram_gb`-Requirement kennt kein Obergrenzen-Pendant, siehe YAML-Kommentar) |
+| SSDs | ⚠️ teilweise — `sata_ssd.yaml` existiert (SATA-SSD als Einzelkategorie), NVMe als eigene Kategorie fehlt weiterhin |
 | Netzteile | ✅ implementiert (`netzteil.yaml`) |
 | Monitore | ⚠️ teilweise — `monitor_curved.yaml` existiert (nur Curved-Segment), keine allgemeine Monitor-Kategorie |
-| Notebooks | ❌ fehlt als PC-Notebook-Kategorie — `macbook.yaml` deckt nur Apple-Notebooks ab (anderer Scope, s. u.) |
+| Notebooks | ✅ implementiert (`notebook_resell.yaml`, category-Feld `notebook_resell`) — ThinkPad (modern) + Gaming-Notebooks (RTX 3060/4060); `macbook.yaml` bleibt separat (anderer Scope, Apple) |
 
 **Zusätzlich vorhanden, außerhalb der Auftrags-Zielliste:** `iphone.yaml`,
 `macbook.yaml`, `retro_konsolen.yaml`, `vintage_elektronik.yaml`,
 `lego_minifiguren.yaml` — fünf Kategorien ohne PC-Hardware-Bezug.
+
+**Reselling-Erweiterung (`notebook_resell.yaml`):** erste Kategorie, die
+das `profit`-Scoring-Gewicht aktiv setzt (`0.25`, war zuvor projektweit
+`0.0` und nur in `scoring/deal_score.py` vorbereitet). Rückwärtskompatibel,
+da ohne gesammelte `price_history`-Daten für die dortigen
+`price_history_model`-Schlüssel `compute_profit()` auf den neutralen
+Platzhalter-Score (60) zurückfällt — keine Verzerrung bestehender
+Kategorien, siehe `scoring/deal_score.py::_profit_score()`.
 
 ## 7. Reselling-Zusatzlogik (über den ursprünglichen Auftrag hinaus)
 
@@ -164,7 +172,7 @@ behandelt werden, nicht als etwas, das "neu geplant" werden muss.
 
 | # | Lücke | Auswirkung | Vorschlag Priorität |
 |---|---|---|---|
-| L1 | 6 der 8 PC-Hardware-Zielkategorien aus dem Auftrag fehlen ganz/teilweise (CPU, Mainboard, RAM, NVMe-SSD, allg. Monitor, Notebook) | Auftragsziel "modularer Hardware Deal Finder" ist zur Hälfte offen | Hoch — Kern des Auftrags |
+| L1 | Noch 2 offene Teilbereiche (NVMe-SSD als eigene Kategorie, allgemeine Monitor-Kategorie über Curved hinaus). CPU/Mainboard/RAM/Notebook seit dieser Session erledigt (`cpu_mainboard_bundle.yaml`, `ram.yaml`, `notebook_resell.yaml`) — CPU/Mainboard bewusst kombiniert statt getrennt (Robins Vorgabe), dokumentiert als Abweichung von der ursprünglichen Auftrags-Zielliste | Auftragsziel "modularer Hardware Deal Finder" größtenteils erfüllt | Mittel — Rest ist Ausbau, kein Kernrisiko mehr |
 | L2 | Detector-Ebene ist NICHT codefrei erweiterbar (Abschnitt 5) | Neue Kategorien mit neuem Hardware-Merkmal brauchen Python-Änderung | **Entschieden (siehe Abschnitt 9a)** — bewusst kontrolliert bei statischen Imports geblieben |
 | L5 | `seen.json`/`found.json` wachsen unbegrenzt (14 MB / 2,1 MB) | Perf./Speicher langfristig | Mittel |
 | L6 | Scope-Drift: 5 Nicht-PC-Kategorien | Klärungsbedarf, kein Bug | **Entschieden (siehe Abschnitt 9b)** — bewusst behalten, unabhängig weiterlaufen lassen |
