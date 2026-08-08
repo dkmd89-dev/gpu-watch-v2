@@ -32,6 +32,18 @@ _FEE_DEFAULTS: dict[str, float] = {
     "packaging_cost": 0.0,
 }
 
+# Ab welcher geschaetzten Marge (in Prozent vom Kaufpreis, siehe
+# Profit.margin_pct) ein Angebot als "Flip-Kandidat" gilt (Dashboard-KPI
+# "💰 Flip-Kandidaten"). Bewusst als eigene Konstante hier im Profit-Modul
+# (analog zu TOP_DEAL_DISCOUNT_THRESHOLD_A/B_PCT in top_deal.py): keine
+# Hardware- oder Marktdaten-Konfiguration, sondern eine Interpretationsregel
+# der bereits vorhandenen compute_profit()-Ergebnisse. Wird (noch) nicht in
+# diesem Modul selbst ausgewertet -- das erfolgt an der Aufrufstelle in
+# app.py (Schritt "Flip-Kandidaten-KPI"), analog dazu, dass top_deal.py
+# selbst auch keine deal_score-Berechnung durchfuehrt, sondern nur einen
+# bereits berechneten Wert entgegennimmt.
+MIN_FLIP_MARGIN_PCT = 20.0
+
 
 @dataclass(frozen=True)
 class Profit:

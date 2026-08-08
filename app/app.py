@@ -19,7 +19,7 @@ from price_history import append_price_point, make_price_point, read_price_point
 from duplicate_detection import find_duplicate, normalize_title
 from presence_tracking import (
     migrate_seen_data, mark_seen, mark_matched, detect_newly_delisted,
-    prune_delisted_entries, DEFAULT_DELISTING_THRESHOLD_SCANS,
+    prune_delisted_entries, enforce_max_size, DEFAULT_DELISTING_THRESHOLD_SCANS,
 )
 from time_to_sell import make_time_to_sell_point, append_time_to_sell_point, read_time_to_sell_points
 from time_to_sell_stats import compute_all_time_to_sell_stats
@@ -68,6 +68,19 @@ DEAL_MAX_AGE_DAYS = int(os.environ.get("DEAL_MAX_AGE_DAYS", "7"))
 # da hier bereits das staerkere "delisted"-Kriterium greift, nicht nur
 # das Alter allein.
 SEEN_DELISTED_MAX_AGE_DAYS = int(os.environ.get("SEEN_DELISTED_MAX_AGE_DAYS", "3"))
+
+# L5-Restlücke (STATUS.md Abschnitt 31): prune_delisted_entries() oben
+# entfernt nur delistete Alt-Eintraege -- AKTIVE (nicht delistete)
+# Eintraege bleiben bewusst unabhaengig vom Alter erhalten (siehe
+# presence_tracking.py-Docstring), was bei breiten search_terms ueber
+# viele Kategorien in der Praxis zu unbegrenztem Wachstum fuehrt (reale
+# seen.json: 14 MB). Zusaetzliche harte Obergrenze an der Gesamtzahl,
+# analog zu FOUND_MAX_ITEMS oben -- bei Ueberschreitung werden die
+# aeltesten Eintraege (nach first_seen) entfernt, siehe
+# presence_tracking.enforce_max_size(). 50.000 Eintraege * ca. 150-250
+# Byte/Eintrag ergibt ca. 7,5-12,5 MB als Obergrenze (Default, Robins
+# Freigabe) -- deutlich unter der aktuell beobachteten 14 MB.
+SEEN_MAX_ITEMS = int(os.environ.get("SEEN_MAX_ITEMS", "50000"))
 
 # Schritt B: Log-Rotation. Ohne Rotation wuchs gpu_watch.log unbegrenzt
 # (ein Long-Running-Container ohne Log-Limit ist ein bekanntes Betriebs-
@@ -749,6 +762,18 @@ def run_scan():
                     "🧹 seen.json bereinigt: %d delistete Alt-Eintraege "
                     "(> %d Tage) entfernt.",
                     pruned_count, SEEN_DELISTED_MAX_AGE_DAYS,
+                )
+            # L5-Restlücke (STATUS.md Abschnitt 31): zusätzliche harte
+            # Obergrenze NACH dem Delisted-Pruning oben -- greift nur, wenn
+            # trotz Delisted-Pruning noch zu viele (überwiegend aktive)
+            # Einträge übrig sind. Normalfall: kein Effekt (overflow <= 0,
+            # siehe enforce_max_size()-Docstring).
+            seen, size_capped_count = enforce_max_size(seen, SEEN_MAX_ITEMS)
+            if size_capped_count:
+                log.info(
+                    "🧹 seen.json Obergrenze erreicht: %d älteste Einträge "
+                    "(> %d Gesamt-Limit) entfernt.",
+                    size_capped_count, SEEN_MAX_ITEMS,
                 )
             _save_json(SEEN_FILE, seen)
             _save_json(FOUND_FILE, found[:FOUND_MAX_ITEMS])

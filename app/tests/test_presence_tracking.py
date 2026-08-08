@@ -149,6 +149,129 @@ def test_detect_newly_delisted_ueberspringt_bereits_delistete_urls():
     assert newly_delisted == []
 
 
+# ============================================================
+# prune_delisted_entries() -- bisher ungetestet (STATUS.md Abschnitt 28:
+# Funktion wurde nachgezogen, weil sie fehlte und app.py deshalb nicht
+# startete; Tests dafür fehlten seitdem). Hier nachgetragen als Teil von
+# Abschnitt 31 (L5), da enforce_max_size() direkt danach im selben
+# Scan-Schritt aufgerufen wird und beide zusammen verifiziert werden sollen.
+# ============================================================
+
+def test_prune_delisted_entries_entfernt_alte_delistete_eintraege():
+    from datetime import datetime, timedelta, timezone
+    from presence_tracking import prune_delisted_entries
+
+    old_ts = (datetime.now(timezone.utc) - timedelta(days=10)).isoformat()
+    entries = {
+        "https://a.test/1": {**SeenEntry(first_seen="t0", last_seen=old_ts).to_dict(), "delisted": True},
+    }
+    kept, removed = prune_delisted_entries(entries, max_age_days=3)
+
+    assert kept == {}
+    assert removed == 1
+
+
+def test_prune_delisted_entries_behaelt_aktive_eintraege_unabhaengig_vom_alter():
+    from datetime import datetime, timedelta, timezone
+    from presence_tracking import prune_delisted_entries
+
+    old_ts = (datetime.now(timezone.utc) - timedelta(days=365)).isoformat()
+    entries = {
+        "https://a.test/1": {**SeenEntry(first_seen="t0", last_seen=old_ts).to_dict(), "delisted": False},
+    }
+    kept, removed = prune_delisted_entries(entries, max_age_days=3)
+
+    assert kept == entries
+    assert removed == 0
+
+
+def test_prune_delisted_entries_behaelt_junge_delistete_eintraege():
+    from datetime import datetime, timedelta, timezone
+    from presence_tracking import prune_delisted_entries
+
+    recent_ts = (datetime.now(timezone.utc) - timedelta(hours=1)).isoformat()
+    entries = {
+        "https://a.test/1": {**SeenEntry(first_seen="t0", last_seen=recent_ts).to_dict(), "delisted": True},
+    }
+    kept, removed = prune_delisted_entries(entries, max_age_days=3)
+
+    assert "https://a.test/1" in kept
+    assert removed == 0
+
+
+def test_prune_delisted_entries_entfernt_migrierte_eintraege_ohne_last_seen():
+    from presence_tracking import prune_delisted_entries
+
+    entries = {
+        "https://a.test/1": {**SeenEntry().to_dict(), "delisted": True},  # last_seen=None (migriert)
+    }
+    kept, removed = prune_delisted_entries(entries, max_age_days=3)
+
+    assert kept == {}
+    assert removed == 1
+
+
+# ============================================================
+# enforce_max_size() -- STATUS.md Abschnitt 31 (L5-Restlücke): harte
+# Obergrenze an der Gesamtzahl seen.json-Einträge, zusätzlich zum
+# alter-basierten prune_delisted_entries() oben.
+# ============================================================
+
+def test_enforce_max_size_greift_nicht_unterhalb_der_grenze():
+    from presence_tracking import enforce_max_size
+
+    entries = {
+        "https://a.test/1": SeenEntry(first_seen="2026-01-01T00:00:00+00:00").to_dict(),
+        "https://a.test/2": SeenEntry(first_seen="2026-01-02T00:00:00+00:00").to_dict(),
+    }
+    kept, removed = enforce_max_size(entries, max_items=5)
+
+    assert kept == entries
+    assert removed == 0
+
+
+def test_enforce_max_size_entfernt_aelteste_eintraege_nach_first_seen():
+    from presence_tracking import enforce_max_size
+
+    entries = {
+        "https://a.test/old": SeenEntry(first_seen="2026-01-01T00:00:00+00:00").to_dict(),
+        "https://a.test/mid": SeenEntry(first_seen="2026-01-02T00:00:00+00:00").to_dict(),
+        "https://a.test/new": SeenEntry(first_seen="2026-01-03T00:00:00+00:00").to_dict(),
+    }
+    kept, removed = enforce_max_size(entries, max_items=2)
+
+    assert removed == 1
+    assert set(kept.keys()) == {"https://a.test/mid", "https://a.test/new"}
+
+
+def test_enforce_max_size_entfernt_migrierte_eintraege_ohne_first_seen_zuerst():
+    from presence_tracking import enforce_max_size
+
+    entries = {
+        "https://a.test/migrated": SeenEntry(first_seen=None).to_dict(),
+        "https://a.test/known": SeenEntry(first_seen="2026-01-01T00:00:00+00:00").to_dict(),
+    }
+    kept, removed = enforce_max_size(entries, max_items=1)
+
+    assert removed == 1
+    assert set(kept.keys()) == {"https://a.test/known"}
+
+
+def test_enforce_max_size_gibt_neues_dict_zurueck_kein_inplace():
+    from presence_tracking import enforce_max_size
+
+    entries = {
+        "https://a.test/1": SeenEntry(first_seen="2026-01-01T00:00:00+00:00").to_dict(),
+        "https://a.test/2": SeenEntry(first_seen="2026-01-02T00:00:00+00:00").to_dict(),
+    }
+    original_len = len(entries)
+    kept, removed = enforce_max_size(entries, max_items=1)
+
+    assert len(entries) == original_len  # Original unveraendert
+    assert kept is not entries
+    assert len(kept) == 1
+
+
 if __name__ == "__main__":
     import pytest
     raise SystemExit(pytest.main([__file__, "-v"]))

@@ -220,3 +220,49 @@ def prune_delisted_entries(
             continue
         kept[url] = entry
     return kept, removed
+
+
+def enforce_max_size(
+    entries: dict[str, dict], max_items: int,
+) -> tuple[dict[str, dict], int]:
+    """Begrenzt seen.json zusätzlich auf eine harte Obergrenze an Einträgen
+    -- Ergänzung zu prune_delisted_entries() (STATUS.md Abschnitt 31,
+    L5-Restlücke): AKTIVE (nicht delistete) Einträge bleiben dort bewusst
+    unabhängig vom Alter erhalten (siehe Docstring oben), was bei breiten
+    search_terms über viele Kategorien in der Praxis zu unbegrenztem
+    Wachstum führt, da die meisten Einträge rohe, ungematchte Suchtreffer
+    sind, die so lange aktiv bleiben, wie die Anzeige online ist.
+
+    Nur wirksam, wenn `len(entries) > max_items` -- Normalfall (Anzahl
+    unterhalb der Grenze) bleibt unverändert, KEIN Eingriff. Wird die
+    Grenze überschritten, werden die ÄLTESTEN Einträge nach `first_seen`
+    entfernt, bis die Grenze wieder eingehalten ist. Einträge ohne
+    `first_seen` (None -- migrierte Alt-Einträge, siehe migrate_seen_data())
+    gelten als am ältesten und werden zuerst entfernt, da für sie ohnehin
+    keine verwertbare Historie vorliegt.
+
+    Bekanntes Restrisiko (dokumentiert, nicht automatisch vermeidbar): eine
+    entfernte, aber weiterhin aktive Anzeige fällt aus der Dedup-Baseline
+    und würde beim nächsten Scan erneut verarbeitet (ggf. erneute
+    Benachrichtigung, falls sie weiterhin die Kriterien erfüllt) --
+    seltener Edge-Case, nur bei dauerhafter Überschreitung von max_items,
+    und betrifft ausschließlich die ältesten (am längsten laufenden)
+    Anzeigen im Bestand.
+
+    Gibt (bereinigtes Dict, Anzahl entfernter Einträge) zurück. Erstellt
+    ein neues Dict statt in-place zu mutieren, analog zu
+    prune_delisted_entries().
+    """
+    overflow = len(entries) - max_items
+    if overflow <= 0:
+        return entries, 0
+
+    def _sort_key(item: tuple[str, dict]) -> str:
+        # None (kein first_seen) sortiert als leerer String vor jedem
+        # echten ISO-8601-Zeitstempel -> gilt als aeltestes.
+        return item[1].get("first_seen") or ""
+
+    ordered = sorted(entries.items(), key=_sort_key)
+    to_remove = {url for url, _ in ordered[:overflow]}
+    kept = {url: entry for url, entry in entries.items() if url not in to_remove}
+    return kept, overflow
