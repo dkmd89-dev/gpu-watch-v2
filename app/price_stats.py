@@ -38,6 +38,22 @@ _MIN_SAMPLES_FOR_TREND = 4
 # _global.yaml).
 _TREND_THRESHOLD_PCT = 5.0
 
+# roadmap.md Phase 5: Confidence-Klassifizierung fuer die Resale-/Markt-
+# Statistik einer Gruppe -- rein informativ (siehe PriceStats-Docstring),
+# beeinflusst NICHT market_price/estimated_resale_price/Deal-Score/
+# Notification-Gate. LOW deckt sich bewusst mit der bestehenden
+# _MIN_SAMPLES_FOR_PERCENTILE_MARKET_PRICE-Schwelle (dort ist
+# estimated_resale_price ohnehin bereits None). HIGH ab 15 Datenpunkten
+# ist ein Platzhalter mangels echter Kalibrierungsdaten fuer dieses neue
+# Feld (Robins Freigabe) -- analog zu anderen Platzhalter-Schwellen im
+# Projekt (z.B. rules/ram.yaml, Abschnitt 30: "Kalibrierung folgt nach
+# Datensammlung").
+_MIN_SAMPLES_FOR_HIGH_CONFIDENCE = 15
+
+CONFIDENCE_LOW = "LOW"
+CONFIDENCE_MEDIUM = "MEDIUM"
+CONFIDENCE_HIGH = "HIGH"
+
 TREND_STEIGEND = "steigend"
 TREND_FALLEND = "fallend"
 TREND_STABIL = "stabil"
@@ -58,6 +74,11 @@ class PriceStats:
     estimated_resale_price bewusst nur das TEURERE obere Preissegment
     derselben Datenpunkte nutzt und damit naeher an einem realistischen
     Wiederverkaufspreis liegt.
+
+    percentile_25/percentile_90, data_age_days und confidence (roadmap.md
+    Phase 5) sind rein informative Zusatzfelder fuer Dashboard/Transparenz --
+    sie fliessen NICHT in market_price/estimated_resale_price/Deal-Score/
+    Notification-Gate ein (siehe compute_price_stats()-Docstring).
     """
 
     model: str
@@ -76,6 +97,20 @@ class PriceStats:
     # ohne dass sie diese beiden Felder kennen muessen.
     percentile_75: float = 0.0
     estimated_resale_price: float | None = None
+    # roadmap.md Phase 5 (Price-History/Resale-Confidence). Alle vier NEU,
+    # mit Defaults fuer Rueckwaertskompatibilitaet zu bestehenden
+    # PriceStats(...)-Konstruktionsstellen (Tests etc.), analog zu
+    # percentile_75/estimated_resale_price oben. Rein informativ -- siehe
+    # compute_price_stats()-Docstring, keine Ruecckwirkung auf
+    # market_price/estimated_resale_price/Deal-Score/Notification-Gate.
+    percentile_25: float = 0.0
+    percentile_90: float = 0.0
+    # Tage seit dem juengsten Datenpunkt der Gruppe (Frische-Indikator,
+    # kleiner = frischer). None nur theoretisch (compute_price_stats()
+    # gibt bei points=[] ohnehin None statt eines PriceStats-Objekts zurueck).
+    data_age_days: float | None = None
+    # "HIGH" / "MEDIUM" / "LOW", siehe CONFIDENCE_*-Konstanten oben.
+    confidence: str = CONFIDENCE_LOW
 
 
 def group_by_model(points: list[PricePoint]) -> dict[str, list[PricePoint]]:
@@ -201,6 +236,41 @@ def _estimated_resale_price(
     return statistics.fmean(trimmed)
 
 
+def _confidence(count: int) -> str:
+    """Klassifiziert die statistische Belastbarkeit einer Gruppe rein anhand
+    der Datenpunkt-Anzahl (roadmap.md Phase 5). Bewusst NICHT zusaetzlich
+    mit dem Datenalter verknuepft -- zwei ueberlagerte Schwellen in einem
+    Label waeren weniger nachvollziehbar, data_age_days steht als eigenes
+    Feld separat zur Verfuegung.
+
+    LOW deckt sich bewusst mit _MIN_SAMPLES_FOR_PERCENTILE_MARKET_PRICE
+    (dort ist estimated_resale_price ohnehin bereits None, siehe
+    _estimated_resale_price()). HIGH-Schwelle ist ein Platzhalter (Robins
+    Freigabe, 15) mangels echter Kalibrierungsdaten fuer dieses neue Feld.
+    """
+    if count < _MIN_SAMPLES_FOR_PERCENTILE_MARKET_PRICE:
+        return CONFIDENCE_LOW
+    if count < _MIN_SAMPLES_FOR_HIGH_CONFIDENCE:
+        return CONFIDENCE_MEDIUM
+    return CONFIDENCE_HIGH
+
+
+def _data_age_days(points: list[PricePoint]) -> float | None:
+    """Tage seit dem juengsten Datenpunkt in `points` (Frische-Indikator,
+    roadmap.md Phase 5). now (Modul-Ebene, Europe/Berlin) wird bewusst
+    NICHT bei jedem Aufruf neu bestimmt -- analog zum bestehenden
+    Modul-weiten `now` oben, gleiche Konvention.
+
+    None nur bei leerer Liste (compute_price_stats() gibt in diesem Fall
+    ohnehin None statt eines PriceStats-Objekts zurueck, dieser Fall ist
+    also praktisch unerreichbar -- sicherer Fallback statt eines Crashs).
+    """
+    if not points:
+        return None
+    newest = max(datetime.fromisoformat(p.date) for p in points)
+    return (now - newest).total_seconds() / 86400
+
+
 def _compute_trend(points: list[PricePoint]) -> tuple[str, float | None]:
     """Vergleicht den Durchschnittspreis der aelteren mit der neueren Haelfte
     der (chronologisch sortierten) Datenpunkte.
@@ -267,6 +337,7 @@ def compute_price_stats(
     prices = sorted(p.price for p in points)
     p5 = _percentile(prices, 5)
     p10 = _percentile(prices, 10)
+    p25 = _percentile(prices, 25)
     median = statistics.median(prices)
     p75 = _percentile(prices, 75)
     p90 = _percentile(prices, 90)
@@ -286,6 +357,10 @@ def compute_price_stats(
         trend_change_pct=trend_change_pct,
         percentile_75=p75,
         estimated_resale_price=_estimated_resale_price(prices, p75, p90),
+        percentile_25=p25,
+        percentile_90=p90,
+        data_age_days=_data_age_days(points),
+        confidence=_confidence(len(prices)),
     )
 
 

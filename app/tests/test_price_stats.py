@@ -2,12 +2,16 @@
 import sys
 from datetime import datetime, timedelta, timezone
 
+import pytest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from price_history import PricePoint
 from price_stats import (
+    CONFIDENCE_HIGH,
+    CONFIDENCE_LOW,
+    CONFIDENCE_MEDIUM,
     TREND_FALLEND,
     TREND_STABIL,
     TREND_STEIGEND,
@@ -58,6 +62,83 @@ def test_perzentile_liegen_zwischen_min_und_median():
     points = [_point(p, days_ago=i) for i, p in enumerate(prices)]
     stats = compute_price_stats("rtx_3060_12gb", points)
     assert stats.min_price <= stats.percentile_5 <= stats.percentile_10 <= stats.median_price
+
+
+# ---------- roadmap.md Phase 5: percentile_25/percentile_90, Datenalter, Confidence ----------
+
+def test_percentile_25_liegt_zwischen_percentile_10_und_median():
+    prices = [100.0, 120.0, 150.0, 180.0, 200.0, 220.0, 250.0, 280.0, 300.0, 320.0]
+    points = [_point(p, days_ago=i) for i, p in enumerate(prices)]
+    stats = compute_price_stats("rtx_3060_12gb", points)
+    assert stats.percentile_10 <= stats.percentile_25 <= stats.median_price
+
+
+def test_percentile_90_liegt_zwischen_percentile_75_und_max():
+    prices = [100.0, 120.0, 150.0, 180.0, 200.0, 220.0, 250.0, 280.0, 300.0, 320.0]
+    points = [_point(p, days_ago=i) for i, p in enumerate(prices)]
+    stats = compute_price_stats("rtx_3060_12gb", points)
+    assert stats.percentile_75 <= stats.percentile_90 <= stats.max_price
+
+
+def test_confidence_low_unter_fuenf_datenpunkten():
+    points = [_point(p, days_ago=i) for i, p in enumerate([100.0, 200.0, 300.0])]
+    stats = compute_price_stats("rtx_3060_12gb", points)
+    assert stats.count == 3
+    assert stats.confidence == CONFIDENCE_LOW
+
+
+def test_confidence_medium_zwischen_fuenf_und_vierzehn_datenpunkten():
+    points = [_point(100.0 + i, days_ago=i) for i in range(8)]
+    stats = compute_price_stats("rtx_3060_12gb", points)
+    assert stats.count == 8
+    assert stats.confidence == CONFIDENCE_MEDIUM
+
+
+def test_confidence_high_ab_fuenfzehn_datenpunkten():
+    points = [_point(100.0 + i, days_ago=i) for i in range(15)]
+    stats = compute_price_stats("rtx_3060_12gb", points)
+    assert stats.count == 15
+    assert stats.confidence == CONFIDENCE_HIGH
+
+
+def test_confidence_grenzwert_vierzehn_ist_noch_medium():
+    points = [_point(100.0 + i, days_ago=i) for i in range(14)]
+    stats = compute_price_stats("rtx_3060_12gb", points)
+    assert stats.count == 14
+    assert stats.confidence == CONFIDENCE_MEDIUM
+
+
+def test_data_age_days_misst_juengsten_datenpunkt():
+    # aeltester Punkt vor 10 Tagen, juengster vor 2 Tagen -> data_age_days
+    # bezieht sich auf den juengsten (Frische-Indikator), nicht den Durchschnitt.
+    points = [_point(100.0, days_ago=10), _point(150.0, days_ago=2)]
+    stats = compute_price_stats("rtx_3060_12gb", points)
+    assert 1.9 <= stats.data_age_days <= 2.1
+
+
+def test_data_age_days_null_bei_heutigem_datenpunkt():
+    # Toleranz nach unten, da das Modul-weite `now` (price_stats.py) einmalig
+    # beim Import gesetzt wird, nicht bei jedem Aufruf -- ein Testpunkt mit
+    # "jetzt" kann dadurch minimal NACH dem eingefrorenen `now` liegen.
+    stats = compute_price_stats("rtx_3060_12gb", [_point(100.0, days_ago=0)])
+    assert stats.data_age_days is not None
+    assert -0.01 <= stats.data_age_days < 0.01
+
+
+def test_confidence_und_neue_perzentile_sind_rein_informativ():
+    """roadmap.md Phase 5: die neuen Felder duerfen market_price/
+    estimated_resale_price nicht veraendern -- Regressionsschutz gegen
+    versehentliche Kopplung."""
+    prices = [100.0, 120.0, 150.0, 180.0, 200.0, 220.0, 250.0, 280.0, 300.0, 320.0]
+    points = [_point(p, days_ago=i) for i, p in enumerate(prices)]
+    stats = compute_price_stats("rtx_3060_12gb", points)
+    assert stats.confidence == CONFIDENCE_MEDIUM
+    # market_price haengt weiterhin ausschliesslich von P10/P90/Median ab,
+    # nicht vom neuen confidence-Feld.
+    assert stats.market_price == pytest.approx(
+        sum(p for p in prices if stats.percentile_10 <= p <= stats.percentile_90) /
+        len([p for p in prices if stats.percentile_10 <= p <= stats.percentile_90])
+    )
 
 
 def test_market_price_faellt_bei_wenig_daten_auf_median_zurueck():
