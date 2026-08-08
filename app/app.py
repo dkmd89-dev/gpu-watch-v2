@@ -19,7 +19,11 @@ from presence_tracking import (
     migrate_seen_data, mark_seen, mark_matched, detect_newly_delisted,
     prune_delisted_entries, enforce_max_size, DEFAULT_DELISTING_THRESHOLD_SCANS,
 )
-from time_to_sell import make_time_to_sell_point, append_time_to_sell_point
+from time_to_sell import (
+    make_time_to_sell_point, append_time_to_sell_point, read_time_to_sell_points,
+)
+from time_to_sell_stats import compute_all_time_to_sell_stats
+from deal_intelligence import classify_deal
 from top_deal import evaluate_top_deal
 from scoring.profit import MIN_FLIP_MARGIN_PCT
 from persistence.json_store import _load_json, _save_json
@@ -379,6 +383,18 @@ def run_scan():
         )
         price_stats_duration = time.perf_counter() - _price_stats_start
 
+        # roadmap.md Phase 7, Schritt 7b: Time-to-Sell-Statistik EINMAL pro
+        # Scan berechnen (analog price_stats_by_model oben), NICHT pro
+        # Treffer -- reines Kategorie-Aggregat (siehe time_to_sell_stats.py),
+        # aendert sich innerhalb eines Scan-Laufs ohnehin nicht (Delisting-
+        # Erkennung, die neue Datenpunkte erzeugen wuerde, laeuft an anderer
+        # Stelle im selben run_scan()-Durchlauf). Rein informative
+        # Zusatzangabe fuers Deal-Intelligence-Feld unten -- KEIN Einfluss
+        # auf deal_score/Notification-Gate/bestehende Top-Deal-Logik.
+        time_to_sell_stats_by_category = compute_all_time_to_sell_stats(
+            read_time_to_sell_points(TIME_TO_SELL_FILE)
+        )
+
         # Baustein 5 (Duplicate-/Cross-Posting-Erkennung, STATUS.md Abschnitt
         # 16): Rohdatenpunkte EINMAL pro Scan laden (analog price_stats_by_model
         # oben) statt pro Treffer neu einzulesen. Waechst waehrend des Scans
@@ -515,6 +531,17 @@ def run_scan():
                     deal_score=result.deal_score,
                 )
 
+                # roadmap.md Phase 7, Schritt 7b: Deal-Intelligence-
+                # Einstufung + Time-to-Sell-Kategorie-Lookup, beide erst
+                # jetzt moeglich (brauchen top_deal_result.is_top_deal bzw.
+                # result.category, die oben/vorher bereits vorliegen).
+                deal_intelligence = classify_deal(
+                    is_top_deal=top_deal_result.is_top_deal,
+                    estimated_margin_pct=result.estimated_margin_pct,
+                    deal_stars=result.deal_stars,
+                )
+                category_tts_stats = time_to_sell_stats_by_category.get(result.category)
+
                 entry = {
                     **item,
                     "rule": result.rule_label,
@@ -586,6 +613,30 @@ def run_scan():
                     "part_out_ratio_pct": (
                         round(result.part_out_ratio_pct, 1)
                         if result.part_out_ratio_pct is not None
+                        else None
+                    ),
+                    # Deal Intelligence (roadmap.md Phase 7, Schritt 7b):
+                    # fuehrt is_top_deal/estimated_margin_pct/deal_stars
+                    # (alle oben bereits berechnet) zu EINER gemeinsamen
+                    # Einstufung zusammen (TOP DEAL/FLIP DEAL/VERY GOOD
+                    # DEAL/WATCH) -- siehe deal_intelligence.py-Docstring:
+                    # reine Zusammenfuehrung bestehender Signale, KEINE neue
+                    # Bewertungslogik, KEIN Einfluss auf deal_score/
+                    # Notification-Gate. Additive Felder, aeltere found.json-
+                    # Eintraege ohne diese Felder bleiben dank is-defined-
+                    # Check im Template kompatibel.
+                    "deal_intelligence_label": deal_intelligence.label,
+                    "deal_intelligence_emoji": deal_intelligence.emoji,
+                    # Rein informative Zusatzangabe (KEIN Einfluss auf die
+                    # obige Einstufung): Median-Verweildauer der KATEGORIE
+                    # dieses Treffers (nicht des Einzelangebots -- fuer ein
+                    # noch aktives Angebot ist die tatsaechliche Verkaufs-
+                    # dauer per Definition unbekannt, siehe time_to_sell_
+                    # stats.py-Docstring). None, solange fuer diese Kategorie
+                    # noch keine Delisting-Ereignisse erfasst wurden.
+                    "expected_days_to_sell": (
+                        round(category_tts_stats.median_days, 1)
+                        if category_tts_stats is not None
                         else None
                     ),
                     "found_at": datetime.now(timezone.utc).isoformat(),
