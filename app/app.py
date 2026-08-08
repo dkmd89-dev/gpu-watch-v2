@@ -19,13 +19,14 @@ from price_history import append_price_point, make_price_point, read_price_point
 from duplicate_detection import find_duplicate, normalize_title
 from presence_tracking import (
     migrate_seen_data, mark_seen, mark_matched, detect_newly_delisted,
-    prune_delisted_entries, enforce_max_size, DEFAULT_DELISTING_THRESHOLD_SCANS,
+    prune_delisted_entries, DEFAULT_DELISTING_THRESHOLD_SCANS,
 )
 from time_to_sell import make_time_to_sell_point, append_time_to_sell_point, read_time_to_sell_points
 from time_to_sell_stats import compute_all_time_to_sell_stats
 from cross_platform_stats import compute_all_cross_platform_stats
 from price_stats import compute_all_price_stats, compute_price_stats, PriceStats
 from top_deal import evaluate_top_deal
+from scoring.profit import MIN_FLIP_MARGIN_PCT
 
 DATA_DIR = Path(os.environ.get("DATA_DIR", "/data"))
 DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -68,19 +69,6 @@ DEAL_MAX_AGE_DAYS = int(os.environ.get("DEAL_MAX_AGE_DAYS", "7"))
 # da hier bereits das staerkere "delisted"-Kriterium greift, nicht nur
 # das Alter allein.
 SEEN_DELISTED_MAX_AGE_DAYS = int(os.environ.get("SEEN_DELISTED_MAX_AGE_DAYS", "3"))
-
-# L5-Restlücke (STATUS.md Abschnitt 31): prune_delisted_entries() oben
-# entfernt nur delistete Alt-Eintraege -- AKTIVE (nicht delistete)
-# Eintraege bleiben bewusst unabhaengig vom Alter erhalten (siehe
-# presence_tracking.py-Docstring), was bei breiten search_terms ueber
-# viele Kategorien in der Praxis zu unbegrenztem Wachstum fuehrt (reale
-# seen.json: 14 MB). Zusaetzliche harte Obergrenze an der Gesamtzahl,
-# analog zu FOUND_MAX_ITEMS oben -- bei Ueberschreitung werden die
-# aeltesten Eintraege (nach first_seen) entfernt, siehe
-# presence_tracking.enforce_max_size(). 50.000 Eintraege * ca. 150-250
-# Byte/Eintrag ergibt ca. 7,5-12,5 MB als Obergrenze (Default, Robins
-# Freigabe) -- deutlich unter der aktuell beobachteten 14 MB.
-SEEN_MAX_ITEMS = int(os.environ.get("SEEN_MAX_ITEMS", "50000"))
 
 # Schritt B: Log-Rotation. Ohne Rotation wuchs gpu_watch.log unbegrenzt
 # (ein Long-Running-Container ohne Log-Limit ist ein bekanntes Betriebs-
@@ -557,7 +545,8 @@ def run_scan():
                 # siehe top_deal.py-Docstring). Nutzt dieselbe, oben bereits
                 # berechnete Preisstatistik -- kein zusaetzlicher Datei-Zugriff.
                 top_deal_result = evaluate_top_deal(
-                    item["price"], price_stats_by_model.get(result.price_history_model)
+                    item["price"], price_stats_by_model.get(result.price_history_model),
+                    deal_score=result.deal_score,
                 )
 
                 entry = {
@@ -763,18 +752,6 @@ def run_scan():
                     "(> %d Tage) entfernt.",
                     pruned_count, SEEN_DELISTED_MAX_AGE_DAYS,
                 )
-            # L5-Restlücke (STATUS.md Abschnitt 31): zusätzliche harte
-            # Obergrenze NACH dem Delisted-Pruning oben -- greift nur, wenn
-            # trotz Delisted-Pruning noch zu viele (überwiegend aktive)
-            # Einträge übrig sind. Normalfall: kein Effekt (overflow <= 0,
-            # siehe enforce_max_size()-Docstring).
-            seen, size_capped_count = enforce_max_size(seen, SEEN_MAX_ITEMS)
-            if size_capped_count:
-                log.info(
-                    "🧹 seen.json Obergrenze erreicht: %d älteste Einträge "
-                    "(> %d Gesamt-Limit) entfernt.",
-                    size_capped_count, SEEN_MAX_ITEMS,
-                )
             _save_json(SEEN_FILE, seen)
             _save_json(FOUND_FILE, found[:FOUND_MAX_ITEMS])
 
@@ -850,16 +827,49 @@ def api_status():
     Rein lesend, aggregiert bestehende Daten (found.json + In-Memory-
     Status-State) -- keine neue Persistenz, kein Einfluss auf run_scan().
 
-    top_deal_count zählt Einträge mit is_top_deal=True (Schritt 8.2).
-    Ältere found.json-Einträge aus der Zeit vor Schritt 8.2 haben dieses
-    Feld noch nicht -- .get("is_top_deal") liefert dafür robust False
-    statt eines KeyError.
+    top_deal_count zählt Einträge mit is_top_deal=True (Schritt 8.2, jetzt
+    neue Score+Discount-Regel siehe top_deal.py).
+
+    Zusätzlich (Auftrag "Top-Deal-Logik optimieren", Abschnitte 11-15) drei
+    weitere KPIs, ALLE ausschließlich aus bereits vorhandenen found.json-
+    Feldern abgeleitet -- keine neue Persistenz, keine neue Rating-Engine:
+
+    - very_good_deals_count: gute Angebote (deal_stars >= ★★★★☆, also
+      deal_score >= 80, dieselbe Skala wie top_deal.TOP_DEAL_SCORE_THRESHOLD_A),
+      die aber NICHT zusätzlich Top-Deal sind (Abschnitt 13: keine
+      Doppelzählung).
+    - flip_candidates_count: Angebote mit estimated_margin_pct >=
+      MIN_FLIP_MARGIN_PCT (siehe scoring/profit.py) -- nutzt die bestehende
+      Reselling-/Margin-Berechnung, kann sich mit Top-Deal überschneiden
+      (Abschnitt 14, ausdrücklich erlaubt).
+    - new_top_deals_count: Top-Deals, deren found_at im aktuell laufenden
+      bzw. zuletzt gestarteten Scan liegt (Abschnitt 15) -- echte Teilmenge
+      von top_deal_count, nutzt das bereits vorhandene found_at-Feld statt
+      neuer Zeitstempel-Logik.
+
+    Ältere found.json-Einträge ohne die jeweiligen Felder (is_top_deal,
+    deal_stars, estimated_margin_pct, found_at) werden über .get() robust
+    als "nicht zutreffend" behandelt statt KeyError.
     """
     found = _load_json(FOUND_FILE, [])
+
+    with _status_lock:
+        status_snapshot = dict(_scan_status)
+
+    last_scan_started_at = status_snapshot["last_scan_started_at"]
+    scan_start_dt = None
+    if last_scan_started_at:
+        try:
+            scan_start_dt = datetime.fromisoformat(last_scan_started_at)
+        except ValueError:
+            scan_start_dt = None
 
     category_counts: dict[str, int] = {}
     manufacturer_counts: dict[str, int] = {}
     top_deal_count = 0
+    very_good_deals_count = 0
+    flip_candidates_count = 0
+    new_top_deals_count = 0
     for f in found:
         cat = f.get("category") or "unbekannt"
         category_counts[cat] = category_counts.get(cat, 0) + 1
@@ -869,11 +879,25 @@ def api_status():
         # Treffern, bei denen im Titel schlicht keine Marke erkennbar war.
         manufacturer = f.get("manufacturer") or "unbekannt"
         manufacturer_counts[manufacturer] = manufacturer_counts.get(manufacturer, 0) + 1
-        if f.get("is_top_deal"):
+
+        is_top_deal = bool(f.get("is_top_deal"))
+        if is_top_deal:
             top_deal_count += 1
 
-    with _status_lock:
-        status_snapshot = dict(_scan_status)
+            found_at = f.get("found_at")
+            if scan_start_dt is not None and found_at:
+                try:
+                    if datetime.fromisoformat(found_at) >= scan_start_dt:
+                        new_top_deals_count += 1
+                except ValueError:
+                    pass
+        elif stars_meet_minimum(f.get("deal_stars") or "", "★★★★☆"):
+            # NICHT is_top_deal (siehe Abschnitt 13: keine Doppelzaehlung).
+            very_good_deals_count += 1
+
+        margin_pct = f.get("estimated_margin_pct")
+        if margin_pct is not None and margin_pct >= MIN_FLIP_MARGIN_PCT:
+            flip_candidates_count += 1
 
     return jsonify({
         "scan_running": status_snapshot["scan_running"],
@@ -891,6 +915,9 @@ def api_status():
         "category_counts": category_counts,
         "manufacturer_counts": manufacturer_counts,
         "top_deal_count": top_deal_count,
+        "very_good_deals_count": very_good_deals_count,
+        "flip_candidates_count": flip_candidates_count,
+        "new_top_deals_count": new_top_deals_count,
         "sources": SOURCES,
         "scan_log_tail": _tail_log(LOG_FILE, 20),
     })
