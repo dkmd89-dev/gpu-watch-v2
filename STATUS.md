@@ -1095,3 +1095,26 @@ feat(rules): drei neue Kategorien (ram, cpu_mainboard_bundle, notebook_resell)
 - PROJEKTSTAND_KOMPLETT.md einmalig aktualisiert (Abschnitt 6 + L1)
 - Kein Python-Code geaendert, 569/569 Tests gruen
 ```
+
+## 31. L5 abgeschlossen: harte Obergrenze für seen.json (`SEEN_MAX_ITEMS`)
+
+**Ausgangslage:** L5 (`seen.json`/`found.json` wachsen unbegrenzt) war laut Phase-0-Analyse noch offen, real bestätigt anhand der produktiven `seen.json` (14 MB, 46.062 Einträge). Analyse ergab: `found.json`/Log-Rotation/delistete `seen.json`-Einträge waren bereits gelöst (siehe Abschnitte 25/26/28) — die verbleibende Lücke betraf ausschließlich AKTIVE (nicht delistete) `seen.json`-Einträge, die laut `prune_delisted_entries()`-Docstring bewusst unabhängig vom Alter erhalten bleiben. Bei breiten `search_terms` über viele Kategorien sind das überwiegend rohe, ungematchte Suchtreffer, die so lange aktiv bleiben, wie die Anzeige online ist.
+
+**Freigegebene Option (A von 2 vorgestellten):** harte Obergrenze an der Gesamtzahl, analog zu `FOUND_MAX_ITEMS`. Neue Funktion `presence_tracking.enforce_max_size(entries, max_items)` — entfernt bei Überschreitung die ältesten Einträge nach `first_seen` (migrierte Alt-Einträge ohne `first_seen` gelten als am ältesten). Greift NICHT, solange die Grenze nicht überschritten ist (Normalfall unverändert). Aufruf in `app.py` direkt nach `prune_delisted_entries()`, vor `_save_json(SEEN_FILE, seen)`.
+
+**Konfiguration:** `SEEN_MAX_ITEMS` (Env-Var, Default `50000`, Robins Freigabe). 50.000 × ca. 150–250 Byte/Eintrag ≈ 7,5–12,5 MB als theoretische Obergrenze, real anhand der produktiven `seen.json` gemessen: 46.062 Einträge ≈ 14 MB → ca. 304 Byte/Eintrag, Grenze greift also bald.
+
+**Nebenbefund:** `prune_delisted_entries()` hatte bisher KEINE Tests (Funktion wurde in Abschnitt 28 als kritischer Fix nachgezogen, Tests fehlten seitdem) — 4 Tests nachgetragen, zusammen mit 5 neuen Tests für `enforce_max_size()`.
+
+**Bekanntes, dokumentiertes Restrisiko:** Eine entfernte, aber weiterhin aktive Anzeige fällt aus der Dedup-Baseline und würde beim nächsten Scan erneut verarbeitet (ggf. erneute Benachrichtigung) — seltener Edge-Case, nur bei dauerhafter Überschreitung von `SEEN_MAX_ITEMS`, betrifft ausschließlich die ältesten Anzeigen im Bestand.
+
+**Geänderte Dateien**
+- `app/presence_tracking.py` — neue Funktion `enforce_max_size()`
+- `app/app.py` — `SEEN_MAX_ITEMS`-Konstante, Import + Aufruf im Scan-Loop
+- `app/tests/test_presence_tracking.py` — 4 Tests für `prune_delisted_entries()` (Nebenbefund, bisher ungetestet) + 5 Tests für `enforce_max_size()`
+
+**Empfohlene Tests**
+`pytest app/tests/` → **577 passed** (569 + 8 neue). `app.py`-Import isoliert verifiziert (kein `ImportError`). `enforce_max_size()` zusätzlich gegen die reale, produktive `seen.json` (46.062 Einträge) verifiziert — aktuell noch unterhalb der Grenze, 0 entfernt (erwartetes Verhalten).
+
+**Mögliche Nebenwirkungen**
+Keine im Normalfall (Grenze noch nicht erreicht). Sobald `seen.json` über 50.000 Einträge wächst, werden die ältesten aktiven Einträge entfernt — siehe dokumentiertes Restrisiko oben. Kein Einfluss auf `found.json`, Scoring, Notifications oder bestehende Kategorien.

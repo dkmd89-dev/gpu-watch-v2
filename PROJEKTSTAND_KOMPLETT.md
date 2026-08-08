@@ -174,7 +174,7 @@ behandelt werden, nicht als etwas, das "neu geplant" werden muss.
 |---|---|---|---|
 | L1 | **Abgeschlossen (siehe Abschnitt 9c)** — Robin verzichtet bewusst auf NVMe-SSD- und allgemeine Monitor-Kategorie, bestehende `sata_ssd.yaml`/`monitor_curved.yaml` reichen aus | — | Erledigt |
 | L2 | Detector-Ebene ist NICHT codefrei erweiterbar (Abschnitt 5) | Neue Kategorien mit neuem Hardware-Merkmal brauchen Python-Änderung | **Entschieden (siehe Abschnitt 9a)** — bewusst kontrolliert bei statischen Imports geblieben |
-| L5 | `seen.json`/`found.json` wachsen unbegrenzt (14 MB / 2,1 MB) | Perf./Speicher langfristig | Mittel |
+| L5 | ✅ Abgeschlossen (`SEEN_MAX_ITEMS`, Abschnitt 31 STATUS.md) — harte Obergrenze von 50.000 Einträgen, älteste werden zuerst entfernt | Perf./Speicher langfristig | Erledigt |
 | L6 | Scope-Drift: 5 Nicht-PC-Kategorien | Klärungsbedarf, kein Bug | **Entschieden (siehe Abschnitt 9b)** — bewusst behalten, unabhängig weiterlaufen lassen |
 | L7 | `app.py` als 977-Zeilen-Monolith (Routen + Scan-Loop + Scheduler in einer Datei) | Wartbarkeit bei weiterem Wachstum | Niedrig, vorausschauend |
 | L8 | Hersteller/Zustand/Lieferumfang-Scoring-Gewichte bewusst auf 0 (kein Detector für Zustand/Lieferumfang) | Deal-Score nutzt nur 3 von 6 Komponenten aktiv | Mittel, hängt von L1/L2 ab |
