@@ -215,6 +215,16 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
     # Faellt auf den internen Schluessel zurueck, falls eine Kategorie kein
     # "label" definiert -- volle Rueckwaertskompatibilitaet.
     category_labels: dict[str, str] = {}
+    # Option 2 ("Flip-Kandidaten-Logik optimieren", STATUS.md Abschnitt 33b):
+    # Mapping {price_history_model: resale_price_group}. Ermoeglicht einer
+    # YAML-Regel, fuer die estimated_resale_price-Schaetzung eine groebere
+    # Gruppe als ihr eigenes price_history_model zu nutzen (optionaler Key
+    # "resale_price_group" je Regel) -- OHNE market_price/deal_score/
+    # Notification-Gate zu beeinflussen, die weiterhin exakt nach
+    # price_history_model gruppieren (siehe price_stats.py::
+    # group_by_resale_group()). Regeln ohne eigenen "resale_price_group"
+    # bilden weiterhin nur sich selbst ab (volle Rueckwaertskompatibilitaet).
+    resale_price_groups: dict[str, str] = {}
     # Migration auf die Plugin-Registry (categories/registry.py): liefert
     # dieselbe Datei-Menge/Reihenfolge wie der vorherige manuelle Glob hier
     # (identischer Ausschluss "_global.yaml", identischer Namens-Fallback
@@ -258,6 +268,15 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
             rule["_scoring_weights"] = category_scoring_weights
             rule["_notify_max_price"] = category_notify_max_price
             merged_rules.append(rule)
+
+            # Option 2: siehe Kommentar bei resale_price_groups oben.
+            # Gleiche price_history_model-Herleitung wie in evaluate()
+            # (rule.get("price_history_model", rule_label)), damit der
+            # Lookup-Key identisch zu dem ist, den evaluate() spaeter
+            # tatsaechlich verwendet.
+            _rule_label = rule.get("label", "?")
+            _phm = rule.get("price_history_model", _rule_label)
+            resale_price_groups[_phm] = rule.get("resale_price_group", _phm)
 
         # Suchbegriffe aus der Kategorie übernehmen, damit neue Kategorien
         # automatisch mitgesucht werden -- ohne Änderung an app.py.
@@ -311,6 +330,11 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
         # Einzeldatei-Modus), bleiben unveraendert lauffaehig.
         "gpu_model_to_price_history_model": gpu_model_to_price_history_model,
         "part_out_detection": part_out_detection_cfg,
+        # Option 2 ("Flip-Kandidaten-Logik optimieren", STATUS.md Abschnitt
+        # 33b): additiver Key, analog zu gpu_model_to_price_history_model
+        # oben -- Aufrufer, die ihn nicht kennen (aeltere app.py-Version,
+        # Legacy-Einzeldatei-Modus), bleiben unveraendert lauffaehig.
+        "resale_price_groups": resale_price_groups,
         "_directory_mode": True,
     }
 

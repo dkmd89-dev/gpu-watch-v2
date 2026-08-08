@@ -14,7 +14,9 @@ from price_stats import (
     TREND_UNBEKANNT,
     compute_all_price_stats,
     compute_price_stats,
+    compute_resale_stats_by_group,
     group_by_model,
+    group_by_resale_group,
 )
 
 
@@ -187,6 +189,56 @@ def test_compute_all_price_stats_liefert_eine_statistik_pro_modell():
 
 def test_compute_all_price_stats_leere_eingabe_liefert_leeres_dict():
     assert compute_all_price_stats([]) == {}
+
+
+# ---------- group_by_resale_group / compute_resale_stats_by_group
+# (Option 2, "Flip-Kandidaten-Logik optimieren", STATUS.md Abschnitt 33b) ----------
+
+def test_group_by_resale_group_fasst_gemappte_modelle_zusammen():
+    points = [
+        _point(20.0, days_ago=0, model="lego_sw_clone", category="lego_minifiguren"),
+        _point(30.0, days_ago=1, model="lego_promo", category="lego_minifiguren"),
+        _point(15.0, days_ago=0, model="lego_cmf", category="lego_minifiguren"),
+    ]
+    mapping = {"lego_sw_clone": "lego_rare_minifig_common", "lego_promo": "lego_rare_minifig_common"}
+    groups = group_by_resale_group(points, mapping)
+    assert set(groups.keys()) == {"lego_rare_minifig_common", "lego_cmf"}
+    assert len(groups["lego_rare_minifig_common"]) == 2
+    assert len(groups["lego_cmf"]) == 1
+
+
+def test_group_by_resale_group_ohne_mapping_eintrag_ist_identitaet():
+    # Modell fehlt im Mapping (kein resale_price_group in der YAML-Regel)
+    # -> bildet weiterhin nur sich selbst ab, identisch zu group_by_model().
+    points = [_point(100.0, days_ago=0, model="rtx_3060_12gb")]
+    assert group_by_resale_group(points, {}) == group_by_model(points)
+
+
+def test_compute_resale_stats_by_group_erhoeht_datenpunkte_pro_gruppe():
+    # 3 Punkte je Einzelmodell (unter der 5er-Perzentil-Schwelle) --
+    # gemeinsam gruppiert reicht es fuer eine belastbare Schaetzung.
+    points = [
+        _point(30.0, days_ago=0, model="lego_sw_clone", category="lego_minifiguren"),
+        _point(35.0, days_ago=1, model="lego_sw_clone", category="lego_minifiguren"),
+        _point(40.0, days_ago=2, model="lego_promo", category="lego_minifiguren"),
+        _point(45.0, days_ago=3, model="lego_promo", category="lego_minifiguren"),
+        _point(50.0, days_ago=4, model="lego_promo", category="lego_minifiguren"),
+    ]
+    mapping = {"lego_sw_clone": "lego_rare_minifig_common", "lego_promo": "lego_rare_minifig_common"}
+    stats_by_group = compute_resale_stats_by_group(points, mapping)
+    assert set(stats_by_group.keys()) == {"lego_rare_minifig_common"}
+    assert stats_by_group["lego_rare_minifig_common"].count == 5
+
+
+def test_compute_resale_stats_by_group_leeres_mapping_wie_compute_all_price_stats():
+    points = [
+        _point(100.0, days_ago=0, model="rtx_3060_12gb"),
+        _point(110.0, days_ago=1, model="rtx_3060_12gb"),
+    ]
+    assert (
+        compute_resale_stats_by_group(points, {})["rtx_3060_12gb"].count
+        == compute_all_price_stats(points)["rtx_3060_12gb"].count
+    )
 
 
 # ---------- Burst-Collapsing-Integration (Schritt 2, "strukturelle Loesung") ----------

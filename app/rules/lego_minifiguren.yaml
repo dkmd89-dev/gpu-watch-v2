@@ -26,6 +26,22 @@
 #   Die spezifischeren Regeln stehen vor den allgemeinen Regeln.
 #   Dadurch können besonders interessante Figuren mit niedrigeren
 #   Deal-Grenzen zuerst erkannt werden.
+#
+# resale_price_group (Option 2, "Flip-Kandidaten-Logik optimieren",
+# STATUS.md Abschnitt 33b): optionaler, zusätzlicher Schlüssel je Regel.
+# Wirkt AUSSCHLIESSLICH auf die estimated_resale_price-Schätzung (Flip-
+# Kandidat/Dashboard-Margenfelder) -- market_price/deal_score/
+# Notification-Gate bleiben unverändert an price_history_model gekoppelt.
+# Grund: bei dieser Kategorie ist die Preishistorie je einzelnem
+# price_history_model strukturell zu dünn für eine belastbare P75-P90-
+# Schätzung (siehe STATUS.md: 185/386 Treffer betroffen). Mehrere
+# thematisch/preislich ähnliche Einzelfigur-Regeln (Okay-Preisgrenze
+# ~35-50€) teilen sich deshalb "lego_rare_minifig_common", die beiden
+# Konvolut-/Sammlungs-Regeln (~60-70€) "lego_bundle_common". Bewusst
+# NICHT einbezogen: lego_sw_rare (deutlich höheres Preisniveau, bis 80€)
+# und lego_cmf (deutlich niedrigeres Preisniveau, bis 25€) -- eine
+# Zusammenlegung würde dort spürbar unterschiedliche Preisniveaus
+# vermischen und die Schätzung eher verschlechtern als verbessern.
 # ============================================================
 
 category: "lego_minifiguren"
@@ -166,6 +182,7 @@ rules:
       - ["lego", "star wars"]
       - ["clone wars", "clone trooper", "clone", "501st", "phase 2", "phase ii"]
     price_history_model: "lego_sw_clone"
+    resale_price_group: "lego_rare_minifig_common"
     max_price: 20
     deal_rating: "Top-Deal"
 
@@ -174,6 +191,7 @@ rules:
       - ["lego", "star wars"]
       - ["clone wars", "clone trooper", "clone", "501st", "phase 2", "phase ii"]
     price_history_model: "lego_sw_clone"
+    resale_price_group: "lego_rare_minifig_common"
     max_price: 35
     deal_rating: "Guter Preis"
 
@@ -182,6 +200,7 @@ rules:
       - ["lego", "star wars"]
       - ["clone wars", "clone trooper", "clone", "501st", "phase 2", "phase ii"]
     price_history_model: "lego_sw_clone"
+    resale_price_group: "lego_rare_minifig_common"
     max_price: 50
     deal_rating: "Interessant"
 
@@ -223,6 +242,7 @@ rules:
       - ["minifigur", "minifig", "figur"]
       - ["rar", "selten", "exclusive", "exklusiv", "limited", "sammler", "alt"]
     price_history_model: "lego_ninjago_rare"
+    resale_price_group: "lego_rare_minifig_common"
     max_price: 10
     deal_rating: "Top-Deal"
 
@@ -232,6 +252,7 @@ rules:
       - ["minifigur", "minifig", "figur"]
       - ["rar", "selten", "exclusive", "exklusiv", "limited", "sammler", "alt"]
     price_history_model: "lego_ninjago_rare"
+    resale_price_group: "lego_rare_minifig_common"
     max_price: 20
     deal_rating: "Guter Preis"
 
@@ -241,6 +262,7 @@ rules:
       - ["minifigur", "minifig", "figur"]
       - ["rar", "selten", "exclusive", "exklusiv", "limited", "sammler", "alt"]
     price_history_model: "lego_ninjago_rare"
+    resale_price_group: "lego_rare_minifig_common"
     max_price: 35
     deal_rating: "Interessant"
 
@@ -250,6 +272,7 @@ rules:
       - ["figuren", "minifiguren", "minifigs"]
       - ["konvolut", "sammlung", "posten", "lot"]
     price_history_model: "lego_ninjago_bundle"
+    resale_price_group: "lego_bundle_common"
     max_price: 20
     deal_rating: "Top-Deal"
 
@@ -259,6 +282,7 @@ rules:
       - ["figuren", "minifiguren", "minifigs"]
       - ["konvolut", "sammlung", "posten", "lot"]
     price_history_model: "lego_ninjago_bundle"
+    resale_price_group: "lego_bundle_common"
     max_price: 40
     deal_rating: "Guter Preis"
 
@@ -268,6 +292,7 @@ rules:
       - ["figuren", "minifiguren", "minifigs"]
       - ["konvolut", "sammlung", "posten", "lot"]
     price_history_model: "lego_ninjago_bundle"
+    resale_price_group: "lego_bundle_common"
     max_price: 70
     deal_rating: "Interessant"
 
@@ -314,6 +339,7 @@ rules:
       - ["minifigur", "minifig", "figur"]
       - ["promo", "exclusive", "exklusiv", "limited", "limitiert", "sdcc", "comic con"]
     price_history_model: "lego_promo"
+    resale_price_group: "lego_rare_minifig_common"
     max_price: 15
     deal_rating: "Top-Deal"
 
@@ -323,6 +349,7 @@ rules:
       - ["minifigur", "minifig", "figur"]
       - ["promo", "exclusive", "exklusiv", "limited", "limitiert", "sdcc", "comic con"]
     price_history_model: "lego_promo"
+    resale_price_group: "lego_rare_minifig_common"
     max_price: 30
     deal_rating: "Guter Preis"
 
@@ -332,6 +359,7 @@ rules:
       - ["minifigur", "minifig", "figur"]
       - ["promo", "exclusive", "exklusiv", "limited", "limitiert", "sdcc", "comic con"]
     price_history_model: "lego_promo"
+    resale_price_group: "lego_rare_minifig_common"
     max_price: 50
     deal_rating: "Interessant"
 
@@ -347,6 +375,7 @@ rules:
       - ["minifigur", "minifig", "figur"]
       - ["rar", "selten", "exclusive", "exklusiv", "limited", "sammler"]
     price_history_model: "lego_superhero_rare"
+    resale_price_group: "lego_rare_minifig_common"
     max_price: 15
     deal_rating: "Top-Deal"
 
@@ -357,6 +386,7 @@ rules:
       - ["minifigur", "minifig", "figur"]
       - ["rar", "selten", "exclusive", "exklusiv", "limited", "sammler"]
     price_history_model: "lego_superhero_rare"
+    resale_price_group: "lego_rare_minifig_common"
     max_price: 30
     deal_rating: "Guter Preis"
 
@@ -367,6 +397,7 @@ rules:
       - ["minifigur", "minifig", "figur"]
       - ["rar", "selten", "exclusive", "exklusiv", "limited", "sammler"]
     price_history_model: "lego_superhero_rare"
+    resale_price_group: "lego_rare_minifig_common"
     max_price: 50
     deal_rating: "Interessant"
 
@@ -382,6 +413,7 @@ rules:
       - ["minifigur", "minifig", "figur"]
       - ["rar", "selten", "exclusive", "exklusiv", "limited", "sammler", "alt"]
     price_history_model: "lego_fantasy_rare"
+    resale_price_group: "lego_rare_minifig_common"
     max_price: 15
     deal_rating: "Top-Deal"
 
@@ -392,6 +424,7 @@ rules:
       - ["minifigur", "minifig", "figur"]
       - ["rar", "selten", "exclusive", "exklusiv", "limited", "sammler", "alt"]
     price_history_model: "lego_fantasy_rare"
+    resale_price_group: "lego_rare_minifig_common"
     max_price: 30
     deal_rating: "Guter Preis"
 
@@ -402,6 +435,7 @@ rules:
       - ["minifigur", "minifig", "figur"]
       - ["rar", "selten", "exclusive", "exklusiv", "limited", "sammler", "alt"]
     price_history_model: "lego_fantasy_rare"
+    resale_price_group: "lego_rare_minifig_common"
     max_price: 50
     deal_rating: "Interessant"
 
@@ -417,6 +451,7 @@ rules:
       - ["minifigur", "minifig", "figur"]
       - ["rar", "selten", "alt", "vintage", "retro", "sammler"]
     price_history_model: "lego_retro_rare"
+    resale_price_group: "lego_rare_minifig_common"
     max_price: 15
     deal_rating: "Top-Deal"
 
@@ -427,6 +462,7 @@ rules:
       - ["minifigur", "minifig", "figur"]
       - ["rar", "selten", "alt", "vintage", "retro", "sammler"]
     price_history_model: "lego_retro_rare"
+    resale_price_group: "lego_rare_minifig_common"
     max_price: 30
     deal_rating: "Guter Preis"
 
@@ -437,6 +473,7 @@ rules:
       - ["minifigur", "minifig", "figur"]
       - ["rar", "selten", "alt", "vintage", "retro", "sammler"]
     price_history_model: "lego_retro_rare"
+    resale_price_group: "lego_rare_minifig_common"
     max_price: 50
     deal_rating: "Interessant"
 
@@ -451,6 +488,7 @@ rules:
       - ["minifiguren", "minifiguren", "figuren", "minifigs"]
       - ["sammlung", "konvolut", "posten", "lot"]
     price_history_model: "lego_minifig_bundle"
+    resale_price_group: "lego_bundle_common"
     max_price: 15
     deal_rating: "Top-Deal"
 
@@ -460,6 +498,7 @@ rules:
       - ["minifiguren", "figuren", "minifigs"]
       - ["sammlung", "konvolut", "posten", "lot"]
     price_history_model: "lego_minifig_bundle"
+    resale_price_group: "lego_bundle_common"
     max_price: 35
     deal_rating: "Guter Preis"
 
@@ -469,6 +508,7 @@ rules:
       - ["minifiguren", "figuren", "minifigs"]
       - ["sammlung", "konvolut", "posten", "lot"]
     price_history_model: "lego_minifig_bundle"
+    resale_price_group: "lego_bundle_common"
     max_price: 60
     deal_rating: "Interessant"
 
@@ -483,6 +523,7 @@ rules:
       - ["minifigur", "minifig", "figur"]
       - ["rar", "selten", "sammler", "exclusive", "exklusiv", "limited", "limitiert", "vintage", "retro"]
     price_history_model: "lego_collector_generic"
+    resale_price_group: "lego_rare_minifig_common"
     max_price: 10
     deal_rating: "Top-Deal"
 
@@ -492,6 +533,7 @@ rules:
       - ["minifigur", "minifig", "figur"]
       - ["rar", "selten", "sammler", "exclusive", "exklusiv", "limited", "limitiert", "vintage", "retro"]
     price_history_model: "lego_collector_generic"
+    resale_price_group: "lego_rare_minifig_common"
     max_price: 20
     deal_rating: "Guter Preis"
 
@@ -501,5 +543,6 @@ rules:
       - ["minifigur", "minifig", "figur"]
       - ["rar", "selten", "sammler", "exclusive", "exklusiv", "limited", "limitiert", "vintage", "retro"]
     price_history_model: "lego_collector_generic"
+    resale_price_group: "lego_rare_minifig_common"
     max_price: 35
     deal_rating: "Interessant"

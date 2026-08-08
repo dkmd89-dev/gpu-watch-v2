@@ -24,7 +24,12 @@ from presence_tracking import (
 from time_to_sell import make_time_to_sell_point, append_time_to_sell_point, read_time_to_sell_points
 from time_to_sell_stats import compute_all_time_to_sell_stats
 from cross_platform_stats import compute_all_cross_platform_stats
-from price_stats import compute_all_price_stats, compute_price_stats, PriceStats
+from price_stats import (
+    compute_all_price_stats,
+    compute_price_stats,
+    compute_resale_stats_by_group,
+    PriceStats,
+)
 from top_deal import (
     evaluate_top_deal,
     TOP_DEAL_SCORE_THRESHOLD_A,
@@ -300,6 +305,33 @@ def _load_price_stats(path: Path) -> dict[str, PriceStats]:
         return {}
 
 
+def _load_resale_stats_by_group(
+    path: Path, model_to_group: dict[str, str]
+) -> dict[str, PriceStats]:
+    """Wie _load_price_stats(), aber gruppiert nach der groeberen Resale-
+    Price-Gruppe (Option 2, STATUS.md Abschnitt 33b) statt nach dem exakten
+    price_history_model. GETRENNT von _load_price_stats() -- market_prices
+    und die Top-Deal-Erkennung nutzen weiterhin ausschliesslich
+    _load_price_stats()/compute_all_price_stats(), unveraendert.
+
+    model_to_group leer (aeltere Configs / Legacy-Einzeldatei-Modus ohne
+    "resale_price_groups"-Key) -> jedes Modell bildet seine eigene Gruppe,
+    identisches Ergebnis zu _load_price_stats() (volle Rueckwaertskompatibilitaet).
+
+    Fehler bei der Berechnung duerfen den Scan nicht abbrechen (analog
+    _load_price_stats()) -- reine Zusatzfunktion.
+    """
+    try:
+        points = read_price_points(path)
+        return compute_resale_stats_by_group(points, model_to_group)
+    except Exception as e:
+        log.error(
+            "Resale-Gruppen-Preisstatistik konnte nicht berechnet werden: %s",
+            e, exc_info=True,
+        )
+        return {}
+
+
 def _market_prices_from_stats(stats_by_model: dict[str, PriceStats]) -> dict[str, float]:
     """Reduziert die volle Preisstatistik (siehe _load_price_stats()) auf das
     {price_history_model: Marktpreis}-Mapping, das evaluate() erwartet
@@ -313,7 +345,11 @@ def _market_prices_from_stats(stats_by_model: dict[str, PriceStats]) -> dict[str
     }
 
 
-def _resale_prices_from_stats(stats_by_model: dict[str, PriceStats]) -> dict[str, float | None]:
+def _resale_prices_from_stats(
+    stats_by_model: dict[str, PriceStats],
+    stats_by_resale_group: dict[str, PriceStats] | None = None,
+    model_to_group: dict[str, str] | None = None,
+) -> dict[str, float | None]:
     """Reduziert die volle Preisstatistik auf das
     {price_history_model: geschaetzter Verkaufspreis}-Mapping (Reselling-/
     Arbitrage-Konzept, STATUS.md Abschnitt 16, Punkt c).
@@ -324,6 +360,17 @@ def _resale_prices_from_stats(stats_by_model: dict[str, PriceStats]) -> dict[str
     obere Preissegment (P75-P90) derselben Daten -- siehe
     price_stats.py::_estimated_resale_price()-Docstring fuer die
     Begruendung.
+
+    Option 2 ("Flip-Kandidaten-Logik optimieren", STATUS.md Abschnitt 33b):
+    stats_by_resale_group/model_to_group sind optional (Default None ->
+    identisches Verhalten zu vorher, volle Rueckwaertskompatibilitaet fuer
+    aeltere Aufrufer/Tests). Sind beide gesetzt, wird estimated_resale_price
+    NICHT mehr aus stats_by_model[model] gelesen, sondern aus der
+    (potenziell groeberen) Gruppe stats_by_resale_group[model_to_group[model]]
+    -- nur fuer Kategorien mit eigenem "resale_price_group" je Regel macht
+    das ueberhaupt einen Unterschied (Default-Gruppe == Modell selbst).
+    market_price/deal_score/Notification-Gate bleiben davon unberuehrt,
+    die nutzen weiterhin ausschliesslich stats_by_model.
 
     Fehlt ein Modell komplett in der Historie (stats is None, noch kein
     einziger Datenpunkt gesammelt), wird das Modell hier weggelassen --
@@ -344,11 +391,23 @@ def _resale_prices_from_stats(stats_by_model: dict[str, PriceStats]) -> dict[str
     Unterscheidung wuerde ein einfaches Weglassen die alte, zu optimistische
     max_price-Naeherung ueber den market_price-Fallback wieder einschleusen.
     """
-    return {
-        model: stats.estimated_resale_price
-        for model, stats in stats_by_model.items()
-        if stats is not None
-    }
+    if not stats_by_resale_group or not model_to_group:
+        return {
+            model: stats.estimated_resale_price
+            for model, stats in stats_by_model.items()
+            if stats is not None
+        }
+
+    result: dict[str, float | None] = {}
+    for model, stats in stats_by_model.items():
+        if stats is None:
+            continue
+        group = model_to_group.get(model, model)
+        group_stats = stats_by_resale_group.get(group)
+        result[model] = (
+            group_stats.estimated_resale_price if group_stats is not None else None
+        )
+    return result
 
 
 def run_scan():
@@ -448,7 +507,17 @@ def run_scan():
         # price_stats_by_model (Top-Deal-Erkennung, Schritt 8.2).
         price_stats_by_model = _load_price_stats(PRICE_HISTORY_FILE)
         market_prices = _market_prices_from_stats(price_stats_by_model)
-        resale_prices = _resale_prices_from_stats(price_stats_by_model)
+        # Option 2 (STATUS.md Abschnitt 33b): resale_price_groups fehlt bei
+        # aelteren Configs (Legacy-Einzeldatei-Modus) -> leeres Dict ->
+        # _resale_prices_from_stats() faellt auf das bisherige Verhalten
+        # zurueck (siehe dortiger Docstring).
+        resale_price_groups = rules_cfg.get("resale_price_groups") or {}
+        resale_stats_by_group = _load_resale_stats_by_group(
+            PRICE_HISTORY_FILE, resale_price_groups
+        )
+        resale_prices = _resale_prices_from_stats(
+            price_stats_by_model, resale_stats_by_group, resale_price_groups
+        )
 
         # Baustein 5 (Duplicate-/Cross-Posting-Erkennung, STATUS.md Abschnitt
         # 16): Rohdatenpunkte EINMAL pro Scan laden (analog price_stats_by_model

@@ -86,6 +86,34 @@ def group_by_model(points: list[PricePoint]) -> dict[str, list[PricePoint]]:
     return groups
 
 
+def group_by_resale_group(
+    points: list[PricePoint], model_to_group: dict[str, str]
+) -> dict[str, list[PricePoint]]:
+    """Gruppiert Datenpunkte nach einer GROEBEREN Resale-Price-Gruppe statt
+    nach dem exakten `price_history_model` (Option 2, "Flip-Kandidaten-Logik
+    optimieren" / STATUS.md Abschnitt 33b).
+
+    Methodisch bewusst GETRENNT von group_by_model()/compute_all_price_stats():
+    jene bleiben unveraendert und liefern weiterhin market_price je EXAKTEM
+    price_history_model (Deal-Score/Notification-Gate duerfen sich durch
+    diese Aenderung nicht verhalten). Diese Funktion dient ausschliesslich
+    als Vorstufe fuer eine groebere estimated_resale_price-Schaetzung bei
+    Kategorien mit strukturell duenner Preishistorie je Modell (z.B. LEGO-
+    Minifiguren, Retro-Konsolen).
+
+    model_to_group: Mapping {price_history_model: resale_price_group}, aus
+    rules_cfg["resale_price_groups"] (siehe matcher.py::_load_rules_from_dir()).
+    Fehlt ein Modell im Mapping (kein `resale_price_group` in der jeweiligen
+    YAML-Regel definiert), dient das Modell als eigene Gruppe (Identitaet) --
+    unveraendertes Verhalten fuer alle Kategorien ohne eigene Gruppierung.
+    """
+    groups: dict[str, list[PricePoint]] = {}
+    for point in points:
+        group = model_to_group.get(point.model, point.model)
+        groups.setdefault(group, []).append(point)
+    return groups
+
+
 def _percentile(sorted_prices: list[float], pct: float) -> float:
     """k-tes Perzentil ueber eine BEREITS sortierte Preisliste.
 
@@ -283,4 +311,30 @@ def compute_all_price_stats(
             burst_max_gap_seconds=burst_max_gap_seconds,
         )
         for model, model_points in group_by_model(points).items()
+    }
+
+
+def compute_resale_stats_by_group(
+    points: list[PricePoint],
+    model_to_group: dict[str, str],
+    *,
+    collapse_bursts: bool = True,
+    burst_max_gap_seconds: float = DEFAULT_MAX_GAP_SECONDS,
+) -> dict[str, PriceStats | None]:
+    """Wie compute_all_price_stats(), aber gruppiert nach der groeberen
+    Resale-Price-Gruppe (group_by_resale_group()) statt nach dem exakten
+    price_history_model. Nur zur Ableitung von estimated_resale_price
+    gedacht (siehe app.py::_resale_prices_from_stats()) -- das
+    zurueckgegebene market_price je Gruppe ist hier ein Nebenprodukt der
+    wiederverwendeten compute_price_stats()-Berechnung und wird bewusst
+    NICHT fuer Deal-Score/Notification-Gate verwendet (die nutzen weiterhin
+    compute_all_price_stats()/group_by_model() unveraendert).
+    """
+    return {
+        group: compute_price_stats(
+            group, group_points,
+            collapse_bursts=collapse_bursts,
+            burst_max_gap_seconds=burst_max_gap_seconds,
+        )
+        for group, group_points in group_by_resale_group(points, model_to_group).items()
     }

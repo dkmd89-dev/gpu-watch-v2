@@ -23,6 +23,15 @@
 # siehe STATUS.md Abschnitt 15/17.2): mangels vorhandener price_history-
 # Datenpunkte fuer diese Kategorie grob geschaetzt. Muessen nach ausreichend
 # gesammelten Scan-Daten anhand echter Marktpreise nachkalibriert werden.
+#
+# resale_price_group (Option 2, "Flip-Kandidaten-Logik optimieren",
+# STATUS.md Abschnitt 33b): wirkt AUSSCHLIESSLICH auf estimated_resale_price
+# (Flip-Kandidat/Dashboard-Margenfelder), market_price/deal_score/
+# Notification-Gate bleiben unveraendert an price_history_model gekoppelt.
+# nintendo_retro_konsole und sony_retro_konsole (aehnliches Preisniveau,
+# Okay-Grenze 90-100€) teilen sich "retro_konsole_single". retro_konvolut
+# (Preisniveau/Charakter -- mehrere Konsolen/Items -- deutlich anders,
+# Okay-Grenze 117€) bleibt bewusst eigene Gruppe.
 # ============================================================
 
 category: "retro_konsolen"
@@ -156,6 +165,7 @@ rules:
       - ["nintendo 64", "n64", "gamecube", "nintendo ds"]
       - ["konsole", "gerät", "system", "controller", "netzteil"]
     price_history_model: "nintendo_retro_konsole"
+    resale_price_group: "retro_konsole_single"
     max_price: 40
     deal_rating: "Top-Deal"
 
@@ -175,6 +185,7 @@ rules:
       - ["nintendo 64", "n64", "gamecube", "nintendo ds"]
       - ["konsole", "gerät", "system", "controller", "netzteil"]
     price_history_model: "nintendo_retro_konsole"
+    resale_price_group: "retro_konsole_single"
     max_price: 70
     deal_rating: "Guter Preis"
 
@@ -194,6 +205,7 @@ rules:
       - ["nintendo 64", "n64", "gamecube", "nintendo ds"]
       - ["konsole", "gerät", "system", "controller", "netzteil"]
     price_history_model: "nintendo_retro_konsole"
+    resale_price_group: "retro_konsole_single"
     max_price: 100
     deal_rating: "Okay"
 
@@ -211,6 +223,7 @@ rules:
       - ["playstation 1", "ps1", "playstation 2", "ps2"]
       - ["konsole", "gerät", "system", "controller", "netzteil"]
     price_history_model: "sony_retro_konsole"
+    resale_price_group: "retro_konsole_single"
     max_price: 35
     deal_rating: "Top-Deal"
 
@@ -225,6 +238,7 @@ rules:
       - ["playstation 1", "ps1", "playstation 2", "ps2"]
       - ["konsole", "gerät", "system", "controller", "netzteil"]
     price_history_model: "sony_retro_konsole"
+    resale_price_group: "retro_konsole_single"
     max_price: 60
     deal_rating: "Guter Preis"
 
@@ -239,6 +253,7 @@ rules:
       - ["playstation 1", "ps1", "playstation 2", "ps2"]
       - ["konsole", "gerät", "system", "controller", "netzteil"]
     price_history_model: "sony_retro_konsole"
+    resale_price_group: "retro_konsole_single"
     max_price: 90
     deal_rating: "Okay"
 
