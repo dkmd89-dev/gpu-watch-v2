@@ -141,6 +141,21 @@ def test_new_top_deals_ist_teilmenge_seit_scan_start():
         assert data["new_top_deals_count"] == 1
 
 
+def test_dashboard_html_enthaelt_neue_kpi_kacheln():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        app_mod = _load_app_module(tmpdir)
+
+        client = app_mod.app.test_client()
+        resp = client.get("/")
+        html = resp.get_data(as_text=True)
+
+        assert resp.status_code == 200
+        assert 'id="cntTopDeals"' in html
+        assert 'id="cntVeryGoodDeals"' in html
+        assert 'id="cntFlipCandidates"' in html
+        assert 'id="cntNewTopDeals"' in html
+
+
 if __name__ == "__main__":
     import pytest
     raise SystemExit(pytest.main([__file__, "-v"]))

@@ -162,6 +162,20 @@
     .counter-card.topdeal {
       background: rgba(255, 180, 84, 0.13);
     }
+    /* Drei weitere KPI-Kacheln (Auftrag "Top-Deal-Logik optimieren",
+       Abschnitt 17): dezente Flaechenfarbe analog .counter-card.topdeal,
+       damit sich alle vier "Highlight"-Kacheln optisch vom neutralen Grau
+       der uebrigen Kacheln abheben, aber sich selbst nicht mit topdeal
+       verwechseln lassen -- je eigener, gedaempfter Farbton. */
+    .counter-card.verygood {
+      background: rgba(255, 180, 84, 0.07);
+    }
+    .counter-card.flip {
+      background: rgba(79, 214, 122, 0.1);
+    }
+    .counter-card.newtopdeal {
+      background: rgba(91, 140, 255, 0.12);
+    }
     /* "Gescannt (letzter Lauf)" ist die am wenigsten wichtige Kennzahl
        (rein technisch/transient) -- bewusst zurueckhaltender dargestellt
        (kleiner, gedaempfte Farbe statt Akzentblau) statt gleichrangig
@@ -176,6 +190,9 @@
       color: var(--accent);
     }
     .counter-value.topdeal { color: var(--amber); }
+    .counter-value.verygood { color: var(--amber); }
+    .counter-value.flip { color: var(--green); }
+    .counter-value.newtopdeal { color: var(--accent); }
     .counter-label {
       font-size: 0.72rem;
       color: var(--text-muted);
@@ -680,7 +697,27 @@
       -->
       <div class="counter-card topdeal" id="topDealsCard">
         <div class="counter-value topdeal" id="cntTopDeals">–</div>
-        <div class="counter-label">Top-Deals</div>
+        <div class="counter-label">🔥 Top-Deals</div>
+      </div>
+      <!--
+        Auftrag "Top-Deal-Logik optimieren" (Abschnitt 11): drei weitere
+        KPI-Kacheln NACH topDealsCard (der Anker fuer ensureCategoryTile()
+        bleibt unveraendert VOR topDealsCard einfuegend, siehe oben --
+        diese drei sind fest, keine dynamische Kategorie-Erzeugung noetig).
+        Werte kommen 1:1 aus /api/status (Backend ist Quelle der Wahrheit,
+        keine eigene Browser-Berechnung, siehe Auftrag Abschnitt 12).
+      -->
+      <div class="counter-card verygood" id="veryGoodDealsCard">
+        <div class="counter-value verygood" id="cntVeryGoodDeals">–</div>
+        <div class="counter-label">⭐ Sehr gute Deals</div>
+      </div>
+      <div class="counter-card flip" id="flipCandidatesCard">
+        <div class="counter-value flip" id="cntFlipCandidates">–</div>
+        <div class="counter-label">💰 Flip-Kandidaten</div>
+      </div>
+      <div class="counter-card newtopdeal" id="newTopDealsCard">
+        <div class="counter-value newtopdeal" id="cntNewTopDeals">–</div>
+        <div class="counter-label">🆕 Neue Top-Deals</div>
       </div>
     </div>
   </section>
@@ -965,6 +1002,14 @@
           document.getElementById('cntSaved').textContent = s.saved_count ?? '–';
           updateCategoryTiles(s.category_counts);
           document.getElementById('cntTopDeals').textContent = s.top_deal_count ?? 0;
+          // Auftrag "Top-Deal-Logik optimieren" (Abschnitt 16/17): drei
+          // weitere KPI-Felder, exakt gleiches Muster wie cntTopDeals oben
+          // -- reines 1:1-Anzeigen des Backend-Werts, keine Browser-
+          // Berechnung. ?? 0 haelt aeltere Backend-Antworten (vor dieser
+          // Erweiterung, ohne diese Felder) robust kompatibel.
+          document.getElementById('cntVeryGoodDeals').textContent = s.very_good_deals_count ?? 0;
+          document.getElementById('cntFlipCandidates').textContent = s.flip_candidates_count ?? 0;
+          document.getElementById('cntNewTopDeals').textContent = s.new_top_deals_count ?? 0;
 
           updateLogBox(s.scan_log_tail);
 
