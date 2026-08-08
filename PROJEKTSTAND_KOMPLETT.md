@@ -726,6 +726,45 @@ neue über die vier Teilschritte).
 an echten Produktivtiteln — analog zum bereits etablierten Vorgehen bei
 `hersteller`.
 
-Phase 6 gilt damit als abgeschlossen. Warte auf Freigabe für den nächsten
-Schritt (`roadmap.md` Phase 7 – Deal Intelligence, oder ein anderer
-offener Punkt nach Wahl).
+Phase 6 gilt damit als abgeschlossen.
+
+---
+
+## 14. `roadmap.md` Phase 7 (Deal Intelligence) — ABGESCHLOSSEN
+
+**Umsetzung, zwei Teilschritte:**
+- **7a — `deal_intelligence.py` gebaut:** reine Funktion `classify_deal()`,
+  führt drei bereits bestehende Signale zusammen — `is_top_deal`
+  (`top_deal.py`), `estimated_margin_pct` (`scoring/profit.py`),
+  `deal_stars` (`scoring/deal_score.py`) — zu einer gemeinsamen
+  Einstufung: TOP DEAL > FLIP DEAL > VERY GOOD DEAL > WATCH. **Keine
+  neuen Schwellenwerte** — importiert exakt dieselben Konstanten
+  (`MIN_FLIP_MARGIN_PCT`, `TOP_DEAL_SCORE_THRESHOLD_A` über
+  `stars_meet_minimum`), die bereits die KPI-Zählung in `api/status.py`
+  verwendet. Per Gegenprobe an 5 Beispieldatensätzen deckungsgleich mit
+  der bestehenden Logik verifiziert.
+- **7b — Verdrahtung:** `run_scan()` berechnet `classify_deal()` pro
+  Treffer, plus Time-to-Sell-Kategorie-Lookup (`expected_days_to_sell`,
+  rein informativ, Median-Verweildauer der Kategorie — NICHT des
+  Einzelangebots, das ist für ein noch aktives Angebot per Definition
+  unbekannt). Drei neue additive `found.json`-Felder:
+  `deal_intelligence_label`, `deal_intelligence_emoji`,
+  `expected_days_to_sell`.
+
+**Kein Einfluss auf bestehende Systeme** (roadmap.md-Vorgabe wörtlich
+erfüllt: "Bestehende Systeme nicht ersetzen, sondern zusammenführen"):
+`deal_score`, Notification-Gate und die bisherige Top-Deal-Logik bleiben
+unverändert. Regressionsschutz-Test stellt sicher, dass `is_top_deal=True`
+immer `deal_intelligence_label == "TOP DEAL"` ergibt (keine
+widersprüchlichen Signale zwischen altem und neuem Feld).
+
+**Geänderte Dateien:** `app/deal_intelligence.py` (neu), `app/app.py`,
+`app/tests/test_deal_intelligence.py` (neu, 13 Tests),
+`app/tests/test_app_deal_intelligence_field.py` (neu, 3 Tests).
+
+**Teststand:** `pytest app/tests/` → **703 passed, 0 failed** (687 + 16
+neue).
+
+Phase 7 gilt damit als abgeschlossen. Warte auf Freigabe für den nächsten
+Schritt (`roadmap.md` Phase 8 – Notifications optimieren, oder ein
+anderer offener Punkt nach Wahl).

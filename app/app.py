@@ -24,7 +24,7 @@ from time_to_sell import (
 )
 from time_to_sell_stats import compute_all_time_to_sell_stats
 from deal_intelligence import classify_deal
-from top_deal import evaluate_top_deal
+from top_deal import evaluate_top_deal, TOP_DEAL_DISCOUNT_THRESHOLD_A_PCT
 from scoring.profit import MIN_FLIP_MARGIN_PCT
 from persistence.json_store import _load_json, _save_json
 from services.statistics_service import (
@@ -252,6 +252,44 @@ def _cleanup_old_deals(found: list[dict], max_age_days: int) -> tuple[list[dict]
         else:
             removed += 1
     return kept, removed
+
+
+def _notification_priority(
+    price: float,
+    urgent_price_threshold: float,
+    deal_stars: str | None,
+    discount_pct: float | None,
+    *,
+    min_stars_for_urgent: str = "★★★★☆",
+    min_discount_pct_for_urgent: float = TOP_DEAL_DISCOUNT_THRESHOLD_A_PCT,
+) -> str:
+    """Bestimmt die ntfy-Priorität ("urgent" oder "default") für einen
+    Treffer, der das Notification-Gate bereits erfüllt hat (roadmap.md
+    Phase 8, Schritt 8b).
+
+    Zwei UNABHÄNGIGE, ODER-verknüpfte Bedingungen für "urgent":
+    1. Bisheriges Verhalten (Phase 6b, unverändert): Preis <=
+       urgent_price_threshold.
+    2. NEU: mindestens `min_stars_for_urgent` (Default ★★★★☆, deckt damit
+       automatisch auch ★★★★★ mit ab -- höherer Rang) UND ein Preisvorteil
+       gegenüber dem Marktpreis von mindestens `min_discount_pct_for_urgent`
+       (Default TOP_DEAL_DISCOUNT_THRESHOLD_A_PCT aus top_deal.py, 25% --
+       wiederverwendete, bereits bestehende Schwelle, keine neue Zahl).
+
+    discount_pct is None (z.B. keine/zu wenig Preishistorie fuer dieses
+    Modell, siehe top_deal.py::evaluate_top_deal()) -> Bedingung 2 kann
+    nie erfüllt sein, Funktion verhält sich dann exakt wie vor Schritt 8b.
+    """
+    if price <= urgent_price_threshold:
+        return "urgent"
+
+    grosser_preisvorteil = (
+        discount_pct is not None and discount_pct >= min_discount_pct_for_urgent
+    )
+    if stars_meet_minimum(deal_stars or "", min_stars_for_urgent) and grosser_preisvorteil:
+        return "urgent"
+
+    return "default"
 
 
 
@@ -693,10 +731,26 @@ def run_scan():
                     append_price_point(PRICE_HISTORY_FILE, new_point)
                     price_points_this_scan.append(new_point)
 
-                # Phase 6b: Benachrichtigungs-Gate. Nur Treffer, die BEIDE
+                # Phase 6b: Benachrichtigungs-Gate. Nur Treffer, die ALLE DREI
                 # Bedingungen erfüllen, werden per ntfy verschickt -- alle
                 # anderen sind bereits oben in found.json gespeichert und im
                 # Dashboard sichtbar, lösen aber keinen Push aus.
+                #
+                # roadmap.md Phase 8, Schritt 8a: dritte Bedingung ergänzt --
+                # "bereits gemeldetes Angebot -> nicht erneut melden". Fuer
+                # eine IDENTISCHE URL ist das durch seen.json ohnehin bereits
+                # erfuellt (eine URL wird nur einmal ueberhaupt ausgewertet,
+                # siehe presence_tracking.py). Die eigentliche Luecke betraf
+                # CROSS-POSTINGS: dasselbe physische Angebot unter anderer
+                # URL/Plattform erzeugt bislang trotz vorhandener
+                # find_duplicate()-Erkennung (siehe oben, `duplicate`-
+                # Variable) einen ZWEITEN Push -- die Erkennung wirkte bisher
+                # NUR auf die Preishistorie, nicht auf Notifications. Jetzt
+                # wiederverwendet (kein zweiter Aufruf, keine neue Logik):
+                # is_duplicate=True unterdrueckt den Push, das Match selbst
+                # landet unveraendert in found.json/Dashboard (identisch zum
+                # bisherigen Verhalten bei der Preishistorie-Unterdrueckung).
+                is_duplicate = duplicate is not None
                 meets_star_gate = stars_meet_minimum(result.deal_stars or "", gate_min_stars)
                 # Kategorie-eigenes Preislimit hat Vorrang vor dem globalen
                 # gate_max_price (siehe matcher.py/rules/*.yaml "notify_max_price").
@@ -705,12 +759,21 @@ def run_scan():
                 )
                 meets_price_gate = item["price"] <= effective_gate_max_price
 
-                if meets_star_gate and meets_price_gate:
+                if meets_star_gate and meets_price_gate and not is_duplicate:
                     emoji = emoji_for(result.deal_rating)
                     clean_title = (
                         result.rule_label.replace("[TOP]", "").replace("[GUT]", "").replace("[OK]", "").strip()
                     )
                     price_str = f"{item['price']:.0f} €"
+
+                    # roadmap.md Phase 8, Schritt 8b: siehe
+                    # _notification_priority()-Docstring fuer die vollstaendige
+                    # Begruendung. top_deal_result oben bereits berechnet,
+                    # kein zusaetzlicher Aufruf noetig.
+                    priority = _notification_priority(
+                        item["price"], urgent_price_threshold,
+                        result.deal_stars, top_deal_result.discount_pct,
+                    )
 
                     _notify_start = time.perf_counter()
                     send_ntfy(
@@ -721,7 +784,7 @@ def run_scan():
                             f"{price_str} · {item['source']} · {item['location']}\n"
                             f"{item['url']}"
                         ),
-                        priority="urgent" if item["price"] <= urgent_price_threshold else "default",
+                        priority=priority,
                         tags=notify_tags,
                     )
                     notification_duration += time.perf_counter() - _notify_start
@@ -729,6 +792,13 @@ def run_scan():
                         "BENACHRICHTIGT [%s/%s/%s] %s – %.0f € – %s",
                         result.rule_label, result.deal_rating, result.deal_stars,
                         item["title"], item["price"], item["url"],
+                    )
+                elif is_duplicate:
+                    log.info(
+                        "GESPEICHERT (Cross-Posting-Duplikat, kein erneuter Push) "
+                        "[%s/%s] %s – %.0f € – %s (Duplikat von %s)",
+                        result.rule_label, result.deal_rating,
+                        item["title"], item["price"], item["url"], duplicate.date,
                     )
                 else:
                     log.info(
