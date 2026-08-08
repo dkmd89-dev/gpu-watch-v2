@@ -175,6 +175,14 @@ fees:
   payment_fee_pct: 2.5
   shipping_cost: 6.0
   packaging_cost: 1.5
+  # Bugfix (Auftrag "Flip-Kandidaten-Logik optimieren", Schritt A, siehe
+  # scoring/profit.py::MIN_PURCHASE_PRICE_FOR_MARGIN_PCT): Mindest-Kaufpreis
+  # in Euro, ab dem estimated_margin_pct ueberhaupt berechnet wird. Verhindert
+  # absurde Prozentwerte bei Mini-/Fehl-Kaufpreisen (z.B. 1€ bei Tausch-/VB-
+  # Inseraten). Entspricht dem Code-Default -- expliziter Eintrag hier nur zur
+  # Transparenz/leichten Anpassbarkeit, kein Verhaltensunterschied zum Fehlen
+  # dieses Keys.
+  min_purchase_price_for_margin_pct: 10.0
 
 # ============================================================
 # Duplicate-/Cross-Posting-Erkennung (Reselling-/Arbitrage-Konzept,

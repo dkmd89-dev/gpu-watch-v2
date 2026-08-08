@@ -44,6 +44,20 @@ _FEE_DEFAULTS: dict[str, float] = {
 # bereits berechneten Wert entgegennimmt.
 MIN_FLIP_MARGIN_PCT = 20.0
 
+# Bugfix (Auftrag "Flip-Kandidaten-Logik optimieren", Schritt A): Mindest-
+# Kaufpreis, ab dem margin_pct ueberhaupt berechnet wird. Hintergrund: bei
+# sehr niedrigen/fehlerhaften Kaufpreisen (z.B. 1€ bei Tausch-/VB-Inseraten
+# ohne echten Preis) divergiert margin_pct = margin_abs / purchase_price * 100
+# ins Absurde (in der Praxis beobachtet: bis zu +58.695% bei purchase_price=1€),
+# obwohl margin_abs (Euro) unauffaellig bleibt. purchase_price <= 0 wurde
+# bereits zuvor abgefangen (None-Ergebnis) -- dieser Guard erweitert dieselbe
+# Schutzlogik auf den ganzen unplausiblen unteren Preisbereich, analog zum
+# bestehenden Umgang mit purchase_price <= 0. Ueberschreibbar via
+# fees["min_purchase_price_for_margin_pct"] in _global.yaml (bewusst im
+# fees-Dict statt eines eigenen Ladepfads -- kleinstmoeglicher Eingriff,
+# keine Aenderung an matcher.py/_load_rules_from_dir() noetig).
+MIN_PURCHASE_PRICE_FOR_MARGIN_PCT = 10.0
+
 
 @dataclass(frozen=True)
 class Profit:
@@ -58,7 +72,11 @@ class Profit:
     margin_abs: geschätzte Marge in Euro (estimated_resale_price -
         purchase_price - fees_total). Kann negativ sein (Verlustgeschäft).
     margin_pct: margin_abs relativ zum Kaufpreis, in Prozent. None, falls
-        purchase_price <= 0 (Division durch Null vermieden).
+        purchase_price <= 0 (Division durch Null vermieden) ODER
+        purchase_price < MIN_PURCHASE_PRICE_FOR_MARGIN_PCT (Bugfix: bei
+        Mini-Kaufpreisen ist die Prozent-Kennzahl strukturell irrefuehrend,
+        siehe Konstanten-Docstring oben). margin_abs bleibt in beiden
+        Faellen weiterhin gesetzt.
     """
 
     purchase_price: float
@@ -100,6 +118,11 @@ def compute_profit(
     price_stats.compute_price_stats(), das bei leeren Datenpunkten ebenfalls
     None statt eines Platzhalter-Objekts liefert, um keine falsche 0€-Marge
     vorzutäuschen.
+
+    margin_pct-Guard (Bugfix, siehe MIN_PURCHASE_PRICE_FOR_MARGIN_PCT-
+    Docstring): bei purchase_price unterhalb der Mindestschwelle wird
+    margin_pct auf None gesetzt statt einer irrefuehrenden Prozentzahl --
+    margin_abs (Euro) ist davon nicht betroffen und bleibt immer gesetzt.
     """
     if estimated_resale_price is None or estimated_resale_price <= 0:
         return None
@@ -113,7 +136,19 @@ def compute_profit(
     )
 
     margin_abs = estimated_resale_price - purchase_price - fees_total
-    margin_pct = (margin_abs / purchase_price * 100) if purchase_price > 0 else None
+
+    # min_purchase_price_for_margin_pct: bewusst NICHT Teil von _FEE_DEFAULTS/
+    # _resolve_fees() (keine Kostenposition, sondern ein Plausibilitaets-
+    # Guard) -- eigener, direkter Lookup im rohen fees-Dict mit demselben
+    # "fehlt -> Default"-Verhalten wie die uebrigen fees-Werte.
+    min_purchase_price_for_pct = (fees or {}).get(
+        "min_purchase_price_for_margin_pct", MIN_PURCHASE_PRICE_FOR_MARGIN_PCT
+    )
+    margin_pct = (
+        (margin_abs / purchase_price * 100)
+        if purchase_price >= min_purchase_price_for_pct
+        else None
+    )
 
     return Profit(
         purchase_price=purchase_price,

@@ -74,3 +74,27 @@ def test_margin_pct_none_bei_kaufpreis_null():
     result = compute_profit(0.0, 150.0)
     assert result.margin_pct is None
     assert result.margin_abs == 150.0
+
+
+# ---------- margin_pct-Guard bei Mini-Kaufpreisen (Bugfix Schritt A) ----------
+
+def test_margin_pct_none_bei_kaufpreis_unter_mindestschwelle():
+    # purchase_price=1€ (z.B. Tausch-/VB-Inserat ohne echten Preis) darf
+    # keine absurde Prozentzahl mehr liefern, margin_abs bleibt gesetzt.
+    result = compute_profit(1.0, 150.0)
+    assert result.margin_pct is None
+    assert result.margin_abs == 149.0
+
+
+def test_margin_pct_gesetzt_ab_mindestschwelle():
+    # Exakt an der Schwelle (Default 10.0) wird margin_pct noch berechnet.
+    result = compute_profit(10.0, 150.0)
+    assert result.margin_pct == 1400.0
+    result_knapp_drunter = compute_profit(9.99, 150.0)
+    assert result_knapp_drunter.margin_pct is None
+
+
+def test_margin_pct_mindestschwelle_ueberschreibbar_via_fees():
+    fees = {"min_purchase_price_for_margin_pct": 0.0}
+    result = compute_profit(1.0, 150.0, fees=fees)
+    assert result.margin_pct == 14900.0
