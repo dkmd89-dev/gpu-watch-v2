@@ -481,4 +481,76 @@ separate Freigabe): `data/found.json.bak-*`, `data/time_to_sell.jsonl` und
 getrackt — Produktivdaten im Repo. Behoben in einem separaten,
 nicht-funktionalen Hygiene-Schritt (siehe Commit-Nachricht dieses Schritts).
 
-Warte auf Freigabe für den nächsten Schritt.
+---
+
+## 10. `roadmap.md` Phase 3 (`app.py` kontrolliert modularisieren) — ABGESCHLOSSEN
+
+**Ausgangslage:** `app.py` war auf 1230 Zeilen gewachsen (L7, siehe
+Abschnitt 9c). Ziel: schrittweise Extraktion nach dem in `roadmap.md`
+vorgeschlagenen Muster (`persistence/`, `services/`, `api/`, `scan/`),
+jeder Teilschritt einzeln freigegeben und per vollständigem `pytest`-Lauf
+verifiziert.
+
+**Umgesetzte Schritte (alle 1:1-Extraktionen, kein Verhalten geändert,
+615/615 Tests nach jedem Schritt grün):**
+
+| Schritt | Extraktion | Neues Modul |
+|---|---|---|
+| 3.1 | `_load_json`, `_save_json`, `_tail_log` | `persistence/json_store.py` |
+| 3.2 | `_load_price_stats`, `_load_resale_stats_by_group`, `_market_prices_from_stats`, `_resale_prices_from_stats` | `services/statistics_service.py` |
+| 3.3 | `/api/price-history`, `/api/price-history/<model>`, `/api/time-to-sell`, `/api/cross-platform` (zustandslose Lesepfade) | `api/history.py` (Blueprint) |
+| 3.4 | `/`, `/api/found`, `/api/scan-now` bzw. `/api/status` | `api/deals.py` + `api/status.py` (Blueprints) |
+| 3.5a | `scheduler_loop()` | `scan/scheduler.py` |
+
+Durchgängiges Muster: reine Verschiebung, Abhängigkeiten (Dateipfade,
+Locks, mutable State-Objekte, `run_scan`-Referenz) werden per
+Factory-Funktion im Closure übergeben statt dupliziert oder zirkulär
+reimportiert — `app.py` bleibt einzige Quelle der Wahrheit für alle
+Konstanten/State-Objekte. URL-Pfade und öffentliche `app_mod.*`-Attribute
+unverändert (gegen die vollständige Testsuite verifiziert, siehe Lehre
+unten).
+
+**Bewusst NICHT extrahiert: `run_scan()` (~534 Zeilen).**
+
+**Begründung (Risikoabwägung, keine Zeitnot):** `run_scan()` referenziert
+**46 verschiedene modul-globale Namen** (Locks, das `_scan_status`-Dict,
+7 Datei-Pfad-Konstanten, ~25 Funktionen aus anderen Modulen) — etwa 3×
+mehr Kopplung als alle Schritte 3.1–3.5a zusammen. Eine saubere Extraktion
+hätte entweder eine Factory-Funktion mit 15–20+ Parametern erfordert
+(unübersichtlich, hohe Fehlerwahrscheinlichkeit beim Verdrahten) oder neue
+Bündelungs-Objekte (z. B. `ScanPaths`/`ScanConfig`/`ScanState`-Dataclasses)
+— das wäre keine reine Verschiebung mehr, sondern echte neue Abstraktion
+und damit ein Verstoß gegen die `roadmap.md`-Regel "keine unnötige
+Abstraktion". Zusätzliches Risiko: `global _scan_running` funktioniert nur
+innerhalb von `app.py` als echtes Modul-Global, nicht über Modulgrenzen
+hinweg per Closure — ein Detail, das bei einer mechanischen Verschiebung
+leicht übersehen würde.
+
+**Lehre aus dieser Session (Schritt 3.4):** Ein als "ungenutzt" entfernter
+Import (`MIN_FLIP_MARGIN_PCT`) brach `test_app_status_kpis.py`, weil der
+Test über `app_mod.MIN_FLIP_MARGIN_PCT` öffentlich darauf zugriff — durch
+den vollständigen Testlauf sofort aufgedeckt und korrigiert. Konsequenz:
+jeder künftige "ungenutzte Import"-Kandidat wird vor dem Entfernen gegen
+`grep -rn "app_mod\." app/tests/` geprüft.
+
+**Ergebnis:** `app.py` **1230 → 790 Zeilen (−36 %)**. Neue Module:
+`persistence/json_store.py` (71 Z.), `services/statistics_service.py`
+(139 Z.), `api/history.py` (125 Z.), `api/deals.py` (94 Z.),
+`api/status.py` (139 Z.), `scan/scheduler.py` (46 Z.). `run_scan()` bleibt
+vollständig und unverändert in `app.py` (L7 damit nicht vollständig
+geschlossen, aber deutlich entschärft — verbleibende Monolith-Kritik
+konzentriert sich jetzt allein auf `run_scan()`, nicht mehr auf die
+gesamte Datei).
+
+**Teststand:** `pytest app/tests/` → **615 passed, 0 failed** (nach jedem
+Teilschritt einzeln verifiziert, nicht nur am Ende).
+
+**Konsequenz für spätere Sessions:** Sollte `run_scan()` künftig doch
+modularisiert werden, ist das kein "Phase 3 fortsetzen", sondern ein
+eigener, bewusst als "neue Abstraktion" (nicht "reine Verschiebung")
+gekennzeichneter Schritt mit eigener Freigabe — z. B. über 2–3
+Dataclasses zur Bündelung der 46 Abhängigkeiten.
+
+Phase 3 gilt damit als abgeschlossen. Warte auf Freigabe für den nächsten
+Schritt (`roadmap.md` Phase 4 – Persistenz analysieren, oder ein anderer
+offener Punkt nach Wahl).
