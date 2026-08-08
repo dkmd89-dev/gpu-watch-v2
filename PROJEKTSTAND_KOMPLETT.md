@@ -2,11 +2,26 @@
 
 > Diese Datei ist die einzige verlässliche Referenz für den Ist-Zustand des
 > Projekts. Jede Angabe wurde gegen den realen Code verifiziert (Dateisystem,
-> `git log`/`status`, echter `pytest`-Lauf — **599/599 Tests grün**).
-> Stand: Repo `main`, letzter committeter Commit `e834914` (RAM/CPU+Mainboard/
-> Notebook-Preisgrenzen- und Matching-Fixes, Details: STATUS.md Abschnitt 34).
+> `git log`/`status`, echter `pytest`-Lauf).
+> Stand: Repo `main`, letzter committeter Commit `d2effe7` (Schritt B/Option 2 —
+> separates Grouping für `estimated_resale_price`, siehe Commit-Message).
 > Working Tree clean, keine unversionierten Änderungen.
 > Ersetzt/ergänzt `PHASE_0_ANALYSE_VERIFIZIERT.md`.
+>
+> **⚠️ Realer Testlauf (verifiziert am 2026-08-08): 613 passed, 2 failed**
+> (56 Testdateien), nicht wie zuvor hier dokumentiert 599/599 grün. Beide
+> Fehlschläge betreffen denselben Bereich — "Flip-Kandidaten Schritt B/Option 1"
+> (Resale-Preis-Fallback bei dünner Preishistorie):
+> - `tests/test_app_margin_field.py::test_found_json_enthaelt_margin_bei_vorhandener_preishistorie`
+>   — erwartet `estimated_margin_eur is not None`, tatsächlich `None`.
+> - `tests/test_matcher_deal_score_integration.py::test_evaluate_resale_prices_none_wert_faellt_nicht_auf_market_price_zurueck`
+>   — erwartet `deal_score == 50`, tatsächlich `60`.
+>
+> Root Cause noch nicht analysiert (Abgleich zwischen dem in Abschnitt 3c
+> beschriebenen `None`-Fallback-Pfad und dem tatsächlichen Verhalten von
+> `_resale_prices_from_stats()`/`compute_profit()`/`_profit_score()` steht aus).
+> Diese Datei dokumentiert nur den Ist-Zustand — die Behebung ist ein
+> eigener, separat freizugebender Schritt.
 
 ---
 
@@ -21,10 +36,12 @@ im Entwicklungsauftrag beschriebenen PC-Fokus hinaus (Details: Abschnitt 6).
 
 ```
 Branch: main
-Letzter committeter Commit: e834914 fix(rules): Notebook-Suchbegriffe von Matching-Regel entkoppelt
+Letzter committeter Commit: d2effe7 feat(profit): Schritt B Option 2 -- separates
+  Grouping fuer estimated_resale_price
 Working Tree: clean
 
-Commits seit b9eb637 (chronologisch):
+Commits seit b9eb637 (chronologisch, neueste zuerst d2effe7):
+  d2effe7 feat(profit): Schritt B Option 2 -- separates Grouping fuer estimated_resale_price
   d8774bd feat(dashboard): KPI-Filter (Top-Deals/Sehr gute Deals/Flip/Neue Top-Deals)
   0849a4e feat(top-deal): neue Score+Discount-Logik aktiviert + found.json recomputed
   90c65dd fix(profit): margin_pct-Guard gegen absurde Werte bei Mini-Kaufpreisen
@@ -33,7 +50,9 @@ Commits seit b9eb637 (chronologisch):
   9f79ed3 fix(rules): CPU+Mainboard-Bundle X-Varianten + Ryzen-5600-Preise
   e834914 fix(rules): Notebook-Suchbegriffe von Matching-Regel entkoppelt
 ```
-Tests: `pytest app/tests/` → **599 passed** (keine Fehler/Skips).
+Tests: `pytest app/tests/` → **613 passed, 2 failed** (siehe Warnhinweis oben).
+Vormals dokumentierte 599/599-grün-Aussage war an einem älteren HEAD
+(`e834914`) erhoben und ist überholt.
 
 ## 3a. Top-Deal-Logik — neu abgeschlossener Workstream (STATUS.md Abschnitt 32)
 
@@ -113,7 +132,7 @@ verifiziert):**
 - Simulation gegen `found.json`-Produktivdaten: **730 → 624**
   Flip-Kandidaten (−106 Fehltreffer mit `price < 10 €`).
 
-**Schritt B, Option 1 — umgesetzt (noch nicht committet):** methodische
+**Schritt B, Option 1 — umgesetzt (committet, in `d2effe7` enthalten):** methodische
 Verfeinerung von `estimated_resale_price` bei dünner Preishistorie
 (< 5 Datenpunkte je `price_history_model`). Angebote, deren
 `price_history_model` unter der Mindest-Sample-Schwelle liegt, zählen jetzt
@@ -127,14 +146,32 @@ ein `None`-Wert nicht versehentlich wieder auf `market_price` zurückfällt
 Notification-Gate sind unverändert. 2 bestehende Tests angepasst, 1 neuer
 Test ergänzt.
 
-**Schritt B, Option 2 — weiterhin offen, noch nicht freigegeben:**
-Granularität der `price_history_model`-Schlüssel bei den betroffenen
-Kategorien (iPhone/Lego/Retro-Konsolen) überprüfen/vergröbern, damit mehr
-Datenpunkte pro Modell zusammenlaufen und Perzentile aussagekräftiger
-werden — größerer Eingriff, betrifft `price_history.jsonl`-Bestandsdaten
-und die YAML-Regeln selbst. Kein
-Einfluss auf `deal_score`/Notification-Gate (Default-Gewicht `profit`
-weiterhin 0.0 in fast allen Kategorien, siehe Abschnitt 7).
+**Schritt B, Option 2 — umgesetzt (committet in `d2effe7`, ⚠️ mit den 2
+offenen Testfehlern, s. Kopfbereich dieser Datei):** separates, gröberes
+Gruppierungs-Mapping ausschließlich für die Resale-Preis-Schätzung
+(`market_price` bleibt bei der bisherigen, feingranularen Gruppierung).
+Umgesetzt:
+- `price_stats.py`: neu `group_by_resale_group()` /
+  `compute_resale_stats_by_group()` (additiv, kein Eingriff in die
+  bestehende `market_price`-Berechnung).
+- `matcher.py::_load_rules_from_dir()`: baut ein `resale_price_groups`-
+  Mapping aus einem optionalen YAML-Key `resale_price_group` je Regel
+  (Default: Identität, also rückwärtskompatibel für Regeln ohne diesen Key).
+- `app.py`: neu `_load_resale_stats_by_group()`; `_resale_prices_from_stats()`
+  um 2 optionale Parameter erweitert, `market_prices`-Pfad unverändert.
+- `rules/lego_minifiguren.yaml`: 7 Einzelfigur-Regeln → Gruppe
+  `lego_rare_minifig_common`, 2 Konvolut-Regeln → `lego_bundle_common`.
+- `rules/retro_konsolen.yaml`: `nintendo_retro_konsole` +
+  `sony_retro_konsole` → gemeinsame Gruppe `retro_konsole_single`.
+- `rules/iphone.yaml` bewusst **nicht** angepasst (laut Commit-Message: keine
+  sichere Gruppierungsachse ohne Preisniveau-Vermischung).
+- 15 neue Tests laut Commit-Message (`price_stats`, Matcher-Mapping,
+  App-Grouping) — dennoch bestehen aktuell 2 Testfehler in angrenzenden
+  Bereichen (Kopfbereich dieser Datei); ob diese durch `d2effe7` verursacht
+  oder vorbestehend sind, ist noch nicht analysiert.
+- `deal_score`/Notification-Gate laut Commit-Message für ALLE Kategorien
+  unverändert (Default-Gewicht `profit` weiterhin 0.0 in fast allen
+  Kategorien, siehe Abschnitt 7).
 
 ## 3d. RAM/CPU+Mainboard/Notebook — Preisgrenzen & Matching-Fixes (abgeschlossen, STATUS.md Abschnitt 34)
 
@@ -315,7 +352,7 @@ behandelt werden, nicht als etwas, das "neu geplant" werden muss.
 | L6 | Scope-Drift: 5 Nicht-PC-Kategorien | Klärungsbedarf, kein Bug | **Entschieden (siehe Abschnitt 9b)** — bewusst behalten, unabhängig weiterlaufen lassen |
 | L7 | `app.py` als 977-Zeilen-Monolith (Routen + Scan-Loop + Scheduler in einer Datei) | Wartbarkeit bei weiterem Wachstum | Niedrig, vorausschauend |
 | L8 | Hersteller/Zustand/Lieferumfang-Scoring-Gewichte bewusst auf 0 (kein Detector für Zustand/Lieferumfang) | Deal-Score nutzt nur 3 von 6 Komponenten aktiv | Mittel, hängt von L1/L2 ab |
-| L9 | **Schritt A + B/Option 1 abgeschlossen (siehe Abschnitt 3c), B/Option 2 offen** — `estimated_resale_price` lieferte bei < 5 Preishistorie-Datenpunkten bisher einen Max-Preis-Fallback, der `flip_candidates_count` bei dünner Datenbasis (iPhone/Lego/Retro-Konsolen) strukturell zu optimistisch machte; liefert seit Option 1 `None` statt Fallback, betroffene Angebote zählen nicht mehr als Flip-Kandidat | Option 2 (Granularität `price_history_model` vergröbern) als weitergehende Verfeinerung noch offen | Niedrig, wartet auf Freigabe für Option 2 |
+| L9 | **Schritt A + B/Option 1 + B/Option 2 committet (siehe Abschnitt 3c)** — `estimated_resale_price` lieferte bei < 5 Preishistorie-Datenpunkten bisher einen Max-Preis-Fallback, der `flip_candidates_count` bei dünner Datenbasis (iPhone/Lego/Retro-Konsolen) strukturell zu optimistisch machte; liefert seit Option 1 `None` statt Fallback, Option 2 gruppiert zusätzlich Lego/Retro-Konsolen gröber für die Resale-Schätzung | **Neu: 2 Testfehler im angrenzenden Bereich (margin_field, deal_score_integration) noch ungeklärt** — Root-Cause-Analyse aussteht | Mittel — vor weiteren Phasen zu klären |
 
 ### 9a. Architekturentscheidung L2 — ENTSCHIEDEN (kein Code geändert)
 
@@ -411,12 +448,27 @@ Detector), keiner davon blockierend.
 
 ---
 
-**Phase 0 + Phase 1 abgeschlossen, keine Code-Änderungen dort.** Punkt 3
-(Kategorien) laut Abschnitt 9c final abgeschlossen. Zusätzlich der
-eigenständige Top-Deal-Logik-Workstream (Abschnitt 3a) inhaltlich fertig,
-aktuell noch unversioniert im Arbeitsverzeichnis (Abschnitt 3b). Ebenfalls
-neu: Flip-Kandidaten-Bugfix Schritt A abgeschlossen (Abschnitt 3c,
-unversioniert), Schritt B (methodische Verfeinerung `estimated_resale_price`,
-siehe L9) noch offen. Weitere offene Punkte: L5 (Datenrotation, ✅ bereits
-erledigt), L7 (`app.py`-Monolith), L8 (Scoring-Komponenten ohne Detector) —
-keiner davon blockierend. Warte auf Freigabe für den nächsten Schritt.
+**Phase 0 + Phase 1 abgeschlossen, keine funktionalen Code-Änderungen dort**
+(diese Aktualisierung ist reine Dokumentations-Synchronisation gemäß
+`roadmap.md` Phase 1). Punkt 3 (Kategorien) laut Abschnitt 9c final
+abgeschlossen. Top-Deal-Logik-Workstream (Abschnitt 3a) und
+Flip-Kandidaten-Bugfix Schritt A + B/Option 1 + B/Option 2 (Abschnitt 3c)
+sind inzwischen alle im HEAD-Commit `d2effe7` committet.
+
+**Neuer, wichtigster offener Punkt:** 2 fehlschlagende Tests
+(`test_app_margin_field.py`, `test_matcher_deal_score_integration.py`) im
+Bereich des Resale-Fallback-Pfads — Root-Cause-Analyse und Freigabe für
+einen Fix stehen aus, bevor mit `roadmap.md` Phase 2 (Performance messen)
+begonnen werden sollte.
+
+Weitere offene Punkte: L5 (Datenrotation, ✅ bereits erledigt), L7
+(`app.py`-Monolith, → `roadmap.md` Phase 3), L8 (Scoring-Komponenten ohne
+Detector, → Phase 6). Keiner davon blockierend.
+
+Zusätzlich identifiziert (Phase-0-Analyse, `roadmap.md`-Kontext, siehe
+separate Freigabe): `data/found.json.bak-*`, `data/time_to_sell.jsonl` und
+`STATUS.md` waren trotz teils gegenteiliger `.gitignore`-Regeln im Git
+getrackt — Produktivdaten im Repo. Behoben in einem separaten,
+nicht-funktionalen Hygiene-Schritt (siehe Commit-Nachricht dieses Schritts).
+
+Warte auf Freigabe für den nächsten Schritt.
