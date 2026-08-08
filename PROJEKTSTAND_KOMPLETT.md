@@ -2,10 +2,10 @@
 
 > Diese Datei ist die einzige verlässliche Referenz für den Ist-Zustand des
 > Projekts. Jede Angabe wurde gegen den realen Code verifiziert (Dateisystem,
-> `git log`/`status`, echter `pytest`-Lauf — **569/569 Tests grün**).
-> Stand: Repo `main`, letzter Commit `ac09d06`, 4 Commits vor `origin/main`.
-> Ersetzt/ergänzt `PHASE_0_ANALYSE_VERIFIZIERT.md`. Keine Code-Änderungen in
-> Phase 0 oder Phase 1 vorgenommen.
+> `git log`/`status`, echter `pytest`-Lauf — **596/596 Tests grün**).
+> Stand: Repo `main`, letzter committeter Commit `b9eb637` + unversionierte
+> Erweiterung dieser Session (Abschnitt 20 KPI-Filter, Details: STATUS.md
+> Abschnitt 32). Ersetzt/ergänzt `PHASE_0_ANALYSE_VERIFIZIERT.md`.
 
 ---
 
@@ -19,13 +19,52 @@ im Entwicklungsauftrag beschriebenen PC-Fokus hinaus (Details: Abschnitt 6).
 ## 2. Repo-Zustand
 
 ```
-Branch: main (4 Commits vor origin/main)
-Letzter Commit: ac09d06 fix(presence-tracking): fehlende prune_delisted_entries() ergänzt + Repo-Bereinigung
-Uncommittet:
-  D  .env.0.tmp
-  M  data/time_to_sell.jsonl (Laufzeitdaten)
+Branch: main
+Letzter committeter Commit: b9eb637 feat(dashboard): Top-Deal-Transparenz auf Deal-Karten (Abschnitt 19)
+Unversioniert (diese Session, siehe STATUS.md Abschnitt 32):
+  M  app/app.py               kpi_filter_thresholds fuer neuen KPI-Filter
+  M  app/templates/index.html filterKpi-Dropdown + data-*-Attribute
+  M  app/tests/test_app_status_kpis.py  3 neue Tests
 ```
-Tests: `pytest app/tests/` → **569 passed** (43 s, keine Fehler/Skips).
+Tests: `pytest app/tests/` → **596 passed** (keine Fehler/Skips).
+
+## 3a. Top-Deal-Logik — neu abgeschlossener Workstream (STATUS.md Abschnitt 32)
+
+Eigenständiger Auftrag ("Top-Deal-Logik optimieren + Dashboard-KPIs
+erweitern"), NICHT Teil der ursprünglichen Phase-0/1-Zielliste dieses
+Dokuments, deshalb hier nur zusammengefasst — Details in STATUS.md:
+
+- **Neue Top-Deal-Regel** (`top_deal.py`): `(Score≥80 UND Discount≥25%)
+  ODER (Score≥90 UND Discount≥20%)` statt der alten reinen 15%-Regel.
+  `evaluate_top_deal()` nimmt jetzt optional `deal_score` entgegen
+  (Default `None`, rückwärtskompatibel).
+- **Vier KPIs in `/api/status`**: `top_deal_count`,
+  `very_good_deals_count` (gut, aber nicht Top-Deal),
+  `flip_candidates_count` (`estimated_margin_pct >= MIN_FLIP_MARGIN_PCT`),
+  `new_top_deals_count` (Top-Deals seit letztem Scan-Start) — alle
+  ausschließlich aus vorhandenen `found.json`-Feldern abgeleitet, keine
+  neue Persistenz.
+- **Dashboard**: 4 KPI-Kacheln, Top-Deal-Transparenz-Zeile auf Deal-Karten
+  (Score/Preis/Marktwert/Rabatt/Regel), sowie **neu ein KPI-Filter**
+  (Top-Deals/Sehr gute Deals/Flip-Kandidaten/Neue Top-Deals) in der
+  bestehenden Filterleiste — client-seitig über neue `data-*`-Attribute
+  je Karte (`data-is-top-deal`, `data-margin-pct`, `data-found-at`),
+  Schwellen per `kpi_filter_thresholds` aus dem Backend injiziert (single
+  source of truth, keine doppelte Zahl in JS).
+- **Nicht verändert** (laut Auftrag bewusst ausgeschlossen): Price-History,
+  PriceStats, Deal-Score-Engine, Scraper/Registries, YAML-Kategorien,
+  Notification-Gate.
+
+Reale KPI-Zahlen (Top-Deals/Sehr gute Deals/Flip-Kandidaten gegen die
+produktive `found.json`) stehen noch aus — in der Entwicklungs-Sandbox
+liegen keine Produktionsdaten vor.
+
+## 3b. Repo-Hygiene (offen, niedrige Priorität)
+
+Änderungen aus diesem Workstream sind aktuell **unversioniert** im
+Arbeitsverzeichnis (siehe 2.). Empfehlung: nach Freigabe der realen
+KPI-Auswertung (3a) in einem Commit zusammenfassen, analog zum bisherigen
+Muster (ein Commit je STATUS.md-Abschnitt).
 
 ## 3. Architektur — Datenfluss
 
@@ -164,7 +203,7 @@ Vorhanden und produktiv, aber im Entwicklungsauftrag nicht erwähnt:
 - **Verhandlungs-Assistent:** `negotiation_tolerance_pct` /
   `negotiation_min_score` / `negotiation_score_component` je Kategorie-Regel
 
-Diese Logik ist bereits durch 569 Tests abgesichert und produktiv im
+Diese Logik ist bereits durch 596 Tests abgesichert und produktiv im
 Einsatz — sie sollte in Phase 1 bewusst als **bestehender Bestandteil**
 behandelt werden, nicht als etwas, das "neu geplant" werden muss.
 
@@ -197,7 +236,7 @@ kehrt sie bewusst um (kein erkannter Gehäusetyp = erfüllt, nicht wie bei
 RAM/SSD/PSU = nicht erfüllt). Ein generischer Dispatcher würde diese enge
 Kopplung nicht auflösen, sondern nur zusätzliche Indirektion um denselben
 speziellen Code bauen — bei hohem Risiko für einen zentralen, produktiv
-laufenden Pfad (569 Tests hängen daran) und nachweislich geringem Nutzen,
+laufenden Pfad (596 Tests hängen daran) und nachweislich geringem Nutzen,
 da jede neue Kategorie mit bestehendem Requirement-Vokabular (`min_ram_gb`,
 `min_cpu`, `case`, `min_psu_watt`, `requires_dedicated_gpu`, …) bereits
 heute rein per YAML funktioniert (bewiesen durch `monitor_curved`,
@@ -273,7 +312,10 @@ Detector), keiner davon blockierend.
 
 ---
 
-**Keine Code-Änderungen vorgenommen (Phase 0 + Phase 1 abgeschlossen).**
-Warte auf Freigabe, mit welchem Punkt aus Abschnitt 9 konkret begonnen
-werden soll (Empfehlung: Punkt 1, dann Punkt 2 als Entscheidung, dann
-Punkt 3 Schritt für Schritt).
+**Phase 0 + Phase 1 abgeschlossen, keine Code-Änderungen dort.** Punkt 3
+(Kategorien) laut Abschnitt 9c final abgeschlossen. Zusätzlich der
+eigenständige Top-Deal-Logik-Workstream (Abschnitt 3a) inhaltlich fertig,
+aktuell noch unversioniert im Arbeitsverzeichnis (Abschnitt 3b). Offene
+Punkte: L5 (Datenrotation, ✅ bereits erledigt), L7 (`app.py`-Monolith),
+L8 (Scoring-Komponenten ohne Detector) — keiner davon blockierend. Warte
+auf Freigabe für den nächsten Schritt.

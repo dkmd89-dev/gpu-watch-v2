@@ -205,6 +205,84 @@ def test_dashboard_html_ohne_top_deal_rule_keine_transparenz_zeile():
         assert 'class="top-deal-detail"' not in grid_html
 
 
+def test_dashboard_html_enthaelt_kpi_filter_dropdown():
+    """Abschnitt 20: neues Filter-Feld + JS-Schwellenkonstante, ohne die
+    bestehenden Filter (Kategorie/Quelle/Hersteller/Score/Preis) zu entfernen."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        app_mod = _load_app_module(tmpdir)
+
+        client = app_mod.app.test_client()
+        html = client.get("/").get_data(as_text=True)
+
+        assert 'id="filterKpi"' in html
+        assert 'value="topdeal"' in html
+        assert 'value="verygood"' in html
+        assert 'value="flip"' in html
+        assert 'value="newtopdeal"' in html
+        # bestehende Filter unveraendert vorhanden
+        for existing_id in ("filterCategory", "filterSource", "filterManufacturer",
+                             "filterMinScore", "filterMaxPrice"):
+            assert f'id="{existing_id}"' in html
+        # single source of truth: dieselben Konstanten wie api_status()
+        assert '"very_good_min_score": 80' in html
+        assert '"flip_min_margin_pct": 20.0' in html
+
+
+def test_dashboard_html_karten_enthalten_kpi_filter_datenattribute():
+    """Die drei neuen data-*-Attribute muessen serverseitig (Jinja) pro
+    Karte gesetzt sein, damit applyFilters() sie im Browser lesen kann."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        app_mod = _load_app_module(tmpdir)
+        _write_found(app_mod, [{
+            "title": "Filter-Testangebot",
+            "price": 265,
+            "url": "https://example.invalid/1",
+            "location": "Karlsruhe",
+            "source": "kleinanzeigen",
+            "category": "gaming_pc",
+            "manufacturer": "Eigenbau",
+            "deal_score": 92,
+            "deal_stars": "★★★★★",
+            "is_top_deal": True,
+            "estimated_margin_pct": 23.5,
+            "found_at": "2026-08-01T00:00:00+00:00",
+        }])
+
+        client = app_mod.app.test_client()
+        html = client.get("/").get_data(as_text=True)
+        grid_html = html.split('id="listingsGrid"')[1].split('id="noMatchState"')[0]
+
+        assert 'data-is-top-deal="true"' in grid_html
+        assert 'data-margin-pct="23.5"' in grid_html
+        assert 'data-found-at="2026-08-01T00:00:00+00:00"' in grid_html
+
+
+def test_dashboard_html_karte_ohne_felder_leere_daten_attribute_kein_fehler():
+    """Aeltere found.json-Eintraege ohne is_top_deal/estimated_margin_pct/
+    found_at duerfen keinen Rendering-Fehler ausloesen (robuste Defaults,
+    analog zum bestehenden data-score-Fallback)."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        app_mod = _load_app_module(tmpdir)
+        _write_found(app_mod, [{
+            "title": "Alter Eintrag ohne neue Felder",
+            "price": 100,
+            "url": "https://example.invalid/2",
+            "location": "Karlsruhe",
+            "source": "kleinanzeigen",
+            "category": "gaming_pc",
+        }])
+
+        client = app_mod.app.test_client()
+        resp = client.get("/")
+        assert resp.status_code == 200
+        html = resp.get_data(as_text=True)
+        grid_html = html.split('id="listingsGrid"')[1].split('id="noMatchState"')[0]
+
+        assert 'data-is-top-deal="false"' in grid_html
+        assert 'data-margin-pct=""' in grid_html
+        assert 'data-found-at=""' in grid_html
+
+
 if __name__ == "__main__":
     import pytest
     raise SystemExit(pytest.main([__file__, "-v"]))

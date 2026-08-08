@@ -1118,3 +1118,69 @@ feat(rules): drei neue Kategorien (ram, cpu_mainboard_bundle, notebook_resell)
 
 **Mögliche Nebenwirkungen**
 Keine im Normalfall (Grenze noch nicht erreicht). Sobald `seen.json` über 50.000 Einträge wächst, werden die ältesten aktiven Einträge entfernt — siehe dokumentiertes Restrisiko oben. Kein Einfluss auf `found.json`, Scoring, Notifications oder bestehende Kategorien.
+
+---
+
+## 32. Top-Deal-Logik optimiert + Dashboard-KPI-Filter (Auftrag "Top-Deal-Logik.txt", Abschnitte 1–27)
+
+**Ausgangslage:** Separater, eigenständiger Auftrag zur bestehenden Top-Deal-Klassifizierung. Bestehende 15-%-Rabattregel (`top_deal.py`) klassifizierte laut produktiver Beobachtung ca. 30 % aller Angebote als Top-Deal — zu ungenau. Price-History/PriceStats/Deal-Score-Engine sollten dabei ausdrücklich unangetastet bleiben.
+
+**Umsetzung in vier Teilschritten (chronologisch, je eigener Commit):**
+
+1. **`top_deal.py`** (`0f63eaf`): `evaluate_top_deal()` erhält optional `deal_score: int | None` (Default `None`, rückwärtskompatibel). Neue Regel: `(Score≥80 UND Discount≥25%) ODER (Score≥90 UND Discount≥20%)` statt der alten Einzel-15%-Konstante. Neue Konstanten `TOP_DEAL_SCORE_THRESHOLD_A/B` + `TOP_DEAL_DISCOUNT_THRESHOLD_A/B_PCT`. `TopDealResult.rule` ("A"/"B"/`None`) neu für Transparenz. Alle Grenzfälle aus Auftrags-Abschnitt 8 als Tests abgedeckt.
+2. **`app.py` + API** (`00bd8e8`): Aufruf um `deal_score=result.deal_score` ergänzt — neue Regel damit produktiv aktiv. `/api/status` um drei KPIs erweitert: `very_good_deals_count` (gut, aber nicht Top-Deal — keine Doppelzählung), `flip_candidates_count` (`estimated_margin_pct >= MIN_FLIP_MARGIN_PCT`, aus `scoring/profit.py`), `new_top_deals_count` (Top-Deals mit `found_at` ≥ letztem Scan-Start). Alle drei ausschließlich aus vorhandenen `found.json`-Feldern, keine neue Persistenz, keine neue Rating-Engine.
+3. **Dashboard-Kacheln + Transparenz** (`09927c8`, `b9eb637`): drei neue `.counter-card`-Kacheln (⭐/💰/🆕) neben der bestehenden 🔥-Kachel, `refreshStatus()` liest die neuen Felder (kein `location.reload()`). Zusätzlich neue `.top-deal-detail`-Zeile auf Deal-Karten (Score/Preis/Marktwert/Rabatt/Regel), nur bei `is_top_deal` — Regel-Schwellen via `top_deal_rule_thresholds` aus `top_deal.py`-Konstanten in den Template-Kontext injiziert (single source of truth für Server- und Client-Render).
+4. **KPI-Filter** (diese Session, Abschnitt 20, noch unversioniert — siehe 32a unten): neues `filterKpi`-Dropdown in der bestehenden Filterleiste.
+
+**Geänderte Dateien (kumuliert über alle vier Teilschritte)**
+- `app/top_deal.py`, `app/app.py`, `app/templates/index.html`, `app/scoring/profit.py` (`MIN_FLIP_MARGIN_PCT`-Konstante), `app/tests/test_top_deal.py`, `app/tests/test_app_status_kpis.py` (neu)
+
+**Empfohlene Tests**
+`pytest app/tests/` → **596 passed**, 0 Fehler (Ausgangsbasis 569 vor diesem Workstream). Isoliert verifiziert: `app.py`-Import ok, `/` und `/api/status` liefern erwartete Felder/HTML.
+
+**Mögliche Nebenwirkungen**
+Top-Deal-Anzahl in der produktiven `found.json` wird durch die strengere Regel spürbar sinken (gewünschter Effekt, siehe Auftrag Abschnitt 23) — reale Vorher/Nachher-Zahlen stehen noch aus, da in dieser Entwicklungsumgebung keine Produktionsdaten (`data/found.json`, `data/price_history.jsonl`) vorliegen. Kein Einfluss auf Price-History, PriceStats, Deal-Score-Gewichte, Scraper, Notification-Gate.
+
+**Commit-Nachrichten (bereits verwendet, 1–3)**
+```
+feat(top-deal): neue Score+Discount-Regel statt reiner 15%-Rabattregel
+feat(top-deal,api): deal_score verdrahten + neue Dashboard-KPIs
+feat(dashboard): drei neue KPI-Kacheln (sehr gute Deals, Flip, neue Top-Deals)
+feat(dashboard): Top-Deal-Transparenz auf Deal-Karten (Abschnitt 19)
+```
+
+### 32a. KPI-Filter (Abschnitt 20) — vierter Teilschritt dieser Session
+
+**Ausgangslage:** Bestehende Filterleiste (`filterCategory/Source/Manufacturer/MinScore/MaxPrice`, rein client-seitig über `data-*`-Attribute + `applyFilters()`) sollte um die vier neuen KPI-Kategorien erweitert werden, sofern mit geringem Aufwand möglich (Auftragsvorgabe).
+
+**Umsetzung:** `app.py` liefert `kpi_filter_thresholds` (`very_good_min_score` = `TOP_DEAL_SCORE_THRESHOLD_A`, `flip_min_margin_pct` = `MIN_FLIP_MARGIN_PCT` — beide bereits vorhandene Konstanten, keine neue Zahl) als Template-Kontext. `templates/index.html`: neues `<select id="filterKpi">` (Alle/🔥/⭐/💰/🆕), drei neue `data-*`-Attribute je Karte (`data-is-top-deal`, `data-margin-pct`, `data-found-at`) in Jinja **und** `renderCardHtml()`, `applyFilters()` um KPI-Logik erweitert — exakt äquivalent zur Backend-Definition in `api_status()`. `lastScanStartedAt` wird aus `refreshStatus()` gemerkt (für „Neue Top-Deals"). Live-Refresh-kompatibel ohne weitere Änderung, da `refreshListings()` bereits nach jedem Scan `populateFilterOptions()` + `applyFilters()` neu aufruft.
+
+**Geänderte Dateien**
+- `app/app.py` — `kpi_filter_thresholds` in `index()`
+- `app/templates/index.html` — `filterKpi`-Select, 3 neue `data-*`-Attribute, `applyFilters()`/`initFilters()`/`resetFilters()` erweitert
+- `app/tests/test_app_status_kpis.py` — 3 neue Tests (Dropdown vorhanden, Datenattribute korrekt gesetzt, robuste Defaults bei fehlenden Feldern)
+
+**Empfohlene Tests**
+`pytest app/tests/` → **596 passed** (593 + 3 neue). Isoliert verifiziert: `/` liefert `filterKpi`, `/api/status` liefert alle vier KPI-Felder.
+
+**Mögliche Nebenwirkungen**
+Keine. Ältere `found.json`-Einträge ohne `is_top_deal`/`estimated_margin_pct`/`found_at` rendern robust mit leeren/`false`-Defaults. „Neue Top-Deals"-Filter liefert bis zum ersten `refreshStatus()`-Poll (~5 s nach Laden) keine Treffer (kein Fehlerzustand).
+
+**Commit-Nachricht (noch nicht committet)**
+```
+feat(dashboard): KPI-Filter (Top-Deals/Sehr gute Deals/Flip/Neue Top-Deals)
+
+- app.py: kpi_filter_thresholds (very_good_min_score, flip_min_margin_pct)
+  als Template-Kontext, wiederverwendet bestehende Konstanten aus
+  top_deal.py/scoring/profit.py -- single source of truth wie bei
+  top_deal_rule_thresholds
+- templates/index.html: neues filterKpi-Select in der Filterleiste,
+  3 neue data-*-Attribute je Karte (Jinja + renderCardHtml()),
+  applyFilters() um KPI-Logik erweitert (identisch zu api_status()),
+  lastScanStartedAt aus refreshStatus() gemerkt fuer "Neue Top-Deals"
+- tests/test_app_status_kpis.py: 3 neue Tests (Filter-Dropdown vorhanden,
+  Datenattribute korrekt, robuste Defaults bei fehlenden Feldern)
+- 596/596 Tests gruen, kein Eingriff in top_deal.py/scoring/Price-History
+```
+
+**Offen:** reale Vorher/Nachher-KPI-Zahlen (Auftrag Abschnitt 23) und der GTX-1070-Testfall (Abschnitt 7) stehen noch aus — erfordern Prüfung gegen die produktive `data/found.json`, die in dieser Entwicklungsumgebung nicht vorliegt.

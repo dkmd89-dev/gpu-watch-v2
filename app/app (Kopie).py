@@ -834,25 +834,12 @@ def index():
         "A": {"score": TOP_DEAL_SCORE_THRESHOLD_A, "discount_pct": TOP_DEAL_DISCOUNT_THRESHOLD_A_PCT},
         "B": {"score": TOP_DEAL_SCORE_THRESHOLD_B, "discount_pct": TOP_DEAL_DISCOUNT_THRESHOLD_B_PCT},
     }
-    # Filter-Erweiterung (Abschnitt 20): Schwellen fuer den neuen KPI-Filter
-    # (Top-Deals / Sehr gute Deals / Flip-Kandidaten / Neue Top-Deals) im
-    # Dashboard. Bewusst dieselben Konstanten wie in api_status() (siehe
-    # dortiger Docstring: very_good <=> deal_score >= TOP_DEAL_SCORE_
-    # THRESHOLD_A, dieselbe Skala wie stars_meet_minimum(..., "★★★★☆")) --
-    # keine neue Zahl, single source of truth bleibt top_deal.py/scoring/
-    # profit.py. Wird 1:1 als JS-Konstante injiziert, damit die Browser-
-    # Filterlogik nie von der Backend-KPI-Zaehlung abweichen kann.
-    kpi_filter_thresholds = {
-        "very_good_min_score": TOP_DEAL_SCORE_THRESHOLD_A,
-        "flip_min_margin_pct": MIN_FLIP_MARGIN_PCT,
-    }
     return render_template(
         "index.html",
         found=found,
         all_categories=all_categories,
         category_labels=category_labels,
         top_deal_rule_thresholds=top_deal_rule_thresholds,
-        kpi_filter_thresholds=kpi_filter_thresholds,
     )
 
 
