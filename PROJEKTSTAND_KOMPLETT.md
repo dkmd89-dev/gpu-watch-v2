@@ -666,6 +666,66 @@ ist Teil von Phase 8, nicht dieser Phase.
 **Teststand:** `pytest app/tests/` → **625 passed, 0 failed** (616 + 9
 neue).
 
-Phase 5 gilt damit als abgeschlossen. Warte auf Freigabe für den nächsten
-Schritt (`roadmap.md` Phase 6 – Deal-Score vervollständigen, oder ein
-anderer offener Punkt nach Wahl).
+Phase 5 gilt damit als abgeschlossen.
+
+---
+
+## 13. `roadmap.md` Phase 6 (Deal-Score vervollständigen) — ABGESCHLOSSEN
+
+**Präzisierter Ausgangsbefund (L8):** Von den ursprünglich "3 von 6
+ungenutzten Komponenten" war nur eine wirklich ohne Detector —
+`hersteller` hatte bereits Detector + Reputationstabelle, nur das Gewicht
+stand auf 0.
+
+**Umsetzung, vier Teilschritte:**
+- **6a — Hersteller aktiviert:** `scoring_weights.hersteller` 0 → 0.05
+  in `_global.yaml`, reine YAML-Änderung, kein Code. `compute_deal_score()`
+  normalisiert automatisch, übrige Gewichte unverändert.
+- **6b — Zustand-Detector gebaut:** `categories/detectors/condition.py`,
+  Vokabular exakt aus dem Auftrag (neu/wie neu/sehr gut/gut/gebraucht/
+  beschädigt/defekt/Bastler) + deutsche Adjektiv-Flexionsformen
+  (gebrauchter/defektes/in gutem Zustand). Zwei Regex-Bugs bei der
+  Entwicklung selbst gefunden und behoben. Nur Titel (keine Beschreibung
+  — `evaluate()` bekommt aktuell keinen `description`-Parameter).
+- **6c — Lieferumfang-Detector gebaut:** `categories/detectors/
+  lieferumfang.py`, positive Signale (OVP/Rechnung/Originalzubehör/
+  Netzteil/Controller/Zubehör) und negative Signale (ohne Netzteil/nur
+  Gerät/defekt) — anders als Zustand mehrere gleichzeitige Signale pro
+  Titel möglich, daher zwei Listen statt einem Label. Zwei Bugs
+  (Doppelzählung "original Zubehör", Fehlsignal bei "kein Zubehör")
+  gefunden und per Lookbehind behoben.
+- **6d — Beide Detectors verdrahtet:** `matcher.py::_build_score_inputs()`
+  ruft beide auf, neue Scoring-Funktionen `_zustand_score()`/
+  `_lieferumfang_score()` in `deal_score.py` (Muster wie
+  `_hersteller_score()`), zwei neue YAML-Tabellen (`condition_scores`,
+  `lieferumfang_signal_scores`, Platzhalter-Kalibrierung).
+
+**Gewichte `zustand`/`lieferumfang` bleiben bei 0** — bewusst, exakt nach
+roadmap.md-Vorgabe ("Keine Gewichtung aktivieren, solange die Erkennung
+nicht ausreichend zuverlässig getestet ist"). Per Regressionstest gegen
+die echte produktive `_global.yaml` abgesichert: ein Titel mit
+erkennbarem Zustand/Lieferumfang liefert exakt denselben Score wie ein
+sonst identischer Titel ohne solche Angaben — die Detectors sind aktiv
+und sichtbar (`DealScoreResult.components`), aber wirkungslos auf den
+Gesamt-Score, bis eine bewusste Aktivierungsentscheidung fällt (wie bei
+`hersteller` in 6a).
+
+**Geänderte Dateien:** `app/categories/detectors/condition.py` (neu),
+`app/categories/detectors/lieferumfang.py` (neu), `app/matcher.py`,
+`app/scoring/deal_score.py`, `app/rules/_global.yaml`,
+`app/tests/test_detector_condition.py` (neu, 22 Tests),
+`app/tests/test_detector_lieferumfang.py` (neu, 21 Tests),
+`app/tests/test_deal_score.py` (+12), `app/tests/
+test_matcher_deal_score_integration.py` (+7).
+
+**Teststand:** `pytest app/tests/` → **687 passed, 0 failed** (625 + 62
+neue über die vier Teilschritte).
+
+**Offener Folgepunkt (nicht Teil dieser Phase):** Aktivierung von
+`zustand`/`lieferumfang` (Gewicht > 0) erst nach Verlässlichkeitsprüfung
+an echten Produktivtiteln — analog zum bereits etablierten Vorgehen bei
+`hersteller`.
+
+Phase 6 gilt damit als abgeschlossen. Warte auf Freigabe für den nächsten
+Schritt (`roadmap.md` Phase 7 – Deal Intelligence, oder ein anderer
+offener Punkt nach Wahl).
