@@ -1,14 +1,12 @@
 import os
-import json
 import time
 import logging
 import logging.handlers
 import threading
-from dataclasses import asdict
 from pathlib import Path
 from datetime import datetime, timedelta, timezone
 
-from flask import Flask, render_template, jsonify
+from flask import Flask
 
 from matcher import load_rules, evaluate
 from scrapers import search_kleinanzeigen, search_ebay
@@ -21,23 +19,20 @@ from presence_tracking import (
     migrate_seen_data, mark_seen, mark_matched, detect_newly_delisted,
     prune_delisted_entries, DEFAULT_DELISTING_THRESHOLD_SCANS,
 )
-from time_to_sell import make_time_to_sell_point, append_time_to_sell_point, read_time_to_sell_points
-from time_to_sell_stats import compute_all_time_to_sell_stats
-from cross_platform_stats import compute_all_cross_platform_stats
-from price_stats import (
-    compute_all_price_stats,
-    compute_price_stats,
-    compute_resale_stats_by_group,
-    PriceStats,
-)
-from top_deal import (
-    evaluate_top_deal,
-    TOP_DEAL_SCORE_THRESHOLD_A,
-    TOP_DEAL_DISCOUNT_THRESHOLD_A_PCT,
-    TOP_DEAL_SCORE_THRESHOLD_B,
-    TOP_DEAL_DISCOUNT_THRESHOLD_B_PCT,
-)
+from time_to_sell import make_time_to_sell_point, append_time_to_sell_point
+from top_deal import evaluate_top_deal
 from scoring.profit import MIN_FLIP_MARGIN_PCT
+from persistence.json_store import _load_json, _save_json
+from services.statistics_service import (
+    _load_price_stats,
+    _load_resale_stats_by_group,
+    _market_prices_from_stats,
+    _resale_prices_from_stats,
+)
+from api.history import build_history_blueprint
+from api.deals import build_deals_blueprint
+from api.status import build_status_blueprint
+from scan.scheduler import build_scheduler_loop
 
 DATA_DIR = Path(os.environ.get("DATA_DIR", "/data"))
 DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -124,6 +119,7 @@ class _SuppressStatusPollingFilter(logging.Filter):
 logging.getLogger("werkzeug").addFilter(_SuppressStatusPollingFilter())
 
 app = Flask(__name__)
+app.register_blueprint(build_history_blueprint(PRICE_HISTORY_FILE, TIME_TO_SELL_FILE))
 
 _seen_lock = threading.Lock()
 _scan_running = False
@@ -168,6 +164,9 @@ _scan_status: dict = {
 # dem Scraper-Plugin-System (Phase 9/10) dynamisch aus den geladenen Plugins
 # abgeleitet.
 SOURCES = ["kleinanzeigen", "ebay"]
+app.register_blueprint(build_status_blueprint(
+    FOUND_FILE, LOG_FILE, _scan_status, _status_lock, SOURCES,
+))
 
 # Legacy-Fallback: wird NUR verwendet, falls die geladene Regel-Config
 # keine eigenen search_terms mitbringt (z.B. alter Einzeldatei-Modus mit
@@ -202,63 +201,6 @@ NOTIFY_TAGS = ["moneybag"]
 # Legacy-Fallback wie oben: greift nur ohne eigenen "notifications"-Block.
 NOTIFY_GATE_MIN_STARS = "★★☆☆☆"
 NOTIFY_GATE_MAX_PRICE = 150
-
-
-def _load_json(path: Path, default):
-    """Laedt JSON aus path. Bei fehlender Datei: default. Bei korrupter
-    (z.B. durch einen Absturz waehrend eines fruehen, nicht-atomaren
-    Schreibvorgangs abgeschnittenen) Datei: die korrupte Datei wird als
-    '<name>.corrupt-<timestamp>' gesichert, eine Warnung geloggt und
-    default zurueckgegeben, statt die Anwendung abstuerzen zu lassen."""
-    if not path.exists():
-        return default
-    try:
-        return json.loads(path.read_text())
-    except json.JSONDecodeError as exc:
-        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-        backup_path = path.with_name(f"{path.name}.corrupt-{timestamp}")
-        try:
-            path.rename(backup_path)
-        except OSError:
-            backup_path = None
-        log.error(
-            "Korrupte JSON-Datei %s konnte nicht gelesen werden (%s) -- "
-            "als %s gesichert, starte mit Standardwert neu.",
-            path, exc, backup_path,
-        )
-        return default
-
-
-def _save_json(path: Path, data) -> None:
-    """Schreibt data als JSON nach path -- atomar ueber eine Temp-Datei
-    im selben Verzeichnis + os.replace(), damit ein Absturz/Kill mitten
-    im Schreibvorgang (z.B. Container-Stop) niemals eine abgeschnittene/
-    korrupte Zieldatei hinterlaesst: entweder der alte oder der neue
-    vollstaendige Inhalt ist vorhanden, nie ein Zwischenzustand."""
-    tmp_path = path.with_name(f"{path.name}.tmp-{os.getpid()}")
-    text = json.dumps(data, ensure_ascii=False, indent=2)
-    with open(tmp_path, "w", encoding="utf-8") as f:
-        f.write(text)
-        f.flush()
-        os.fsync(f.fileno())
-    os.replace(tmp_path, path)
-
-
-def _tail_log(path: Path, n: int) -> list[str]:
-    """Liest die letzten `n` Zeilen aus der Log-Datei fürs Dashboard.
-
-    Fehlt die Datei (z.B. ganz frischer Container-Start) -> leere Liste,
-    kein Fehler. Ein Lesefehler wird geloggt statt die Status-Route zum
-    Absturz zu bringen (Dashboard-Zusatzinfo, kein kritischer Pfad).
-    """
-    if not path.exists():
-        return []
-    try:
-        lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
-        return lines[-n:]
-    except OSError as e:
-        log.error("Scan-Log konnte nicht gelesen werden: %s", e, exc_info=True)
-        return []
 
 
 def _cleanup_old_deals(found: list[dict], max_age_days: int) -> tuple[list[dict], int]:
@@ -300,129 +242,7 @@ def _cleanup_old_deals(found: list[dict], max_age_days: int) -> tuple[list[dict]
 
 
 
-def _load_price_stats(path: Path) -> dict[str, PriceStats]:
-    """Berechnet die volle Preisstatistik je price_history_model.
 
-    Gemeinsame Basis für zwei Verwendungszwecke:
-    - Marktpreise fürs Deal-Score-Scoring (Schritt 7.5, siehe
-      _market_prices_from_stats() unten)
-    - Top-Deal-Erkennung (Schritt 8.2, siehe evaluate_top_deal() in run_scan())
-
-    Ein Fehler beim Statistik-Aufbau darf den Scan nicht abbrechen --
-    Preisstatistik ist eine Zusatzfunktion, kein kritischer Pfad (analog zu
-    append_price_point() in price_history.py).
-    """
-    try:
-        points = read_price_points(path)
-        return compute_all_price_stats(points)
-    except Exception as e:
-        log.error("Preisstatistik konnte nicht berechnet werden: %s", e, exc_info=True)
-        return {}
-
-
-def _load_resale_stats_by_group(
-    path: Path, model_to_group: dict[str, str]
-) -> dict[str, PriceStats]:
-    """Wie _load_price_stats(), aber gruppiert nach der groeberen Resale-
-    Price-Gruppe (Option 2, STATUS.md Abschnitt 33b) statt nach dem exakten
-    price_history_model. GETRENNT von _load_price_stats() -- market_prices
-    und die Top-Deal-Erkennung nutzen weiterhin ausschliesslich
-    _load_price_stats()/compute_all_price_stats(), unveraendert.
-
-    model_to_group leer (aeltere Configs / Legacy-Einzeldatei-Modus ohne
-    "resale_price_groups"-Key) -> jedes Modell bildet seine eigene Gruppe,
-    identisches Ergebnis zu _load_price_stats() (volle Rueckwaertskompatibilitaet).
-
-    Fehler bei der Berechnung duerfen den Scan nicht abbrechen (analog
-    _load_price_stats()) -- reine Zusatzfunktion.
-    """
-    try:
-        points = read_price_points(path)
-        return compute_resale_stats_by_group(points, model_to_group)
-    except Exception as e:
-        log.error(
-            "Resale-Gruppen-Preisstatistik konnte nicht berechnet werden: %s",
-            e, exc_info=True,
-        )
-        return {}
-
-
-def _market_prices_from_stats(stats_by_model: dict[str, PriceStats]) -> dict[str, float]:
-    """Reduziert die volle Preisstatistik (siehe _load_price_stats()) auf das
-    {price_history_model: Marktpreis}-Mapping, das evaluate() erwartet
-    (Schritt 7.4/7.5). None (kein Modell in der Historie) -> unveraendertes
-    Verhalten wie vor Schritt 7.4 (reines regelbasiertes max_price-Signal).
-    """
-    return {
-        model: stats.market_price
-        for model, stats in stats_by_model.items()
-        if stats is not None
-    }
-
-
-def _resale_prices_from_stats(
-    stats_by_model: dict[str, PriceStats],
-    stats_by_resale_group: dict[str, PriceStats] | None = None,
-    model_to_group: dict[str, str] | None = None,
-) -> dict[str, float | None]:
-    """Reduziert die volle Preisstatistik auf das
-    {price_history_model: geschaetzter Verkaufspreis}-Mapping (Reselling-/
-    Arbitrage-Konzept, STATUS.md Abschnitt 16, Punkt c).
-
-    Methodisch GETRENNT von _market_prices_from_stats(): market_price ist
-    ein Ankaufs-Proxy (Basis: alle vom Bot selbst gematchten, tendenziell
-    guenstigen Angebote), estimated_resale_price nutzt bewusst nur das
-    obere Preissegment (P75-P90) derselben Daten -- siehe
-    price_stats.py::_estimated_resale_price()-Docstring fuer die
-    Begruendung.
-
-    Option 2 ("Flip-Kandidaten-Logik optimieren", STATUS.md Abschnitt 33b):
-    stats_by_resale_group/model_to_group sind optional (Default None ->
-    identisches Verhalten zu vorher, volle Rueckwaertskompatibilitaet fuer
-    aeltere Aufrufer/Tests). Sind beide gesetzt, wird estimated_resale_price
-    NICHT mehr aus stats_by_model[model] gelesen, sondern aus der
-    (potenziell groeberen) Gruppe stats_by_resale_group[model_to_group[model]]
-    -- nur fuer Kategorien mit eigenem "resale_price_group" je Regel macht
-    das ueberhaupt einen Unterschied (Default-Gruppe == Modell selbst).
-    market_price/deal_score/Notification-Gate bleiben davon unberuehrt,
-    die nutzen weiterhin ausschliesslich stats_by_model.
-
-    Fehlt ein Modell komplett in der Historie (stats is None, noch kein
-    einziger Datenpunkt gesammelt), wird das Modell hier weggelassen --
-    evaluate() faellt dann weiterhin auf market_price zurueck (siehe
-    dortiger Docstring), unveraendertes Verhalten.
-
-    "Flip-Kandidaten-Logik optimieren", Schritt B (Option 1, STATUS.md
-    Abschnitt 33b): liegt fuer ein Modell zwar eine PriceStats-Instanz vor,
-    aber estimated_resale_price ist None (zu duenne Preishistorie, siehe
-    price_stats.py::_estimated_resale_price()), wird das Modell hier
-    BEWUSST MIT dem Wert None ins Mapping aufgenommen, statt komplett
-    weggelassen zu werden. Der Unterschied ist entscheidend: ein fehlender
-    Modell-Key bedeutet fuer matcher.py "Modell unbekannt -> Fallback auf
-    market_price", waehrend ein vorhandener Key mit Wert None bedeutet
-    "Modell bekannt, aber Verkaufspreis-Schaetzung aktuell nicht
-    belastbar genug -> keine Marge/kein Flip-Kandidat berechnen" (matcher.py
-    faellt in diesem Fall NICHT auf market_price zurueck). Ohne diese
-    Unterscheidung wuerde ein einfaches Weglassen die alte, zu optimistische
-    max_price-Naeherung ueber den market_price-Fallback wieder einschleusen.
-    """
-    if not stats_by_resale_group or not model_to_group:
-        return {
-            model: stats.estimated_resale_price
-            for model, stats in stats_by_model.items()
-            if stats is not None
-        }
-
-    result: dict[str, float | None] = {}
-    for model, stats in stats_by_model.items():
-        if stats is None:
-            continue
-        group = model_to_group.get(model, model)
-        group_stats = stats_by_resale_group.get(group)
-        result[model] = (
-            group_stats.estimated_resale_price if group_stats is not None else None
-        )
-    return result
 
 
 def run_scan():
@@ -955,270 +775,9 @@ def run_scan():
             _scan_status["last_scan_finished_at"] = datetime.now(timezone.utc).isoformat()
 
 
-def scheduler_loop():
-    interval = int(os.environ.get("SCAN_INTERVAL_MINUTES", "10")) * 60
-    while True:
-        try:
-            run_scan()
-        except Exception:
-            log.exception("Fehler im Scan-Durchlauf")
-
-        next_at = datetime.now(timezone.utc) + timedelta(seconds=interval)
-        with _status_lock:
-            _scan_status["next_scan_at"] = next_at.isoformat()
-
-        time.sleep(interval)
-
-
-@app.route("/")
-def index():
-    found = _load_json(FOUND_FILE, [])
-    # Dashboard-Folgeschritt: vollstaendige Kategorie-Liste aus den Rules
-    # (nicht nur aus den aktuell sichtbaren found.json-Eintraegen) fuers
-    # Kategorie-Filter-Dropdown im Template -- siehe matcher.py-Kommentar
-    # bei "categories". get(..., []) statt [] direkt, falls load_rules()
-    # im Legacy-Einzeldatei-Modus laeuft (dort existiert der Key nicht).
-    rules_cfg = load_rules(str(Path(__file__).parent / "rules"))
-    all_categories = rules_cfg.get("categories", [])
-    # Dashboard-Kachel-Folgeschritt: Anzeigenamen je Kategorie (YAML-Feld
-    # "label") fuers generische KPI-Kachel-Rendering im Template. get(...,
-    # {}) statt {} direkt, falls load_rules() im Legacy-Einzeldatei-Modus
-    # laeuft (dort existiert der Key nicht) -- Template faellt dann auf den
-    # internen Kategorie-Schluessel als Anzeigename zurueck.
-    category_labels = rules_cfg.get("category_labels", {})
-    # Top-Deal-Transparenz (Abschnitt 19): Regel-Schwellen aus top_deal.py
-    # als Template-Kontext statt hartkodierter Zahlen im HTML/JS -- damit
-    # der angezeigte Regeltext nie von den tatsaechlichen Konstanten
-    # abweichen kann (single source of truth bleibt top_deal.py).
-    top_deal_rule_thresholds = {
-        "A": {"score": TOP_DEAL_SCORE_THRESHOLD_A, "discount_pct": TOP_DEAL_DISCOUNT_THRESHOLD_A_PCT},
-        "B": {"score": TOP_DEAL_SCORE_THRESHOLD_B, "discount_pct": TOP_DEAL_DISCOUNT_THRESHOLD_B_PCT},
-    }
-    # Filter-Erweiterung (Abschnitt 20): Schwellen fuer den neuen KPI-Filter
-    # (Top-Deals / Sehr gute Deals / Flip-Kandidaten / Neue Top-Deals) im
-    # Dashboard. Bewusst dieselben Konstanten wie in api_status() (siehe
-    # dortiger Docstring: very_good <=> deal_score >= TOP_DEAL_SCORE_
-    # THRESHOLD_A, dieselbe Skala wie stars_meet_minimum(..., "★★★★☆")) --
-    # keine neue Zahl, single source of truth bleibt top_deal.py/scoring/
-    # profit.py. Wird 1:1 als JS-Konstante injiziert, damit die Browser-
-    # Filterlogik nie von der Backend-KPI-Zaehlung abweichen kann.
-    kpi_filter_thresholds = {
-        "very_good_min_score": TOP_DEAL_SCORE_THRESHOLD_A,
-        "flip_min_margin_pct": MIN_FLIP_MARGIN_PCT,
-    }
-    return render_template(
-        "index.html",
-        found=found,
-        all_categories=all_categories,
-        category_labels=category_labels,
-        top_deal_rule_thresholds=top_deal_rule_thresholds,
-        kpi_filter_thresholds=kpi_filter_thresholds,
-    )
-
-
-@app.route("/api/found")
-def api_found():
-    return jsonify(_load_json(FOUND_FILE, []))
-
-
-@app.route("/api/status")
-def api_status():
-    """Live-Status fürs Dashboard (Phase 8, Schritt 8.1 + 8.2).
-
-    Rein lesend, aggregiert bestehende Daten (found.json + In-Memory-
-    Status-State) -- keine neue Persistenz, kein Einfluss auf run_scan().
-
-    top_deal_count zählt Einträge mit is_top_deal=True (Schritt 8.2, jetzt
-    neue Score+Discount-Regel siehe top_deal.py).
-
-    Zusätzlich (Auftrag "Top-Deal-Logik optimieren", Abschnitte 11-15) drei
-    weitere KPIs, ALLE ausschließlich aus bereits vorhandenen found.json-
-    Feldern abgeleitet -- keine neue Persistenz, keine neue Rating-Engine:
-
-    - very_good_deals_count: gute Angebote (deal_stars >= ★★★★☆, also
-      deal_score >= 80, dieselbe Skala wie top_deal.TOP_DEAL_SCORE_THRESHOLD_A),
-      die aber NICHT zusätzlich Top-Deal sind (Abschnitt 13: keine
-      Doppelzählung).
-    - flip_candidates_count: Angebote mit estimated_margin_pct >=
-      MIN_FLIP_MARGIN_PCT (siehe scoring/profit.py) -- nutzt die bestehende
-      Reselling-/Margin-Berechnung, kann sich mit Top-Deal überschneiden
-      (Abschnitt 14, ausdrücklich erlaubt).
-    - new_top_deals_count: Top-Deals, deren found_at im aktuell laufenden
-      bzw. zuletzt gestarteten Scan liegt (Abschnitt 15) -- echte Teilmenge
-      von top_deal_count, nutzt das bereits vorhandene found_at-Feld statt
-      neuer Zeitstempel-Logik.
-
-    Ältere found.json-Einträge ohne die jeweiligen Felder (is_top_deal,
-    deal_stars, estimated_margin_pct, found_at) werden über .get() robust
-    als "nicht zutreffend" behandelt statt KeyError.
-    """
-    found = _load_json(FOUND_FILE, [])
-
-    with _status_lock:
-        status_snapshot = dict(_scan_status)
-
-    last_scan_started_at = status_snapshot["last_scan_started_at"]
-    scan_start_dt = None
-    if last_scan_started_at:
-        try:
-            scan_start_dt = datetime.fromisoformat(last_scan_started_at)
-        except ValueError:
-            scan_start_dt = None
-
-    category_counts: dict[str, int] = {}
-    manufacturer_counts: dict[str, int] = {}
-    top_deal_count = 0
-    very_good_deals_count = 0
-    flip_candidates_count = 0
-    new_top_deals_count = 0
-    for f in found:
-        cat = f.get("category") or "unbekannt"
-        category_counts[cat] = category_counts.get(cat, 0) + 1
-        # Aeltere found.json-Eintraege aus der Zeit vor dem Hersteller-
-        # Detector haben dieses Feld noch nicht -- .get() liefert dafuer
-        # robust None statt eines KeyError, "unbekannt" gruppiert sie mit
-        # Treffern, bei denen im Titel schlicht keine Marke erkennbar war.
-        manufacturer = f.get("manufacturer") or "unbekannt"
-        manufacturer_counts[manufacturer] = manufacturer_counts.get(manufacturer, 0) + 1
-
-        is_top_deal = bool(f.get("is_top_deal"))
-        if is_top_deal:
-            top_deal_count += 1
-
-            found_at = f.get("found_at")
-            if scan_start_dt is not None and found_at:
-                try:
-                    if datetime.fromisoformat(found_at) >= scan_start_dt:
-                        new_top_deals_count += 1
-                except ValueError:
-                    pass
-        elif stars_meet_minimum(f.get("deal_stars") or "", "★★★★☆"):
-            # NICHT is_top_deal (siehe Abschnitt 13: keine Doppelzaehlung).
-            very_good_deals_count += 1
-
-        margin_pct = f.get("estimated_margin_pct")
-        if margin_pct is not None and margin_pct >= MIN_FLIP_MARGIN_PCT:
-            flip_candidates_count += 1
-
-    return jsonify({
-        "scan_running": status_snapshot["scan_running"],
-        "last_scan_started_at": status_snapshot["last_scan_started_at"],
-        "last_scan_finished_at": status_snapshot["last_scan_finished_at"],
-        "last_scan_error": status_snapshot["last_scan_error"],
-        "next_scan_at": status_snapshot["next_scan_at"],
-        "scan_progress": {
-            "current": status_snapshot["scan_progress_current"],
-            "total": status_snapshot["scan_progress_total"],
-        },
-        "scanned_count_last_scan": status_snapshot["scanned_count_last_scan"],
-        "new_hits_last_scan": status_snapshot["new_hits_last_scan"],
-        "saved_count": len(found),
-        "category_counts": category_counts,
-        "manufacturer_counts": manufacturer_counts,
-        "top_deal_count": top_deal_count,
-        "very_good_deals_count": very_good_deals_count,
-        "flip_candidates_count": flip_candidates_count,
-        "new_top_deals_count": new_top_deals_count,
-        "sources": SOURCES,
-        "scan_log_tail": _tail_log(LOG_FILE, 20),
-    })
-
-
-@app.route("/api/price-history")
-def api_price_history_index():
-    """Kurz-Übersicht aller price_history_model-Schlüssel mit Statistik,
-    aber OHNE Zeitreihe (Schritt 8.3) -- fürs Dashboard, um zu ermitteln,
-    für welche Modelle überhaupt Preishistorie/Diagramme verfügbar sind.
-    Für die volle Zeitreihe eines einzelnen Modells siehe
-    /api/price-history/<model>.
-    """
-    points = read_price_points(PRICE_HISTORY_FILE)
-    stats_by_model = compute_all_price_stats(points)
-    return jsonify({
-        model: asdict(stats)
-        for model, stats in stats_by_model.items()
-        if stats is not None
-    })
-
-
-@app.route("/api/price-history/<model>")
-def api_price_history_detail(model):
-    """Aggregierte Statistik + chronologische Zeitreihe für EIN
-    price_history_model (Schritt 8.3), z.B. fürs Preisdiagramm im
-    Dashboard.
-
-    Unbekanntes/noch nie gesehenes model -> KEIN 404, sondern stats=null
-    und series=[] (analog zum fail-soft-Verhalten von read_price_points()
-    bei fehlender Datei) -- ein neu angelegtes Kategorie-/Hardware-Modell
-    ohne bisherige Treffer ist kein Fehlerfall, sondern der Normalzustand
-    direkt nach dem Anlegen einer neuen YAML-Regel.
-    """
-    points = read_price_points(PRICE_HISTORY_FILE)
-    model_points = sorted(
-        (p for p in points if p.model == model), key=lambda p: p.date
-    )
-    stats = compute_price_stats(model, model_points)
-
-    return jsonify({
-        "model": model,
-        "stats": asdict(stats) if stats is not None else None,
-        "series": [
-            {
-                "price": p.price,
-                "date": p.date,
-                "source": p.source,
-                "deal_score": p.deal_score,
-            }
-            for p in model_points
-        ],
-    })
-
-
-@app.route("/api/time-to-sell")
-def api_time_to_sell():
-    """Time-to-Sell-Statistik je Kategorie fürs Dashboard (Baustein 6,
-    Schritt 4) -- nutzt ausschließlich die bestehenden Funktionen aus
-    Schritt 3 (time_to_sell.read_time_to_sell_points(),
-    time_to_sell_stats.compute_all_time_to_sell_stats()), kein neuer
-    Berechnungscode. Analog zu /api/price-history: leeres Dict, solange
-    noch kein Delisting erkannt wurde (kein Fehlerfall, siehe
-    read_time_to_sell_points()-Docstring).
-    """
-    points = read_time_to_sell_points(TIME_TO_SELL_FILE)
-    stats_by_category = compute_all_time_to_sell_stats(points)
-    return jsonify({
-        category: asdict(stats)
-        for category, stats in stats_by_category.items()
-    })
-
-
-@app.route("/api/cross-platform")
-def api_cross_platform():
-    """Cross-Platform-Preisvergleich je price_history_model fürs Dashboard
-    (Baustein 4, Schritt 2) -- nutzt ausschließlich die bestehenden
-    Funktionen aus Schritt 1 (price_history.read_price_points(),
-    cross_platform_stats.compute_all_cross_platform_stats()), kein neuer
-    Berechnungscode. Analog zu /api/time-to-sell: leeres Dict, solange
-    für kein Modell Datenpunkte aus mindestens 2 verschiedenen Quellen
-    vorliegen (kein Fehlerfall, siehe compute_cross_platform_stats()-
-    Docstring).
-
-    by_source ist ein verschachteltes Dict je Quelle (SourceStats) --
-    asdict() serialisiert dataclasses rekursiv, kein manuelles Flatten
-    nötig.
-    """
-    points = read_price_points(PRICE_HISTORY_FILE)
-    stats_by_model = compute_all_cross_platform_stats(points)
-    return jsonify({
-        model: asdict(stats)
-        for model, stats in stats_by_model.items()
-    })
-
-
-@app.route("/api/scan-now", methods=["POST"])
-def api_scan_now():
-    threading.Thread(target=run_scan, daemon=True).start()
-    return jsonify({"status": "started"})
+app.register_blueprint(build_deals_blueprint(
+    FOUND_FILE, Path(__file__).parent / "rules", run_scan,
+))
 
 
 if __name__ == "__main__":
@@ -1226,5 +785,6 @@ if __name__ == "__main__":
     # sofort sichtbar ist, dass der Bot erfolgreich hochgefahren ist und
     # auf den naechsten Scan-Zyklus wartet.
     log.info("🤖 [HARDWARE_DEAL] ✅ Bot läuft und lauscht auf Nachrichten...")
+    scheduler_loop = build_scheduler_loop(run_scan, _status_lock, _scan_status, log)
     threading.Thread(target=scheduler_loop, daemon=True).start()
     app.run(host="0.0.0.0", port=5000)
