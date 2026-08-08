@@ -424,6 +424,7 @@ docs: Scope-Entscheidung L6 getroffen -- Nicht-PC-Kategorien bleiben bestehen
 - `matcher.py::evaluate()`: neuer optionaler Parameter `resale_prices`. `estimated_resale_price` kommt jetzt bevorzugt aus `resale_prices`; fehlt ein Modelleintrag (oder wird `resale_prices` gar nicht übergeben, z.B. ältere Aufrufer/Tests), Fallback auf `market_price` -- exakt das bisherige Phase-1-Platzhalter-Verhalten, volle Rückwärtskompatibilität. `market_price` bleibt unverändert Input für die `"price"`-Komponente (Ankaufsperspektive über `_price_score()`); nur die `"profit"`-Komponente nutzt jetzt den getrennten Verkaufspreis.
 - Tests: 5 neue Tests in `tests/test_price_stats.py` (Fallback auf `max_price` statt Median, `estimated_resale_price > market_price` bei genug Daten, `percentile_75`-Lage, Einzeldatenpunkt-Fall), 3 neue Tests in `tests/test_matcher_deal_score_integration.py` (Nutzung von `resale_prices` statt `market_prices`, Fallback bei fehlendem Modelleintrag, Fallback ohne `resale_prices`-Parameter).
 - **Keine Auswirkung auf bestehende produktive Scores außer der GPU-Kategorie** (einzige mit `profit`-Gewicht > 0, siehe Punkt a) -- und selbst dort nur, sobald für ein Modell ≥5 Preishistorie-Datenpunkte vorliegen (sonst bleibt der bisherige Platzhalter-/Fallback-Pfad aktiv).
+- **Hinweis (nachträglich):** Der hier beschriebene `max_price`-Fallback bei `< 5` Datenpunkten wurde im "Flip-Kandidaten-Logik optimieren"-Auftrag als strukturell zu optimistisch identifiziert und durch Schritt B, Option 1 (siehe Abschnitt 33b) ersetzt -- `estimated_resale_price` liefert seitdem in diesem Fall `None` statt `max_price`.
 - In dieser Sandbox (kein `pytest` installierbar, kein Netzwerkzugriff): eigener Minimal-Runner ohne pytest-Fixtures verwendet -- **422/443 grün**, alle 21 Fehlschläge weiterhin ausschließlich fehlende `tmp_path`/`monkeypatch`-Fixtures des Runners (siehe Punkt a), keine Regression. Bitte in Robins echter Umgebung mit echtem `pytest` gegenprüfen.
 
 **Punkt b umgesetzt (Marge im Dashboard anzeigen):**
@@ -1268,28 +1269,92 @@ found.json-Datensatz), behebt Extremfall +58.695% bei 1€-Inseraten.
 Schritt B (estimated_resale_price-Methodik) folgt separat.
 ```
 
-### 33b. Schritt B — offen, noch nicht freigegeben
+### 33b. Schritt B — Option 1 abgeschlossen (committet), Option 2 offen
 
 Methodische Verfeinerung von `estimated_resale_price` bei dünner
-Preishistorie. Zwei Stoßrichtungen zur Diskussion, noch keine Entscheidung
-getroffen bzw. Freigabe erteilt:
+Preishistorie. Zwei Stoßrichtungen standen zur Diskussion:
 
-1. **Kein Flip-Kandidat bei zu wenig Datenpunkten:** Angebote, deren
-   `price_history_model` unter `_MIN_SAMPLES_FOR_PERCENTILE_MARKET_PRICE`
-   liegt (aktuell 5), zählen nicht als Flip-Kandidat statt den
-   `max_price`-Fallback als Verkaufsreferenz zu nutzen. Konservativer,
-   reduziert False Positives weiter — reduziert aber auch die
-   Gesamt-Trefferzahl spürbar (betrifft laut Analyse v. a. `iphone`,
-   `lego_minifiguren`, `retro_konsolen`).
-2. **Granularität der `price_history_model`-Schlüssel überprüfen:** bei
-   den betroffenen Kategorien ggf. vergröbern, damit mehr Datenpunkte pro
-   Modell zusammenlaufen und Perzentile aussagekräftiger werden. Größerer
-   Eingriff, betrifft potenziell `price_history.jsonl`-Bestandsdaten und
-   die YAML-Regeln selbst — nicht mehr "kleinstmöglicher Eingriff".
+1. **Kein Flip-Kandidat bei zu wenig Datenpunkten — UMGESETZT.** Angebote,
+   deren `price_history_model` unter
+   `_MIN_SAMPLES_FOR_PERCENTILE_MARKET_PRICE` liegt (aktuell 5), zählen
+   nicht mehr als Flip-Kandidat, statt den `max_price`-Fallback als
+   Verkaufsreferenz zu nutzen.
+2. **Granularität der `price_history_model`-Schlüssel überprüfen:**
+   weiterhin offen. Größerer Eingriff, betrifft potenziell
+   `price_history.jsonl`-Bestandsdaten und die YAML-Regeln selbst — nicht
+   mehr "kleinstmöglicher Eingriff". Wartet auf separate Freigabe.
 
-Betrifft ausschließlich `price_stats.py`/`scoring/profit.py`, kein
-Einfluss auf `deal_score`/Notification-Gate. Wartet auf Freigabe/
-Priorisierung, bevor einer der beiden Wege umgesetzt wird.
+**Umsetzung Option 1:** `price_stats.py::_estimated_resale_price()` liefert
+bei `< _MIN_SAMPLES_FOR_PERCENTILE_MARKET_PRICE` Datenpunkten jetzt `None`
+statt des bisherigen `max_price`-Fallbacks (Parameter `max_price` aus der
+Funktionssignatur entfernt, nicht mehr benötigt). Da `None` an dieser
+Stelle in `app.py::_resale_prices_from_stats()` bislang schlicht
+weggelassen wurde — was `matcher.py::evaluate()` als "Modell unbekannt"
+interpretiert und wieder auf `market_price` zurückfallen ließ (exakt die
+ursprüngliche Optimismus-Verzerrung über einen Umweg) —, wurde die
+Rückfall-Logik in zwei weiteren Dateien angepasst (siehe unten): der
+Eingriff bleibt damit nicht wie ursprünglich skizziert auf
+`price_stats.py`/`scoring/profit.py` beschränkt, sondern umfasst zusätzlich
+`app.py` und `matcher.py` (an `scoring/profit.py` war letztlich keine
+Änderung nötig, da `compute_profit()`/`_profit_score()` `None`-Werte
+bereits als dokumentierten Platzhalter-Fall behandeln).
+
+**Geänderte Dateien**
+- `app/price_stats.py` — `_estimated_resale_price()`: `None` statt
+  `max_price`-Fallback bei `< 5` Datenpunkten, Docstring aktualisiert
+- `app/app.py` — `_resale_prices_from_stats()`: nimmt Modelle mit
+  `estimated_resale_price is None` jetzt explizit MIT dem Wert `None` ins
+  Mapping auf (statt sie wegzulassen), Rückgabetyp `dict[str, float | None]`
+- `app/matcher.py` — `evaluate()`: Fallback auf `market_price` nur noch,
+  wenn der Modell-Key in `resale_prices` komplett fehlt; ist der Key
+  vorhanden mit Wert `None`, bleibt `estimated_resale_price` `None`
+  (kein Fallback) — Docstring aktualisiert
+- `app/tests/test_price_stats.py` — 2 bestehende Tests an neues Verhalten
+  angepasst (`max_price`-Fallback-Test → `None`-Test; Einzeldatenpunkt-Test
+  → `None`-Test)
+- `app/tests/test_matcher_deal_score_integration.py` — 1 neuer Test:
+  Modell-Key vorhanden mit `None`-Wert → kein Fallback auf `market_price`,
+  `estimated_margin_pct`/`estimated_margin_eur` bleiben `None`
+
+**Empfohlene Tests**
+`pytest app/tests/` (lokal/CI ausführen — in der Analyse-Sandbox ohne
+Projekt-Dependencies nicht ausführbar). Erwartung: alle bisherigen 599
+Tests weiterhin grün (2 angepasst, s. o.) + 1 neuer Test = 600 gesamt.
+Zusätzlich empfohlen: Simulation gegen eine aktuelle `found.json`-Kopie
+(analog zu Schritt A) zur Kontrolle des neuen `flip_candidates_count`.
+
+**Mögliche Nebenwirkungen**
+`flip_candidates_count` sinkt weiter (zusätzlich zu Schritt A) für
+Kategorien mit dünner Preishistorie je `price_history_model`
+(`lego_minifiguren`, `iphone`, `retro_konsolen`, `vintage_elektronik`,
+`monitor_curved` laut Root-Cause-Analyse). `market_price` und damit die
+`price`-Score-Komponente/Notification-Gate sind unverändert — nur die
+`profit`-Komponente und die abgeleiteten `estimated_margin_*`-Felder sind
+betroffen (Standard-Gewicht `profit` weiterhin 0.0 in fast allen
+Kategorien außer `gpu.yaml`/`notebook_resell.yaml`). Ältere `found.json`-
+Einträge mit bereits gesetztem `estimated_margin_pct` bleiben bis zum
+nächsten Scan unverändert im Dashboard sichtbar (rein additive
+Neuberechnung, kein rückwirkendes Update).
+
+**Commit-Nachricht (noch nicht committet)**
+```
+fix(profit): Schritt B Option 1 -- kein Flip-Kandidat bei duenner
+Preishistorie (< 5 Datenpunkte)
+
+- price_stats.py: _estimated_resale_price() liefert None statt
+  max_price-Fallback bei < _MIN_SAMPLES_FOR_PERCENTILE_MARKET_PRICE
+  Datenpunkten (max_price-Parameter entfernt)
+- app.py: _resale_prices_from_stats() nimmt Modelle mit None-Wert
+  explizit ins Mapping auf statt sie wegzulassen
+- matcher.py: Fallback auf market_price nur noch bei komplett
+  fehlendem Modell-Key, nicht mehr bei vorhandenem Key mit Wert None
+- tests: 2 Tests angepasst, 1 neuer Test
+
+Reduziert flip_candidates_count weiter fuer Kategorien mit duenner
+Preishistorie (iphone, lego_minifiguren, retro_konsolen u.a.).
+Kein Einfluss auf deal_score/Notification-Gate/market_price.
+Option 2 (Granularitaet price_history_model) weiterhin offen.
+```
 
 ### 34. RAM / CPU+Mainboard / Notebook — Ursachenforschung + 3 Fixes (freigegeben, committet)
 

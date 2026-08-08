@@ -83,16 +83,18 @@ def test_market_price_schliesst_ausreisser_bei_genug_daten_aus():
 # (P75-P90) statt des gesamten P10-P90-Bereichs -- siehe
 # price_stats.py::_estimated_resale_price()-Docstring.
 
-def test_estimated_resale_price_faellt_bei_wenig_daten_auf_max_price_zurueck():
-    # Weniger als 5 Datenpunkte -> Verkaufsschaetzung faellt auf max_price
-    # zurueck (NICHT auf den Median wie market_price -- siehe Docstring:
-    # die schon nach unten verzerrte Median-Naeherung soll nicht ein
-    # zweites Mal fuer die Verkaufsseite verwendet werden).
+def test_estimated_resale_price_ist_none_bei_wenig_daten():
+    # Weniger als 5 Datenpunkte -> keine belastbare Verkaufsschaetzung.
+    # Seit "Flip-Kandidaten-Logik optimieren", Schritt B (Option 1,
+    # STATUS.md Abschnitt 33b): liefert bewusst None statt (wie vorher)
+    # eines max_price-Fallbacks -- der fruehere Fallback erwies sich bei
+    # duenner Preishistorie als strukturell zu optimistisch. market_price
+    # bleibt von dieser Aenderung unberuehrt.
     prices = [100.0, 500.0, 300.0]
     points = [_point(p, days_ago=i) for i, p in enumerate(prices)]
     stats = compute_price_stats("rtx_3060_12gb", points)
-    assert stats.estimated_resale_price == stats.max_price == 500.0
-    assert stats.estimated_resale_price != stats.median_price
+    assert stats.estimated_resale_price is None
+    assert stats.market_price == 300.0  # Median, unveraendert
 
 
 def test_estimated_resale_price_liegt_ueber_market_price_bei_genug_daten():
@@ -115,9 +117,12 @@ def test_percentile_75_liegt_zwischen_median_und_percentile_90():
     assert stats.median_price <= stats.percentile_75 <= stats.max_price
 
 
-def test_estimated_resale_price_einzelner_datenpunkt_ist_dieser_wert():
+def test_estimated_resale_price_einzelner_datenpunkt_ist_none():
+    # 1 Datenpunkt < _MIN_SAMPLES_FOR_PERCENTILE_MARKET_PRICE (5) -> None
+    # (Schritt B, Option 1) statt frueher der Einzelwert selbst.
     stats = compute_price_stats("office_pc", [_point(200.0, days_ago=0, model="office_pc")])
-    assert stats.estimated_resale_price == 200.0
+    assert stats.estimated_resale_price is None
+    assert stats.market_price == 200.0  # Median bei einem Punkt = der Punkt selbst
 
 
 # ---------- Trend ----------

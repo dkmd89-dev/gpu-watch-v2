@@ -55,6 +55,14 @@ search_terms:
   - "Kingston HyperX DDR4"
   - "Crucial DDR4 RAM"
   - "Crucial Ballistix"
+  # +++ NEUE SUCHBEGRIFFE FÜR KLEINANZEIGEN & QUOKA +++
+  - "RAM Speicher DDR4"
+  - "PC Arbeitsspeicher DDR4"
+  - "Arbeitsspeicher PC DDR4"
+  - "DDR4 Riegel"
+  - "DDR4 RAM Riegel"
+  - "DDR4 Dual Kit"
+  - "RAM DDR4 Desktop"
 
 # SCORING-GEWICHTUNG
 # Analog zu sata_ssd.yaml/netzteil.yaml/monitor_curved.yaml: RAM ist eine
@@ -125,7 +133,7 @@ rules:
   - label: "8GB DDR4 RAM ★ Top-Deal"
     price_history_model: "ram_ddr4_8gb"
     require_all_of:
-      - ["8gb", "8 g", "8gb"]
+      - ["8gb", "8 g", "8gb", "8 gb"]  # +++ "8 gb" mit Leerzeichen hinzugefügt +++
       - ["ddr4", "ddr 4"]
     min_vram_gb: 0
     max_price: 15
@@ -134,7 +142,7 @@ rules:
   - label: "8GB DDR4 RAM"
     price_history_model: "ram_ddr4_8gb"
     require_all_of:
-      - ["8gb", "8 g", "8gb"]
+      - ["8gb", "8 g", "8gb", "8 gb"]  # +++ "8 gb" mit Leerzeichen hinzugefügt +++
       - ["ddr4", "ddr 4"]
     min_vram_gb: 0
     max_price: 22
@@ -146,7 +154,7 @@ rules:
   - label: "16GB DDR4 RAM ★ Top-Deal"
     price_history_model: "ram_ddr4_16gb"
     require_all_of:
-      - ["16gb", "16 g", "16gb", "2x8gb", "2x8 gb", "2x 8gb"]
+      - ["16gb", "16 g", "16gb", "16 gb", "2x8gb", "2x8 gb", "2x 8gb"] # +++ "16 gb" +++
       - ["ddr4", "ddr 4"]
     min_vram_gb: 0
     max_price: 35
@@ -155,7 +163,7 @@ rules:
   - label: "16GB DDR4 RAM"
     price_history_model: "ram_ddr4_16gb"
     require_all_of:
-      - ["16gb", "16 g", "16gb", "2x8gb", "2x8 gb", "2x 8gb"]
+      - ["16gb", "16 g", "16gb", "16 gb", "2x8gb", "2x8 gb", "2x 8gb"] # +++ "16 gb" +++
       - ["ddr4", "ddr 4"]
     min_vram_gb: 0
     max_price: 55
@@ -167,7 +175,7 @@ rules:
   - label: "32GB DDR4 RAM ★ Top-Deal"
     price_history_model: "ram_ddr4_32gb"
     require_all_of:
-      - ["32gb", "32 g", "32gb", "2x16gb", "2x16 gb", "2x 16gb"]
+      - ["32gb", "32 g", "32gb", "32 gb", "2x16gb", "2x16 gb", "2x 16gb"] # +++ "32 gb" + 2x16GB-FIX +++
       - ["ddr4", "ddr 4"]
     min_vram_gb: 0
     max_price: 70
@@ -176,7 +184,7 @@ rules:
   - label: "32GB DDR4 RAM"
     price_history_model: "ram_ddr4_32gb"
     require_all_of:
-      - ["32gb", "32 g", "32gb", "2x16gb", "2x16 gb", "2x 16gb"]
+      - ["32gb", "32 g", "32gb", "32 gb", "2x16gb", "2x16 gb", "2x 16gb"] # +++ "32 gb" + 2x16GB-FIX +++
       - ["ddr4", "ddr 4"]
     min_vram_gb: 0
     max_price: 110

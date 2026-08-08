@@ -356,6 +356,29 @@ def test_evaluate_faellt_ohne_resale_prices_eintrag_auf_market_price_zurueck():
     assert r.deal_score == 100
 
 
+def test_evaluate_resale_prices_none_wert_faellt_nicht_auf_market_price_zurueck():
+    # "Flip-Kandidaten-Logik optimieren", Schritt B (Option 1, STATUS.md
+    # Abschnitt 33b): Modell-Key IST in resale_prices vorhanden (PriceStats
+    # existiert), aber der Wert ist None (zu duenne Preishistorie, siehe
+    # price_stats.py::_estimated_resale_price()). Im Unterschied zum
+    # "Modell fehlt komplett"-Fall (siehe Test oben) darf HIER kein
+    # Fallback auf market_price erfolgen -- sonst waere das Angebot trotz
+    # unbelastbarer Datenlage ein Flip-Kandidat.
+    cfg = _cfg_profit_only()
+    r = evaluate(
+        "RTX 3060 12GB", 100.0, cfg,
+        market_prices={"rtx_3060_12gb": 200.0},  # wuerde allein hohe Marge ergeben
+        resale_prices={"rtx_3060_12gb": None},
+    )
+    assert r.matched is True
+    assert r.estimated_margin_pct is None
+    assert r.estimated_margin_eur is None
+    # profit-Score faellt auf den neutralen Platzhalter zurueck (50) --
+    # bei _scoring_weights={"profit": 1.0} entspricht das direkt dem
+    # Gesamt-Score.
+    assert r.deal_score == 50
+
+
 def test_evaluate_ohne_resale_prices_param_faellt_auf_market_price_zurueck():
     # Aeltere Aufrufer, die resale_prices gar nicht kennen (Standard None) --
     # exakt das bisherige Verhalten vor Punkt c.

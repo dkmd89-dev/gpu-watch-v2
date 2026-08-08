@@ -313,7 +313,7 @@ def _market_prices_from_stats(stats_by_model: dict[str, PriceStats]) -> dict[str
     }
 
 
-def _resale_prices_from_stats(stats_by_model: dict[str, PriceStats]) -> dict[str, float]:
+def _resale_prices_from_stats(stats_by_model: dict[str, PriceStats]) -> dict[str, float | None]:
     """Reduziert die volle Preisstatistik auf das
     {price_history_model: geschaetzter Verkaufspreis}-Mapping (Reselling-/
     Arbitrage-Konzept, STATUS.md Abschnitt 16, Punkt c).
@@ -323,15 +323,31 @@ def _resale_prices_from_stats(stats_by_model: dict[str, PriceStats]) -> dict[str
     guenstigen Angebote), estimated_resale_price nutzt bewusst nur das
     obere Preissegment (P75-P90) derselben Daten -- siehe
     price_stats.py::_estimated_resale_price()-Docstring fuer die
-    Begruendung. Fehlt ein Modell in der Historie (stats is None) oder
-    liefert stats.estimated_resale_price ausnahmsweise None, wird das
-    Modell hier schlicht weggelassen -- evaluate() faellt dann auf
-    market_price zurueck (siehe dortiger Docstring), kein Crash.
+    Begruendung.
+
+    Fehlt ein Modell komplett in der Historie (stats is None, noch kein
+    einziger Datenpunkt gesammelt), wird das Modell hier weggelassen --
+    evaluate() faellt dann weiterhin auf market_price zurueck (siehe
+    dortiger Docstring), unveraendertes Verhalten.
+
+    "Flip-Kandidaten-Logik optimieren", Schritt B (Option 1, STATUS.md
+    Abschnitt 33b): liegt fuer ein Modell zwar eine PriceStats-Instanz vor,
+    aber estimated_resale_price ist None (zu duenne Preishistorie, siehe
+    price_stats.py::_estimated_resale_price()), wird das Modell hier
+    BEWUSST MIT dem Wert None ins Mapping aufgenommen, statt komplett
+    weggelassen zu werden. Der Unterschied ist entscheidend: ein fehlender
+    Modell-Key bedeutet fuer matcher.py "Modell unbekannt -> Fallback auf
+    market_price", waehrend ein vorhandener Key mit Wert None bedeutet
+    "Modell bekannt, aber Verkaufspreis-Schaetzung aktuell nicht
+    belastbar genug -> keine Marge/kein Flip-Kandidat berechnen" (matcher.py
+    faellt in diesem Fall NICHT auf market_price zurueck). Ohne diese
+    Unterscheidung wuerde ein einfaches Weglassen die alte, zu optimistische
+    max_price-Naeherung ueber den market_price-Fallback wieder einschleusen.
     """
     return {
         model: stats.estimated_resale_price
         for model, stats in stats_by_model.items()
-        if stats is not None and stats.estimated_resale_price is not None
+        if stats is not None
     }
 
 

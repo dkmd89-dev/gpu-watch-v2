@@ -73,7 +73,7 @@ liegen keine Produktionsdaten vor.
 produktive `found.json`-Daten (siehe 3a, letzter Absatz) steht weiterhin
 aus — unabhängig vom Commit-Status.
 
-## 3c. Flip-Kandidaten-Bugfix — Schritt A abgeschlossen, Schritt B offen
+## 3c. Flip-Kandidaten-Bugfix — Schritt A + B/Option 1 abgeschlossen, B/Option 2 offen
 
 Eigenständiger Auftrag ("Flip-Kandidaten-Logik anpassen/optimieren"),
 ausgelöst durch produktiven Befund: KPI `flip_candidates_count` zeigte
@@ -86,16 +86,20 @@ verifiziert):**
   fehlerhaften Kaufpreisen (Tausch-/VB-Inserate mit `price=1€`) ins
   Absurde — beobachteter Extremfall `+58.695 %` bei einem MacBook-Inserat
   für 1 €. 70 der 730 Treffer hatten `price ≤ 5 €`.
-- **Ursache 2 (methodisch, NICHT behoben — Schritt B, offen):** Auch ohne
-  diese Ausreißer bleiben **~500 Treffer mit plausiblem Preis (>20 €)**
-  über der 20 %-Schwelle. Grund: `price_stats.py::_estimated_resale_price()`
-  fällt bei `< 5` Preishistorie-Datenpunkten je `price_history_model` auf
-  den bisherigen Maximalpreis zurück — bei granularen Regel-Labels
-  (einzelnes iPhone-Modell+Speicher, einzelnes Lego-Set, einzelne
-  Retro-Konsole) ist die Datenbasis oft dünn, wodurch die Marge
-  strukturell zu optimistisch wird. Betroffene Kategorien:
+- **Ursache 2 (methodisch, behoben via Schritt B/Option 1):** Auch ohne
+  die Ausreißer aus Ursache 1 blieben **~500 Treffer mit plausiblem Preis
+  (>20 €)** über der 20 %-Schwelle. Grund: `price_stats.py::
+  _estimated_resale_price()` fiel bei `< 5` Preishistorie-Datenpunkten je
+  `price_history_model` auf den bisherigen Maximalpreis zurück — bei
+  granularen Regel-Labels (einzelnes iPhone-Modell+Speicher, einzelnes
+  Lego-Set, einzelne Retro-Konsole) ist die Datenbasis oft dünn, wodurch
+  die Marge strukturell zu optimistisch wurde. Betroffene Kategorien:
   `lego_minifiguren` (185/386 Treffer), `iphone` (152/1110),
   `retro_konsolen` (103/240), `vintage_elektronik`, `monitor_curved`.
+  Seit Schritt B/Option 1 zählen diese Treffer nicht mehr als
+  Flip-Kandidat (siehe unten) — Option 2 (Granularität der
+  `price_history_model`-Schlüssel) bleibt als separate, weitergehende
+  Verfeinerung offen.
 
 **Schritt A — umgesetzt (committet als `90c65dd`, siehe Abschnitt 2):**
 - `scoring/profit.py`: neue Konstante `MIN_PURCHASE_PRICE_FOR_MARGIN_PCT`
@@ -109,20 +113,26 @@ verifiziert):**
 - Simulation gegen `found.json`-Produktivdaten: **730 → 624**
   Flip-Kandidaten (−106 Fehltreffer mit `price < 10 €`).
 
-**Schritt B — offen, noch nicht freigegeben:** methodische Verfeinerung
-von `estimated_resale_price` bei dünner Preishistorie (< 5 Datenpunkte je
-`price_history_model`). Zwei Stoßrichtungen zur Diskussion, noch keine
-Entscheidung getroffen:
-  1. Kein Flip-Kandidaten-Zähler für Angebote, deren `price_history_model`
-     unter der Mindest-Sample-Schwelle liegt (statt Max-Preis-Fallback als
-     Verkaufsreferenz zu nutzen) — konservativer, reduziert False Positives
-     weiter, aber auch die Gesamtzahl erkannter Flip-Kandidaten deutlich.
-  2. Granularität der `price_history_model`-Schlüssel bei den betroffenen
-     Kategorien (iPhone/Lego/Retro-Konsolen) überprüfen/vergröbern, damit
-     mehr Datenpunkte pro Modell zusammenlaufen und Perzentile
-     aussagekräftiger werden — größerer Eingriff, betrifft
-     `price_history.jsonl`-Bestandsdaten.
-Betrifft ausschließlich `price_stats.py`/`scoring/profit.py` — kein
+**Schritt B, Option 1 — umgesetzt (noch nicht committet):** methodische
+Verfeinerung von `estimated_resale_price` bei dünner Preishistorie
+(< 5 Datenpunkte je `price_history_model`). Angebote, deren
+`price_history_model` unter der Mindest-Sample-Schwelle liegt, zählen jetzt
+nicht mehr als Flip-Kandidat — statt wie bisher den Max-Preis-Fallback als
+Verkaufsreferenz zu nutzen, liefert `_estimated_resale_price()` in diesem
+Fall `None`. Umgesetzt in `price_stats.py`, `app.py`
+(`_resale_prices_from_stats()`) und `matcher.py` (`evaluate()`) — die
+Rückfall-Logik musste in zwei zusätzlichen Dateien angepasst werden, damit
+ein `None`-Wert nicht versehentlich wieder auf `market_price` zurückfällt
+(siehe STATUS.md Abschnitt 33b für Details). `market_price` und das
+Notification-Gate sind unverändert. 2 bestehende Tests angepasst, 1 neuer
+Test ergänzt.
+
+**Schritt B, Option 2 — weiterhin offen, noch nicht freigegeben:**
+Granularität der `price_history_model`-Schlüssel bei den betroffenen
+Kategorien (iPhone/Lego/Retro-Konsolen) überprüfen/vergröbern, damit mehr
+Datenpunkte pro Modell zusammenlaufen und Perzentile aussagekräftiger
+werden — größerer Eingriff, betrifft `price_history.jsonl`-Bestandsdaten
+und die YAML-Regeln selbst. Kein
 Einfluss auf `deal_score`/Notification-Gate (Default-Gewicht `profit`
 weiterhin 0.0 in fast allen Kategorien, siehe Abschnitt 7).
 
@@ -305,7 +315,7 @@ behandelt werden, nicht als etwas, das "neu geplant" werden muss.
 | L6 | Scope-Drift: 5 Nicht-PC-Kategorien | Klärungsbedarf, kein Bug | **Entschieden (siehe Abschnitt 9b)** — bewusst behalten, unabhängig weiterlaufen lassen |
 | L7 | `app.py` als 977-Zeilen-Monolith (Routen + Scan-Loop + Scheduler in einer Datei) | Wartbarkeit bei weiterem Wachstum | Niedrig, vorausschauend |
 | L8 | Hersteller/Zustand/Lieferumfang-Scoring-Gewichte bewusst auf 0 (kein Detector für Zustand/Lieferumfang) | Deal-Score nutzt nur 3 von 6 Komponenten aktiv | Mittel, hängt von L1/L2 ab |
-| L9 | **Schritt A abgeschlossen (siehe Abschnitt 3c), Schritt B offen** — `estimated_resale_price` fällt bei < 5 Preishistorie-Datenpunkten auf Max-Preis-Fallback zurück, macht `flip_candidates_count` bei dünner Datenbasis (iPhone/Lego/Retro-Konsolen) strukturell zu optimistisch | ~500 verbleibende, methodisch überhöhte Flip-Treffer (nach Schritt-A-Bugfix: 624 statt 730) | Mittel, wartet auf Freigabe |
+| L9 | **Schritt A + B/Option 1 abgeschlossen (siehe Abschnitt 3c), B/Option 2 offen** — `estimated_resale_price` lieferte bei < 5 Preishistorie-Datenpunkten bisher einen Max-Preis-Fallback, der `flip_candidates_count` bei dünner Datenbasis (iPhone/Lego/Retro-Konsolen) strukturell zu optimistisch machte; liefert seit Option 1 `None` statt Fallback, betroffene Angebote zählen nicht mehr als Flip-Kandidat | Option 2 (Granularität `price_history_model` vergröbern) als weitergehende Verfeinerung noch offen | Niedrig, wartet auf Freigabe für Option 2 |
 
 ### 9a. Architekturentscheidung L2 — ENTSCHIEDEN (kein Code geändert)
 

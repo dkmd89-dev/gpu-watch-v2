@@ -123,8 +123,8 @@ def _market_price(sorted_prices: list[float], p10: float, p90: float, median: fl
 
 
 def _estimated_resale_price(
-    sorted_prices: list[float], p75: float, p90: float, max_price: float
-) -> float:
+    sorted_prices: list[float], p75: float, p90: float
+) -> float | None:
     """Verkaufspreis-Naeherung, methodisch GETRENNT von _market_price()
     (Reselling-/Arbitrage-Konzept, STATUS.md Abschnitt 16, Punkt c).
 
@@ -147,18 +147,28 @@ def _estimated_resale_price(
 
     Bei zu wenigen Datenpunkten (< _MIN_SAMPLES_FOR_PERCENTILE_MARKET_PRICE,
     derselbe Schwellwert wie bei market_price) sind Perzentile ohnehin kaum
-    tragfaehig -- dann faellt estimated_resale_price auf max_price zurueck
-    (der teuerste TATSAECHLICH beobachtete Preis), NICHT auf den Median wie
-    bei market_price: max_price ist die konservativste verfuegbare Verkaufs-
-    referenz und vermeidet, die ohnehin schon nach unten verzerrte Median-
-    Naeherung ein zweites Mal fuer eine Verkaufsschaetzung zu verwenden.
+    tragfaehig. Frueher (vor "Flip-Kandidaten-Logik optimieren", Schritt B)
+    fiel estimated_resale_price hier auf max_price zurueck -- das erwies
+    sich in der Praxis als strukturell zu optimistisch (max_price ist bei
+    granularen Regel-Labels mit duenner Preishistorie, z.B. Lego-
+    Minifiguren, iPhone, Retro-Konsolen, haeufig schon der einzige/hoechste
+    beobachtete Einzelpreis und damit KEINE verlaessliche Verkaufsreferenz).
+    Seit Schritt B liefert die Funktion in diesem Fall bewusst None statt
+    eines Zahlenwerts: "keine belastbare Verkaufspreis-Schaetzung" statt
+    einer unzuverlaessigen Naeherung. Aufrufer (siehe app.py::
+    _resale_prices_from_stats(), matcher.py::evaluate()) behandeln dieses
+    None NICHT als "Modell unbekannt" (das wuerde weiterhin auf
+    market_price zurueckfallen und die alte Optimismus-Verzerrung ueber
+    einen Umweg reproduzieren), sondern als "fuer dieses Modell aktuell
+    keine Marge/kein Flip-Kandidat berechenbar" -- exakt Option 1 aus
+    STATUS.md Abschnitt 33b.
     """
     if len(sorted_prices) < _MIN_SAMPLES_FOR_PERCENTILE_MARKET_PRICE:
-        return max_price
+        return None
 
     trimmed = [p for p in sorted_prices if p75 <= p <= p90]
     if not trimmed:
-        return max_price  # sollte praktisch nie vorkommen, aber sicherer Fallback
+        return None  # sollte praktisch nie vorkommen, aber sicherer Fallback
 
     return statistics.fmean(trimmed)
 
@@ -247,7 +257,7 @@ def compute_price_stats(
         trend=trend,
         trend_change_pct=trend_change_pct,
         percentile_75=p75,
-        estimated_resale_price=_estimated_resale_price(prices, p75, p90, max(prices)),
+        estimated_resale_price=_estimated_resale_price(prices, p75, p90),
     )
 
 

@@ -633,14 +633,20 @@ def evaluate(
 
     resale_prices (Reselling-/Arbitrage-Konzept, STATUS.md Abschnitt 16,
     Punkt c): optionales Mapping {price_history_model: geschaetzter
-    Verkaufspreis}, typischerweise gebaut aus
+    Verkaufspreis oder None}, typischerweise gebaut aus
     app._resale_prices_from_stats() (PriceStats.estimated_resale_price --
     methodisch von market_price getrennt, siehe price_stats.py-Docstring).
-    Fehlt ein Modell in resale_prices (oder wird resale_prices gar nicht
-    uebergeben, z.B. aeltere Aufrufer/Tests), faellt die Marge-Berechnung
-    fuer dieses Modell auf market_prices zurueck -- volle Rueckwaerts-
-    kompatibilitaet zum bisherigen Verhalten (Phase-1-Platzhalter-
-    Entscheidung: estimated_resale_price == market_price).
+    Fehlt der Modell-Key komplett in resale_prices (oder wird resale_prices
+    gar nicht uebergeben, z.B. aeltere Aufrufer/Tests), faellt die Marge-
+    Berechnung fuer dieses Modell auf market_prices zurueck -- volle
+    Rueckwaertskompatibilitaet zum bisherigen Verhalten (Phase-1-
+    Platzhalter-Entscheidung: estimated_resale_price == market_price).
+    Ist der Modell-Key dagegen VORHANDEN, aber sein Wert None ("Flip-
+    Kandidaten-Logik optimieren", Schritt B, Option 1: zu duenne
+    Preishistorie fuer eine belastbare Schaetzung), erfolgt bewusst KEIN
+    Fallback auf market_price -- estimated_resale_price bleibt None,
+    wodurch fuer dieses Angebot keine Marge/kein Flip-Kandidat berechnet
+    wird (siehe compute_profit()).
 
     Baustein 3 (Bundle-/Part-Out-Erkennung, STATUS.md Abschnitt 16,
     Schritt 2): nutzt DIESELBEN market_prices wie oben (kein zusaetzlicher
@@ -775,13 +781,25 @@ def evaluate(
         # Reselling-/Arbitrage-Konzept (STATUS.md Abschnitt 16, Punkt c):
         # estimated_resale_price kommt jetzt bevorzugt aus resale_prices
         # (PriceStats.estimated_resale_price, P75-P90-Segment -- siehe
-        # price_stats.py-Docstring), NICHT mehr aus market_price. Fehlt ein
-        # Eintrag (Modell noch nicht in resale_prices, oder resale_prices
-        # gar nicht uebergeben), Fallback auf market_price -- exakt das
-        # bisherige Phase-1-Platzhalter-Verhalten, volle Rueckwaerts-
-        # kompatibilitaet fuer aeltere Aufrufer/Tests.
-        estimated_resale_price = (resale_prices or {}).get(price_history_model)
-        if estimated_resale_price is None:
+        # price_stats.py-Docstring), NICHT mehr aus market_price. Fehlt der
+        # Modell-Key komplett (noch keine Preishistorie fuer dieses Modell,
+        # oder resale_prices gar nicht uebergeben), Fallback auf
+        # market_price -- exakt das bisherige Phase-1-Platzhalter-Verhalten,
+        # volle Rueckwaertskompatibilitaet fuer aeltere Aufrufer/Tests.
+        #
+        # "Flip-Kandidaten-Logik optimieren", Schritt B (Option 1,
+        # STATUS.md Abschnitt 33b): ist der Modell-Key VORHANDEN, aber sein
+        # Wert None (app.py::_resale_prices_from_stats() -- zu duenne
+        # Preishistorie fuer eine belastbare P75-P90-Schaetzung), erfolgt
+        # BEWUSST KEIN Fallback auf market_price. estimated_resale_price
+        # bleibt None -> compute_profit() liefert kein Profit-Objekt ->
+        # estimated_margin_pct bleibt None -> kein Flip-Kandidat (siehe
+        # app.py::flip_candidates_count). market_price selbst ist davon
+        # unberuehrt und fliesst weiterhin unveraendert in die "price"-
+        # Score-Komponente ein.
+        if resale_prices is not None and price_history_model in resale_prices:
+            estimated_resale_price = resale_prices[price_history_model]
+        else:
             estimated_resale_price = market_price
         # Reselling-/Arbitrage-Konzept (STATUS.md Abschnitt 16, Punkt b):
         # separater compute_profit()-Aufruf fuer die Dashboard-Rohwerte
