@@ -373,10 +373,12 @@ def test_evaluate_resale_prices_none_wert_faellt_nicht_auf_market_price_zurueck(
     assert r.matched is True
     assert r.estimated_margin_pct is None
     assert r.estimated_margin_eur is None
-    # profit-Score faellt auf den neutralen Platzhalter zurueck (50) --
-    # bei _scoring_weights={"profit": 1.0} entspricht das direkt dem
+    # profit-Score faellt auf den neutralen Platzhalter zurueck --
+    # scoring/deal_score.py::_PLACEHOLDER_SCORE = 60 (projektweit einheitlich
+    # verwendet, u.a. auch fuer Zustand/Lieferumfang/Hersteller-Default).
+    # Bei _scoring_weights={"profit": 1.0} entspricht das direkt dem
     # Gesamt-Score.
-    assert r.deal_score == 50
+    assert r.deal_score == 60
 
 
 def test_evaluate_ohne_resale_prices_param_faellt_auf_market_price_zurueck():

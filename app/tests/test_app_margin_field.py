@@ -46,13 +46,28 @@ def _seed_price_history(tmpdir: str, model: str, prices: list[float]) -> None:
     price_stats.compute_price_stats() beim naechsten run_scan() bereits
     einen market_price fuer `model` berechnen kann (mindestens 5 Punkte,
     siehe _MIN_SAMPLES_FOR_PERCENTILE_MARKET_PRICE in price_stats.py).
+
+    Jeder Punkt bekommt einen eigenen `fingerprint`, damit burst_cleanup.py
+    (siehe dortiger Docstring: Punkte OHNE fingerprint mit identischem
+    model/price/source innerhalb von max_gap_seconds gelten als EIN
+    Scan-Ereignis) die hier erzeugten 5 Punkte nicht faelschlich zu einem
+    einzigen Datenpunkt kollabiert -- sonst faellt die Stichprobe unter
+    _MIN_SAMPLES_FOR_PERCENTILE_MARKET_PRICE und estimated_resale_price
+    wird None (Root-Cause des urspruenglichen Testfehlers, kein App-Bug:
+    das Fixture simulierte technisch nur EINE Marktbeobachtung, nicht 5).
     """
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
     from price_history import append_price_point, make_price_point
 
     path = Path(tmpdir) / "price_history.jsonl"
-    for price in prices:
-        append_price_point(path, make_price_point(price=price, source="kleinanzeigen", model=model))
+    for i, price in enumerate(prices):
+        append_price_point(
+            path,
+            make_price_point(
+                price=price, source="kleinanzeigen", model=model,
+                fingerprint=f"{model}-testpoint-{i}",
+            ),
+        )
 
 
 def test_found_json_enthaelt_margin_bei_vorhandener_preishistorie():

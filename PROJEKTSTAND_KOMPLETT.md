@@ -8,6 +8,15 @@
 > Working Tree clean, keine unversionierten Änderungen.
 > Ersetzt/ergänzt `PHASE_0_ANALYSE_VERIFIZIERT.md`.
 >
+> **Update (2026-08-08, nach Root-Cause-Fix der 2 Testfehler):** Beide unten
+> beschriebenen Testfehler waren **Test-eigene Defekte, kein App-Bug**
+> (Details siehe Git-Historie: Fixture ohne `fingerprint` wurde von
+> `burst_cleanup.py` fälschlich zu einem einzigen Datenpunkt kollabiert;
+> zweite Assertion erwartete Platzhalter-Score `50` statt der tatsächlichen,
+> projektweiten Konstante `_PLACEHOLDER_SCORE = 60`). Nach Korrektur der
+> beiden Testdateien: **615 passed, 0 failed.** Kein Produktionscode
+> geändert.
+>
 > **⚠️ Realer Testlauf (verifiziert am 2026-08-08): 613 passed, 2 failed**
 > (56 Testdateien), nicht wie zuvor hier dokumentiert 599/599 grün. Beide
 > Fehlschläge betreffen denselben Bereich — "Flip-Kandidaten Schritt B/Option 1"
@@ -455,11 +464,12 @@ abgeschlossen. Top-Deal-Logik-Workstream (Abschnitt 3a) und
 Flip-Kandidaten-Bugfix Schritt A + B/Option 1 + B/Option 2 (Abschnitt 3c)
 sind inzwischen alle im HEAD-Commit `d2effe7` committet.
 
-**Neuer, wichtigster offener Punkt:** 2 fehlschlagende Tests
-(`test_app_margin_field.py`, `test_matcher_deal_score_integration.py`) im
-Bereich des Resale-Fallback-Pfads — Root-Cause-Analyse und Freigabe für
-einen Fix stehen aus, bevor mit `roadmap.md` Phase 2 (Performance messen)
-begonnen werden sollte.
+**Neuer, wichtigster offener Punkt:** ✅ Behoben (2026-08-08) — die 2
+fehlschlagenden Tests (`test_app_margin_field.py`,
+`test_matcher_deal_score_integration.py`) waren Test-eigene Defekte
+(Burst-Cleanup-Kollision im Fixture bzw. falsch kalibrierte Assertion),
+kein App-Bug. Beide Testdateien korrigiert, Produktionscode unverändert.
+Aktueller Teststand: **615 passed, 0 failed.**
 
 Weitere offene Punkte: L5 (Datenrotation, ✅ bereits erledigt), L7
 (`app.py`-Monolith, → `roadmap.md` Phase 3), L8 (Scoring-Komponenten ohne
