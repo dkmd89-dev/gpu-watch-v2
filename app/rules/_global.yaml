@@ -92,21 +92,33 @@ notifications:
 # ============================================================
 # Deal-Score-Gewichte (Phase 6) -- siehe scoring/deal_score.py
 # ============================================================
-# Hersteller/Zustand/Lieferumfang sind bewusst auf 0 gesetzt: für diese
-# drei Komponenten existiert noch kein Detector (siehe deal_score.py-
+# Zustand/Lieferumfang sind bewusst auf 0 gesetzt: für diese zwei
+# Komponenten existiert noch kein Detector (siehe deal_score.py-
 # Docstring), sie würden sonst nur den neutralen Platzhalterwert (60)
-# liefern und den erreichbaren Maximal-Score künstlich auf 92 (4 Sterne)
-# deckeln. Deren Gewicht wurde stattdessen auf die drei Komponenten mit
-# echter Datengrundlage verteilt: Preis 50%, Ausstattung 25%,
-# Hardwarequalität 25%. Damit sind wieder 100 Punkte / 5 Sterne
-# erreichbar. Sobald Detectors für Hersteller/Zustand/Lieferumfang
-# existieren, können diese Gewichte neu verteilt werden.
+# liefern und den erreichbaren Maximal-Score künstlich deckeln.
+# "Hersteller" wurde in roadmap.md Phase 6, Schritt 6a AKTIVIERT
+# (Detector + Reputationstabelle waren bereits vorhanden, siehe unten) --
+# die übrigen Gewichte (Preis/Ausstattung/Hardwarequalität) mussten dafür
+# NICHT angepasst werden, compute_deal_score() normalisiert automatisch.
+# Sobald Detectors für Zustand/Lieferumfang existieren (roadmap.md Phase
+# 6, Schritt 6b: Zustand-Detector bereits gebaut, siehe categories/
+# detectors/condition.py -- Verdrahtung + Aktivierung sind eigene,
+# separate Folgeschritte), können auch diese Gewichte aktiviert werden.
 # ============================================================
 scoring_weights:
   price: 0.7
   ausstattung: 0.15
   hardware_qualitaet: 0.15
-  hersteller: 0
+  # roadmap.md Phase 6, Schritt 6a: aktiviert. Detector (categories/
+  # detectors/manufacturer.py) und Reputationstabelle (siehe unten) waren
+  # bereits vollstaendig verdrahtet, nur das Gewicht stand noch auf 0
+  # (siehe Kommentar bei der Reputationstabelle). Wert 0.05 uebernommen
+  # aus dem in scoring/deal_score.py::DEFAULT_WEIGHTS bereits dokumentierten
+  # Zielwert. compute_deal_score() normalisiert automatisch (weighted_sum /
+  # total_weight) -- die uebrigen Gewichte mussten dafuer nicht angepasst
+  # werden, ihr RELATIVER Anteil sinkt dadurch minimal (price effektiv von
+  # 70% auf ca. 66,7% der Gesamtsumme 1.05 statt 1.0).
+  hersteller: 0.05
   zustand: 0
   lieferumfang: 0
 
@@ -119,11 +131,10 @@ scoring_weights:
 # z.B. "HP" nicht "Hewlett-Packard"). "_default" greift für erkannte,
 # aber hier noch nicht gepflegte Marken.
 #
-# WICHTIG: Das "hersteller"-Gewicht in scoring_weights (oben) steht
-# weiterhin bewusst auf 0 -- diese Tabelle macht die Komponente technisch
-# nutzbar, ändert aber NICHT automatisch den produktiv laufenden Score.
-# Aktivierung (Gewicht > 0, ggf. Neuverteilung der übrigen Gewichte) ist
-# eine separate, bewusste Entscheidung (siehe Commit-Begründung).
+# WICHTIG: Das "hersteller"-Gewicht in scoring_weights (oben) wurde in
+# roadmap.md Phase 6, Schritt 6a AKTIVIERT (0 -> 0.05) -- diese Tabelle
+# fließt seitdem tatsächlich in den produktiv berechneten Score ein,
+# nicht mehr nur technisch nutzbar ohne Wirkung.
 # ============================================================
 manufacturer_reputation:
   Dell: 80
