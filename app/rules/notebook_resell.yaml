@@ -3,8 +3,23 @@ label: "Notebooks (Reselling)"
 scan_priority: 6
 notify_max_price: 650
 
+# FIX (Stand: 2026-08-08, siehe STATUS.md "Analyse RAM/CPU+Mainboard/
+# Notebook"): search_terms sind für die Kleinanzeigen-Volltextsuche
+# ausschließlich als AND-Verknüpfung wirksam ("ThinkPad Ryzen" verlangt
+# BEIDE Wörter im Titel). Die eigentliche Matching-Regel unten
+# ("ThinkPad T14/X13...") verlangt aber gar kein "ryzen" -- nur
+# "thinkpad" + Modellcode (t14/t490/x13/x390/l14). Da ThinkPads dieser
+# Modellreihen überwiegend mit Intel-CPUs verkauft werden, filterte der
+# alte Suchbegriff genau die Mehrheit der eigentlich passenden Angebote
+# schon vor der Bewertung heraus -- zu eng, unabhängig vom Preis.
+# Ersetzt durch je einen Suchbegriff pro Modellcode aus der
+# Matching-Regel, ohne "ryzen"-Einschränkung.
 search_terms:
-  - "ThinkPad Ryzen"
+  - "ThinkPad T14"
+  - "ThinkPad X13"
+  - "ThinkPad T490"
+  - "ThinkPad X390"
+  - "ThinkPad L14"
   - "Lenovo Legion"
   - "ASUS ROG"
   - "ASUS TUF Gaming"

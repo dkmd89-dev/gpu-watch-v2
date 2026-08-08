@@ -1290,3 +1290,78 @@ getroffen bzw. Freigabe erteilt:
 Betrifft ausschließlich `price_stats.py`/`scoring/profit.py`, kein
 Einfluss auf `deal_score`/Notification-Gate. Wartet auf Freigabe/
 Priorisierung, bevor einer der beiden Wege umgesetzt wird.
+
+### 34. RAM / CPU+Mainboard / Notebook — Ursachenforschung + 3 Fixes (freigegeben, committet)
+
+**Ausgangsbefund:** Alle drei in Abschnitt 30 eingeführten Kategorien
+lieferten in der Produktivumgebung kaum bzw. keine Treffer. Ursache über
+Live-Marktrecherche (Kleinanzeigen) sowie Code-Review von
+`matcher._contains_term()` verifiziert:
+
+1. **RAM/CPU+Mainboard — Preisgrenzen zu niedrig:** `ram.yaml` und
+   `cpu_mainboard_bundle.yaml` wurden in Abschnitt 30 mit explizit
+   unkalibrierten Platzhalter-Preisgrenzen eingeführt (Kommentar:
+   "Kalibrierung folgt nach Datensammlung"). Live-Abgleich gegen reale
+   Kleinanzeigen-Angebote zeigte: 16GB DDR4 real 25–230€ (Median ~60–70€)
+   gegen alte Grenze 25€/38€; 32GB DDR4 real 67–400€ (Median ~150€) gegen
+   alte Grenze 45€/60€; Ryzen-5600+B550-Bundles real 130–250€ gegen alte
+   Grenze 90€/120€ — die alten Grenzen trafen jeweils nur den absoluten
+   Tiefstpreis oder gar kein reales Angebot.
+2. **CPU+Mainboard — Wortgrenzen-Bug:** `matcher._contains_term()` prüft
+   exakte Wortgrenzen (`(?<!\w)term(?!\w)`). Die Regel verlangte
+   `"ryzen 5 5600"`/`"r5 5600"` bzw. `"ryzen 5 3600"`/`"r5 3600"` — das
+   matcht NICHT bei `"5600X"`/`"3600X"` (das `X` verletzt die rechte
+   Wortgrenze). Reale Angebote nutzen laut Recherche ganz überwiegend die
+   X-Variante. `"12400f"` brauchte keinen Fix, der Term deckt das Suffix
+   bereits vollständig ab.
+3. **Notebook — search_terms enger als die Matching-Regel:** Der
+   Suchbegriff `"ThinkPad Ryzen"` verlangte (Kleinanzeigen-Volltextsuche,
+   AND-Semantik) zwingend `"ryzen"` im Titel — die Matching-Regel selbst
+   verlangt aber gar kein `"ryzen"`, nur `thinkpad` + Modellcode
+   (t14/t490/x13/x390/l14). Da diese ThinkPad-Reihen überwiegend mit
+   Intel-CPUs verkauft werden, filterte der Suchbegriff die Mehrheit der
+   eigentlich passenden Angebote schon vor der Bewertung heraus.
+
+**Umsetzung (3 separate, unabhängige Commits):**
+
+- `91e20e2` — `ram.yaml`: `max_price` 16GB Top-Deal 25→35€, Guter Preis
+  38→55€; 32GB Top-Deal 45→70€, Guter Preis 60→110€. 8GB unverändert
+  (alte Grenzen lieferten dort nachweislich noch reale Treffer).
+- `9f79ed3` — `cpu_mainboard_bundle.yaml`: `require_all_of` um
+  `"ryzen 5 5600x"`/`"r5 5600x"` und `"ryzen 5 3600x"`/`"r5 3600x"`
+  ergänzt; Ryzen-5600+B550-Bundle `max_price` Top-Deal 90→150€, Guter
+  Preis 120→200€; `notify_max_price` 130→200€ (höchster
+  Guter-Preis-Schwellwert aller drei Combos). 12400F- und
+  Ryzen-3600-Bundle-Preisgrenzen bewusst **unverändert** gelassen — die
+  Live-Recherche lieferte für diese beiden keine auswertbaren
+  Preisangaben (nur Beschreibungstexte, keine Preiszahlen in den
+  Suchergebnis-Snippets); offener Punkt bis zur nächsten Kalibrierung.
+- `e834914` — `notebook_resell.yaml`: `search_terms` `"ThinkPad Ryzen"`
+  ersetzt durch je einen Begriff pro Modellcode aus der Matching-Regel:
+  `"ThinkPad T14"`, `"ThinkPad X13"`, `"ThinkPad T490"`,
+  `"ThinkPad X390"`, `"ThinkPad L14"`. Notebook-Preisgrenzen
+  (180/240/400/490/550€) geprüft, keine Fehlkalibrierung erkennbar,
+  unverändert gelassen.
+
+**Geänderte Dateien**
+- `app/rules/ram.yaml`
+- `app/rules/cpu_mainboard_bundle.yaml`
+- `app/rules/notebook_resell.yaml`
+
+**Empfohlene Tests**
+`pytest app/tests/` → **599 passed**, keine Regression (reine
+YAML-Wertänderungen, kein Python-Code betroffen). Wortgrenzen-Fix
+zusätzlich isoliert per Regex-Test bestätigt: `_contains_term()` matcht
+`"ryzen 5 5600x"` jetzt korrekt gegen Titel mit `"5600X"`, während der
+alte Term `"ryzen 5 5600"` dort weiterhin (korrekt) nicht matcht.
+
+**Mögliche Nebenwirkungen**
+Höhere `max_price`-Grenzen bei RAM/CPU+Mainboard führen zu mehr
+Treffern und potenziell mehr ntfy-Last — das Notification-Gate
+(`gate_min_stars` + `notifications.max_price` in `_global.yaml`) bleibt
+davon unberührt und begrenzt weiterhin unabhängig. Breitere
+Notebook-`search_terms` erhöhen die Anzahl gescannter Anzeigen pro
+Scan-Zyklus (Intel-ThinkPads kommen jetzt mit rein) — Scan-Dauer kann
+leicht steigen. Keine Breaking Changes, keine API-Änderungen.
+
+**Commit-Nachrichten:** siehe `git log -p 91e20e2 9f79ed3 e834914`.

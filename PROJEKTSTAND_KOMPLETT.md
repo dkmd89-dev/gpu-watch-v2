@@ -3,9 +3,9 @@
 > Diese Datei ist die einzige verlässliche Referenz für den Ist-Zustand des
 > Projekts. Jede Angabe wurde gegen den realen Code verifiziert (Dateisystem,
 > `git log`/`status`, echter `pytest`-Lauf — **599/599 Tests grün**).
-> Stand: Repo `main`, letzter committeter Commit `b9eb637` + unversionierte
-> Erweiterung dieser Session (Abschnitt 20 KPI-Filter, Abschnitt 3c
-> Flip-Kandidaten-Bugfix Schritt A, Details: STATUS.md Abschnitt 32/33).
+> Stand: Repo `main`, letzter committeter Commit `e834914` (RAM/CPU+Mainboard/
+> Notebook-Preisgrenzen- und Matching-Fixes, Details: STATUS.md Abschnitt 34).
+> Working Tree clean, keine unversionierten Änderungen.
 > Ersetzt/ergänzt `PHASE_0_ANALYSE_VERIFIZIERT.md`.
 
 ---
@@ -21,14 +21,17 @@ im Entwicklungsauftrag beschriebenen PC-Fokus hinaus (Details: Abschnitt 6).
 
 ```
 Branch: main
-Letzter committeter Commit: b9eb637 feat(dashboard): Top-Deal-Transparenz auf Deal-Karten (Abschnitt 19)
-Unversioniert (diese Session, siehe STATUS.md Abschnitt 32/33):
-  M  app/app.py               kpi_filter_thresholds fuer neuen KPI-Filter
-  M  app/templates/index.html filterKpi-Dropdown + data-*-Attribute
-  M  app/tests/test_app_status_kpis.py  3 neue Tests
-  M  app/scoring/profit.py    margin_pct-Guard bei Mini-Kaufpreisen (Abschnitt 3c, Schritt A)
-  M  app/rules/_global.yaml   fees.min_purchase_price_for_margin_pct (optional)
-  M  app/tests/test_profit.py 3 neue Tests
+Letzter committeter Commit: e834914 fix(rules): Notebook-Suchbegriffe von Matching-Regel entkoppelt
+Working Tree: clean
+
+Commits seit b9eb637 (chronologisch):
+  d8774bd feat(dashboard): KPI-Filter (Top-Deals/Sehr gute Deals/Flip/Neue Top-Deals)
+  0849a4e feat(top-deal): neue Score+Discount-Logik aktiviert + found.json recomputed
+  90c65dd fix(profit): margin_pct-Guard gegen absurde Werte bei Mini-Kaufpreisen
+  bfd7077 docs: Flip-Kandidaten-Bugfix Schritt A dokumentiert, Schritt B offen
+  91e20e2 fix(rules): RAM-Preisgrenzen 16GB/32GB DDR4 kalibriert
+  9f79ed3 fix(rules): CPU+Mainboard-Bundle X-Varianten + Ryzen-5600-Preise
+  e834914 fix(rules): Notebook-Suchbegriffe von Matching-Regel entkoppelt
 ```
 Tests: `pytest app/tests/` → **599 passed** (keine Fehler/Skips).
 
@@ -63,12 +66,12 @@ Reale KPI-Zahlen (Top-Deals/Sehr gute Deals/Flip-Kandidaten gegen die
 produktive `found.json`) stehen noch aus — in der Entwicklungs-Sandbox
 liegen keine Produktionsdaten vor.
 
-## 3b. Repo-Hygiene (offen, niedrige Priorität)
+## 3b. Repo-Hygiene (erledigt)
 
-Änderungen aus diesem Workstream sind aktuell **unversioniert** im
-Arbeitsverzeichnis (siehe 2.). Empfehlung: nach Freigabe der realen
-KPI-Auswertung (3a) in einem Commit zusammenfassen, analog zum bisherigen
-Muster (ein Commit je STATUS.md-Abschnitt).
+Änderungen aus diesem Workstream sind mittlerweile committet
+(`d8774bd`, `0849a4e`, siehe Abschnitt 2). Reale KPI-Auswertung gegen
+produktive `found.json`-Daten (siehe 3a, letzter Absatz) steht weiterhin
+aus — unabhängig vom Commit-Status.
 
 ## 3c. Flip-Kandidaten-Bugfix — Schritt A abgeschlossen, Schritt B offen
 
@@ -94,7 +97,7 @@ verifiziert):**
   `lego_minifiguren` (185/386 Treffer), `iphone` (152/1110),
   `retro_konsolen` (103/240), `vintage_elektronik`, `monitor_curved`.
 
-**Schritt A — umgesetzt (unversioniert, siehe Abschnitt 2):**
+**Schritt A — umgesetzt (committet als `90c65dd`, siehe Abschnitt 2):**
 - `scoring/profit.py`: neue Konstante `MIN_PURCHASE_PRICE_FOR_MARGIN_PCT`
   (Default 10 €). `margin_pct` wird `None` statt eines irreführenden Werts,
   wenn `purchase_price` darunter liegt — `margin_abs` (Euro) bleibt
@@ -122,6 +125,34 @@ Entscheidung getroffen:
 Betrifft ausschließlich `price_stats.py`/`scoring/profit.py` — kein
 Einfluss auf `deal_score`/Notification-Gate (Default-Gewicht `profit`
 weiterhin 0.0 in fast allen Kategorien, siehe Abschnitt 7).
+
+## 3d. RAM/CPU+Mainboard/Notebook — Preisgrenzen & Matching-Fixes (abgeschlossen, STATUS.md Abschnitt 34)
+
+Drei in Abschnitt 30 (STATUS.md) neu eingeführte Kategorien lieferten in
+der Produktivumgebung kaum Treffer. Ursache je Kategorie per
+Live-Marktrecherche (Kleinanzeigen) und Code-Review verifiziert, drei
+unabhängige Commits:
+
+- **`ram.yaml`** (`91e20e2`): unkalibrierte Platzhalter-Preisgrenzen bei
+  16GB/32GB DDR4 lagen weit unter realem Marktniveau. Neu: 16GB
+  35€/55€, 32GB 70€/110€ (Top-Deal/Guter Preis). 8GB unverändert.
+- **`cpu_mainboard_bundle.yaml`** (`9f79ed3`): `matcher._contains_term()`
+  prüft exakte Wortgrenzen — Regeln matchten `"5600"`/`"3600"` nicht bei
+  den in der Praxis dominierenden X-Varianten (`"5600X"`/`"3600X"`).
+  Synonyme ergänzt. Zusätzlich Ryzen-5600-Bundle-Preisgrenzen live
+  verifiziert und auf 150€/200€ angehoben (`notify_max_price` → 200€).
+  12400F-/Ryzen-3600-Preisgrenzen bewusst unverändert (keine belastbaren
+  Marktdaten verfügbar — offener Punkt).
+- **`notebook_resell.yaml`** (`e834914`): `search_terms` enger als die
+  Matching-Regel — `"ThinkPad Ryzen"` (AND-Suche) filterte
+  Intel-ThinkPads (Mehrheit der Angebote) schon vor der Bewertung heraus,
+  obwohl die Matching-Regel kein `"ryzen"` verlangt. Suchbegriffe auf
+  Modellcodes umgestellt (`"ThinkPad T14"`/`"X13"`/`"T490"`/`"X390"`/
+  `"L14"`).
+
+Reine YAML-Änderungen, kein Python-Code betroffen, **599/599 Tests
+grün**. Details, Root-Cause-Analyse und Nebenwirkungen: STATUS.md
+Abschnitt 34.
 
 ## 3. Architektur — Datenfluss
 

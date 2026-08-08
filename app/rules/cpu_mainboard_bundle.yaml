@@ -47,6 +47,32 @@
 #      analog zu gpu.yaml (Einzelmodelle) statt gaming_pc.yaml (ein
 #      gemeinsamer Bucket), da die drei Combos hardwaremäßig eigene
 #      Produkte mit eigener Marktpreis-Entwicklung sind.
+#
+# FIX (Stand: 2026-08-08, siehe STATUS.md "Analyse RAM/CPU+Mainboard/
+# Notebook"):
+#   a) Wortgrenzen-Bug: matcher._contains_term() prüft exakte Wortgrenzen
+#      ((?<!\w)term(?!\w)) -- "ryzen 5 5600"/"r5 5600" matchen dadurch
+#      NICHT bei "5600X" (das "X" verletzt die rechte Wortgrenze). Reale
+#      Angebote nutzen laut Marktrecherche ganz überwiegend die
+#      X-Variante. Gleiches Muster für "3600"/"3600X". Bei "12400f" ist
+#      kein Fix nötig -- der Term ("12400f") ist bereits die vollständige
+#      Modellbezeichnung inkl. Suffix.
+#      -> "ryzen 5 5600x"/"r5 5600x" bzw. "ryzen 5 3600x"/"r5 3600x" als
+#      zusätzliche Synonyme in require_all_of ergänzt.
+#   b) Preisgrenzen Ryzen-5600-Bundle live gegen Kleinanzeigen verifiziert:
+#      reale Bundles (CPU+Board+Kühler[+RAM]) liegen meist bei 130-250€,
+#      die alten Grenzen (90€/120€) trafen praktisch kein reales Angebot.
+#      Neu: Top-Deal 150€, Guter Preis 200€ (analog zum RAM-Muster:
+#      Top-Deal spürbar unter, Guter Preis auf/knapp unter dem geschätzten
+#      Median ~180-190€). notify_max_price entsprechend auf 200€ angehoben
+#      (höchster Guter-Preis-Schwellwert aller drei Combos, siehe
+#      Abweichung 1 oben).
+#   c) 12400F- und Ryzen-3600-Bundle-Preisgrenzen bewusst NICHT geändert:
+#      für diese beiden lieferte die Live-Recherche keine auswertbaren
+#      Preisangaben (nur Beschreibungstexte, keine Preiszahlen in den
+#      Suchergebnis-Snippets). Bleibt offener Punkt bis zur nächsten
+#      Kalibrierung mit echten price_history.jsonl-Daten oder gezielter
+#      Preisrecherche.
 # ============================================================
 
 category: "cpu_mainboard_bundle"
@@ -60,7 +86,7 @@ scan_priority: 5
 # das eigentliche Qualitäts-Gate läuft über gate_min_stars (_global.yaml,
 # aktuell ★★★☆☆) und den je nach deal_rating unterschiedlichen
 # Preis-Score, nicht über dieses Limit allein.
-notify_max_price: 130
+notify_max_price: 200
 
 search_terms:
   - "Ryzen 5 5600 Mainboard"
@@ -94,28 +120,28 @@ rules:
   - label: "Ryzen 5 5600 + B550 Bundle ★ Top-Deal"
     price_history_model: "cpu_bundle_ryzen5600_b550"
     require_all_of:
-      - ["ryzen 5 5600", "r5 5600"]
+      - ["ryzen 5 5600", "r5 5600", "ryzen 5 5600x", "r5 5600x"]
       - ["b550", "b450", "mainboard", "board", "bundle", "set", "kombi"]
     exclude:
       - "1600"
       - "2600"
       - "3600"
     min_vram_gb: 0
-    max_price: 90
+    max_price: 150
     deal_rating: "Top-Deal"
     negotiation_tolerance_pct: 15.0
 
   - label: "Ryzen 5 5600 + B550 Bundle ★ Guter Preis"
     price_history_model: "cpu_bundle_ryzen5600_b550"
     require_all_of:
-      - ["ryzen 5 5600", "r5 5600"]
+      - ["ryzen 5 5600", "r5 5600", "ryzen 5 5600x", "r5 5600x"]
       - ["b550", "b450", "mainboard", "board", "bundle", "set", "kombi"]
     exclude:
       - "1600"
       - "2600"
       - "3600"
     min_vram_gb: 0
-    max_price: 120
+    max_price: 200
     deal_rating: "Guter Preis"
 
   # ============================================================
@@ -150,7 +176,7 @@ rules:
   - label: "Ryzen 5 3600 + B450 Bundle ★ Top-Deal"
     price_history_model: "cpu_bundle_ryzen3600_b450"
     require_all_of:
-      - ["ryzen 5 3600", "r5 3600"]
+      - ["ryzen 5 3600", "r5 3600", "ryzen 5 3600x", "r5 3600x"]
       - ["b450", "b550", "a320", "mainboard", "board", "bundle", "set", "kombi"]
     exclude:
       - "1600"
@@ -162,7 +188,7 @@ rules:
   - label: "Ryzen 5 3600 + B450 Bundle ★ Guter Preis"
     price_history_model: "cpu_bundle_ryzen3600_b450"
     require_all_of:
-      - ["ryzen 5 3600", "r5 3600"]
+      - ["ryzen 5 3600", "r5 3600", "ryzen 5 3600x", "r5 3600x"]
       - ["b450", "b550", "a320", "mainboard", "board", "bundle", "set", "kombi"]
     exclude:
       - "1600"

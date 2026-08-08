@@ -149,7 +149,7 @@ rules:
       - ["16gb", "16 g", "16gb", "2x8gb", "2x8 gb", "2x 8gb"]
       - ["ddr4", "ddr 4"]
     min_vram_gb: 0
-    max_price: 25
+    max_price: 35
     deal_rating: "Top-Deal"
 
   - label: "16GB DDR4 RAM"
@@ -158,7 +158,7 @@ rules:
       - ["16gb", "16 g", "16gb", "2x8gb", "2x8 gb", "2x 8gb"]
       - ["ddr4", "ddr 4"]
     min_vram_gb: 0
-    max_price: 38
+    max_price: 55
     deal_rating: "Guter Preis"
 
   # ============================================================
@@ -170,7 +170,7 @@ rules:
       - ["32gb", "32 g", "32gb", "2x16gb", "2x16 gb", "2x 16gb"]
       - ["ddr4", "ddr 4"]
     min_vram_gb: 0
-    max_price: 45
+    max_price: 70
     deal_rating: "Top-Deal"
 
   - label: "32GB DDR4 RAM"
@@ -179,5 +179,5 @@ rules:
       - ["32gb", "32 g", "32gb", "2x16gb", "2x16 gb", "2x 16gb"]
       - ["ddr4", "ddr 4"]
     min_vram_gb: 0
-    max_price: 60
+    max_price: 110
     deal_rating: "Guter Preis"
