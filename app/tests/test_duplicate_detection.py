@@ -56,6 +56,56 @@ def test_find_duplicate_erkennt_gleiches_model_titel_preis_im_fenster():
     assert result.price == 200.0
 
 
+# --- roadmap.md Phase 9: wortstellungs-unabhaengiger Vergleich ---
+
+def test_find_duplicate_erkennt_trotz_unterschiedlicher_wortreihenfolge():
+    # "Asus RTX 3060 12GB" vs. "RTX 3060 12GB Asus" -- dasselbe physische
+    # Angebot, aber Kleinanzeigen/eBay-Titel oft unterschiedlich formuliert.
+    now = datetime.now(timezone.utc)
+    existing_fingerprint = normalize_title("Asus RTX 3060 12GB")
+    new_fingerprint = normalize_title("RTX 3060 12GB Asus")
+    assert existing_fingerprint != new_fingerprint  # Vorbedingung: String-Vergleich waere negativ
+
+    existing = [_point(200.0, days_ago=5, now=now, fingerprint=existing_fingerprint)]
+
+    result = find_duplicate(
+        model="rtx_3060_12gb", price=205.0, fingerprint=new_fingerprint,
+        existing_points=existing, now=now,
+    )
+
+    assert result is not None
+
+
+def test_find_duplicate_unterschiedliche_wort_haeufigkeit_bleibt_kein_duplikat():
+    # Regressionsschutz: sorted() statt set() -- "rtx rtx 3060" (zwei rtx)
+    # darf NICHT als Duplikat von "rtx 3060" (ein rtx) gelten, obwohl beide
+    # dieselbe WORTMENGE haben.
+    now = datetime.now(timezone.utc)
+    existing = [_point(200.0, days_ago=5, now=now, fingerprint="rtx rtx 3060")]
+
+    result = find_duplicate(
+        model="rtx_3060_12gb", price=205.0, fingerprint="rtx 3060",
+        existing_points=existing, now=now,
+    )
+
+    assert result is None
+
+
+def test_find_duplicate_echte_wortunterschiede_bleiben_kein_duplikat():
+    # Regressionsschutz: der Wortstellungs-Fix darf die Erkennungsgenauigkeit
+    # nicht lockern -- unterschiedliche Woerter (nicht nur Reihenfolge)
+    # muessen weiterhin als kein Duplikat gelten.
+    now = datetime.now(timezone.utc)
+    existing = [_point(200.0, days_ago=5, now=now, fingerprint="asus rtx 3060 12gb")]
+
+    result = find_duplicate(
+        model="rtx_3060_12gb", price=205.0, fingerprint="msi rtx 3060 12gb",
+        existing_points=existing, now=now,
+    )
+
+    assert result is None
+
+
 def test_find_duplicate_none_bei_unterschiedlichem_model():
     now = datetime.now(timezone.utc)
     existing = [_point(200.0, model="rtx_3070", days_ago=5, now=now)]

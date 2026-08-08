@@ -765,6 +765,79 @@ widersprüchlichen Signale zwischen altem und neuem Feld).
 **Teststand:** `pytest app/tests/` → **703 passed, 0 failed** (687 + 16
 neue).
 
-Phase 7 gilt damit als abgeschlossen. Warte auf Freigabe für den nächsten
-Schritt (`roadmap.md` Phase 8 – Notifications optimieren, oder ein
-anderer offener Punkt nach Wahl).
+Phase 7 gilt damit als abgeschlossen.
+
+---
+
+## 15. `roadmap.md` Phase 8 (Notifications optimieren) — ABGESCHLOSSEN
+
+**Umsetzung, zwei Teilschritte:**
+- **8a — Cross-Posting-Duplikate von Notifications ausgeschlossen:**
+  `find_duplicate()` (bereits vorhanden, wirkte bisher nur auf die
+  Preishistorie) wird jetzt zusätzlich als dritte Notification-Gate-
+  Bedingung genutzt (`not is_duplicate`). Behebt die einzige real
+  bestehende Lücke bei "bereits gemeldetes Angebot → nicht erneut
+  melden" — für identische URLs war das durch `seen.json` ohnehin
+  bereits erfüllt. Per Gegenprobe verifiziert (Fix entfernt → Test
+  wird rot → wiederhergestellt → grün).
+- **8b — Priorität verfeinert:** neue Funktion `_notification_priority()`
+  — zusätzlich zum bisherigen preisbasierten `urgent`-Fall löst jetzt
+  auch ★★★★☆/★★★★★ + Preisvorteil ≥ 25 % (wiederverwendete
+  `TOP_DEAL_DISCOUNT_THRESHOLD_A_PCT`, keine neue Zahl) `urgent` aus.
+  Logik bewusst in eine reine, separate Funktion extrahiert (statt
+  inline im Notification-Block) — direkt testbar, u. a. exakter
+  Grenzwert (25,0 % vs. 24,9 %) und expliziter Regressionsschutz für
+  den unveränderten preisbasierten Fall.
+
+**Kein Ersatz des bestehenden Gates** (roadmap.md-Vorgabe wörtlich
+erfüllt: "Bestehendes Notification-Gate nicht unnötig ersetzen"): beide
+Schritte sind reine, ODER-/UND-verknüpfte Ergänzungen um bereits
+vorhandene Signale (`find_duplicate()`, `top_deal_result.discount_pct`).
+
+**Geänderte Dateien:** `app/app.py`,
+`app/tests/test_app_duplicate_detection.py` (+1 Test),
+`app/tests/test_app_notification_priority.py` (neu, 10 Tests).
+
+**Teststand:** `pytest app/tests/` → **714 passed, 0 failed** (703 + 11
+neue).
+
+Phase 8 gilt damit als abgeschlossen.
+
+---
+
+## 16. `roadmap.md` Phase 9 (Duplicate Detection verbessern) — ABGESCHLOSSEN (eingegrenzt)
+
+**Wichtigster Befund der Analyse:** Von den in roadmap.md vorgeschlagenen
+Zusatzsignalen (Quelle, Titel, Seller, Location, Preis, Bilder) sind
+**Seller und Bilder aktuell gar nicht verfügbar**: kein Scraper extrahiert
+einen Verkäufernamen; `images` wird nur von `quoka.py` befüllt
+(`kleinanzeigen.py`/`ebay.py` liefern immer `[]`). Eine Nutzung hätte
+zuerst scraperseitige Erweiterungen vorausgesetzt — auf Wunsch bewusst
+**nicht umgesetzt** (Robins Entscheidung). `location` bleibt weiterhin
+bewusst ausgeschlossen (bereits vor dieser Session begründet:
+Kleinanzeigen-Ortsangaben zu ungenau).
+
+**Umsetzung, eingegrenzt auf verlässlich verfügbare Signale:**
+wortstellungs-unabhängiger Fingerprint-Vergleich — "Asus RTX 3060 12GB"
+und "RTX 3060 12GB Asus" gelten jetzt als dasselbe Angebot. Neue Funktion
+`_fingerprint_words()` (sortierte Wortfolge) in `find_duplicate()`
+verwendet, `normalize_title()` selbst bewusst **unverändert** (Wort-
+reihenfolge im gespeicherten Fingerprint bleibt erhalten — kein
+Formatwechsel, keine Migration bestehender `price_history.jsonl`-Zeilen
+nötig). `sorted()` statt `set()`: Wort-*Häufigkeit* bleibt weiterhin
+unterscheidungsrelevant (keine Lockerung der Erkennungsgenauigkeit,
+roadmap.md-Vorgabe "keine aggressiven False-Positive-Regeln" eingehalten).
+
+**Geänderte Dateien:** `app/duplicate_detection.py`,
+`app/tests/test_duplicate_detection.py` (+3 Tests).
+
+**Teststand:** `pytest app/tests/` → **717 passed, 0 failed** (714 + 3
+neue).
+
+**Offener, bewusst zurückgestellter Punkt:** Seller-/Bilder-basierte
+Erkennung — erst sinnvoll nach einer eigenen, separaten
+Scraper-Erweiterung (nicht Teil dieser Phase).
+
+Phase 9 gilt damit als abgeschlossen. Warte auf Freigabe für den nächsten
+Schritt (`roadmap.md` Phase 10 – Automatische Datenqualitätskontrolle,
+oder ein anderer offener Punkt nach Wahl).

@@ -53,6 +53,30 @@ _NON_ALNUM_RE = re.compile(r"[^a-z0-9 ]+")
 _MULTI_SPACE_RE = re.compile(r"\s+")
 
 
+def _fingerprint_words(fingerprint: str) -> tuple[str, ...]:
+    """Zerlegt einen normalisierten Fingerprint in eine sortierte Wort-
+    Sequenz fuer einen wortstellungs-UNabhaengigen Vergleich (roadmap.md
+    Phase 9).
+
+    Grund: normalize_title() erhaelt bewusst die urspruengliche Wort-
+    reihenfolge (Format-Stabilitaet fuer bereits geschriebene
+    price_history.jsonl-Zeilen, keine Migration noetig) -- zwei
+    Cross-Postings desselben Angebots koennen den Titel aber in
+    unterschiedlicher Reihenfolge formulieren (z.B. "Asus RTX 3060 12GB"
+    vs. "RTX 3060 12GB Asus"), was mit reinem String-Vergleich als
+    unterschiedlich gilt und ein echtes Duplikat uebersehen wuerde.
+
+    sorted() statt set(): behaelt Wiederholungen korrekt bei (z.B. zwei
+    Vorkommen von "rtx" bleiben zwei Vorkommen) -- ein set() wuerde
+    Titel mit unterschiedlicher Wort-HAEUFIGKEIT faelschlich gleichsetzen.
+    Bewusst weiterhin rein deterministisch (kein Fuzzy-Matching), nur die
+    Reihenfolge wird ignoriert -- alle anderen Woerter muessen weiterhin
+    exakt uebereinstimmen (keine Lockerung der Erkennungsgenauigkeit,
+    siehe roadmap.md-Vorgabe "keine aggressiven False-Positive-Regeln").
+    """
+    return tuple(sorted(fingerprint.split()))
+
+
 def normalize_title(title: str) -> str:
     """Normalisiert einen Angebotstitel fuer den Duplikat-Vergleich.
 
@@ -61,6 +85,13 @@ def normalize_title(title: str) -> str:
     (kein Fuzzy-Matching/keine externe Bibliothek) -- reicht fuer den
     Zweck (offensichtliche Duplikate/Cross-Postings erkennen), bleibt aber
     leicht nachvollziehbar und testbar.
+
+    Wortreihenfolge bleibt bewusst ERHALTEN (keine Sortierung hier) --
+    der wortstellungs-unabhaengige Vergleich passiert erst in
+    find_duplicate() ueber _fingerprint_words() (siehe dort), damit sich
+    das gespeicherte Fingerprint-Format in price_history.jsonl durch
+    diese Verbesserung NICHT aendert (keine Migration bestehender
+    Zeilen noetig).
     """
     lowered = title.lower()
     cleaned = _NON_ALNUM_RE.sub(" ", lowered)
@@ -101,7 +132,8 @@ def find_duplicate(
     Nachvollziehbarkeit), oder None wenn kein Duplikat gefunden wurde.
     Ein Duplikat liegt vor, wenn ALLE Kriterien erfuellt sind:
     - gleiches `model` (price_history_model)
-    - gleicher `fingerprint` (normalisierter Titel, siehe normalize_title())
+    - gleicher `fingerprint` (normalisierter Titel, siehe normalize_title() --
+      Vergleich ist wortstellungs-unabhaengig, siehe _fingerprint_words())
     - Preis innerhalb `price_tolerance_pct`
     - bestehender Punkt liegt nicht laenger als `window_days` zurueck
 
@@ -116,7 +148,11 @@ def find_duplicate(
     for point in existing_points:
         if point.model != model:
             continue
-        if point.fingerprint is None or point.fingerprint != fingerprint:
+        if point.fingerprint is None:
+            continue
+        # roadmap.md Phase 9: wortstellungs-unabhaengiger Vergleich statt
+        # exakter String-Gleichheit -- siehe _fingerprint_words()-Docstring.
+        if _fingerprint_words(point.fingerprint) != _fingerprint_words(fingerprint):
             continue
         if not _price_within_tolerance(point.price, price, price_tolerance_pct):
             continue
