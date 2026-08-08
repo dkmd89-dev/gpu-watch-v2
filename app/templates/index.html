@@ -296,6 +296,13 @@
     .margin { font-size: 0.78rem; font-weight: 600; margin-top: 0.1rem; }
     .margin.positive { color: var(--green); }
     .margin.negative { color: var(--red); }
+    /* Top-Deal-Transparenz (Abschnitt 19): kompakte Einzeiler-Zeile,
+       zeigt Score/Preis/Marktwert/Rabatt/Regel -- nur bei is_top_deal. */
+    .top-deal-detail {
+      font-size: 0.74rem;
+      color: var(--amber);
+      margin-top: 0.1rem;
+    }
     /* Schritt 8.3: kleines Plattform-Icon statt reinem Text-Label --
        bewusst KEINE Original-Marken-Logos, nur generische Font-Awesome-
        Icons zur Unterscheidbarkeit. Farben je Quelle wie zuvor. */
@@ -800,6 +807,16 @@
           <span class="badge part-out" title="Der Marktwert der verbauten GPU macht einen Großteil des Angebotspreises aus">🧩 Part-Out-Kandidat{% if f.part_out_ratio_pct is not none %} ({{ "%.0f"|format(f.part_out_ratio_pct) }}% GPU-Wert){% endif %}</span>
         {%- endif %}
       </div>
+      {#- Top-Deal-Transparenz (Abschnitt 19): nur bei is_top_deal, damit
+          nachvollziehbar ist, WARUM der Bestpreis-Badge erschien -- kompakte
+          Einzeiler-Zeile statt eigenem Detailbereich (kein UI-Umbau). #}
+      {%- if f.is_top_deal and f.top_deal_rule and top_deal_rule_thresholds.get(f.top_deal_rule) %}
+        {%- set _rt = top_deal_rule_thresholds[f.top_deal_rule] %}
+      <div class="top-deal-detail" title="Score ≥ {{ _rt.score }} + ≥ {{ '%.0f'|format(_rt.discount_pct) }}% unter Marktwert (Regel {{ f.top_deal_rule }})">
+        Score {{ f.deal_score }} · {{ "%.0f"|format(f.price) }} € vs. {{ "%.0f"|format(f.top_deal_market_price) }} € Marktwert ·
+        -{{ "%.0f"|format(f.top_deal_discount_pct) }}% · Regel {{ f.top_deal_rule }}
+      </div>
+      {%- endif %}
       <div class="title-row">
         <span class="title">{{ f.title }}</span>
         <span class="price">{{ "%.0f"|format(f.price) }} €</span>
@@ -891,6 +908,11 @@
     // per tojson injiziert, damit Server- und Client-Render nicht auseinanderlaufen.
     const ICON_MAP = {{ icon_map | tojson }};
     const ICON_DEFAULT = {{ icon_default | tojson }};
+    // Top-Deal-Transparenz (Abschnitt 19): dieselbe Quelle wie das
+    // Server-Render oben (top_deal_rule_thresholds), per tojson injiziert
+    // -- damit Client-Render (renderCardHtml()) nie von den tatsaechlichen
+    // top_deal.py-Konstanten abweichen kann.
+    const TOP_DEAL_RULE_THRESHOLDS = {{ top_deal_rule_thresholds | tojson }};
 
     // Dashboard-Kachel-Folgeschritt: generisches KPI-Kachel-Rendering.
     // Ersetzt die bisher fest codierten "Office-PCs"/"Gaming-PCs"-Kacheln
@@ -1264,6 +1286,18 @@
         ? `<div class="stars">${escapeHtml(f.deal_stars)}</div>`
         : '';
 
+      // Top-Deal-Transparenz (Abschnitt 19): analog zum server-seitigen
+      // Jinja-Rendering oben -- nur anzeigen, wenn is_top_deal + eine der
+      // bekannten Regeln (top_deal_rule) vorliegt.
+      let topDealDetailHtml = '';
+      if (f.is_top_deal && f.top_deal_rule && TOP_DEAL_RULE_THRESHOLDS[f.top_deal_rule]) {
+        const rt = TOP_DEAL_RULE_THRESHOLDS[f.top_deal_rule];
+        const marketPrice = Number(f.top_deal_market_price) || 0;
+        const discountPct = Number(f.top_deal_discount_pct) || 0;
+        const title = `Score ≥ ${rt.score} + ≥ ${rt.discount_pct.toFixed(0)}% unter Marktwert (Regel ${escapeHtml(f.top_deal_rule)})`;
+        topDealDetailHtml = `<div class="top-deal-detail" title="${title}">Score ${escapeHtml(String(f.deal_score ?? ''))} · ${price.toFixed(0)} € vs. ${marketPrice.toFixed(0)} € Marktwert · -${discountPct.toFixed(0)}% · Regel ${escapeHtml(f.top_deal_rule)}</div>`;
+      }
+
       // Reselling-/Arbitrage-Konzept (STATUS.md Abschnitt 16, Punkt b):
       // analog zum server-seitigen Jinja-Rendering oben -- nur anzeigen,
       // wenn ein estimated_margin_eur vorliegt.
@@ -1306,6 +1340,7 @@
         <span class="price">${price.toFixed(0)} €</span>
       </div>
       ${starsHtml}
+      ${topDealDetailHtml}
       ${marginHtml}
       <div class="meta"><i class="platform-icon ${iconInfo.icon}" style="color: ${iconInfo.color};" title="${escapeHtml(source)}"></i>${metaParts.join(' · ')}${foundAtHtml}
       </div>

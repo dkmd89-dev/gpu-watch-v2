@@ -156,6 +156,55 @@ def test_dashboard_html_enthaelt_neue_kpi_kacheln():
         assert 'id="cntNewTopDeals"' in html
 
 
+def test_dashboard_html_zeigt_top_deal_transparenz():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        app_mod = _load_app_module(tmpdir)
+        _write_found(app_mod, [{
+            "title": "Top-Deal-Testangebot",
+            "price": 265,
+            "url": "https://example.invalid/1",
+            "location": "Karlsruhe",
+            "source": "kleinanzeigen",
+            "category": "gaming_pc",
+            "manufacturer": "Eigenbau",
+            "deal_score": 92,
+            "deal_stars": "★★★★★",
+            "is_top_deal": True,
+            "top_deal_discount_pct": 22.1,
+            "top_deal_market_price": 340,
+            "top_deal_rule": "B",
+            "found_at": "2026-08-01T00:00:00+00:00",
+        }])
+
+        client = app_mod.app.test_client()
+        html = client.get("/").get_data(as_text=True)
+        grid_html = html.split('id="listingsGrid"')[1].split('id="noMatchState"')[0]
+
+        assert 'class="top-deal-detail"' in grid_html
+        assert "Score 92" in grid_html
+        assert "340" in grid_html
+        assert "-22%" in grid_html
+        assert "Regel B" in grid_html
+
+
+def test_dashboard_html_ohne_top_deal_rule_keine_transparenz_zeile():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        app_mod = _load_app_module(tmpdir)
+        # Aelterer found.json-Eintrag ohne top_deal_rule/top_deal_market_price
+        # (vor diesem Schritt) -- darf keinen Fehler werfen, keine Zeile.
+        _write_found(app_mod, [_entry(is_top_deal=False)])
+
+        client = app_mod.app.test_client()
+        resp = client.get("/")
+        assert resp.status_code == 200
+        html = resp.get_data(as_text=True)
+        # JS-Quelltext (renderCardHtml()) enthaelt "top-deal-detail" immer
+        # als String-Literal -- daher gezielt nur den serverseitig
+        # gerenderten Karten-Bereich pruefen, nicht das komplette Dokument.
+        grid_html = html.split('id="listingsGrid"')[1].split('id="noMatchState"')[0]
+        assert 'class="top-deal-detail"' not in grid_html
+
+
 if __name__ == "__main__":
     import pytest
     raise SystemExit(pytest.main([__file__, "-v"]))

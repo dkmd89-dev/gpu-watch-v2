@@ -25,7 +25,13 @@ from time_to_sell import make_time_to_sell_point, append_time_to_sell_point, rea
 from time_to_sell_stats import compute_all_time_to_sell_stats
 from cross_platform_stats import compute_all_cross_platform_stats
 from price_stats import compute_all_price_stats, compute_price_stats, PriceStats
-from top_deal import evaluate_top_deal
+from top_deal import (
+    evaluate_top_deal,
+    TOP_DEAL_SCORE_THRESHOLD_A,
+    TOP_DEAL_DISCOUNT_THRESHOLD_A_PCT,
+    TOP_DEAL_SCORE_THRESHOLD_B,
+    TOP_DEAL_DISCOUNT_THRESHOLD_B_PCT,
+)
 from scoring.profit import MIN_FLIP_MARGIN_PCT
 
 DATA_DIR = Path(os.environ.get("DATA_DIR", "/data"))
@@ -569,6 +575,19 @@ def run_scan():
                         if top_deal_result.discount_pct is not None
                         else None
                     ),
+                    # Top-Deal-Transparenz (Auftrag "Top-Deal-Logik
+                    # optimieren", Abschnitt 19): zusaetzliche, rein additive
+                    # Felder, damit das Dashboard nachvollziehbar anzeigen
+                    # kann, WARUM ein Angebot als Top-Deal erkannt wurde --
+                    # ohne evaluate_top_deal() ein zweites Mal aufzurufen.
+                    # None/None fuer aeltere found.json-Eintraege vor diesem
+                    # Schritt (is-defined-Check im Template).
+                    "top_deal_market_price": (
+                        round(top_deal_result.market_price, 0)
+                        if top_deal_result.market_price is not None
+                        else None
+                    ),
+                    "top_deal_rule": top_deal_result.rule,
                     # Reselling-/Arbitrage-Konzept (STATUS.md Abschnitt 16,
                     # Punkt b): Rohwerte fuer die Dashboard-Anzeige. None,
                     # solange keine Preishistorie fuer dieses Modell vorliegt
@@ -807,11 +826,20 @@ def index():
     # laeuft (dort existiert der Key nicht) -- Template faellt dann auf den
     # internen Kategorie-Schluessel als Anzeigename zurueck.
     category_labels = rules_cfg.get("category_labels", {})
+    # Top-Deal-Transparenz (Abschnitt 19): Regel-Schwellen aus top_deal.py
+    # als Template-Kontext statt hartkodierter Zahlen im HTML/JS -- damit
+    # der angezeigte Regeltext nie von den tatsaechlichen Konstanten
+    # abweichen kann (single source of truth bleibt top_deal.py).
+    top_deal_rule_thresholds = {
+        "A": {"score": TOP_DEAL_SCORE_THRESHOLD_A, "discount_pct": TOP_DEAL_DISCOUNT_THRESHOLD_A_PCT},
+        "B": {"score": TOP_DEAL_SCORE_THRESHOLD_B, "discount_pct": TOP_DEAL_DISCOUNT_THRESHOLD_B_PCT},
+    }
     return render_template(
         "index.html",
         found=found,
         all_categories=all_categories,
         category_labels=category_labels,
+        top_deal_rule_thresholds=top_deal_rule_thresholds,
     )
 
 
