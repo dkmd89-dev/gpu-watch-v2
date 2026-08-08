@@ -25,6 +25,9 @@ from time_to_sell import (
 from time_to_sell_stats import compute_all_time_to_sell_stats
 from deal_intelligence import classify_deal
 from top_deal import evaluate_top_deal, TOP_DEAL_DISCOUNT_THRESHOLD_A_PCT
+from data_quality import (
+    check_thin_price_history, check_stale_categories, check_zero_match_categories,
+)
 from scoring.profit import MIN_FLIP_MARGIN_PCT
 from persistence.json_store import _load_json, _save_json
 from services.statistics_service import (
@@ -550,6 +553,14 @@ def run_scan():
 
             category_buckets.setdefault(result.category or "unbekannt", []).append((item, result))
 
+        # roadmap.md Phase 10, Schritt 10b: Trefferzahl je Kategorie
+        # strukturiert erfassen (bisher nur als Log-Zeile weiter unten,
+        # "🔍 Kategorie 'X' fertig: N Treffer") -- Grundlage fuer
+        # check_zero_match_categories() am Scan-Ende. Keine neue Zaehlung,
+        # len(bucket) wurde ohnehin schon fuer die bestehende Log-Zeile
+        # gebraucht.
+        category_match_counts = {cat: len(bucket) for cat, bucket in category_buckets.items()}
+
         # Phase 2: kategorieweise Verarbeitung (found.json/price_history/ntfy
         # -- exakt dieselbe Logik wie zuvor, nur gruppiert statt im rohen
         # Scrape-Reihenfolge). category_order zuerst, danach evtl. weitere
@@ -892,6 +903,21 @@ def run_scan():
             deduplicated_count, matching_and_scoring_duration,
             price_stats_duration, persistence_duration, notification_duration,
         )
+
+        # roadmap.md Phase 10 (Automatische Datenqualitätskontrolle):
+        # nutzt ausschliesslich bereits oben berechnete Daten
+        # (price_stats_by_model, price_points_this_scan, category_match_
+        # counts) -- keine neue Berechnung, keine Rueckwirkung auf
+        # deal_score/Notification-Gate/Matching. Reine Beobachtungsschicht,
+        # nur Logging (Dashboard-Anbindung ist eine eigene, spaetere Phase,
+        # siehe data_quality.py-Docstring).
+        data_quality_warnings = [
+            *check_thin_price_history(price_stats_by_model),
+            *check_stale_categories(price_points_this_scan),
+            *check_zero_match_categories(category_match_counts, len(raw)),
+        ]
+        for warning in data_quality_warnings:
+            log.warning("⚠️ Datenqualität [%s]: %s", warning.kind, warning.message)
 
         with _status_lock:
             _scan_status["scanned_count_last_scan"] = len(raw)

@@ -838,6 +838,87 @@ neue).
 Erkennung — erst sinnvoll nach einer eigenen, separaten
 Scraper-Erweiterung (nicht Teil dieser Phase).
 
-Phase 9 gilt damit als abgeschlossen. Warte auf Freigabe für den nächsten
-Schritt (`roadmap.md` Phase 10 – Automatische Datenqualitätskontrolle,
-oder ein anderer offener Punkt nach Wahl).
+Phase 9 gilt damit als abgeschlossen.
+
+---
+
+## 17. `roadmap.md` Phase 10 (Automatische Datenqualitätskontrolle) — ABGESCHLOSSEN
+
+**Analyse-Ergebnis:** Von den fünf in roadmap.md genannten Warnsignalen
+sind zwei praktisch kostenlos aus bereits vorhandenen Daten ableitbar
+(dünne Preishistorie über `PriceStats.confidence`, Phase 5; veraltete
+Kategorie über `price_history.jsonl`), eines mit vorhandenen Zählwerten
+strukturierbar (Kategorie-Trefferquote), eines bewusst nicht umgesetzt
+(siehe unten).
+
+**Wichtiger Befund:** `found.json` ist für "N Tage keine Treffer"
+ungeeignet — wird nach `DEAL_MAX_AGE_DAYS` (Default 7 Tage) automatisch
+bereinigt, würde sich bei einer Prüfung nahe dieser Schwelle selbst ins
+Leere laufen. `price_history.jsonl` (append-only) ist die verlässliche
+Quelle.
+
+**Schritt 10a:** neues Modul `data_quality.py` —
+`check_thin_price_history()` (nutzt `PriceStats.confidence`, keine neue
+Schwelle) und `check_stale_categories()` (Kategorien ohne neuen
+`price_history.jsonl`-Punkt seit >7 Tagen, Schwelle wörtlich aus
+roadmap.md übernommen). Zunächst bewusst nicht verdrahtet.
+
+**Schritt 10b:** `check_zero_match_categories()` ergänzt — nutzt
+`len(bucket)` je Kategorie, das `run_scan()` beim Aufbau der
+`category_buckets` ohnehin schon erzeugt (bisher nur als Log-Zeile
+sichtbar), keine neue Zählung nötig. Alle drei Prüfungen jetzt am
+Scan-Ende in `run_scan()` verdrahtet, Ergebnisse werden geloggt
+(`⚠️ Datenqualität [...]`) — reine Beobachtungsschicht, kein Einfluss auf
+`deal_score`/Notification-Gate/Matching. Dashboard-Anzeige ist bewusst
+NICHT Teil dieser Phase (roadmap.md behandelt "Dashboard" als eigenen,
+separaten Abschnitt außerhalb der nummerierten Phasen).
+
+**Bewusst NICHT umgesetzt:** "Regel: 91% ausgeschlossen"
+(feingranulare Ausschlussquote je einzelner YAML-Regel) — hätte eine
+Instrumentierung innerhalb von `matcher.py::evaluate()`s Kernschleife
+vorausgesetzt (deutlich invasiver als alle übrigen Prüfungen, die nur
+bereits vorhandene End-Ergebnisse auswerten). `check_zero_match_categories()`
+liefert dafür eine erreichbare Annäherung ohne Eingriff in die zentrale
+Matching-Logik.
+
+**Geänderte Dateien:** `app/data_quality.py` (neu, 187 Zeilen),
+`app/app.py` (Verdrahtung), `app/tests/test_data_quality.py` (neu, 20
+Tests), `app/tests/test_app_data_quality_wiring.py` (neu, 2
+End-to-End-Tests).
+
+**Teststand:** `pytest app/tests/` → **739 passed, 0 failed** (717 + 22
+neue über beide Teilschritte).
+
+Phase 10 gilt damit als abgeschlossen.
+
+---
+
+## Roadmap (Phasen 0–10) vollständig abgeschlossen
+
+Damit ist die in `roadmap.md` unter "Empfohlene Reihenfolge" definierte
+komplette Phasen-Sequenz (0 Analyse → 1 Doku-Sync → 2 Performance messen
+→ 3 app.py modularisieren → 4 Persistenz → 5 Price-History/Resale-
+Confidence → 6 Deal-Score → 7 Deal Intelligence → 8 Notifications → 9
+Duplicate Detection → 10 Datenqualitätskontrolle) durchlaufen. Jede Phase
+wurde einzeln analysiert, umgesetzt, getestet und dokumentiert (siehe
+Abschnitte 9–17 oben), mit vollständiger Testabdeckung nach jedem
+einzelnen Schritt (kein Rückgang der Testanzahl, keine geschwächten
+Tests).
+
+**Bewusst nicht Teil dieser Roadmap-Phasen** (roadmap.md behandelt sie
+als eigene, nachgelagerte Abschnitte, nicht als nummerierte Phasen):
+Dashboard-Weiterentwicklung, sowie mehrere im Projektverlauf bewusst
+zurückgestellte Einzelpunkte:
+- `run_scan()` (~534 Zeilen) nicht weiter modularisiert (Abschnitt 10:
+  46 modul-globale Abhängigkeiten, Risiko/Nutzen-Abwägung)
+- Aktivierung der Deal-Score-Komponenten `zustand`/`lieferumfang`
+  (Gewicht > 0) — Detectors gebaut und verdrahtet (Abschnitt 13), aber
+  noch nicht an echten Produktivtiteln verlässlichkeitsgeprüft
+- Seller-/Bilder-basierte Duplicate Detection (Abschnitt 16) — setzt
+  eine eigene Scraper-Erweiterung voraus, auf Wunsch nicht umgesetzt
+- Regel-Ausschlussquote je YAML-Regel (Abschnitt 17) — hätte eine
+  invasivere Instrumentierung von `matcher.py::evaluate()` vorausgesetzt
+
+Diese vier Punkte sind bewusste, begründete Auslassungen (Risiko/Nutzen-
+bzw. Aufwand/Nutzen-Abwägung oder ausdrücklicher Wunsch des
+Auftraggebers), keine übersehenen Lücken.
