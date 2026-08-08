@@ -18,6 +18,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from price_stats import CONFIDENCE_LOW
+
 # Neutrale Default-Werte je Kostenposition, falls "fees:" in _global.yaml
 # fehlt oder eine einzelne Position darin nicht gesetzt ist (z.B. ältere
 # Configs vor Einführung dieses Moduls). 0 bedeutet "keine bekannte Kosten-
@@ -43,6 +45,15 @@ _FEE_DEFAULTS: dict[str, float] = {
 # selbst auch keine deal_score-Berechnung durchfuehrt, sondern nur einen
 # bereits berechneten Wert entgegennimmt.
 MIN_FLIP_MARGIN_PCT = 20.0
+
+# Phase 11 (Flip-Kandidaten korrigieren), Punkt A: robuste Qualifikation
+# statt des bisherigen alleinigen margin_pct-Kriteriums (siehe
+# is_robust_flip_candidate() unten fuer die vollstaendige Begruendung).
+# Werte sind bewusste, konservative PHASE-11-STARTWERTE (Robins Vorgabe),
+# KEINE final kalibrierten Zahlen -- vollstaendige Kalibrierung ist
+# ausdruecklich Phase 12 vorbehalten, hier nicht anfassen.
+MIN_FLIP_MARGIN_EUR = 30.0
+MIN_FLIP_DEAL_SCORE = 75
 
 # Bugfix (Auftrag "Flip-Kandidaten-Logik optimieren", Schritt A): Mindest-
 # Kaufpreis, ab dem margin_pct ueberhaupt berechnet wird. Hintergrund: bei
@@ -156,4 +167,56 @@ def compute_profit(
         fees_total=round(fees_total, 2),
         margin_abs=round(margin_abs, 2),
         margin_pct=round(margin_pct, 2) if margin_pct is not None else None,
+    )
+
+
+def is_robust_flip_candidate(
+    margin_pct: float | None,
+    margin_eur: float | None,
+    deal_score: int | None,
+    resale_confidence: str | None,
+) -> bool:
+    """Robuste Flip-Kandidat-Qualifikation (Phase 11, Punkt A).
+
+    URSACHE der ueberhoehten Flip-Kandidaten-Zahl (siehe Phase-11-Analyse):
+    Die bisherige Pruefung an beiden Aufrufstellen (api/status.py,
+    deal_intelligence.py) nutzte AUSSCHLIESSLICH `margin_pct >=
+    MIN_FLIP_MARGIN_PCT` -- ein 15€-Artikel mit 20% Marge (3€ absoluter
+    Gewinn) zaehlte damit genauso als Flip-Kandidat wie ein 300€-Artikel
+    mit 100€ Gewinn, unabhaengig von Deal-Qualitaet oder Verlaesslichkeit
+    der Resale-Schaetzung.
+
+    Diese Funktion ist jetzt die EINZIGE Stelle, die "Flip-Kandidat"
+    entscheidet (Single Source of Truth) -- beide bisherigen Aufrufstellen
+    wurden darauf umgestellt, keine Duplikation der Kriterien mehr.
+
+    ALLE VIER Bedingungen muessen erfuellt sein:
+    1. margin_pct >= MIN_FLIP_MARGIN_PCT (bestehend, 20%)
+    2. margin_eur >= MIN_FLIP_MARGIN_EUR (NEU, 30€ -- schliesst Mini-
+       Gewinne bei prozentual hoher, aber absolut vernachlaessigbarer
+       Marge aus)
+    3. deal_score >= MIN_FLIP_DEAL_SCORE (NEU, 75 -- ein Flip-Kandidat
+       sollte auch insgesamt ein ordentliches Angebot sein, nicht nur
+       zufaellig eine gute Marge haben)
+    4. resale_confidence NICHT LOW (NEU -- eine Marge auf Basis einer
+       Schaetzung mit < 5 Datenpunkten ist nicht belastbar genug, um
+       jemanden zu einem Kauf zu ermutigen; siehe price_stats.py::
+       CONFIDENCE_LOW)
+
+    Fehlender Wert (None) bei irgendeinem Faktor -> False (kein Flip-
+    Kandidat) -- fehlende Information darf nie zu einer optimistischeren
+    Einstufung fuehren als vollstaendige Information.
+
+    Alle drei neuen Schwellen (MIN_FLIP_MARGIN_EUR, MIN_FLIP_DEAL_SCORE,
+    "nicht LOW") sind bewusste PHASE-11-STARTWERTE (Robins Vorgabe) --
+    keine endgueltige Kalibrierung, die erfolgt separat in Phase 12.
+    """
+    if margin_pct is None or margin_eur is None or deal_score is None or resale_confidence is None:
+        return False
+
+    return (
+        margin_pct >= MIN_FLIP_MARGIN_PCT
+        and margin_eur >= MIN_FLIP_MARGIN_EUR
+        and deal_score >= MIN_FLIP_DEAL_SCORE
+        and resale_confidence != CONFIDENCE_LOW
     )

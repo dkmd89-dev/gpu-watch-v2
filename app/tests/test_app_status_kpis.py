@@ -14,6 +14,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from scoring.profit import MIN_FLIP_MARGIN_PCT, MIN_FLIP_MARGIN_EUR, MIN_FLIP_DEAL_SCORE
+
 
 def _load_app_module(data_dir: str):
     import logging
@@ -38,6 +40,9 @@ def _entry(
     is_top_deal: bool = False,
     deal_stars: str | None = None,
     estimated_margin_pct: float | None = None,
+    estimated_margin_eur: float | None = None,
+    deal_score: int | None = None,
+    resale_confidence: str | None = None,
     found_at: str | None = "2026-08-01T00:00:00+00:00",
 ) -> dict:
     return {
@@ -48,6 +53,9 @@ def _entry(
         "is_top_deal": is_top_deal,
         "deal_stars": deal_stars,
         "estimated_margin_pct": estimated_margin_pct,
+        "estimated_margin_eur": estimated_margin_eur,
+        "deal_score": deal_score,
+        "resale_confidence": resale_confidence,
         "found_at": found_at,
     }
 
@@ -101,16 +109,53 @@ def test_very_good_deals_zaehlt_nur_nicht_top_deals():
         assert data["very_good_deals_count"] == 2
 
 
-def test_flip_candidates_ab_min_margin_und_unabhaengig_von_top_deal():
+def test_flip_candidates_ab_allen_vier_faktoren_und_unabhaengig_von_top_deal():
     with tempfile.TemporaryDirectory() as tmpdir:
         app_mod = _load_app_module(tmpdir)
-        min_margin = app_mod.MIN_FLIP_MARGIN_PCT
+        # Robuste Startwerte (Phase 11, Punkt A) -- siehe scoring/profit.py.
+        min_pct = MIN_FLIP_MARGIN_PCT
+        min_eur = MIN_FLIP_MARGIN_EUR
+        min_score = MIN_FLIP_DEAL_SCORE
         _write_found(app_mod, [
             # Top-Deal UND Flip-Kandidat gleichzeitig -> ausdruecklich
             # erlaubt (Abschnitt 14), zaehlt in beiden KPIs.
-            _entry(is_top_deal=True, estimated_margin_pct=min_margin + 5),
-            _entry(is_top_deal=False, estimated_margin_pct=min_margin),
-            _entry(is_top_deal=False, estimated_margin_pct=min_margin - 0.01),
+            _entry(
+                is_top_deal=True, estimated_margin_pct=min_pct + 5,
+                estimated_margin_eur=min_eur + 10, deal_score=min_score + 5,
+                resale_confidence="HIGH",
+            ),
+            # Erfuellt alle vier Faktoren exakt an der Schwelle.
+            _entry(
+                is_top_deal=False, estimated_margin_pct=min_pct,
+                estimated_margin_eur=min_eur, deal_score=min_score,
+                resale_confidence="MEDIUM",
+            ),
+            # margin_pct knapp unter der Schwelle.
+            _entry(
+                is_top_deal=False, estimated_margin_pct=min_pct - 0.01,
+                estimated_margin_eur=min_eur, deal_score=min_score,
+                resale_confidence="MEDIUM",
+            ),
+            # margin_eur knapp unter der Schwelle -- waere unter der alten
+            # Ein-Kriterium-Logik faelschlich als Flip-Kandidat gezaehlt worden.
+            _entry(
+                is_top_deal=False, estimated_margin_pct=min_pct + 10,
+                estimated_margin_eur=min_eur - 0.01, deal_score=min_score,
+                resale_confidence="MEDIUM",
+            ),
+            # deal_score knapp unter der Schwelle.
+            _entry(
+                is_top_deal=False, estimated_margin_pct=min_pct + 10,
+                estimated_margin_eur=min_eur, deal_score=min_score - 1,
+                resale_confidence="MEDIUM",
+            ),
+            # resale_confidence LOW -- unbelastbare Schaetzung.
+            _entry(
+                is_top_deal=False, estimated_margin_pct=min_pct + 10,
+                estimated_margin_eur=min_eur, deal_score=min_score,
+                resale_confidence="LOW",
+            ),
+            # Gar keine Margendaten.
             _entry(is_top_deal=False, estimated_margin_pct=None),
         ])
 

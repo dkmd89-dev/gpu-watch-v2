@@ -15,7 +15,7 @@ from flask import Blueprint, jsonify
 
 from persistence.json_store import _load_json, _tail_log
 from scoring.deal_score import stars_meet_minimum
-from scoring.profit import MIN_FLIP_MARGIN_PCT
+from scoring.profit import is_robust_flip_candidate
 
 
 def build_status_blueprint(
@@ -52,10 +52,13 @@ def build_status_blueprint(
           deal_score >= 80, dieselbe Skala wie top_deal.TOP_DEAL_SCORE_THRESHOLD_A),
           die aber NICHT zusätzlich Top-Deal sind (Abschnitt 13: keine
           Doppelzählung).
-        - flip_candidates_count: Angebote mit estimated_margin_pct >=
-          MIN_FLIP_MARGIN_PCT (siehe scoring/profit.py) -- nutzt die bestehende
-          Reselling-/Margin-Berechnung, kann sich mit Top-Deal überschneiden
-          (Abschnitt 14, ausdrücklich erlaubt).
+        - flip_candidates_count: Angebote, die is_robust_flip_candidate()
+          (scoring/profit.py, Phase 11 Punkt A) erfüllen -- margin_pct UND
+          margin_eur UND deal_score UND resale_confidence, nicht mehr nur
+          margin_pct allein (Ursache der vormals überhöhten Zahl, siehe
+          Phase-11-Analyse). Single Source of Truth mit deal_intelligence.py.
+          Kann sich mit Top-Deal überschneiden (Abschnitt 14, ausdrücklich
+          erlaubt).
         - new_top_deals_count: Top-Deals, deren found_at im aktuell laufenden
           bzw. zuletzt gestarteten Scan liegt (Abschnitt 15) -- echte Teilmenge
           von top_deal_count, nutzt das bereits vorhandene found_at-Feld statt
@@ -109,8 +112,12 @@ def build_status_blueprint(
                 # NICHT is_top_deal (siehe Abschnitt 13: keine Doppelzaehlung).
                 very_good_deals_count += 1
 
-            margin_pct = f.get("estimated_margin_pct")
-            if margin_pct is not None and margin_pct >= MIN_FLIP_MARGIN_PCT:
+            if is_robust_flip_candidate(
+                margin_pct=f.get("estimated_margin_pct"),
+                margin_eur=f.get("estimated_margin_eur"),
+                deal_score=f.get("deal_score"),
+                resale_confidence=f.get("resale_confidence"),
+            ):
                 flip_candidates_count += 1
 
         return jsonify({

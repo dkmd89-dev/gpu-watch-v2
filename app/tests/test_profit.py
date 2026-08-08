@@ -4,7 +4,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from scoring.profit import Profit, compute_profit
+from scoring.profit import (
+    Profit, compute_profit, is_robust_flip_candidate,
+    MIN_FLIP_MARGIN_PCT, MIN_FLIP_MARGIN_EUR, MIN_FLIP_DEAL_SCORE,
+)
 
 
 # ---------- Grundfälle ----------
@@ -98,3 +101,61 @@ def test_margin_pct_mindestschwelle_ueberschreibbar_via_fees():
     fees = {"min_purchase_price_for_margin_pct": 0.0}
     result = compute_profit(1.0, 150.0, fees=fees)
     assert result.margin_pct == 14900.0
+
+
+# ---------- is_robust_flip_candidate() (Phase 11, Punkt A) ----------
+
+def test_robust_flip_candidate_wenn_alle_vier_faktoren_erfuellt():
+    assert is_robust_flip_candidate(
+        margin_pct=MIN_FLIP_MARGIN_PCT, margin_eur=MIN_FLIP_MARGIN_EUR,
+        deal_score=MIN_FLIP_DEAL_SCORE, resale_confidence="MEDIUM",
+    ) is True
+
+
+def test_robust_flip_candidate_mit_high_confidence_auch_erfuellt():
+    assert is_robust_flip_candidate(
+        margin_pct=30.0, margin_eur=100.0, deal_score=90,
+        resale_confidence="HIGH",
+    ) is True
+
+
+def test_kein_flip_candidate_bei_low_confidence():
+    assert is_robust_flip_candidate(
+        margin_pct=30.0, margin_eur=100.0, deal_score=90,
+        resale_confidence="LOW",
+    ) is False
+
+
+def test_kein_flip_candidate_bei_zu_geringer_margin_pct():
+    assert is_robust_flip_candidate(
+        margin_pct=MIN_FLIP_MARGIN_PCT - 0.01, margin_eur=100.0,
+        deal_score=90, resale_confidence="HIGH",
+    ) is False
+
+
+def test_kein_flip_candidate_bei_zu_geringer_margin_eur():
+    # Regressionsschutz: genau der Fall, der die urspruengliche
+    # Ueberzaehlung verursachte -- hohe Prozent-Marge, aber winziger
+    # absoluter Gewinn.
+    assert is_robust_flip_candidate(
+        margin_pct=50.0, margin_eur=MIN_FLIP_MARGIN_EUR - 0.01,
+        deal_score=90, resale_confidence="HIGH",
+    ) is False
+
+
+def test_kein_flip_candidate_bei_zu_niedrigem_deal_score():
+    assert is_robust_flip_candidate(
+        margin_pct=30.0, margin_eur=100.0,
+        deal_score=MIN_FLIP_DEAL_SCORE - 1, resale_confidence="HIGH",
+    ) is False
+
+
+def test_kein_flip_candidate_bei_fehlendem_wert():
+    assert is_robust_flip_candidate(None, 100.0, 90, "HIGH") is False
+    assert is_robust_flip_candidate(30.0, None, 90, "HIGH") is False
+    assert is_robust_flip_candidate(30.0, 100.0, None, "HIGH") is False
+    assert is_robust_flip_candidate(30.0, 100.0, 90, None) is False
+
+
+def test_kein_flip_candidate_ganz_ohne_werte():
+    assert is_robust_flip_candidate(None, None, None, None) is False

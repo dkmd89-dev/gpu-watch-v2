@@ -922,3 +922,74 @@ zurückgestellte Einzelpunkte:
 Diese vier Punkte sind bewusste, begründete Auslassungen (Risiko/Nutzen-
 bzw. Aufwand/Nutzen-Abwägung oder ausdrücklicher Wunsch des
 Auftraggebers), keine übersehenen Lücken.
+
+---
+
+## 18. Phase 11 (Flip-Kandidaten und neue Kategorien korrigieren) — ABGESCHLOSSEN
+
+**Vorab: Repository-Sync.** Der Sandbox-Klon war 12 Commits hinter
+`origin/main` (unabhängig weiterentwickelt, deckt sich inhaltlich exakt
+mit den bis Phase 10a vorgeschlagenen Änderungen). Per
+`git reset --hard origin/main` synchronisiert, ein dabei fehlender Test
+wiederhergestellt (738/738 grün vor Phase-11-Beginn).
+
+**A) Ursache der überhöhten Flip-Kandidaten-Zahl:** `api/status.py` und
+`deal_intelligence.py` nutzten beide ausschließlich
+`estimated_margin_pct >= MIN_FLIP_MARGIN_PCT` (20 %) — ohne absolute
+Marge, Deal-Score oder Resale-Confidence. Ein 15 €-Artikel mit 3 €
+absolutem Gewinn zählte damit genauso wie ein 300 €-Artikel mit 100 €
+Gewinn.
+
+**Fix:** `scoring/profit.py::is_robust_flip_candidate()` — Single Source
+of Truth für beide bisherigen Aufrufstellen, prüft ALLE VIER Faktoren
+(`margin_pct >= 20 %` UND `margin_eur >= 30 €` UND `deal_score >= 75`
+UND `resale_confidence != LOW`, Robins Phase-11-Startwerte). Dafür wurde
+`resale_confidence` (aus `PriceStats.confidence`, Phase 5) erstmals bis
+`MatchResult`/`found.json` durchgereicht (`_resale_confidence_from_stats()`
+in `services/statistics_service.py`, spiegelt exakt die Gruppen-/
+Fallback-Logik von `_resale_prices_from_stats()`).
+
+**B) Sichere Re-Evaluierung (an Robins Vorgabe angepasst):**
+`matcher.compute_ruleset_signature()` — bewusst EIN globaler Hash über
+alle matching-relevanten Regelfelder, kein Hash pro Kategorie (Begründung:
+`evaluate()` iteriert bereits linear durch alle Regeln aller Kategorien
+in einem Durchlauf, first-match-wins — ein Pro-Kategorie-Hash hätte
+keinen Verhaltensunterschied, nur mehr Zustand, siehe Docstring).
+`presence_tracking.needs_reevaluation()`: **nur** Angebote, die NIE
+gematcht wurden (`category is None`) UND deren Ruleset-Hash veraltet
+ist, werden erneut evaluiert. Bereits gematchte Angebote werden NIE
+erneut evaluiert — zentrale Sicherheitsgarantie gegen doppelte
+Preishistorie/Notifications, per eigenem Test abgesichert.
+
+**C) `cpu_mainboard_bundle = 0 Treffer`:** Ursache ist derselbe
+Mechanismus wie A — Angebote, die vor dem jüngsten YAML-Fix (Stand
+2026-08-08: Word-Boundary-Bug 5600X/3600X, Preis-Rekalibrierung
+Ryzen-5600) bereits gescannt und nie gematcht wurden, saßen dauerhaft in
+`seen.json` fest. Per synthetischem End-to-End-Test bestätigt: ein
+zuvor "seen, nie gematcht"-Angebot mit realistischem Bundle-Titel wird
+nach dem Fix korrekt der Kategorie `cpu_mainboard_bundle` zugeordnet.
+**Zusätzlich dokumentiert, nicht geändert** (Auftrags-Vorgabe): die
+Preisgrenzen der Ryzen-3600-Combo (55 €/75 €) und der i5-12400F-Combo
+(100 €/130 €) wurden laut YAML-Kommentar nie mit echten Marktdaten
+verifiziert und wirken unrealistisch niedrig — Kalibrierung ist
+ausdrücklich Phase 12 vorbehalten.
+
+**Geänderte Dateien:** `scoring/profit.py`, `services/statistics_
+service.py`, `matcher.py`, `presence_tracking.py`, `app.py`,
+`api/status.py`, `deal_intelligence.py`, plus Tests in `test_profit.py`
+(+8), `test_matcher_ruleset_signature.py` (neu, 8), `test_presence_
+tracking.py` (+9), `test_app_presence_tracking.py` (2 ersetzt 1),
+`test_deal_intelligence.py` (7 ersetzen 4), `test_app_status_kpis.py`
+(1 aktualisiert).
+
+**Teststand:** `pytest app/tests/` → **766 passed, 0 failed** (738 vor
+Phase 11 + netto 28 neue/aktualisierte).
+
+**Offene Punkte für Phase 12:**
+- Vollständige Preisgrenzen-Kalibrierung aller Kategorien (explizit
+  ausgeklammert in Phase 11)
+- Insbesondere: Ryzen-3600- und i5-12400F-Bundle-Preisgrenzen (siehe C)
+- Beobachten, ob die Phase-11-Startwerte (20 %/30 €/75/nicht-LOW) nach
+  echten Produktivdaten nachjustiert werden müssen
+
+Phase 11 gilt damit als abgeschlossen.

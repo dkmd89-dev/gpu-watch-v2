@@ -84,6 +84,13 @@ class MatchResult:
     # Felder mit Default, bestehender Code bleibt unverändert lauffähig.
     estimated_margin_eur: float | None = None
     estimated_margin_pct: float | None = None
+    # Phase 11, Punkt A (robuste Flip-Kandidat-Qualifikation): Confidence
+    # (LOW/MEDIUM/HIGH, siehe price_stats.py) der PriceStats-Quelle, aus
+    # der estimated_resale_price oben stammt -- None, wenn kein
+    # price_history_model bekannt ist ODER resale_confidence gar nicht an
+    # evaluate() uebergeben wurde (aeltere Aufrufer/Tests, volle
+    # Rueckwaertskompatibilitaet).
+    resale_confidence: str | None = None
     # Verhandlungs-Assistent (STATUS.md Abschnitt 16, Punkt 7): True, wenn
     # dieses Match NUR dank der negotiation_*-Felder der Kategorie-YAML
     # zustande kam (Preis > max_price, aber innerhalb der konfigurierten
@@ -677,12 +684,58 @@ def _build_score_inputs(title_lower: str, requirements: dict | None, features: d
     }
 
 
+def compute_ruleset_signature(rules_cfg: dict) -> str:
+    """Deterministischer Fingerprint über die MATCHING-relevanten Teile von
+    rules_cfg (Phase 11, Punkt B: sichere Re-Evaluierung).
+
+    Aendert sich, sobald sich Regeln aendern/hinzukommen/wegfallen, die das
+    Ergebnis von evaluate() beeinflussen koennten (Label, Kategorie,
+    match/require_all_of/requirements, exclude, price_history_model,
+    max_price) -- NICHT bei rein kosmetischen YAML-Aenderungen
+    (Kommentare, Score-Gewichte, notify_max_price etc.), die das
+    Match-Ergebnis eines Titels nicht beeinflussen koennen.
+
+    BEWUSST EIN GLOBALER Hash ueber die GESAMTE Regel-Liste, kein
+    Hash pro Kategorie: evaluate() iteriert bereits heute linear durch
+    ALLE Regeln aller Kategorien in EINEM Durchlauf (erste passende Regel
+    gewinnt, siehe evaluate()-Docstring) -- es gibt in der bestehenden
+    Architektur keine Vorstellung von "nur Kategorie X pruefen", ohne
+    evaluate() selbst umzubauen. Ein Hash pro Kategorie wuerde denselben
+    vollstaendigen Durchlauf erzwingen wie ein globaler Hash (jede
+    Neubewertung eines bisher ungematchten Angebots muss ohnehin die
+    komplette, aktuelle Regel-Liste in der richtigen Prioritaetsreihenfolge
+    durchlaufen) -- ohne Verhaltensunterschied, nur mit mehr Zustand pro
+    seen.json-Eintrag. Kleinstmoegliche, architektur-konforme Loesung
+    (siehe Auftrag: "keine unnoetige Neugestaltung des Presence-Systems").
+    """
+    import hashlib
+    import json as _json
+
+    relevant = []
+    for rule in rules_cfg.get("rules", []):
+        relevant.append({
+            "label": rule.get("label"),
+            "_category": rule.get("_category"),
+            "match": rule.get("match"),
+            "require_all_of": rule.get("require_all_of"),
+            "requirements": rule.get("requirements"),
+            "exclude": rule.get("exclude"),
+            "_category_exclude_terms": rule.get("_category_exclude_terms"),
+            "price_history_model": rule.get("price_history_model"),
+            "max_price": rule.get("max_price"),
+            "min_vram_gb": rule.get("min_vram_gb"),
+        })
+    canonical = _json.dumps(relevant, sort_keys=True, default=str)
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
+
+
 def evaluate(
     title: str,
     price: float,
     rules_cfg: dict,
     market_prices: dict[str, float] | None = None,
     resale_prices: dict[str, float] | None = None,
+    resale_confidence: dict[str, str] | None = None,
 ) -> MatchResult:
     """Wertet Titel/Preis gegen die Regel-Matrix aus.
 
@@ -711,6 +764,14 @@ def evaluate(
     Fallback auf market_price -- estimated_resale_price bleibt None,
     wodurch fuer dieses Angebot keine Marge/kein Flip-Kandidat berechnet
     wird (siehe compute_profit()).
+
+    resale_confidence (Phase 11, Punkt A): optionales Mapping
+    {price_history_model: Confidence-Label ("LOW"/"MEDIUM"/"HIGH")},
+    typischerweise gebaut aus app._resale_confidence_from_stats() --
+    MUSS aus derselben PriceStats-Quelle stammen wie resale_prices oben
+    (sonst inkonsistent). Fehlt der Modell-Key oder wird resale_confidence
+    gar nicht uebergeben -> MatchResult.resale_confidence bleibt None
+    (volle Rueckwaertskompatibilitaet).
 
     Baustein 3 (Bundle-/Part-Out-Erkennung, STATUS.md Abschnitt 16,
     Schritt 2): nutzt DIESELBEN market_prices wie oben (kein zusaetzlicher
@@ -865,6 +926,13 @@ def evaluate(
             estimated_resale_price = resale_prices[price_history_model]
         else:
             estimated_resale_price = market_price
+        # Phase 11, Punkt A: Confidence-Label fuer denselben Modell-Key --
+        # bewusst OHNE Fallback auf market_price-Aehnliches Verhalten (im
+        # Unterschied zu estimated_resale_price oben), da es fuer
+        # market_price keine eigene Confidence gibt. Fehlt der Modell-Key
+        # in resale_confidence -> None (analog zu "kein price_history_model
+        # bekannt").
+        resale_confidence_label = (resale_confidence or {}).get(price_history_model)
         # Reselling-/Arbitrage-Konzept (STATUS.md Abschnitt 16, Punkt b):
         # separater compute_profit()-Aufruf fuer die Dashboard-Rohwerte
         # (Euro/Prozent). compute_deal_score() ruft intern denselben
@@ -966,6 +1034,7 @@ def evaluate(
             notify_max_price=rule.get("_notify_max_price"),
             estimated_margin_eur=profit.margin_abs if profit else None,
             estimated_margin_pct=profit.margin_pct if profit else None,
+            resale_confidence=resale_confidence_label,
             negotiation_candidate=negotiation_candidate,
             part_out_gpu_value=part_out_gpu_value,
             part_out_ratio_pct=part_out_ratio_pct,

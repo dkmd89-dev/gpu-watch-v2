@@ -67,6 +67,15 @@ class SeenEntry:
     delisted: bool = False
     category: str | None = None
     price_history_model: str | None = None
+    # Phase 11, Punkt B (sichere Re-Evaluierung): Fingerprint (siehe
+    # matcher.compute_ruleset_signature()) des Regelwerks, gegen das dieses
+    # Angebot zuletzt evaluiert wurde. None fuer Alt-Eintraege (vor diesem
+    # Schritt) -- wird wie fehlende first_seen/last_seen-Werte bei
+    # migrierten Eintraegen behandelt: kein Fehlerfall, sondern das
+    # natuerliche "wurde noch nie mit einem bekannten Regelwerk-Stand
+    # verglichen" -- ein Alt-Eintrag OHNE Match ist damit automatisch ein
+    # Re-Evaluierungs-Kandidat beim naechsten Scan (siehe app.py).
+    last_evaluated_ruleset_hash: str | None = None
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -113,6 +122,44 @@ def mark_seen(entries: dict[str, dict], url: str, timestamp: str) -> None:
         entries[url] = SeenEntry(first_seen=timestamp, last_seen=timestamp).to_dict()
     else:
         entry["last_seen"] = timestamp
+
+
+def needs_reevaluation(entry: dict, current_ruleset_hash: str) -> bool:
+    """Phase 11, Punkt B: darf dieses (bereits bekannte) Angebot erneut
+    gegen die Regeln evaluiert werden?
+
+    NUR True, wenn BEIDE Bedingungen gelten:
+    1. Das Angebot wurde NOCH NIE gematcht (category is None) -- ein
+       bereits gematchtes Angebot (existiert schon in found.json/
+       Preishistorie, hat ggf. schon eine Notification ausgeloest) wird
+       NIE erneut evaluiert, unabhaengig vom Regelwerk-Stand. Das ist die
+       zentrale Sicherheitsgarantie gegen doppelte Preishistorie-
+       Eintraege/Notifications (siehe Auftrag).
+    2. Der Regelwerk-Fingerprint hat sich seit der letzten Pruefung
+       geaendert (oder es liegt noch gar keiner vor, z.B. Alt-Eintrag) --
+       sonst wuerde jedes ungematchte Angebot bei JEDEM Scan erneut
+       evaluiert, auch wenn sich nichts geaendert hat (unnoetiger
+       Mehraufwand ohne neuen Erkenntnisgewinn).
+    """
+    if entry.get("category") is not None:
+        return False
+    return entry.get("last_evaluated_ruleset_hash") != current_ruleset_hash
+
+
+def mark_ruleset_evaluated(entries: dict[str, dict], url: str, ruleset_hash: str) -> None:
+    """Vermerkt, dass `url` soeben gegen den Regelwerk-Stand `ruleset_hash`
+    evaluiert wurde (Phase 11, Punkt B) -- UNABHAENGIG vom Ergebnis (auch
+    bei erneut erfolglosem Match), damit dasselbe, weiterhin nicht
+    passende Angebot nicht bei jedem Scan wieder als Re-Evaluierungs-
+    Kandidat auftaucht, solange sich das Regelwerk nicht erneut aendert.
+
+    Wird fuer JEDES evaluierte Angebot aufgerufen (neu gesehene UND
+    Re-Evaluierungs-Kandidaten), unmittelbar nach dem evaluate()-Aufruf in
+    app.py -- siehe dortige Verdrahtung.
+    """
+    entry = entries.get(url)
+    if entry is not None:
+        entry["last_evaluated_ruleset_hash"] = ruleset_hash
 
 
 def mark_matched(

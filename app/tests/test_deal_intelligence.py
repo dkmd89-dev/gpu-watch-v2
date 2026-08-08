@@ -33,25 +33,61 @@ def test_top_deal_gewinnt_auch_bei_gleichzeitig_erfuellter_flip_bedingung():
     assert r.label == LABEL_TOP_DEAL
 
 
-# ---------- Prioritätsstufe 2: FLIP DEAL ----------
+# ---------- Prioritätsstufe 2: FLIP DEAL (Phase 11, Punkt A: alle vier Faktoren) ----------
 
-def test_flip_deal_ab_min_flip_margin_pct():
-    r = classify_deal(is_top_deal=False, estimated_margin_pct=20.0)
+def test_flip_deal_wenn_alle_vier_faktoren_erfuellt():
+    r = classify_deal(
+        is_top_deal=False, estimated_margin_pct=20.0, estimated_margin_eur=30.0,
+        deal_score=75, resale_confidence="MEDIUM",
+    )
     assert r == DealIntelligence(label=LABEL_FLIP_DEAL, emoji=EMOJI_FLIP_DEAL)
 
 
-def test_flip_deal_knapp_unter_schwelle_faellt_durch():
-    r = classify_deal(is_top_deal=False, estimated_margin_pct=19.9)
+def test_flip_deal_knapp_unter_margin_pct_schwelle_faellt_durch():
+    r = classify_deal(
+        is_top_deal=False, estimated_margin_pct=19.9, estimated_margin_eur=30.0,
+        deal_score=75, resale_confidence="MEDIUM",
+    )
+    assert r.label != LABEL_FLIP_DEAL
+
+
+def test_flip_deal_knapp_unter_margin_eur_schwelle_faellt_durch():
+    r = classify_deal(
+        is_top_deal=False, estimated_margin_pct=20.0, estimated_margin_eur=29.9,
+        deal_score=75, resale_confidence="MEDIUM",
+    )
+    assert r.label != LABEL_FLIP_DEAL
+
+
+def test_flip_deal_knapp_unter_deal_score_schwelle_faellt_durch():
+    r = classify_deal(
+        is_top_deal=False, estimated_margin_pct=20.0, estimated_margin_eur=30.0,
+        deal_score=74, resale_confidence="MEDIUM",
+    )
+    assert r.label != LABEL_FLIP_DEAL
+
+
+def test_flip_deal_mit_low_confidence_faellt_durch():
+    r = classify_deal(
+        is_top_deal=False, estimated_margin_pct=20.0, estimated_margin_eur=30.0,
+        deal_score=75, resale_confidence="LOW",
+    )
     assert r.label != LABEL_FLIP_DEAL
 
 
 def test_flip_deal_ohne_margin_wert_faellt_durch():
-    r = classify_deal(is_top_deal=False, estimated_margin_pct=None)
+    r = classify_deal(
+        is_top_deal=False, estimated_margin_pct=None, estimated_margin_eur=30.0,
+        deal_score=75, resale_confidence="MEDIUM",
+    )
     assert r.label != LABEL_FLIP_DEAL
 
 
 def test_flip_deal_gewinnt_vor_very_good_deal():
-    r = classify_deal(is_top_deal=False, estimated_margin_pct=25.0, deal_stars="★★★★★")
+    r = classify_deal(
+        is_top_deal=False, estimated_margin_pct=25.0, estimated_margin_eur=50.0,
+        deal_score=80, resale_confidence="HIGH", deal_stars="★★★★★",
+    )
     assert r.label == LABEL_FLIP_DEAL
 
 

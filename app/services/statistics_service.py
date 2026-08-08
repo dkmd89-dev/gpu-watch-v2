@@ -137,3 +137,45 @@ def _resale_prices_from_stats(
             group_stats.estimated_resale_price if group_stats is not None else None
         )
     return result
+
+
+def _resale_confidence_from_stats(
+    stats_by_model: dict[str, PriceStats],
+    stats_by_resale_group: dict[str, PriceStats] | None = None,
+    model_to_group: dict[str, str] | None = None,
+) -> dict[str, str]:
+    """Reduziert die volle Preisstatistik auf das
+    {price_history_model: Confidence-Label}-Mapping (Phase 11, Punkt A:
+    robuste Flip-Kandidat-Qualifikation).
+
+    Spiegelt EXAKT dieselbe Gruppen-/Fallback-Aufloesung wie
+    _resale_prices_from_stats() (siehe dortiger Docstring fuer die
+    vollstaendige Begruendung) -- die Confidence MUSS von derselben
+    PriceStats-Quelle stammen wie der tatsaechlich verwendete
+    estimated_resale_price, sonst waeren beide Werte inkonsistent
+    zueinander (z.B. Preis aus der Gruppen-Statistik, Confidence aber aus
+    der Modell-Statistik).
+
+    Anders als bei _resale_prices_from_stats() gibt es hier KEIN "Key
+    vorhanden aber Wert None"-Sonderfall (Option 1, Abschnitt 33b) --
+    Confidence ist nie None (siehe price_stats.py::_confidence(), liefert
+    immer LOW/MEDIUM/HIGH), daher wird ein Modell ohne verwertbare
+    PriceStats-Instanz hier schlicht weggelassen statt mit einem
+    Platzhalter-Wert aufgenommen zu werden.
+    """
+    if not stats_by_resale_group or not model_to_group:
+        return {
+            model: stats.confidence
+            for model, stats in stats_by_model.items()
+            if stats is not None
+        }
+
+    result: dict[str, str] = {}
+    for model, stats in stats_by_model.items():
+        if stats is None:
+            continue
+        group = model_to_group.get(model, model)
+        group_stats = stats_by_resale_group.get(group)
+        if group_stats is not None:
+            result[model] = group_stats.confidence
+    return result

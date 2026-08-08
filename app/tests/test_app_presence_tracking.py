@@ -120,11 +120,15 @@ def test_altes_listenformat_wird_beim_scan_automatisch_migriert():
         assert seen[_LISTING["url"]]["first_seen"] is not None
 
 
-def test_bereits_bekanntes_altes_angebot_wird_nicht_erneut_gematcht():
-    """Rückwärtskompatibilität: eine migrierte Alt-URL (first_seen=None) mit
-    exakt derselben URL wie ein aktueller Treffer darf NICHT erneut als
-    neuer Fund verarbeitet werden -- die bisherige Dedup-Semantik
-    (uid in seen -> skip) bleibt unveraendert erhalten."""
+def test_migrierte_nie_gematchte_alt_url_wird_jetzt_re_evaluiert():
+    """Phase 11, Punkt B (bewusste Verhaltensänderung ggü. vorher): eine
+    migrierte Alt-URL (first_seen=None, NIE gematcht -- altes Listenformat
+    kennt kein "category"-Feld) wird jetzt erneut evaluiert, da sie noch
+    keinen last_evaluated_ruleset_hash trägt (None != aktueller Hash).
+    Das ist der zentrale Fix für "seen.json darf nicht als Blockade für
+    neue Kategorien wirken" -- vor Phase 11 wurde eine solche URL für
+    immer übersprungen, selbst wenn eine neue/geänderte Regel sie jetzt
+    korrekt matchen würde."""
     with tempfile.TemporaryDirectory() as tmpdir:
         seen_path = Path(tmpdir) / "seen.json"
         seen_path.write_text(json.dumps([_LISTING["url"]]), encoding="utf-8")
@@ -133,14 +137,59 @@ def test_bereits_bekanntes_altes_angebot_wird_nicht_erneut_gematcht():
 
         _run_scan_with(app_mod, [_LISTING])
 
+        # _LISTING matcht die GPU-Top-Deal-Regel (siehe api_status.py-Log:
+        # "RTX 3060 12GB ★ Top-Deal") -- wird jetzt korrekt gefunden.
         found = json.loads(app_mod.FOUND_FILE.read_text(encoding="utf-8"))
-        assert found == []
+        assert len(found) == 1
+        assert found[0]["url"] == _LISTING["url"]
 
         seen = json.loads(app_mod.SEEN_FILE.read_text(encoding="utf-8"))
         # first_seen bleibt None (keine erfundene Historie), last_seen wird
         # trotzdem aktualisiert, da das Angebot in diesem Scan erneut
-        # auftauchte.
+        # auftauchte. category ist jetzt gesetzt (frisch gematcht).
         assert seen[_LISTING["url"]]["first_seen"] is None
+        assert seen[_LISTING["url"]]["last_seen"] is not None
+        assert seen[_LISTING["url"]]["category"] is not None
+        assert seen[_LISTING["url"]]["last_evaluated_ruleset_hash"] is not None
+
+
+def test_bereits_gematchte_url_wird_nie_erneut_evaluiert():
+    """Phase 11, Punkt B: die eigentliche Sicherheitsgarantie -- ein
+    Angebot, das BEREITS EINMAL gematcht wurde (category gesetzt), wird
+    NIE erneut evaluiert, unabhängig vom Regelwerk-Stand. Das verhindert
+    doppelte Preishistorie-Einträge/Notifications für dasselbe Angebot.
+    """
+    with tempfile.TemporaryDirectory() as tmpdir:
+        seen_path = Path(tmpdir) / "seen.json"
+        # Bereits gematchter Eintrag (category gesetzt), altes/anderes
+        # last_evaluated_ruleset_hash als das, was der aktuelle Scan haben
+        # wird -- muss trotzdem uebersprungen werden.
+        seen_path.write_text(json.dumps({
+            _LISTING["url"]: {
+                "first_seen": "2026-01-01T00:00:00+00:00",
+                "last_seen": "2026-01-01T00:00:00+00:00",
+                "missed_scans": 0,
+                "delisted": False,
+                "category": "gpu",
+                "price_history_model": "rtx_3060_12gb",
+                "last_evaluated_ruleset_hash": "veraltet-und-anders",
+            }
+        }), encoding="utf-8")
+
+        app_mod = _load_app_module(tmpdir)
+
+        _run_scan_with(app_mod, [_LISTING])
+
+        # KEIN neuer found.json-Eintrag -- das Angebot war schon "bekannt"
+        # (gematcht), evaluate() wurde für diesen Scan gar nicht erneut
+        # aufgerufen.
+        found = json.loads(app_mod.FOUND_FILE.read_text(encoding="utf-8"))
+        assert found == []
+
+        seen = json.loads(app_mod.SEEN_FILE.read_text(encoding="utf-8"))
+        # last_evaluated_ruleset_hash bleibt unveraendert -- kein erneuter
+        # evaluate()-Aufruf fuer bereits gematchte Eintraege.
+        assert seen[_LISTING["url"]]["last_evaluated_ruleset_hash"] == "veraltet-und-anders"
         assert seen[_LISTING["url"]]["last_seen"] is not None
 
 

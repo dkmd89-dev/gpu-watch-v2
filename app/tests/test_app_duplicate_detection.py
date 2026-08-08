@@ -99,6 +99,56 @@ def test_cross_posting_erzeugt_nur_einen_price_history_eintrag():
         assert any("Duplicate-/Cross-Posting-Erkennung" in m for m in capture.messages)
 
 
+def test_cross_posting_duplikat_loest_keinen_zweiten_ntfy_push_aus():
+    # roadmap.md Phase 8, Schritt 8a: Cross-Posting-Duplikate duerfen nur
+    # EINMAL benachrichtigt werden. Preis 15.0€ (wie in test_matcher_
+    # deal_score_integration.py verifiziert: ★★★★☆, erfuellt sicher das
+    # Notification-Gate: gate_min_stars="★★★☆☆", gate_max_price=150€).
+    with tempfile.TemporaryDirectory() as tmpdir:
+        app_mod = _load_app_module(tmpdir)
+
+        capture = _CaptureHandler()
+        app_mod.log.addHandler(capture)
+
+        kleinanzeigen_listings = [{
+            "source": "Kleinanzeigen",
+            "title": "ASUS RTX 2080Ti DUAL Lüfter",
+            "price": 15.0,
+            "url": "https://example.test/dup-notify-kleinanzeigen",
+            "location": "Musterstadt",
+            "description": "",
+            "images": [],
+        }]
+        ebay_listings = [{
+            "source": "eBay",
+            "title": "ASUS RTX 2080Ti DUAL Lüfter",
+            "price": 15.0,
+            "url": "https://example.test/dup-notify-ebay",
+            "location": "",
+            "description": "",
+            "images": [],
+        }]
+
+        ntfy_mock = MagicMock()
+        with patch.object(scrapers.kleinanzeigen, "search_kleinanzeigen", return_value=kleinanzeigen_listings), \
+             patch.object(scrapers.ebay, "search_ebay", return_value=ebay_listings), \
+             patch.object(scrapers.quoka, "search_quoka", return_value=[]), \
+             patch.object(app_mod, "send_ntfy", ntfy_mock):
+            app_mod.run_scan()
+
+        app_mod.log.removeHandler(capture)
+
+        found = json.loads(app_mod.FOUND_FILE.read_text(encoding="utf-8"))
+        urls = {e["url"] for e in found}
+        assert "https://example.test/dup-notify-kleinanzeigen" in urls
+        assert "https://example.test/dup-notify-ebay" in urls
+
+        assert ntfy_mock.call_count == 1
+        assert any(
+            "Cross-Posting-Duplikat, kein erneuter Push" in m for m in capture.messages
+        )
+
+
 def test_unterschiedliche_titel_erzeugen_zwei_price_history_eintraege():
     with tempfile.TemporaryDirectory() as tmpdir:
         app_mod = _load_app_module(tmpdir)

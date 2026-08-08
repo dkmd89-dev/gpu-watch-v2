@@ -8,7 +8,7 @@ from datetime import datetime, timedelta, timezone
 
 from flask import Flask
 
-from matcher import load_rules, evaluate
+from matcher import load_rules, evaluate, compute_ruleset_signature
 from scrapers import search_kleinanzeigen, search_ebay
 from scrapers.registry import discover_scrapers
 from notify import send_ntfy, emoji_for, rating_stars_for
@@ -18,6 +18,7 @@ from duplicate_detection import find_duplicate, normalize_title
 from presence_tracking import (
     migrate_seen_data, mark_seen, mark_matched, detect_newly_delisted,
     prune_delisted_entries, enforce_max_size, DEFAULT_DELISTING_THRESHOLD_SCANS,
+    needs_reevaluation, mark_ruleset_evaluated,
 )
 from time_to_sell import (
     make_time_to_sell_point, append_time_to_sell_point, read_time_to_sell_points,
@@ -28,13 +29,14 @@ from top_deal import evaluate_top_deal, TOP_DEAL_DISCOUNT_THRESHOLD_A_PCT
 from data_quality import (
     check_thin_price_history, check_stale_categories, check_zero_match_categories,
 )
-from scoring.profit import MIN_FLIP_MARGIN_PCT
+from scoring.profit import MIN_FLIP_MARGIN_PCT, is_robust_flip_candidate
 from persistence.json_store import _load_json, _save_json
 from services.statistics_service import (
     _load_price_stats,
     _load_resale_stats_by_group,
     _market_prices_from_stats,
     _resale_prices_from_stats,
+    _resale_confidence_from_stats,
 )
 from api.history import build_history_blueprint
 from api.deals import build_deals_blueprint
@@ -329,6 +331,12 @@ def run_scan():
 
         rules_cfg = load_rules(str(Path(__file__).parent / "rules"))
         defaults = rules_cfg["defaults"]
+        # Phase 11, Punkt B (sichere Re-Evaluierung): EINMAL pro Scan
+        # berechnet, analog zu price_stats_by_model -- siehe
+        # matcher.compute_ruleset_signature()-Docstring fuer die
+        # Begruendung, warum ein GLOBALER (statt Pro-Kategorie-) Hash die
+        # architektur-konforme, kleinstmoegliche Loesung ist.
+        ruleset_hash = compute_ruleset_signature(rules_cfg)
 
         # Suchbegriffe kommen aus den Kategorie-YAMLs (rules_cfg["search_terms"]).
         # Nur falls eine Config das (noch) nicht mitliefert -- z.B. Legacy-
@@ -422,6 +430,14 @@ def run_scan():
         resale_prices = _resale_prices_from_stats(
             price_stats_by_model, resale_stats_by_group, resale_price_groups
         )
+        # Phase 11, Punkt A (robuste Flip-Kandidat-Qualifikation): dieselbe
+        # Gruppen-/Fallback-Aufloesung wie resale_prices oben, MUSS aus
+        # denselben Argumenten gebaut werden (siehe _resale_confidence_
+        # from_stats()-Docstring) -- sonst waeren Preis und Confidence
+        # inkonsistent zueinander.
+        resale_confidence_by_model = _resale_confidence_from_stats(
+            price_stats_by_model, resale_stats_by_group, resale_price_groups
+        )
         price_stats_duration = time.perf_counter() - _price_stats_start
 
         # roadmap.md Phase 7, Schritt 7b: Time-to-Sell-Statistik EINMAL pro
@@ -512,25 +528,47 @@ def run_scan():
                 # URLs zusätzlich first_seen an.
                 mark_seen(seen, uid, now_iso)
                 if already_seen:
-                    already_seen_count += 1
-                    continue
-                # Sofort persistieren statt erst am Scan-Ende: verhindert,
-                # dass ein Crash mitten im Scan dazu führt, dass bereits
-                # verarbeitete (und ggf. schon benachrichtigte) Angebote
-                # beim nächsten Lauf erneut gematcht und doppelt verschickt
-                # werden (siehe Phase-0-Analyse, Befund d). Für bereits
-                # bekannte URLs (nur last_seen aktualisiert) wird NICHT
-                # sofort persistiert -- das wäre bei tausenden bereits
-                # bekannten Angeboten pro Scan ein spürbarer I/O-Mehraufwand
-                # für eine unkritische Information (last_seen); diese
-                # Updates werden gesammelt am Scan-Ende geschrieben (siehe
-                # unten). Kein Datenverlustrisiko: bei einem Crash bleibt
-                # last_seen für diese Einträge lediglich auf dem Stand des
-                # vorherigen Scans -- first_seen (sicherheitsrelevant für
-                # Schritt 2) ist davon nicht betroffen.
-                _persist_start = time.perf_counter()
-                _save_json(SEEN_FILE, seen)
-                persistence_duration += time.perf_counter() - _persist_start
+                    # Phase 11, Punkt B: seen.json darf NICHT dauerhaft
+                    # blockieren, wenn eine Kategorie/Regel neu hinzukommt
+                    # oder sich aendert -- ein bisher NIE gematchtes
+                    # Angebot (z.B. weil cpu_mainboard_bundle beim
+                    # ersten Sehen noch gar nicht existierte) wird dann
+                    # erneut evaluiert. Ein bereits GEMATCHTES Angebot
+                    # (existiert schon in found.json/Preishistorie, ggf.
+                    # bereits benachrichtigt) wird NIE erneut evaluiert --
+                    # siehe needs_reevaluation()-Docstring fuer die
+                    # vollstaendige Sicherheitsgarantie gegen doppelte
+                    # Preishistorie-Eintraege/Notifications.
+                    if not needs_reevaluation(seen[uid], ruleset_hash):
+                        already_seen_count += 1
+                        continue
+                    # Re-Evaluierungs-Kandidat: faellt durch zur normalen
+                    # Verarbeitung unten (kein "Sofort persistieren" fuer
+                    # last_seen-Updates bei bereits bekannten URLs, siehe
+                    # Kommentar unten -- last_evaluated_ruleset_hash wird
+                    # nach evaluate() unten gesetzt und am Scan-Ende
+                    # gemeinsam mit last_seen persistiert, kein
+                    # zusaetzlicher I/O-Aufwand hier).
+                else:
+                    # Sofort persistieren statt erst am Scan-Ende: verhindert,
+                    # dass ein Crash mitten im Scan dazu führt, dass bereits
+                    # verarbeitete (und ggf. schon benachrichtigte) Angebote
+                    # beim nächsten Lauf erneut gematcht und doppelt verschickt
+                    # werden (siehe Phase-0-Analyse, Befund d). Für bereits
+                    # bekannte URLs (nur last_seen aktualisiert, oder ein
+                    # Re-Evaluierungs-Kandidat) wird NICHT sofort persistiert
+                    # -- das wäre bei tausenden bereits bekannten Angeboten
+                    # pro Scan ein spürbarer I/O-Mehraufwand für eine
+                    # unkritische Information; diese Updates werden gesammelt
+                    # am Scan-Ende geschrieben (siehe unten). Kein
+                    # Datenverlustrisiko: bei einem Crash bleibt last_seen/
+                    # last_evaluated_ruleset_hash für diese Einträge
+                    # lediglich auf dem Stand des vorherigen Scans --
+                    # first_seen (sicherheitsrelevant für Schritt 2) ist
+                    # davon nicht betroffen.
+                    _persist_start = time.perf_counter()
+                    _save_json(SEEN_FILE, seen)
+                    persistence_duration += time.perf_counter() - _persist_start
 
             # roadmap.md Phase 2: Matching- und Deal-Score-Zeit. Beide in
             # einem Wert, da evaluate() sie intern nicht getrennt berechnet
@@ -539,8 +577,16 @@ def run_scan():
             result = evaluate(
                 item["title"], item["price"], rules_cfg,
                 market_prices=market_prices, resale_prices=resale_prices,
+                resale_confidence=resale_confidence_by_model,
             )
             matching_and_scoring_duration += time.perf_counter() - _match_start
+            with _seen_lock:
+                # Phase 11, Punkt B: IMMER vermerken, auch bei erneut
+                # erfolglosem Match -- sonst wuerde dasselbe, weiterhin
+                # nicht passende Angebot bei jedem folgenden Scan erneut
+                # als Re-Evaluierungs-Kandidat auftauchen (siehe
+                # needs_reevaluation()-Docstring).
+                mark_ruleset_evaluated(seen, uid, ruleset_hash)
             if not result.matched:
                 continue
 
@@ -580,13 +626,17 @@ def run_scan():
                     deal_score=result.deal_score,
                 )
 
-                # roadmap.md Phase 7, Schritt 7b: Deal-Intelligence-
-                # Einstufung + Time-to-Sell-Kategorie-Lookup, beide erst
-                # jetzt moeglich (brauchen top_deal_result.is_top_deal bzw.
-                # result.category, die oben/vorher bereits vorliegen).
+                # roadmap.md Phase 7, Schritt 7b (erweitert Phase 11, Punkt
+                # A): Deal-Intelligence-Einstufung + Time-to-Sell-Kategorie-
+                # Lookup, beide erst jetzt moeglich (brauchen top_deal_
+                # result.is_top_deal bzw. result.category, die oben/vorher
+                # bereits vorliegen).
                 deal_intelligence = classify_deal(
                     is_top_deal=top_deal_result.is_top_deal,
                     estimated_margin_pct=result.estimated_margin_pct,
+                    estimated_margin_eur=result.estimated_margin_eur,
+                    deal_score=result.deal_score,
+                    resale_confidence=result.resale_confidence,
                     deal_stars=result.deal_stars,
                 )
                 category_tts_stats = time_to_sell_stats_by_category.get(result.category)
@@ -639,6 +689,11 @@ def run_scan():
                         if result.estimated_margin_pct is not None
                         else None
                     ),
+                    # Phase 11, Punkt A (robuste Flip-Kandidat-Qualifikation):
+                    # Confidence der PriceStats-Quelle hinter estimated_
+                    # resale_price/estimated_margin_*. Additives Feld, siehe
+                    # is_robust_flip_candidate() fuer die Verwendung.
+                    "resale_confidence": result.resale_confidence,
                     # Verhandlungs-Assistent (STATUS.md Abschnitt 16, Punkt 7):
                     # True, wenn dieses Match nur dank negotiation_*-Feldern
                     # der Kategorie-Regel zustande kam (Preis > max_price,
