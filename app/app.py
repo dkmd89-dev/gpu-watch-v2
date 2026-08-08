@@ -17,7 +17,7 @@ from price_history import append_price_point, make_price_point, read_price_point
 from duplicate_detection import find_duplicate, normalize_title
 from presence_tracking import (
     migrate_seen_data, mark_seen, mark_matched, detect_newly_delisted,
-    prune_delisted_entries, DEFAULT_DELISTING_THRESHOLD_SCANS,
+    prune_delisted_entries, enforce_max_size, DEFAULT_DELISTING_THRESHOLD_SCANS,
 )
 from time_to_sell import make_time_to_sell_point, append_time_to_sell_point
 from top_deal import evaluate_top_deal
@@ -75,6 +75,15 @@ DEAL_MAX_AGE_DAYS = int(os.environ.get("DEAL_MAX_AGE_DAYS", "7"))
 # da hier bereits das staerkere "delisted"-Kriterium greift, nicht nur
 # das Alter allein.
 SEEN_DELISTED_MAX_AGE_DAYS = int(os.environ.get("SEEN_DELISTED_MAX_AGE_DAYS", "3"))
+
+# Sofort-Fix (roadmap.md Phase 4, Persistenz-Analyse): harte Obergrenze fuer
+# AKTIVE (nicht delistete) seen.json-Eintraege, Ergaenzung zur alter-
+# basierten Bereinigung oben -- siehe presence_tracking.enforce_max_size().
+# 50.000 Eintraege * ca. 150-250 Byte/Eintrag ergibt ca. 7,5-12,5 MB als
+# Obergrenze (Default, bereits einmal freigegeben, siehe STATUS.md
+# Abschnitt 31 -- durch einen spaeteren, unabhaengigen Commit versehentlich
+# aus app.py verschwunden, hier wiederhergestellt).
+SEEN_MAX_ITEMS = int(os.environ.get("SEEN_MAX_ITEMS", "50000"))
 
 # Schritt B: Log-Rotation. Ohne Rotation wuchs gpu_watch.log unbegrenzt
 # (ein Long-Running-Container ohne Log-Limit ist ein bekanntes Betriebs-
@@ -725,6 +734,19 @@ def run_scan():
                     "🧹 seen.json bereinigt: %d delistete Alt-Eintraege "
                     "(> %d Tage) entfernt.",
                     pruned_count, SEEN_DELISTED_MAX_AGE_DAYS,
+                )
+            # Sofort-Fix (roadmap.md Phase 4): haerte Obergrenze fuer AKTIVE
+            # (nicht delistete) Eintraege -- prune_delisted_entries() oben
+            # deckt bewusst nur delistete Eintraege ab (siehe dortiger
+            # Docstring). Ohne diese Ergaenzung waechst seen.json bei
+            # breiten search_terms unbegrenzt. Greift NICHT, solange die
+            # Grenze nicht ueberschritten ist (Normalfall unveraendert).
+            seen, size_capped_count = enforce_max_size(seen, SEEN_MAX_ITEMS)
+            if size_capped_count:
+                log.info(
+                    "🧹 seen.json Obergrenze erreicht: %d älteste Einträge "
+                    "(> %d Gesamt-Limit) entfernt.",
+                    size_capped_count, SEEN_MAX_ITEMS,
                 )
             _persist_start = time.perf_counter()
             _save_json(SEEN_FILE, seen)

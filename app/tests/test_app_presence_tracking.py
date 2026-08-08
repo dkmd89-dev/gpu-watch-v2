@@ -144,6 +144,50 @@ def test_bereits_bekanntes_altes_angebot_wird_nicht_erneut_gematcht():
         assert seen[_LISTING["url"]]["last_seen"] is not None
 
 
+def test_seen_json_wird_bei_ueberschreitung_von_seen_max_items_gekappt():
+    """Regressionstest (roadmap.md Phase 4, Sofort-Fix): run_scan() muss
+    presence_tracking.enforce_max_size() tatsaechlich aufrufen, wenn
+    len(seen) > SEEN_MAX_ITEMS. Dieser Test haette die stille Regression
+    aus Commit 00bd8e8 (SEEN_MAX_ITEMS-Verdrahtung versehentlich entfernt,
+    obwohl enforce_max_size() selbst unveraendert und getestet blieb)
+    erkannt -- die reine Unit-Test-Abdeckung von enforce_max_size() allein
+    reicht nicht, da sie den Aufruf aus app.py heraus nicht prueft.
+    """
+    with tempfile.TemporaryDirectory() as tmpdir:
+        os.environ["SEEN_MAX_ITEMS"] = "5"
+        try:
+            seen_path = Path(tmpdir) / "seen.json"
+            # 6 vorbefuellte, aeltere Eintraege -- eine ueber der (fuer
+            # diesen Test bewusst niedrig gesetzten) Grenze von 5.
+            preexisting = {
+                f"https://example.test/old-{i}": {
+                    "first_seen": f"2026-01-0{i+1}T00:00:00+00:00",
+                    "last_seen": f"2026-01-0{i+1}T00:00:00+00:00",
+                    "missed_scans": 0,
+                    "delisted": False,
+                }
+                for i in range(6)
+            }
+            seen_path.write_text(json.dumps(preexisting), encoding="utf-8")
+
+            app_mod = _load_app_module(tmpdir)
+            assert app_mod.SEEN_MAX_ITEMS == 5
+
+            _run_scan_with(app_mod, [_LISTING])
+
+            seen = json.loads(app_mod.SEEN_FILE.read_text(encoding="utf-8"))
+            # 6 alte + 1 neuer Treffer aus diesem Scan = 7 vor dem Kappen ->
+            # muss auf die Grenze (5) reduziert werden. Die aeltesten
+            # Eintraege (old-0, old-1) fallen weg, der neue Treffer sowie
+            # die juengsten alten Eintraege bleiben erhalten.
+            assert len(seen) == 5
+            assert _LISTING["url"] in seen
+            assert "https://example.test/old-0" not in seen
+            assert "https://example.test/old-1" not in seen
+        finally:
+            del os.environ["SEEN_MAX_ITEMS"]
+
+
 if __name__ == "__main__":
     import pytest
     raise SystemExit(pytest.main([__file__, "-v"]))

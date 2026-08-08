@@ -18,5 +18,6 @@ STATUS.md
 .vscode/
 .idea/
 data/price_history.jsonl
+data/time_to_sell.jsonl
 *.backup
 .env.*.tmp
