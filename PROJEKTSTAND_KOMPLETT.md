@@ -2,10 +2,11 @@
 
 > Diese Datei ist die einzige verlässliche Referenz für den Ist-Zustand des
 > Projekts. Jede Angabe wurde gegen den realen Code verifiziert (Dateisystem,
-> `git log`/`status`, echter `pytest`-Lauf — **596/596 Tests grün**).
+> `git log`/`status`, echter `pytest`-Lauf — **599/599 Tests grün**).
 > Stand: Repo `main`, letzter committeter Commit `b9eb637` + unversionierte
-> Erweiterung dieser Session (Abschnitt 20 KPI-Filter, Details: STATUS.md
-> Abschnitt 32). Ersetzt/ergänzt `PHASE_0_ANALYSE_VERIFIZIERT.md`.
+> Erweiterung dieser Session (Abschnitt 20 KPI-Filter, Abschnitt 3c
+> Flip-Kandidaten-Bugfix Schritt A, Details: STATUS.md Abschnitt 32/33).
+> Ersetzt/ergänzt `PHASE_0_ANALYSE_VERIFIZIERT.md`.
 
 ---
 
@@ -21,12 +22,15 @@ im Entwicklungsauftrag beschriebenen PC-Fokus hinaus (Details: Abschnitt 6).
 ```
 Branch: main
 Letzter committeter Commit: b9eb637 feat(dashboard): Top-Deal-Transparenz auf Deal-Karten (Abschnitt 19)
-Unversioniert (diese Session, siehe STATUS.md Abschnitt 32):
+Unversioniert (diese Session, siehe STATUS.md Abschnitt 32/33):
   M  app/app.py               kpi_filter_thresholds fuer neuen KPI-Filter
   M  app/templates/index.html filterKpi-Dropdown + data-*-Attribute
   M  app/tests/test_app_status_kpis.py  3 neue Tests
+  M  app/scoring/profit.py    margin_pct-Guard bei Mini-Kaufpreisen (Abschnitt 3c, Schritt A)
+  M  app/rules/_global.yaml   fees.min_purchase_price_for_margin_pct (optional)
+  M  app/tests/test_profit.py 3 neue Tests
 ```
-Tests: `pytest app/tests/` → **596 passed** (keine Fehler/Skips).
+Tests: `pytest app/tests/` → **599 passed** (keine Fehler/Skips).
 
 ## 3a. Top-Deal-Logik — neu abgeschlossener Workstream (STATUS.md Abschnitt 32)
 
@@ -65,6 +69,59 @@ liegen keine Produktionsdaten vor.
 Arbeitsverzeichnis (siehe 2.). Empfehlung: nach Freigabe der realen
 KPI-Auswertung (3a) in einem Commit zusammenfassen, analog zum bisherigen
 Muster (ein Commit je STATUS.md-Abschnitt).
+
+## 3c. Flip-Kandidaten-Bugfix — Schritt A abgeschlossen, Schritt B offen
+
+Eigenständiger Auftrag ("Flip-Kandidaten-Logik anpassen/optimieren"),
+ausgelöst durch produktiven Befund: KPI `flip_candidates_count` zeigte
+**730 von 2500** Angeboten (29 %) — deutlich zu hoch, um plausibel zu sein.
+
+**Root-Cause-Analyse (gegen echte `found.json`-Produktivdaten
+verifiziert):**
+- **Ursache 1 (Bug, behoben — Schritt A):** `estimated_margin_pct =
+  margin_abs / purchase_price * 100` divergiert bei sehr niedrigen/
+  fehlerhaften Kaufpreisen (Tausch-/VB-Inserate mit `price=1€`) ins
+  Absurde — beobachteter Extremfall `+58.695 %` bei einem MacBook-Inserat
+  für 1 €. 70 der 730 Treffer hatten `price ≤ 5 €`.
+- **Ursache 2 (methodisch, NICHT behoben — Schritt B, offen):** Auch ohne
+  diese Ausreißer bleiben **~500 Treffer mit plausiblem Preis (>20 €)**
+  über der 20 %-Schwelle. Grund: `price_stats.py::_estimated_resale_price()`
+  fällt bei `< 5` Preishistorie-Datenpunkten je `price_history_model` auf
+  den bisherigen Maximalpreis zurück — bei granularen Regel-Labels
+  (einzelnes iPhone-Modell+Speicher, einzelnes Lego-Set, einzelne
+  Retro-Konsole) ist die Datenbasis oft dünn, wodurch die Marge
+  strukturell zu optimistisch wird. Betroffene Kategorien:
+  `lego_minifiguren` (185/386 Treffer), `iphone` (152/1110),
+  `retro_konsolen` (103/240), `vintage_elektronik`, `monitor_curved`.
+
+**Schritt A — umgesetzt (unversioniert, siehe Abschnitt 2):**
+- `scoring/profit.py`: neue Konstante `MIN_PURCHASE_PRICE_FOR_MARGIN_PCT`
+  (Default 10 €). `margin_pct` wird `None` statt eines irreführenden Werts,
+  wenn `purchase_price` darunter liegt — `margin_abs` (Euro) bleibt
+  unverändert gesetzt. Überschreibbar via
+  `fees.min_purchase_price_for_margin_pct` in `_global.yaml`.
+- `rules/_global.yaml`: neuer optionaler Key im bestehenden `fees:`-Block
+  (kein neuer Ladepfad in `matcher.py` nötig).
+- `tests/test_profit.py`: 3 neue Tests. Volle Suite: **599/599 grün**.
+- Simulation gegen `found.json`-Produktivdaten: **730 → 624**
+  Flip-Kandidaten (−106 Fehltreffer mit `price < 10 €`).
+
+**Schritt B — offen, noch nicht freigegeben:** methodische Verfeinerung
+von `estimated_resale_price` bei dünner Preishistorie (< 5 Datenpunkte je
+`price_history_model`). Zwei Stoßrichtungen zur Diskussion, noch keine
+Entscheidung getroffen:
+  1. Kein Flip-Kandidaten-Zähler für Angebote, deren `price_history_model`
+     unter der Mindest-Sample-Schwelle liegt (statt Max-Preis-Fallback als
+     Verkaufsreferenz zu nutzen) — konservativer, reduziert False Positives
+     weiter, aber auch die Gesamtzahl erkannter Flip-Kandidaten deutlich.
+  2. Granularität der `price_history_model`-Schlüssel bei den betroffenen
+     Kategorien (iPhone/Lego/Retro-Konsolen) überprüfen/vergröbern, damit
+     mehr Datenpunkte pro Modell zusammenlaufen und Perzentile
+     aussagekräftiger werden — größerer Eingriff, betrifft
+     `price_history.jsonl`-Bestandsdaten.
+Betrifft ausschließlich `price_stats.py`/`scoring/profit.py` — kein
+Einfluss auf `deal_score`/Notification-Gate (Default-Gewicht `profit`
+weiterhin 0.0 in fast allen Kategorien, siehe Abschnitt 7).
 
 ## 3. Architektur — Datenfluss
 
@@ -217,6 +274,7 @@ behandelt werden, nicht als etwas, das "neu geplant" werden muss.
 | L6 | Scope-Drift: 5 Nicht-PC-Kategorien | Klärungsbedarf, kein Bug | **Entschieden (siehe Abschnitt 9b)** — bewusst behalten, unabhängig weiterlaufen lassen |
 | L7 | `app.py` als 977-Zeilen-Monolith (Routen + Scan-Loop + Scheduler in einer Datei) | Wartbarkeit bei weiterem Wachstum | Niedrig, vorausschauend |
 | L8 | Hersteller/Zustand/Lieferumfang-Scoring-Gewichte bewusst auf 0 (kein Detector für Zustand/Lieferumfang) | Deal-Score nutzt nur 3 von 6 Komponenten aktiv | Mittel, hängt von L1/L2 ab |
+| L9 | **Schritt A abgeschlossen (siehe Abschnitt 3c), Schritt B offen** — `estimated_resale_price` fällt bei < 5 Preishistorie-Datenpunkten auf Max-Preis-Fallback zurück, macht `flip_candidates_count` bei dünner Datenbasis (iPhone/Lego/Retro-Konsolen) strukturell zu optimistisch | ~500 verbleibende, methodisch überhöhte Flip-Treffer (nach Schritt-A-Bugfix: 624 statt 730) | Mittel, wartet auf Freigabe |
 
 ### 9a. Architekturentscheidung L2 — ENTSCHIEDEN (kein Code geändert)
 
@@ -315,7 +373,9 @@ Detector), keiner davon blockierend.
 **Phase 0 + Phase 1 abgeschlossen, keine Code-Änderungen dort.** Punkt 3
 (Kategorien) laut Abschnitt 9c final abgeschlossen. Zusätzlich der
 eigenständige Top-Deal-Logik-Workstream (Abschnitt 3a) inhaltlich fertig,
-aktuell noch unversioniert im Arbeitsverzeichnis (Abschnitt 3b). Offene
-Punkte: L5 (Datenrotation, ✅ bereits erledigt), L7 (`app.py`-Monolith),
-L8 (Scoring-Komponenten ohne Detector) — keiner davon blockierend. Warte
-auf Freigabe für den nächsten Schritt.
+aktuell noch unversioniert im Arbeitsverzeichnis (Abschnitt 3b). Ebenfalls
+neu: Flip-Kandidaten-Bugfix Schritt A abgeschlossen (Abschnitt 3c,
+unversioniert), Schritt B (methodische Verfeinerung `estimated_resale_price`,
+siehe L9) noch offen. Weitere offene Punkte: L5 (Datenrotation, ✅ bereits
+erledigt), L7 (`app.py`-Monolith), L8 (Scoring-Komponenten ohne Detector) —
+keiner davon blockierend. Warte auf Freigabe für den nächsten Schritt.

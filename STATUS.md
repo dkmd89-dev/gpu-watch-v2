@@ -1184,3 +1184,109 @@ feat(dashboard): KPI-Filter (Top-Deals/Sehr gute Deals/Flip/Neue Top-Deals)
 ```
 
 **Offen:** reale Vorher/Nachher-KPI-Zahlen (Auftrag Abschnitt 23) und der GTX-1070-Testfall (Abschnitt 7) stehen noch aus — erfordern Prüfung gegen die produktive `data/found.json`, die in dieser Entwicklungsumgebung nicht vorliegt.
+
+## 33. Flip-Kandidaten-Logik optimieren — Schritt A abgeschlossen, Schritt B offen
+
+**Auslöser:** produktives Dashboard zeigte `flip_candidates_count = 730`
+von 2500 gespeicherten Angeboten (29 %) — Auftrag: Logik anpassen/optimieren,
+Analyse gegen `PROJEKTSTAND_KOMPLETT.md`/`STATUS.md` und die letzten beiden
+Commits.
+
+**Root-Cause-Analyse (verifiziert gegen echte `found.json`-Produktivdaten,
+2500 Einträge):**
+- **Ursache 1 (Bug):** `compute_profit()` (`scoring/profit.py`) berechnet
+  `margin_pct = margin_abs / purchase_price * 100`. Bei sehr niedrigem/
+  fehlerhaftem `purchase_price` (Tausch-/VB-Inserate ohne echten Preis,
+  `price=1€`) divergiert das ins Absurde. Beobachtete Extremfälle:
+  `+58.695%` (MacBook Pro "ohne Display", 1€), `+52.525%` (iPhone 15 Pro
+  Max, 1€), `+45.421%` (Gaming-PC, 1€). 70 der 730 Flip-Treffer hatten
+  `price ≤ 5€`, 122 `price ≤ 10€`. `purchase_price ≤ 0` war bereits
+  gegen `None` abgesichert (siehe bestehender Test
+  `test_margin_pct_none_bei_kaufpreis_null`), der Bereich knapp darüber
+  nicht.
+- **Ursache 2 (methodisch, weiterhin offen):** Auch ohne diese Ausreißer
+  bleiben rund 500 Treffer mit plausiblem Preis (>20€) über der
+  20%-Schwelle (`MIN_FLIP_MARGIN_PCT`). `price_stats.py::
+  _estimated_resale_price()` fällt bei `< _MIN_SAMPLES_FOR_PERCENTILE_
+  MARKET_PRICE` (5) Datenpunkten je `price_history_model` auf den
+  bisherigen `max_price` zurück (bewusste, dokumentierte
+  Konservativitätsentscheidung laut Docstring, aber bei granularen
+  Regel-Labels mit dünner Preishistorie strukturell zu optimistisch).
+  Konzentriert bei `lego_minifiguren` (185/386 Treffer betroffen),
+  `iphone` (152/1110), `retro_konsolen` (103/240), `vintage_elektronik`,
+  `monitor_curved`.
+
+### 33a. Schritt A — margin_pct-Guard bei Mini-Kaufpreisen
+
+**Umsetzung:** `scoring/profit.py`: neue Konstante
+`MIN_PURCHASE_PRICE_FOR_MARGIN_PCT = 10.0`. In `compute_profit()` wird
+`margin_pct` auf `None` gesetzt, wenn `purchase_price` darunter liegt —
+`margin_abs` (Euro) bleibt in jedem Fall gesetzt, keine Änderung an dessen
+Berechnung. Schwelle überschreibbar via neuen, optionalen Key
+`fees.min_purchase_price_for_margin_pct` in `rules/_global.yaml` (bewusst
+im bestehenden `fees`-Dict statt eines eigenen Ladepfads in `matcher.py`/
+`_load_rules_from_dir()` — kleinstmöglicher Eingriff, analog zum
+bisherigen "fehlt → Default"-Muster der übrigen `fees`-Werte).
+
+**Geänderte Dateien**
+- `app/scoring/profit.py` — `MIN_PURCHASE_PRICE_FOR_MARGIN_PCT`-Konstante,
+  Guard in `compute_profit()`, Docstrings aktualisiert
+- `app/rules/_global.yaml` — `fees.min_purchase_price_for_margin_pct: 10.0`
+  (entspricht Code-Default, keine Verhaltensänderung falls Key fehlt)
+- `app/tests/test_profit.py` — 3 neue Tests (Mini-Kaufpreis → `None`,
+  exakte Schwelle, YAML-Override via `fees`-Dict)
+
+**Empfohlene Tests**
+`pytest app/tests/` → **599 passed** (596 + 3 neue). Simulation gegen
+`data/found.json.bak-20260808T065702` (2500 Einträge): `flip_candidates_
+count` sinkt von **730 auf 624** (−106 Fehltreffer mit `price < 10€`,
+inkl. des 58.695%-Ausreißers).
+
+**Mögliche Nebenwirkungen**
+Keine bei bestehenden Kategorien/Scores — `deal_score`/`deal_stars`
+unberührt (`profit`-Scoring-Gewicht weiterhin 0.0 in fast allen
+Kategorien außer `gpu.yaml`/`notebook_resell.yaml`, siehe Abschnitt 16;
+dort behandelt `_profit_score()` `margin_pct is None` bereits als
+bekannten Placeholder-Fall — kein neues Verhalten). Ältere `found.json`-
+Einträge mit `price < 10€` und bereits gesetztem `estimated_margin_pct`
+bleiben bis zum nächsten Scan unverändert im Dashboard sichtbar (rein
+additive Neuberechnung, kein rückwirkendes Update bestehender Einträge).
+
+**Commit-Nachricht (noch nicht committet)**
+```
+fix(profit): margin_pct-Guard gegen absurde Werte bei Mini-Kaufpreisen
+
+- scoring/profit.py: MIN_PURCHASE_PRICE_FOR_MARGIN_PCT (10€ Default),
+  margin_pct=None statt Fehlwert bei purchase_price darunter
+  (margin_abs unveraendert)
+- rules/_global.yaml: fees.min_purchase_price_for_margin_pct (optional,
+  ueberschreibbar)
+- tests/test_profit.py: 3 neue Tests
+
+Reduziert Flip-Kandidaten-Fehltreffer (730 -> 624 im aktuellen
+found.json-Datensatz), behebt Extremfall +58.695% bei 1€-Inseraten.
+Schritt B (estimated_resale_price-Methodik) folgt separat.
+```
+
+### 33b. Schritt B — offen, noch nicht freigegeben
+
+Methodische Verfeinerung von `estimated_resale_price` bei dünner
+Preishistorie. Zwei Stoßrichtungen zur Diskussion, noch keine Entscheidung
+getroffen bzw. Freigabe erteilt:
+
+1. **Kein Flip-Kandidat bei zu wenig Datenpunkten:** Angebote, deren
+   `price_history_model` unter `_MIN_SAMPLES_FOR_PERCENTILE_MARKET_PRICE`
+   liegt (aktuell 5), zählen nicht als Flip-Kandidat statt den
+   `max_price`-Fallback als Verkaufsreferenz zu nutzen. Konservativer,
+   reduziert False Positives weiter — reduziert aber auch die
+   Gesamt-Trefferzahl spürbar (betrifft laut Analyse v. a. `iphone`,
+   `lego_minifiguren`, `retro_konsolen`).
+2. **Granularität der `price_history_model`-Schlüssel überprüfen:** bei
+   den betroffenen Kategorien ggf. vergröbern, damit mehr Datenpunkte pro
+   Modell zusammenlaufen und Perzentile aussagekräftiger werden. Größerer
+   Eingriff, betrifft potenziell `price_history.jsonl`-Bestandsdaten und
+   die YAML-Regeln selbst — nicht mehr "kleinstmöglicher Eingriff".
+
+Betrifft ausschließlich `price_stats.py`/`scoring/profit.py`, kein
+Einfluss auf `deal_score`/Notification-Gate. Wartet auf Freigabe/
+Priorisierung, bevor einer der beiden Wege umgesetzt wird.
