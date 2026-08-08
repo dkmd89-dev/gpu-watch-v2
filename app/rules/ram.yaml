@@ -1,0 +1,183 @@
+# ============================================================
+# RAM-Kategorie (nur DDR4, keine MHz-Grenze laut Auftrag)
+# ============================================================
+# Architekturentscheidung (siehe PROJEKTSTAND_KOMPLETT.md Abschnitt 9a,
+# L2): matcher.py's requirements-Typ "min_ram_gb" prüft nur eine
+# MINDESTGRÖSSE (categories/detectors/ram.py::detect_ram_gb() +
+# matcher._ram_meets_requirement()), es gibt bewusst KEIN "max_ram_gb"
+# (anders als min_ssd_gb/max_ssd_gb bei SATA-SSD oder min_psu_watt/
+# max_psu_watt bei Netzteil). Eine sauber getrennte 8/16/32GB-Preis-
+# Tier-Struktur über requirements wäre daher nur über eine fragile,
+# implizite Regel-Reihenfolge (absteigend nach min_ram_gb) lösbar --
+# nicht deklarativ, schwer wartbar. Da für diesen Schritt ausdrücklich
+# KEIN Code-Change vorgesehen ist, wird stattdessen (wie bereits bei
+# monitor_curved.yaml begründet) reines Titel-Keyword-Matching
+# (require_all_of) verwendet: die Kapazität ("8GB"/"16GB"/"32GB") ist
+# im Titel ohnehin fast immer explizit genannt, ein eigener Detector-
+# Requirement-Typ bringt hier keinen echten Mehrwert.
+#
+# min_vram_gb: 0 -- derselbe Bugfix wie bei sata_ssd.yaml/monitor_curved.yaml:
+# matcher.py's generische VRAM-Heuristik (\d{1,2}\s*gb) würde "16GB"/"32GB"
+# sonst fälschlich als "0GB VRAM" interpretieren und das Match verwerfen.
+#
+# Bekannte, bewusst nicht gelöste Lücke (analog zu anderen Kategorien):
+# Kit-Notationen wie "2x8GB" (= 16GB) werden NICHT auf die 16GB-Regel
+# gemappt, da der Begriff "8gb" als Wortgrenze in "2x8gb" korrekt NICHT
+# matcht (siehe matcher._contains_term()) -- das Kit fällt dann durch alle
+# Kapazitäts-Regeln und wird nicht gematcht. Titel nennen in der Praxis
+# aber überwiegend die Gesamtkapazität direkt ("16GB DDR4 RAM (2x8GB)"),
+# wo "16gb" ohnehin vorkommt -- Restrisiko gering, als bekannte
+# Einschränkung dokumentiert statt vorab über-konstruiert zu lösen.
+#
+# Preisgrenzen sind PLATZHALTER (keine price_history.jsonl-Daten für
+# diese neue Kategorie vorhanden) -- Kalibrierung folgt nach
+# Datensammlung, analog zum bisherigen Muster (netzteil.yaml/
+# monitor_curved.yaml initial). Bewusst KEIN Verhandlungs-Assistent in
+# diesem Schritt (neue Kategorie ohne Erfahrungswerte, exakt wie bei
+# monitor_curved.yaml begründet).
+# ============================================================
+
+category: "ram"
+label: "RAM (DDR4)"
+
+# gpu:1, sata_ssd:2, netzteil:3 bereits vergeben -- nächster freier Wert.
+scan_priority: 4
+
+search_terms:
+  - "RAM DDR4"
+  - "DDR4 RAM"
+  - "Arbeitsspeicher DDR4"
+  - "8GB DDR4"
+  - "16GB DDR4"
+  - "32GB DDR4"
+  - "Corsair Vengeance DDR4"
+  - "G.Skill Ripjaws DDR4"
+  - "Kingston HyperX DDR4"
+  - "Crucial DDR4 RAM"
+  - "Crucial Ballistix"
+
+# SCORING-GEWICHTUNG
+# Analog zu sata_ssd.yaml/netzteil.yaml/monitor_curved.yaml: RAM ist eine
+# einzelne, austauschbare Komponente ohne CPU/SSD/GPU-Ausstattungsmerkmale
+# -- Preis dominiert, hardware_qualitaet (hier: Deal-Rating-Stufe als
+# grober Tie-Breaker) fließt leicht mit ein. hersteller bleibt bei 0: die
+# vorhandene manufacturer_reputation-Tabelle deckt PC-OEM-Marken ab
+# (Dell, HP, ...), nicht RAM-Hersteller (Corsair, G.Skill, Kingston, ...).
+scoring_weights:
+  price: 0.85
+  ausstattung: 0
+  hardware_qualitaet: 0.15
+  hersteller: 0
+  zustand: 0
+  lieferumfang: 0
+
+# EXCLUDES – Fehltreffer-Quellen STRIKT AUSSCHLIESSEN
+# "defekt"/"bastler"/"ersatzteil" etc. NICHT hier dupliziert -- bereits
+# über exclude_global in _global.yaml für ALLE Kategorien abgedeckt.
+exclude_category:
+  # Nur DDR4 (Auftrag) -- DDR3/DDR5 explizit ausschließen, falls im Titel
+  # genannt (verhindert z.B. dass ein DDR5-Kit über die reinen GB-Zahlen
+  # trotzdem in eine DDR4-Preisregel fällt).
+  - "ddr3"
+  - "ddr5"
+
+  # Laptop-/SODIMM-RAM ist ein anderer Formfaktor/Markt als Desktop-DIMM
+  # -- andere Preisklasse, würde die Kategorie sonst verfälschen.
+  - "sodimm"
+  - "so-dimm"
+  - "so dimm"
+  - "laptop"
+  - "notebook"
+
+  # Komplette PCs (RAM nur als Bundle-Bestandteil erwähnt, kein
+  # eigenständiges RAM-Angebot) -- gleiches Muster wie sata_ssd.yaml.
+  - "gaming pc"
+  - "gaming-pc"
+  - "komplett pc"
+  - "pc komplett"
+  - "komplettsystem"
+  - "fertig pc"
+  - "optiplex"
+  - "thinkcentre"
+  - "esprimo"
+  - "prodesk"
+  - "elitedesk"
+  - "nuc"
+  - "mini pc"
+
+  # Server-/Workstation-RAM (ECC/Registered) -- anderer Formfaktor/Markt,
+  # oft nicht kompatibel mit gewöhnlichen Desktop-Boards.
+  - "ecc"
+  - "registered"
+  - "rdimm"
+  - "server ram"
+
+  # Konsolen (können "16GB" u.ä. im Titel enthalten, z.B. Speicherkarten)
+  - "playstation"
+  - "xbox"
+  - "nintendo"
+  - "switch"
+
+rules:
+  # ============================================================
+  # 8GB DDR4
+  # ============================================================
+  - label: "8GB DDR4 RAM ★ Top-Deal"
+    price_history_model: "ram_ddr4_8gb"
+    require_all_of:
+      - ["8gb"]
+      - ["ddr4"]
+    min_vram_gb: 0
+    max_price: 10
+    deal_rating: "Top-Deal"
+
+  - label: "8GB DDR4 RAM"
+    price_history_model: "ram_ddr4_8gb"
+    require_all_of:
+      - ["8gb"]
+      - ["ddr4"]
+    min_vram_gb: 0
+    max_price: 15
+    deal_rating: "Guter Preis"
+
+  # ============================================================
+  # 16GB DDR4
+  # ============================================================
+  - label: "16GB DDR4 RAM ★ Top-Deal"
+    price_history_model: "ram_ddr4_16gb"
+    require_all_of:
+      - ["16gb"]
+      - ["ddr4"]
+    min_vram_gb: 0
+    max_price: 20
+    deal_rating: "Top-Deal"
+
+  - label: "16GB DDR4 RAM"
+    price_history_model: "ram_ddr4_16gb"
+    require_all_of:
+      - ["16gb"]
+      - ["ddr4"]
+    min_vram_gb: 0
+    max_price: 28
+    deal_rating: "Guter Preis"
+
+  # ============================================================
+  # 32GB DDR4
+  # ============================================================
+  - label: "32GB DDR4 RAM ★ Top-Deal"
+    price_history_model: "ram_ddr4_32gb"
+    require_all_of:
+      - ["32gb"]
+      - ["ddr4"]
+    min_vram_gb: 0
+    max_price: 35
+    deal_rating: "Top-Deal"
+
+  - label: "32GB DDR4 RAM"
+    price_history_model: "ram_ddr4_32gb"
+    require_all_of:
+      - ["32gb"]
+      - ["ddr4"]
+    min_vram_gb: 0
+    max_price: 48
+    deal_rating: "Guter Preis"
