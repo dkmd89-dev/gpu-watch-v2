@@ -303,6 +303,43 @@ Kein weiterer Punkt ist priorisiert oder für den nächsten Schritt vorausgewäh
 
 ---
 
+## 30. Architekturentscheidung L2 (Detector-Registry) — entschieden, kein Code geändert
+
+**Ausgangslage:** `PROJEKTSTAND_KOMPLETT.md` (Abschnitt 9) listete L2 als offene, hoch priorisierte architektonische Grundsatzfrage: soll `matcher.py` künftig generisch über `categories/detectors/registry.py::discover_detectors()` laufen, statt Detectors statisch zu importieren?
+
+**Analyse (verifiziert an `matcher.py::_evaluate_hardware_requirements()`, Zeilen 491–556):** Jeder Requirement-Typ (`min_ram_gb`, `min_ssd_gb`, `min_psu_watt`, `min_cpu`, `case`, `requires_dedicated_gpu`) ist kein reiner Detector-Aufruf, sondern eng gekoppelt an eine eigene Validierungsfunktion (`_ram_meets_requirement`, `_storage_meets_requirement`, `_psu_meets_requirement`, `_cpu_meets_requirement`, `_case_meets_requirement`, `_gpu_meets_requirement`) sowie an die Weiterverwendung des Feature-Werts in `_build_score_inputs()` (Headroom-Berechnung, `has_ssd`, `has_dedicated_gpu`). Die "fehlend"-Semantik ist zudem nicht einheitlich — `_case_meets_requirement` kehrt sie bewusst um. Ein generischer Dispatcher würde diese Kopplung nicht auflösen, nur zusätzliche Indirektion um denselben speziellen Code bauen.
+
+**Entscheidung: Option B — kontrolliert bei statischen Imports bleiben.** `categories/detectors/registry.py` bleibt reine Discovery-/Test-Infrastruktur (unverändert), `matcher.py` wird NICHT umgestellt. Für neue Kategorien mit bestehendem Requirement-Vokabular bleibt es bei reinem YAML (bereits bewiesen durch `monitor_curved`/`sata_ssd`/`netzteil`). Für ein genuin neues Hardware-Merkmal gilt künftig als dokumentiertes, wiederholbares Muster: (1) neue `detect_<n>()`-Funktion, (2) neuer `if "<key>" in requirements:`-Block in `_evaluate_hardware_requirements()` — bereits einmal real angewendet (SATA-SSD-Kapazitätsprüfung, Abschnitt 10).
+
+**Geänderte Dateien:**
+- `PROJEKTSTAND_KOMPLETT.md` (L2-Zeile auf "entschieden" gesetzt, neuer Abschnitt 9a mit Begründung)
+- `STATUS.md` (dieser Abschnitt)
+
+**Kein Python-Code geändert.**
+
+**Empfohlene Tests:** Keine — reine Dokumentationsänderung, Verhalten unverändert. `pytest app/tests/` bleibt bei 569/569 (in dieser Sandbox erneut verifiziert).
+
+**Mögliche Nebenwirkungen:** Keine funktionalen. Legt die Leitplanke für Punkt 3 (Kategorien ergänzen) fest: RAM/SSD-Erweiterung sind reine YAML-Schritte, Mainboard/CPU-Einzelkategorie/Monitor-Panel-Typ/Notebook brauchen je einen kleinen, kontrollierten Detector-Schritt.
+
+**Commit-Nachricht:**
+```
+docs: Architekturentscheidung L2 getroffen -- Detector-Ebene bleibt statisch
+
+- PROJEKTSTAND_KOMPLETT.md: L2 als entschieden markiert, neuer Abschnitt 9a
+  mit Begruendung (Requirement-Typen sind Dreiklang aus Detector +
+  Validierungsfunktion + Feature-Weiterverwendung, nicht einheitliche
+  "fehlend"-Semantik, generischer Dispatcher loest die Kopplung nicht auf)
+- Entscheidung: matcher.py bleibt bei statischen Detector-Imports,
+  categories/detectors/registry.py bleibt reine Discovery-Infrastruktur
+- Dokumentiertes Muster fuer neue Hardware-Merkmale: neuer Detector +
+  neuer Requirement-Key-Block in _evaluate_hardware_requirements()
+  (~10 Zeilen), bereits einmal real angewendet (SATA-SSD-Kapazitaet)
+- STATUS.md: Abschnitt 30 ergaenzt
+- Kein Python-Code geaendert, 569/569 Tests unveraendert gruen
+```
+
+---
+
 ## 16. Nächstes Konzept: Reselling-/Arbitrage-Erweiterung (geplant, nicht begonnen)
 
 **Ziel:** Über den bestehenden Deal-Score hinaus soll der Bot künftig gezielt Angebote erkennen, die sich günstig einkaufen und mit Marge weiterverkaufen lassen ("billig rein, teurer raus"), statt nur "günstig für den Eigenbedarf" zu bewerten.

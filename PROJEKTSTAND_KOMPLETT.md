@@ -165,25 +165,54 @@ behandelt werden, nicht als etwas, das "neu geplant" werden muss.
 | # | Lücke | Auswirkung | Vorschlag Priorität |
 |---|---|---|---|
 | L1 | 6 der 8 PC-Hardware-Zielkategorien aus dem Auftrag fehlen ganz/teilweise (CPU, Mainboard, RAM, NVMe-SSD, allg. Monitor, Notebook) | Auftragsziel "modularer Hardware Deal Finder" ist zur Hälfte offen | Hoch — Kern des Auftrags |
-| L2 | Detector-Ebene ist NICHT codefrei erweiterbar (Abschnitt 5) | Neue Kategorien mit neuem Hardware-Merkmal brauchen Python-Änderung, widerspricht wörtlich der Zielarchitektur-Vorgabe | Hoch — architektonische Grundsatzfrage |
-| L3 | Uncommittete Reste (`.env.0.tmp`, `time_to_sell.jsonl`) | Verunreinigt künftige Diffs | Niedrig, schnell erledigt |
-| L4 | `data/price_history (Kopie).txt` — verwaistes 1,8-MB-Duplikat | Datenmüll, kein Code-Bezug | Niedrig |
+| L2 | Detector-Ebene ist NICHT codefrei erweiterbar (Abschnitt 5) | Neue Kategorien mit neuem Hardware-Merkmal brauchen Python-Änderung | **Entschieden (siehe Abschnitt 9a)** — bewusst kontrolliert bei statischen Imports geblieben |
 | L5 | `seen.json`/`found.json` wachsen unbegrenzt (14 MB / 2,1 MB) | Perf./Speicher langfristig | Mittel |
 | L6 | Scope-Drift: 5 Nicht-PC-Kategorien | Klärungsbedarf, kein Bug | Entscheidung nötig, keine technische Priorität |
 | L7 | `app.py` als 977-Zeilen-Monolith (Routen + Scan-Loop + Scheduler in einer Datei) | Wartbarkeit bei weiterem Wachstum | Niedrig, vorausschauend |
 | L8 | Hersteller/Zustand/Lieferumfang-Scoring-Gewichte bewusst auf 0 (kein Detector für Zustand/Lieferumfang) | Deal-Score nutzt nur 3 von 6 Komponenten aktiv | Mittel, hängt von L1/L2 ab |
 
-## 9. Plan für die offenen Punkte (Vorschlag, ungeprüft/unimplementiert)
+### 9a. Architekturentscheidung L2 — ENTSCHIEDEN (kein Code geändert)
 
-1. **Aufräumschritt (klein, isoliert):** L3 + L4 in einem Mini-Schritt beheben
-   (git add/rm, Kopie-Datei löschen) — unabhängig von allem anderen.
-2. **Architekturentscheidung zu L2** treffen, BEVOR neue Kategorien gebaut
-   werden: Detector-Registry generisch anbinden (Risiko wie im Docstring
-   beschrieben) vs. bewusst bei statischen Imports bleiben und für jede neue
-   Kategorie mit neuem Merkmal einen klar abgegrenzten, dokumentierten
-   Mini-Schritt "neuer Detector + ein neuer Aufruf in `_evaluate_hardware_
-   requirements()`" einplanen (kleine, kontrollierte Ausnahme vom
-   "nur YAML"-Ziel).
+**Entscheidung:** Option B — kontrolliert bei statischen Imports in
+`matcher.py` bleiben. `categories/detectors/registry.py` bleibt reine
+Discovery-/Test-Infrastruktur, `matcher.py` wird NICHT auf sie umgestellt.
+
+**Begründung (verifiziert an `_evaluate_hardware_requirements()`,
+`matcher.py` Zeilen 491–556):** Jeder Requirement-Typ ist kein reiner
+Detector-Aufruf, sondern ein Dreiklang aus Detector + eigener
+Validierungsfunktion (`_ram_meets_requirement`, `_storage_meets_requirement`,
+`_psu_meets_requirement`, `_cpu_meets_requirement`, `_case_meets_requirement`,
+`_gpu_meets_requirement`) + Weiterverwendung des Feature-Werts in
+`_build_score_inputs()` (Headroom-Berechnung, `has_ssd`, `has_dedicated_gpu`).
+Die "fehlend"-Semantik ist zudem NICHT einheitlich — `_case_meets_requirement`
+kehrt sie bewusst um (kein erkannter Gehäusetyp = erfüllt, nicht wie bei
+RAM/SSD/PSU = nicht erfüllt). Ein generischer Dispatcher würde diese enge
+Kopplung nicht auflösen, sondern nur zusätzliche Indirektion um denselben
+speziellen Code bauen — bei hohem Risiko für einen zentralen, produktiv
+laufenden Pfad (569 Tests hängen daran) und nachweislich geringem Nutzen,
+da jede neue Kategorie mit bestehendem Requirement-Vokabular (`min_ram_gb`,
+`min_cpu`, `case`, `min_psu_watt`, `requires_dedicated_gpu`, …) bereits
+heute rein per YAML funktioniert (bewiesen durch `monitor_curved`,
+`sata_ssd`, `netzteil`). Widerspricht zudem der Grundregel "nicht komplett
+umschreiben, nur erweitern".
+
+**Konsequenz für Punkt 3 (Kategorien ergänzen):** Kategorien, die mit
+bestehendem Requirement-Vokabular auskommen (z. B. RAM als eigene
+Kategorie, SSD/NVMe-Erweiterung) → reines YAML, kein Detector-Aufwand.
+Kategorien mit einem genuin NEUEN Hardware-Merkmal (Mainboard-Chipsatz,
+Monitor-Panel-Typ, notebook-spezifische Merkmale) → dokumentiertes,
+wiederholbares Zwei-Schritt-Muster als bewusste, kontrollierte Ausnahme
+vom "nur YAML"-Ziel:
+1. neue `detect_<n>()`-Funktion in `categories/detectors/`
+2. neuer `if "<key>" in requirements:`-Block in
+   `_evaluate_hardware_requirements()` (~10 Zeilen, gleiches Muster wie
+   die sechs bestehenden Blöcke)
+
+Kein Rewrite, minimales Risiko, sofort testbar — genau dieses Muster wurde
+bereits einmal real angewendet (SATA-SSD-Kapazitätsprüfung, siehe
+STATUS.md Abschnitt 10).
+
+
 3. **Kategorien nacheinander ergänzen** (je ein Schritt, Freigabe-Workflow):
    RAM → SSD/NVMe-Erweiterung → Mainboard → CPU → Monitor (allgemein) →
    Notebook (PC, nicht Apple). Reihenfolge nach vorhandenen vs. fehlenden
