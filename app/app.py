@@ -146,6 +146,21 @@ _scan_status: dict = {
     "scan_progress_total": 0,
     "scanned_count_last_scan": 0,
     "new_hits_last_scan": 0,
+    # roadmap.md Phase 2 (Scan-Performance-Metriken): rein additive Felder,
+    # zunaechst nur "gemessen" -- keine Optimierung, siehe run_scan()-
+    # Metrik-Erfassung unten. Alle *_sec-Werte sind Sekunden (float),
+    # None solange kein Scan gelaufen ist.
+    "scan_duration_last_scan_sec": None,
+    "scrape_duration_by_source_sec": {},
+    "deduplicated_count_last_scan": 0,
+    # Hinweis: matcher.evaluate() berechnet Matching UND Deal-Score in
+    # einem Aufruf (nicht getrennt aufrufbar ohne matcher.py anzufassen,
+    # was ausserhalb des Phase-2-Scopes liegt -- siehe Begruendung im
+    # zugehoerigen Schritt-Report). Diese Zeit deckt daher beides ab.
+    "matching_and_scoring_duration_sec": None,
+    "price_stats_duration_sec": None,
+    "persistence_duration_sec": None,
+    "notification_duration_sec": None,
 }
 
 # Suchquellen-Übersicht fürs Dashboard. Statisch, da app.py aktuell fest
@@ -428,6 +443,16 @@ def run_scan():
 
     try:
         log.info("Starte Scan...")
+        # roadmap.md Phase 2: Gesamtdauer-Messung. perf_counter() statt
+        # time.time(), da hier nur Differenzen (keine Wanduhrzeit) gebraucht
+        # werden -- monotone, fuer Laufzeitmessung geeignete Quelle.
+        _scan_start_perf = time.perf_counter()
+        scrape_duration_by_source: dict[str, float] = {}
+        matching_and_scoring_duration = 0.0
+        persistence_duration = 0.0
+        notification_duration = 0.0
+        already_seen_count = 0
+
         rules_cfg = load_rules(str(Path(__file__).parent / "rules"))
         defaults = rules_cfg["defaults"]
 
@@ -505,6 +530,11 @@ def run_scan():
         # gewuenscht). Liefert die Grundlage fuer ZWEI Signale aus derselben
         # Berechnung: market_prices (Deal-Score, Schritt 7.5) und
         # price_stats_by_model (Top-Deal-Erkennung, Schritt 8.2).
+        # roadmap.md Phase 2: Price-Statistics-Zeit -- deckt den gesamten
+        # Block ab (Markt- UND Resale-Preisstatistik), da beide auf
+        # derselben Preishistorie-Datei aufbauen und im selben Schritt
+        # (einmal pro Scan) berechnet werden, siehe Kommentar oben.
+        _price_stats_start = time.perf_counter()
         price_stats_by_model = _load_price_stats(PRICE_HISTORY_FILE)
         market_prices = _market_prices_from_stats(price_stats_by_model)
         # Option 2 (STATUS.md Abschnitt 33b): resale_price_groups fehlt bei
@@ -518,6 +548,7 @@ def run_scan():
         resale_prices = _resale_prices_from_stats(
             price_stats_by_model, resale_stats_by_group, resale_price_groups
         )
+        price_stats_duration = time.perf_counter() - _price_stats_start
 
         # Baustein 5 (Duplicate-/Cross-Posting-Erkennung, STATUS.md Abschnitt
         # 16): Rohdatenpunkte EINMAL pro Scan laden (analog price_stats_by_model
@@ -550,8 +581,15 @@ def run_scan():
         raw = []
         scraper_plugins = discover_scrapers()
         for scraper_name, plugin in scraper_plugins.items():
+            # roadmap.md Phase 2: Scraping-Zeit je Quelle. Einzeln pro
+            # Plugin gemessen (nicht nur gesamt), damit eine einzelne
+            # langsame Quelle sichtbar wird statt in der Summe unterzugehen.
+            _scrape_start = time.perf_counter()
             raw += plugin.search(
                 search_terms, defaults["location_plz"], defaults["radius_km"], global_max_price,
+            )
+            scrape_duration_by_source[scraper_name] = round(
+                time.perf_counter() - _scrape_start, 3
             )
 
         with _status_lock:
@@ -588,6 +626,7 @@ def run_scan():
                 # URLs zusätzlich first_seen an.
                 mark_seen(seen, uid, now_iso)
                 if already_seen:
+                    already_seen_count += 1
                     continue
                 # Sofort persistieren statt erst am Scan-Ende: verhindert,
                 # dass ein Crash mitten im Scan dazu führt, dass bereits
@@ -603,12 +642,19 @@ def run_scan():
                 # last_seen für diese Einträge lediglich auf dem Stand des
                 # vorherigen Scans -- first_seen (sicherheitsrelevant für
                 # Schritt 2) ist davon nicht betroffen.
+                _persist_start = time.perf_counter()
                 _save_json(SEEN_FILE, seen)
+                persistence_duration += time.perf_counter() - _persist_start
 
+            # roadmap.md Phase 2: Matching- und Deal-Score-Zeit. Beide in
+            # einem Wert, da evaluate() sie intern nicht getrennt berechnet
+            # (siehe Kommentar bei "matching_and_scoring_duration_sec" oben).
+            _match_start = time.perf_counter()
             result = evaluate(
                 item["title"], item["price"], rules_cfg,
                 market_prices=market_prices, resale_prices=resale_prices,
             )
+            matching_and_scoring_duration += time.perf_counter() - _match_start
             if not result.matched:
                 continue
 
@@ -723,7 +769,9 @@ def run_scan():
                     # bisherigen Scan-Ende-Save, den Treffer endgültig verlieren
                     # -- er gilt ja bereits als "seen" und würde beim nächsten
                     # Lauf nicht erneut ausgewertet.
+                    _persist_start = time.perf_counter()
                     _save_json(FOUND_FILE, found[:FOUND_MAX_ITEMS])
+                    persistence_duration += time.perf_counter() - _persist_start
 
                 new_hits += 1
 
@@ -784,6 +832,7 @@ def run_scan():
                     )
                     price_str = f"{item['price']:.0f} €"
 
+                    _notify_start = time.perf_counter()
                     send_ntfy(
                         title=f"{emoji} {clean_title} – {price_str}",
                         message=(
@@ -795,6 +844,7 @@ def run_scan():
                         priority="urgent" if item["price"] <= urgent_price_threshold else "default",
                         tags=notify_tags,
                     )
+                    notification_duration += time.perf_counter() - _notify_start
                     log.info(
                         "BENACHRICHTIGT [%s/%s/%s] %s – %.0f € – %s",
                         result.rule_label, result.deal_rating, result.deal_stars,
@@ -856,17 +906,42 @@ def run_scan():
                     "(> %d Tage) entfernt.",
                     pruned_count, SEEN_DELISTED_MAX_AGE_DAYS,
                 )
+            _persist_start = time.perf_counter()
             _save_json(SEEN_FILE, seen)
             _save_json(FOUND_FILE, found[:FOUND_MAX_ITEMS])
+            persistence_duration += time.perf_counter() - _persist_start
+
+        scan_duration = time.perf_counter() - _scan_start_perf
+        deduplicated_count = len(raw) - already_seen_count
 
         log.info(
             "✅ Scan komplett: %d Treffer insgesamt (von %d geprüften Angeboten).",
             new_hits, len(raw),
         )
+        # roadmap.md Phase 2: strukturierte Metrik-Zusammenfassung, ein
+        # Log-Eintrag pro Scan -- Grundlage fuer spaetere Auswertung, ohne
+        # dafuer erst das Dashboard (Phase 8) zu brauchen.
+        log.info(
+            "📊 Scan-Metriken: Gesamtdauer=%.2fs, Scraping=%s, "
+            "gescrapt=%d, dedupliziert=%d, Matching+Scoring=%.2fs, "
+            "Price-Stats=%.2fs, Persistence=%.2fs, Notification=%.2fs",
+            scan_duration, scrape_duration_by_source, len(raw),
+            deduplicated_count, matching_and_scoring_duration,
+            price_stats_duration, persistence_duration, notification_duration,
+        )
 
         with _status_lock:
             _scan_status["scanned_count_last_scan"] = len(raw)
             _scan_status["new_hits_last_scan"] = new_hits
+            _scan_status["scan_duration_last_scan_sec"] = round(scan_duration, 3)
+            _scan_status["scrape_duration_by_source_sec"] = scrape_duration_by_source
+            _scan_status["deduplicated_count_last_scan"] = deduplicated_count
+            _scan_status["matching_and_scoring_duration_sec"] = round(
+                matching_and_scoring_duration, 3
+            )
+            _scan_status["price_stats_duration_sec"] = round(price_stats_duration, 3)
+            _scan_status["persistence_duration_sec"] = round(persistence_duration, 3)
+            _scan_status["notification_duration_sec"] = round(notification_duration, 3)
 
     except Exception as e:
         log.exception(f"Fehler im Scan: {e}")
