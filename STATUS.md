@@ -340,6 +340,41 @@ docs: Architekturentscheidung L2 getroffen -- Detector-Ebene bleibt statisch
 
 ---
 
+## 31. Scope-Entscheidung L6 (Nicht-PC-Kategorien) — entschieden, kein Code geändert
+
+**Ausgangslage:** `PROJEKTSTAND_KOMPLETT.md` (Abschnitt 9) listete L6 als offenen Klärungsbedarf: 5 Kategorien ohne PC-Hardware-Bezug (`iphone`, `macbook`, `retro_konsolen`, `vintage_elektronik`, `lego_minifiguren`) existieren außerhalb der PC-fokussierten Zielliste dieses Entwicklungsauftrags.
+
+**Analyse:** Alle fünf sind vollständig isolierte YAML-Plugins ohne Kopplung zu `office_pc`/`gaming_pc`, in eigenen früheren Sessions bewusst freigegeben (Reselling-/Nischen-Erweiterung, Abschnitte 22/23) und produktiv im Einsatz. Der PC-Fokus dieses Auftrags ("Version 2 konzentriert sich ausschließlich auf komplette PCs") bezieht sich auf die neue Zielliste (Grafikkarten, CPUs, Mainboards, RAM, SSDs, Netzteile, Monitore, Notebooks) — keine der 5 Kategorien fällt darunter, aber auch keine steht damit im Konflikt.
+
+**Entscheidung: Option A — behalten, unabhängig weiterlaufen lassen.** Kein technischer Konflikt mit der PC-Kategorie-Arbeit (Punkt 3), kein Aufwand, kein Datenverlust. Entfernen/Archivieren hätte produktiv gesammelte Preishistorie/Funde ohne technischen Grund verworfen bzw. stillgelegt.
+
+**Geänderte Dateien:**
+- `PROJEKTSTAND_KOMPLETT.md` (L6-Zeile → "Entschieden", neuer Abschnitt 9b mit Begründung)
+- `STATUS.md` (dieser Abschnitt)
+
+**Kein Python-Code geändert, keine YAML-Datei geändert.**
+
+**Empfohlene Tests:** Keine — reine Dokumentationsänderung. `pytest app/tests/` bleibt unverändert bei 569/569.
+
+**Mögliche Nebenwirkungen:** Keine. Legt fest, dass Punkt 3 (Kategorien ergänzen) sich ausschließlich auf die PC-Zielliste konzentriert, ohne die 5 bestehenden Kategorien anzufassen.
+
+**Commit-Nachricht:**
+```
+docs: Scope-Entscheidung L6 getroffen -- Nicht-PC-Kategorien bleiben bestehen
+
+- PROJEKTSTAND_KOMPLETT.md: L6 als entschieden markiert, neuer Abschnitt 9b
+  mit Begruendung (iphone/macbook/retro_konsolen/vintage_elektronik/
+  lego_minifiguren sind isolierte YAML-Plugins, eigene fruehere Freigabe,
+  kein Konflikt mit PC-Fokus dieses Auftrags)
+- Entscheidung: alle 5 Kategorien bleiben unveraendert bestehen und aktiv
+- Kuenftige Kategorie-Arbeit (Punkt 3) fokussiert sich ausschliesslich
+  auf die PC-Zielliste des Auftrags
+- STATUS.md: Abschnitt 31 ergaenzt
+- Kein Code/YAML geaendert, 569/569 Tests unveraendert gruen
+```
+
+---
+
 ## 16. Nächstes Konzept: Reselling-/Arbitrage-Erweiterung (geplant, nicht begonnen)
 
 **Ziel:** Über den bestehenden Deal-Score hinaus soll der Bot künftig gezielt Angebote erkennen, die sich günstig einkaufen und mit Marge weiterverkaufen lassen ("billig rein, teurer raus"), statt nur "günstig für den Eigenbedarf" zu bewerten.

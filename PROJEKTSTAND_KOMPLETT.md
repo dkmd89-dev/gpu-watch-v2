@@ -167,7 +167,7 @@ behandelt werden, nicht als etwas, das "neu geplant" werden muss.
 | L1 | 6 der 8 PC-Hardware-Zielkategorien aus dem Auftrag fehlen ganz/teilweise (CPU, Mainboard, RAM, NVMe-SSD, allg. Monitor, Notebook) | Auftragsziel "modularer Hardware Deal Finder" ist zur Hälfte offen | Hoch — Kern des Auftrags |
 | L2 | Detector-Ebene ist NICHT codefrei erweiterbar (Abschnitt 5) | Neue Kategorien mit neuem Hardware-Merkmal brauchen Python-Änderung | **Entschieden (siehe Abschnitt 9a)** — bewusst kontrolliert bei statischen Imports geblieben |
 | L5 | `seen.json`/`found.json` wachsen unbegrenzt (14 MB / 2,1 MB) | Perf./Speicher langfristig | Mittel |
-| L6 | Scope-Drift: 5 Nicht-PC-Kategorien | Klärungsbedarf, kein Bug | Entscheidung nötig, keine technische Priorität |
+| L6 | Scope-Drift: 5 Nicht-PC-Kategorien | Klärungsbedarf, kein Bug | **Entschieden (siehe Abschnitt 9b)** — bewusst behalten, unabhängig weiterlaufen lassen |
 | L7 | `app.py` als 977-Zeilen-Monolith (Routen + Scan-Loop + Scheduler in einer Datei) | Wartbarkeit bei weiterem Wachstum | Niedrig, vorausschauend |
 | L8 | Hersteller/Zustand/Lieferumfang-Scoring-Gewichte bewusst auf 0 (kein Detector für Zustand/Lieferumfang) | Deal-Score nutzt nur 3 von 6 Komponenten aktiv | Mittel, hängt von L1/L2 ab |
 
@@ -220,10 +220,30 @@ STATUS.md Abschnitt 10).
    CPU-Einzelkategorie brauchen ggf. neue).
 4. **L5 (Datenrotation)** als eigener, späterer Schritt — nicht blockierend
    für die Kategorie-Arbeit.
-5. **L6 (Scope-Drift)** vor Schritt 3 entscheiden: bleiben Nicht-PC-
-   Kategorien bestehen (kein Aufwand, laufen unabhängig) oder werden sie
-   bewusst aus dem Fokus genommen (rein organisatorisch, kein Löschen
-   nötig, da YAML-Plugins isoliert sind).
+### 9b. Scope-Entscheidung L6 — ENTSCHIEDEN (kein Code geändert)
+
+**Entscheidung:** Option A — die 5 Nicht-PC-Kategorien (`iphone`, `macbook`,
+`retro_konsolen`, `vintage_elektronik`, `lego_minifiguren`) bleiben
+unverändert bestehen und laufen unabhängig weiter.
+
+**Begründung:** Alle fünf sind vollständig isolierte YAML-Plugins
+(`categories/registry.py::discover_categories()`), ohne jede Kopplung zu
+`office_pc`/`gaming_pc`. Sie wurden in eigenen, separat freigegebenen
+Sessions (Reselling-/Nischen-Erweiterung, STATUS.md Abschnitte 22/23)
+bewusst hinzugefügt und sind produktiv im Einsatz (Preishistorie,
+Notification-Gate). Der PC-Fokus des aktuellen Entwicklungsauftrags
+("Version 2 konzentriert sich ausschließlich auf komplette PCs") gilt für
+die *neue* Zielliste (Grafikkarten, CPUs, Mainboards, RAM, SSDs, Netzteile,
+Monitore, Notebooks) — keine der fünf Nischen-Kategorien steht dort.
+Behalten hat keinen technischen Konflikt mit Punkt 3 (PC-Kategorien
+ergänzen) und keinen Aufwand; Entfernen/Archivieren hätte produktiv
+gesammelte Daten ohne technischen Grund verworfen bzw. stillgelegt.
+
+**Konsequenz:** Keine weitere Aktion nötig. Künftige Kategorie-Arbeit
+(Punkt 3) fokussiert sich ausschließlich auf die PC-Zielliste des
+Auftrags, ohne die bestehenden 5 Kategorien anzufassen.
+
+
 
 ---
 
