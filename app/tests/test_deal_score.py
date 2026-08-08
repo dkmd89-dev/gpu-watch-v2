@@ -10,6 +10,8 @@ from scoring.deal_score import (
     _hardware_qualitaet_score,
     _ausstattung_score,
     _hersteller_score,
+    _zustand_score,
+    _lieferumfang_score,
     DEFAULT_WEIGHTS,
 )
 
@@ -125,6 +127,74 @@ def test_hersteller_score_unbekannte_marke_ohne_default_platzhalter():
 def test_hersteller_score_wird_auf_null_bis_hundert_geklemmt():
     assert _hersteller_score("X", {"X": 150}) == 100
     assert _hersteller_score("X", {"X": -20}) == 0
+
+
+# ---------- _zustand_score (roadmap.md Phase 6, Schritt 6d) ----------
+
+def test_zustand_score_ohne_erkannten_zustand_platzhalter():
+    assert _zustand_score(None) == 60
+
+
+def test_zustand_score_ohne_bewertungstabelle_platzhalter():
+    assert _zustand_score("Wie neu", None) == 60
+    assert _zustand_score("Wie neu", {}) == 60
+
+
+def test_zustand_score_bekannter_wert_aus_tabelle():
+    table = {"Wie neu": 88, "Defekt": 10, "_default": 60}
+    assert _zustand_score("Wie neu", table) == 88
+    assert _zustand_score("Defekt", table) == 10
+
+
+def test_zustand_score_unbekannter_wert_nutzt_default():
+    table = {"Neu": 95, "_default": 60}
+    assert _zustand_score("EinNeuerZustand", table) == 60
+
+
+def test_zustand_score_wird_auf_null_bis_hundert_geklemmt():
+    assert _zustand_score("X", {"X": 150}) == 100
+    assert _zustand_score("X", {"X": -20}) == 0
+
+
+# ---------- _lieferumfang_score (roadmap.md Phase 6, Schritt 6d) ----------
+
+def test_lieferumfang_score_ohne_signale_platzhalter():
+    assert _lieferumfang_score() == 60
+    assert _lieferumfang_score((), ()) == 60
+
+
+def test_lieferumfang_score_ohne_punktetabelle_platzhalter():
+    assert _lieferumfang_score(("OVP",), (), None) == 60
+    assert _lieferumfang_score(("OVP",), (), {}) == 60
+
+
+def test_lieferumfang_score_positive_signale_addieren_sich_zum_basiswert():
+    table = {"_base": 60, "OVP": 8, "Rechnung": 8}
+    assert _lieferumfang_score(("OVP",), (), table) == 68
+    assert _lieferumfang_score(("OVP", "Rechnung"), (), table) == 76
+
+
+def test_lieferumfang_score_negative_signale_ziehen_vom_basiswert_ab():
+    table = {"_base": 60, "ohne Netzteil": -10, "defekt": -15}
+    assert _lieferumfang_score((), ("ohne Netzteil",), table) == 50
+    assert _lieferumfang_score((), ("ohne Netzteil", "defekt"), table) == 35
+
+
+def test_lieferumfang_score_positive_und_negative_signale_gemischt():
+    table = {"_base": 60, "OVP": 8, "ohne Netzteil": -10}
+    assert _lieferumfang_score(("OVP",), ("ohne Netzteil",), table) == 58
+
+
+def test_lieferumfang_score_unbekanntes_signal_traegt_null_bei():
+    table = {"_base": 60, "OVP": 8}
+    assert _lieferumfang_score(("EinUnbekanntesSignal",), (), table) == 60
+
+
+def test_lieferumfang_score_wird_auf_null_bis_hundert_geklemmt():
+    table = {"_base": 60, "X": 100}
+    assert _lieferumfang_score(("X",), (), table) == 100
+    table_negativ = {"_base": 10, "Y": -50}
+    assert _lieferumfang_score((), ("Y",), table_negativ) == 0
 
 
 # ---------- compute_deal_score: Stern-Schwellen ----------

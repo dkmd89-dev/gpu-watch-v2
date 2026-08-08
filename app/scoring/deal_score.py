@@ -1,20 +1,27 @@
 """Deal-Score-Berechnung (Phase 6): gewichteter Score 0-100 aus mehreren
 Komponenten, vollständig über YAML-Gewichte konfigurierbar.
 
-WICHTIGER HINWEIS zum aktuellen Stand: Von den sechs im Auftrag genannten
-Komponenten (Preis, Ausstattung, Hardwarequalität, Hersteller, Zustand,
-Lieferumfang) haben aktuell nur "Preis" und "Hardwarequalität" eine
-verlässliche Datengrundlage aus den bestehenden Detectors/Regeln.
-"Hersteller", "Zustand" und "Lieferumfang" liefern bewusst einen NEUTRALEN
-PLATZHALTERWERT (60/100), da es noch keine entsprechenden Detectors gibt:
-- Hersteller: keine Reputations-/Qualitätsliste je Marke
-- Zustand: kein Parser für Formulierungen wie "neuwertig"/"gebraucht"
-- Lieferumfang: kein Erkennung von Zubehör/Rechnung/Garantie im Titel
+WICHTIGER HINWEIS zum aktuellen Stand (Stand: roadmap.md Phase 6, Schritt
+6d): Von den sechs im Auftrag genannten Komponenten (Preis, Ausstattung,
+Hardwarequalität, Hersteller, Zustand, Lieferumfang) haben inzwischen
+FÜNF eine echte Datengrundlage:
+- Hersteller: aktiviert (Schritt 6a), Detector + Reputationstabelle.
+- Zustand: Detector vorhanden (categories/detectors/condition.py,
+  Schritt 6b) und hier verdrahtet (Schritt 6d) -- Gewicht bleibt
+  bewusst bei 0 in rules/_global.yaml (Aktivierung ist ein separater,
+  eigener Schritt, analog zu Hersteller).
+- Lieferumfang: Detector vorhanden (categories/detectors/
+  lieferumfang.py, Schritt 6c) und hier verdrahtet (Schritt 6d) --
+  Gewicht bleibt ebenfalls bei 0, aus demselben Grund.
 
-Diese drei Komponenten sind über die YAML-Gewichte schon ansteuerbar
-(z.B. auf Gewicht 0 setzbar, um sie faktisch zu deaktivieren), liefern
-aber inhaltlich noch keine differenzierte Bewertung. Das ist ein bewusst
-offen gelassener Folgeschritt, kein vergessener Teil.
+"Verdrahtet, aber Gewicht 0" bedeutet: die Komponenten liefern bereits
+differenzierte Scores in `DealScoreResult.components` (z.B. fürs
+Dashboard/Debugging sichtbar), fließen aber NICHT in den gewichteten
+Gesamt-Score ein, bis das YAML-Gewicht bewusst aktiviert wird -- exakt
+das bereits bei "Hersteller" erprobte Muster.
+
+Diese drei Komponenten sind über die YAML-Gewichte ansteuerbar (Gewicht
+0 = faktisch deaktiviert für den Gesamt-Score).
 
 PHASE 7, SCHRITT 7.4: "Preis" kann jetzt optional zusätzlich zum
 regelbasierten max_price-Vergleich einen aus der LOKAL gesammelten
@@ -251,6 +258,73 @@ def _hersteller_score(
     return max(0, min(100, round(value)))
 
 
+def _zustand_score(
+    condition_label: str | None,
+    condition_scores: dict | None = None,
+) -> int:
+    """Score (0-100) auf Basis der erkannten Zustandsangabe (siehe
+    categories/detectors/condition.py) und einer YAML-konfigurierbaren
+    Bewertungstabelle (rules/_global.yaml: "condition_scores").
+
+    Exakt dasselbe Auflösungsmuster wie _hersteller_score() (siehe
+    dortiger Docstring fuer die vollstaendige Begruendung):
+    1. Kein erkannter Zustand (condition_label is None) -> Platzhalter.
+    2. Keine Bewertungstabelle uebergeben -> ebenfalls Platzhalter, auch
+       wenn ein Zustand erkannt wurde.
+    3. Zustand erkannt UND in der Tabelle vorhanden -> hinterlegter Wert.
+    4. Zustand erkannt, aber nicht in der Tabelle -> "_default", sonst
+       Platzhalter.
+    """
+    if condition_label is None or not condition_scores:
+        return _PLACEHOLDER_SCORE
+
+    default = condition_scores.get("_default", _PLACEHOLDER_SCORE)
+    value = condition_scores.get(condition_label, default)
+    return max(0, min(100, round(value)))
+
+
+def _lieferumfang_score(
+    positive_signals: tuple[str, ...] = (),
+    negative_signals: tuple[str, ...] = (),
+    lieferumfang_signal_scores: dict | None = None,
+) -> int:
+    """Score (0-100) auf Basis der erkannten Lieferumfang-Signale (siehe
+    categories/detectors/lieferumfang.py) und einer YAML-konfigurierbaren
+    Punktetabelle (rules/_global.yaml: "lieferumfang_signal_scores").
+
+    Anders als _hersteller_score()/_zustand_score() (genau EIN erkannter
+    Wert) koennen hier MEHRERE Signale gleichzeitig vorliegen -- die
+    Tabelle enthaelt deshalb keine 0-100-Absolutwerte je Signal, sondern
+    additive Punkte-Deltas (positiv ODER negativ) relativ zu einem
+    Basiswert ("_base"). Jedes gefundene Signal traegt seinen Tabellen-
+    wert zum Basiswert bei; das Vorzeichen steckt in der Tabelle selbst
+    (z.B. "OVP": 8, "ohne Netzteil": -10) -- positive UND negative Signale
+    werden deshalb identisch behandelt (schlicht aufaddiert), keine
+    separate Vorzeichen-Logik noetig.
+
+    Aufloesung:
+    1. Weder positive noch negative Signale erkannt -> Platzhalter
+       (analog zu condition_label is None bei _zustand_score()).
+    2. Keine Punktetabelle uebergeben -> ebenfalls Platzhalter, auch wenn
+       Signale erkannt wurden (volle Rueckwaertskompatibilitaet).
+    3. Sonst: Basiswert ("_base", faellt auf Platzhalter zurueck falls
+       nicht in der Tabelle) + Summe der Deltas aller gefundenen Signale
+       (Tabellen-Eintrag fehlt fuer ein Signal -> 0, kein Beitrag),
+       auf 0-100 begrenzt.
+    """
+    if not positive_signals and not negative_signals:
+        return _PLACEHOLDER_SCORE
+    if not lieferumfang_signal_scores:
+        return _PLACEHOLDER_SCORE
+
+    base = lieferumfang_signal_scores.get("_base", _PLACEHOLDER_SCORE)
+    total = base
+    for signal in (*positive_signals, *negative_signals):
+        total += lieferumfang_signal_scores.get(signal, 0)
+
+    return max(0, min(100, round(total)))
+
+
 def _profit_score(profit: Profit | None) -> int:
     """Score (0-100) auf Basis der geschätzten Wiederverkaufsmarge
     (siehe scoring/profit.py::compute_profit()).
@@ -287,6 +361,11 @@ def compute_deal_score(
     market_price: float | None = None,
     manufacturer_name: str | None = None,
     manufacturer_reputation: dict | None = None,
+    condition_label: str | None = None,
+    condition_scores: dict | None = None,
+    lieferumfang_positive_signals: tuple[str, ...] = (),
+    lieferumfang_negative_signals: tuple[str, ...] = (),
+    lieferumfang_signal_scores: dict | None = None,
     estimated_resale_price: float | None = None,
     fees: dict | None = None,
 ) -> DealScoreResult:
@@ -310,6 +389,22 @@ def compute_deal_score(
     beide nicht übergeben (Standard), verhält sich diese Funktion EXAKT
     wie zuvor (neutraler Platzhalter) -- volle Rückwärtskompatibilität.
 
+    condition_label / condition_scores (roadmap.md Phase 6, Schritt 6d):
+    optionale erkannte Zustandsangabe (siehe categories/detectors/
+    condition.py) und optionale YAML-Bewertungstabelle (rules/
+    _global.yaml: "condition_scores"), fließen in die "zustand"-
+    Komponente ein (siehe _zustand_score()). Exakt dasselbe Rückwärts-
+    kompatibilitäts-Muster wie manufacturer_name/manufacturer_reputation.
+
+    lieferumfang_positive_signals / lieferumfang_negative_signals /
+    lieferumfang_signal_scores (roadmap.md Phase 6, Schritt 6d): optionale
+    erkannte Lieferumfang-Signale (siehe categories/detectors/
+    lieferumfang.py) und optionale YAML-Punktetabelle (rules/_global.yaml:
+    "lieferumfang_signal_scores"), fließen in die "lieferumfang"-
+    Komponente ein (siehe _lieferumfang_score()). Werden keine Signale/
+    keine Tabelle übergeben (Standard), verhält sich diese Funktion EXAKT
+    wie zuvor (neutraler Platzhalter).
+
     estimated_resale_price / fees (Reselling-/Arbitrage-Konzept, STATUS.md
     Abschnitt 16): optionaler geschätzter Wiederverkaufspreis und optionale
     Gebührenkonfiguration (siehe scoring/profit.py::compute_profit()),
@@ -330,8 +425,12 @@ def compute_deal_score(
             deal_rating, cpu_headroom, ram_headroom_gb
         ),
         "hersteller": _hersteller_score(manufacturer_name, manufacturer_reputation),
-        "zustand": _PLACEHOLDER_SCORE,
-        "lieferumfang": _PLACEHOLDER_SCORE,
+        "zustand": _zustand_score(condition_label, condition_scores),
+        "lieferumfang": _lieferumfang_score(
+            lieferumfang_positive_signals,
+            lieferumfang_negative_signals,
+            lieferumfang_signal_scores,
+        ),
         "profit": _profit_score(profit),
     }
 

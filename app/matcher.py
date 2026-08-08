@@ -14,6 +14,8 @@ from categories.detectors.gpu import detect_dedicated_gpu
 from categories.detectors.storage import detect_ssd_gb
 from categories.detectors.psu import detect_psu_watt
 from categories.detectors.manufacturer import detect_manufacturer
+from categories.detectors.condition import detect_condition
+from categories.detectors.lieferumfang import detect_lieferumfang
 from scoring.deal_score import compute_deal_score, DEFAULT_WEIGHTS, COMPONENT_KEYS
 from scoring.profit import compute_profit
 
@@ -135,6 +137,8 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
     notifications = {}
     scoring_weights = {}
     manufacturer_reputation = {}
+    condition_scores = {}
+    lieferumfang_signal_scores = {}
     fees = {}
     duplicate_detection_cfg = {}
     part_out_detection_cfg = {}
@@ -161,6 +165,14 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
         # Komponente faellt weiterhin auf den neutralen Platzhalter zurueck
         # (volle Rueckwaertskompatibilitaet, siehe _hersteller_score()).
         manufacturer_reputation = global_cfg.get("manufacturer_reputation", {})
+        # roadmap.md Phase 6, Schritt 6d: analog zu manufacturer_reputation
+        # oben -- leere Dicts, falls _global.yaml keine "condition_scores"-/
+        # "lieferumfang_signal_scores"-Sektion definiert (aeltere Configs,
+        # oder bewusst noch nicht kalibriert) -> beide Komponenten fallen
+        # dann weiterhin auf den neutralen Platzhalter zurueck (siehe
+        # scoring/deal_score.py::_zustand_score()/_lieferumfang_score()).
+        condition_scores = global_cfg.get("condition_scores", {})
+        lieferumfang_signal_scores = global_cfg.get("lieferumfang_signal_scores", {})
         # Reselling-/Arbitrage-Konzept (STATUS.md Abschnitt 16): Gebühren-
         # modell fuer scoring/profit.py::compute_profit(). Analog zu
         # manufacturer_reputation oben -- leeres Dict, falls _global.yaml
@@ -312,6 +324,12 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
         "notifications": notifications,
         "scoring_weights": scoring_weights,
         "manufacturer_reputation": manufacturer_reputation,
+        # roadmap.md Phase 6, Schritt 6d: additive Keys, analog zu
+        # manufacturer_reputation oben -- Aufrufer, die sie nicht kennen
+        # (aeltere app.py-Version, Legacy-Einzeldatei-Modus), bleiben
+        # unveraendert lauffaehig.
+        "condition_scores": condition_scores,
+        "lieferumfang_signal_scores": lieferumfang_signal_scores,
         # Reselling-/Arbitrage-Konzept (STATUS.md Abschnitt 16): additiver
         # Key, analog zu manufacturer_reputation -- Aufrufer, die ihn nicht
         # kennen (aeltere app.py-Version, Legacy-Einzeldatei-Modus), bleiben
@@ -628,12 +646,34 @@ def _build_score_inputs(title_lower: str, requirements: dict | None, features: d
     manufacturer = detect_manufacturer(title_lower)
     manufacturer_name = manufacturer.name if manufacturer is not None else None
 
+    # Zustand-/Lieferumfang-Detector-Verdrahtung (roadmap.md Phase 6,
+    # Schritt 6d): wie bei manufacturer oben KEINE Kategorie-Einschraenkung
+    # -- Zustands-/Lieferumfangsangaben koennen bei jeder Angebotsart im
+    # Titel stehen. None (condition) bzw. leere Tupel (lieferumfang)
+    # bleiben der korrekte Wert, wenn der Titel nichts Erkennbares enthaelt
+    # -- die jeweilige Score-Komponente behandelt das als neutralen
+    # Platzhalter (siehe scoring/deal_score.py::_zustand_score()/
+    # _lieferumfang_score()).
+    condition_match = detect_condition(title_lower)
+    condition_label = condition_match.condition if condition_match is not None else None
+
+    lieferumfang_match = detect_lieferumfang(title_lower)
+    if lieferumfang_match is not None:
+        lieferumfang_positive_signals = lieferumfang_match.positive_signals
+        lieferumfang_negative_signals = lieferumfang_match.negative_signals
+    else:
+        lieferumfang_positive_signals = ()
+        lieferumfang_negative_signals = ()
+
     return {
         "cpu_headroom": cpu_headroom,
         "ram_headroom_gb": ram_headroom_gb,
         "has_ssd": has_ssd,
         "has_dedicated_gpu": has_dedicated_gpu,
         "manufacturer_name": manufacturer_name,
+        "condition_label": condition_label,
+        "lieferumfang_positive_signals": lieferumfang_positive_signals,
+        "lieferumfang_negative_signals": lieferumfang_negative_signals,
     }
 
 
@@ -844,6 +884,12 @@ def evaluate(
             weights=scoring_weights,
             market_price=market_price,
             manufacturer_reputation=rules_cfg.get("manufacturer_reputation") or None,
+            # roadmap.md Phase 6, Schritt 6d: analog zu manufacturer_
+            # reputation oben -- None statt leerem Dict, falls _global.yaml
+            # keine eigene Sektion definiert (volle Rueckwaertskompatibilitaet,
+            # siehe _zustand_score()/_lieferumfang_score()-Docstrings).
+            condition_scores=rules_cfg.get("condition_scores") or None,
+            lieferumfang_signal_scores=rules_cfg.get("lieferumfang_signal_scores") or None,
             # estimated_resale_price kommt jetzt aus resale_prices (siehe
             # oben), NICHT mehr 1:1 aus market_price -- die im Phase-1-
             # Architekturentscheid dokumentierte methodische Trennung

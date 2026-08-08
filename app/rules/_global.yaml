@@ -153,6 +153,61 @@ manufacturer_reputation:
   _default: 60
 
 # ============================================================
+# Zustand-Bewertungstabelle (roadmap.md Phase 6, Schritt 6d)
+# ============================================================
+# Werte 0-100, genutzt von scoring/deal_score.py::_zustand_score(), NUR
+# wenn categories/detectors/condition.py einen Zustand erkennt (siehe
+# dort für die erkannten Werte -- müssen hier exakt übereinstimmen).
+#
+# WICHTIG: Das "zustand"-Gewicht in scoring_weights (oben) steht BEWUSST
+# weiterhin auf 0 -- diese Tabelle macht die Komponente technisch nutzbar
+# (sichtbar in DealScoreResult.components), ändert aber NICHT den
+# produktiv berechneten Gesamt-Score. Aktivierung ist ein separater,
+# eigener Schritt (analog zu "hersteller", Schritt 6a).
+#
+# Platzhalter-Kalibrierung (Reihenfolge der Werte spiegelt die natürliche
+# Qualitätsabstufung wider, mangels echter Kalibrierungsdaten aber nicht
+# empirisch hergeleitet -- Kalibrierung folgt nach Datensammlung, analog
+# zu anderen Platzhalter-Schwellen im Projekt, z.B. rules/ram.yaml).
+condition_scores:
+  Neu: 95
+  Wie neu: 88
+  Sehr gut: 78
+  Gut: 65
+  Gebraucht: 55
+  Beschädigt: 30
+  Defekt: 10
+  Bastler: 5
+  _default: 60
+
+# ============================================================
+# Lieferumfang-Punktetabelle (roadmap.md Phase 6, Schritt 6d)
+# ============================================================
+# Additive Punkte-Deltas (positiv ODER negativ) relativ zu "_base",
+# genutzt von scoring/deal_score.py::_lieferumfang_score(), NUR wenn
+# categories/detectors/lieferumfang.py mindestens ein Signal erkennt
+# (siehe dort für die erkannten Signal-Namen -- müssen hier exakt
+# übereinstimmen). Mehrere gleichzeitig erkannte Signale addieren sich.
+#
+# WICHTIG: Das "lieferumfang"-Gewicht in scoring_weights (oben) steht
+# BEWUSST weiterhin auf 0 -- gleiche Begründung wie bei condition_scores
+# oben. Aktivierung ist ein separater, eigener Schritt.
+#
+# Platzhalter-Kalibrierung, mangels echter Daten nicht empirisch
+# hergeleitet (siehe condition_scores oben für dieselbe Einschränkung).
+lieferumfang_signal_scores:
+  _base: 60
+  OVP: 8
+  Rechnung: 8
+  Originalzubehör: 6
+  Netzteil: 4
+  Controller: 4
+  Zubehör: 3
+  "ohne Netzteil": -10
+  "nur Gerät": -8
+  defekt: -15
+
+# ============================================================
 # Gebührenmodell (Reselling-/Arbitrage-Konzept, siehe STATUS.md
 # Abschnitt 16) -- genutzt von scoring/profit.py::compute_profit().
 # ============================================================

@@ -116,6 +116,108 @@ def test_evaluate_reicht_manufacturer_reputation_bis_zum_score_durch():
     assert r.deal_score == 80
 
 
+# ---------- roadmap.md Phase 6, Schritt 6d: Zustand/Lieferumfang ----------
+
+def test_build_score_inputs_erkennt_zustand():
+    inputs = _build_score_inputs("rtx 3060 wie neu ovp", None, {})
+    assert inputs["condition_label"] == "Wie neu"
+
+
+def test_build_score_inputs_ohne_zustand_liefert_none():
+    inputs = _build_score_inputs("gaming pc ryzen 5 3600 rtx 3060", None, {})
+    assert inputs["condition_label"] is None
+
+
+def test_build_score_inputs_erkennt_lieferumfang_signale():
+    inputs = _build_score_inputs("netzteil ovp, rechnung vorhanden", None, {})
+    assert set(inputs["lieferumfang_positive_signals"]) == {"OVP", "Rechnung", "Netzteil"}
+    assert inputs["lieferumfang_negative_signals"] == ()
+
+
+def test_build_score_inputs_ohne_lieferumfang_signale_liefert_leere_tupel():
+    inputs = _build_score_inputs("gaming pc ryzen 5 3600 rtx 3060", None, {})
+    assert inputs["lieferumfang_positive_signals"] == ()
+    assert inputs["lieferumfang_negative_signals"] == ()
+
+
+def test_evaluate_reicht_condition_scores_bis_zum_score_durch():
+    # Gleiches Muster wie test_evaluate_reicht_manufacturer_reputation_
+    # bis_zum_score_durch() oben, hier fuer die "zustand"-Komponente.
+    cfg = {
+        "defaults": {},
+        "rules": [
+            {
+                "label": "Test-Office-PC",
+                "requirements": {
+                    "min_ram_gb": 8,
+                    "min_cpu": {"intel": {"min_tier_rank": 5, "min_generation": 8}},
+                },
+                "max_price": 300,
+                "deal_rating": "Okay",
+                "_category": "office_pc",
+                "_category_exclude_terms": [],
+                "_scoring_weights": {"zustand": 1.0},
+            }
+        ],
+        "search_terms": [],
+        "notifications": {},
+        "scoring_weights": {},
+        "condition_scores": {"Wie neu": 88, "_default": 60},
+        "_directory_mode": True,
+    }
+    r = evaluate("Office PC i5-8500 16GB RAM wie neu", 100.0, cfg)
+    assert r.matched is True
+    assert r.deal_score == 88
+
+
+def test_evaluate_reicht_lieferumfang_signal_scores_bis_zum_score_durch():
+    cfg = {
+        "defaults": {},
+        "rules": [
+            {
+                "label": "Test-Office-PC",
+                "requirements": {
+                    "min_ram_gb": 8,
+                    "min_cpu": {"intel": {"min_tier_rank": 5, "min_generation": 8}},
+                },
+                "max_price": 300,
+                "deal_rating": "Okay",
+                "_category": "office_pc",
+                "_category_exclude_terms": [],
+                "_scoring_weights": {"lieferumfang": 1.0},
+            }
+        ],
+        "search_terms": [],
+        "notifications": {},
+        "scoring_weights": {},
+        "lieferumfang_signal_scores": {"_base": 60, "OVP": 8, "Rechnung": 8},
+        "_directory_mode": True,
+    }
+    r = evaluate("Office PC i5-8500 16GB RAM OVP Rechnung", 100.0, cfg)
+    assert r.matched is True
+    assert r.deal_score == 76
+
+
+def test_evaluate_produktiv_geladene_config_aendert_score_nicht_trotz_erkennung():
+    # Regressionsschutz (roadmap.md Phase 6, Schritt 6d): die produktive
+    # rules/_global.yaml enthaelt bereits condition_scores/lieferumfang_
+    # signal_scores (Schritt 6d), aber die zugehoerigen Gewichte bleiben
+    # bewusst bei 0. Ein Titel mit erkennbarem Zustand/Lieferumfang darf
+    # den Score deshalb NICHT veraendern, verglichen mit einem sonst
+    # identischen Titel ohne solche Angaben.
+    cfg = load_rules(RULES_DIR)
+    r_mit = evaluate(
+        "Gaming PC Intel Core i5-8500 16GB RAM RTX 3060 512GB SSD Tower wie neu OVP",
+        150.0, cfg,
+    )
+    r_ohne = evaluate(
+        "Gaming PC Intel Core i5-8500 16GB RAM RTX 3060 512GB SSD Tower",
+        150.0, cfg,
+    )
+    assert r_mit.matched is True and r_ohne.matched is True
+    assert r_mit.deal_score == r_ohne.deal_score
+
+
 def test_evaluate_reicht_market_price_als_estimated_resale_price_durch():
     # Reselling-/Arbitrage-Konzept (STATUS.md Abschnitt 16): market_prices
     # wird laut Phase-1-Entscheidung 1:1 als estimated_resale_price genutzt.
