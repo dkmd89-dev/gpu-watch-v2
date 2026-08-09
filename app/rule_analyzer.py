@@ -79,6 +79,10 @@ KNOWN_RULE_FIELDS = {
     # Phase 15 (kontrollierter Review, "Variante C"): kontextbewusster
     # Exclude-Gegenpart, siehe matcher.py::_any_conditional_exclude().
     "_category_exclude_unless_preceded_by",
+    # Phase 15 (kontrollierter Folge-Review, "Gehäuse/Shell-Fix"): zweiter
+    # kontextbewusster Exclude-Gegenpart, siehe
+    # matcher.py::_any_conditional_exclude_presence().
+    "_category_exclude_unless_also_contains",
     "_ignore_global_excludes",
     "_scoring_weights",
     "_notify_max_price",

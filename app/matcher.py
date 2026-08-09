@@ -290,6 +290,27 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
         category_excludes_unless_preceded_by = cat_cfg.get(
             "exclude_category_unless_preceded_by", {}
         )
+        # Phase 15 (kontrollierter Folge-Review, "Gehäuse/Shell-Fix"):
+        # zweiter, andersartiger kontextbewusster Exclude-Gegenpart. Manche
+        # Begriffe (z.B. "gehäuse") sind NICHT wie "ladekabel" ein reines
+        # Zubehoerwort, sondern gleichzeitig eine uebliche Zustands-
+        # beschreibung eines kompletten Geraets ("Gehäuse leicht
+        # vergilbt/verkratzt"). Eine Adjazenz-Regel wie bei
+        # "..._unless_preceded_by" (ein Konnektor unmittelbar davor) passt
+        # hier nicht -- die Zustandsbeschreibung steht typischerweise NACH
+        # dem Begriff und in wechselndem Abstand ("Gehäuse: leicht
+        # vergilbt", "Gehäuse minimal verkratzt"). Der Begriff soll daher
+        # NUR ausschliessen, wenn im GESAMTEN Titel KEIN Begriff aus einer
+        # Positiv-/Kontextliste vorkommt -- {Begriff: [erlaubte Kontext-/
+        # Zustandsbegriffe]}. Bewusst KEIN Adjazenz-/Abstands-Check (siehe
+        # _any_conditional_exclude_presence()-Docstring fuer die Abwaegung).
+        # Ein Begriff hier gehoert NICHT zusaetzlich in exclude_category
+        # (siehe evaluate()), sonst waere die Bedingung wirkungslos. Default
+        # leeres Dict -> 100% identisches Verhalten zu vorher fuer
+        # Kategorien, die dieses Feld nicht setzen.
+        category_excludes_unless_context = cat_cfg.get(
+            "exclude_category_unless_also_contains", {}
+        )
         # Optionaler Gegenpart zu exclude_global (_global.yaml): manche
         # Kategorien bilden ausdrücklich Bastler-/Reparatur-Angebote ab
         # (z.B. "PS5 Controller mit Stick Drift" als eigene, günstigere
@@ -322,6 +343,7 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
             rule["_category"] = category_name
             rule["_category_exclude_terms"] = category_excludes
             rule["_category_exclude_unless_preceded_by"] = category_excludes_unless_preceded_by
+            rule["_category_exclude_unless_also_contains"] = category_excludes_unless_context
             rule["_ignore_global_excludes"] = category_ignore_global_excludes
             rule["_scoring_weights"] = category_scoring_weights
             rule["_notify_max_price"] = category_notify_max_price
@@ -528,6 +550,42 @@ def _any_conditional_exclude(text: str, conditional_excludes: dict[str, list[str
         _contains_term_unless_preceded_by(text, term, connectors)
         for term, connectors in conditional_excludes.items()
     )
+
+
+# ============================================================
+# Kontextbewusster Exclude, Variante 2 (Phase 15, kontrollierter
+# Folge-Review, "Gehäuse/Shell-Fix")
+# ============================================================
+# Andere Kontext-Beziehung als Variante C oben: dort geht es um einen
+# Begriff, der bei BUNDLE-Erwaehnung erlaubt ist (Konnektor unmittelbar
+# DAVOR). Hier geht es um einen Begriff, der bei einer GERAETE-
+# Zustandsbeschreibung ueberall im Titel erlaubt ist, unabhaengig vom
+# Abstand ("Gehäuse: leicht vergilbt" vs. "Gehäuse minimal verkratzt" vs.
+# "... Display neuwertig, Gehäuse hat leichte Kratzer" -- der Zustandsbegriff
+# kann vor, nach oder mit mehreren Woertern Abstand zum Begriff stehen).
+# Eine Adjazenz-/Abstandsregel wie bei Variante C waere hier zu spezifisch
+# und wuerde reale Formulierungen verfehlen -- daher bewusst eine einfache,
+# TITELWEITE Praesenzpruefung statt einer weiteren Regex-Konstruktion.
+# Abwaegung: dadurch werden theoretisch auch Titel nicht ausgeschlossen, in
+# denen ein Zustandsbegriff UND ein Standalone-Gehäuse-Angebot unabhaengig
+# voneinander vorkommen (sehr seltene Kombination in der Praxis) -- ein
+# bewusst in Kauf genommener, geringer Recall-Nachteil gegenueber einem
+# false-negativ bei einem echten Geraete-Angebot mit Zustandsbeschreibung
+# (dessen Vermeidung der eigentliche Zweck dieser Variante ist).
+def _any_conditional_exclude_presence(
+    text: str, conditional_excludes: dict[str, list[str]]
+) -> bool:
+    """True, wenn MINDESTENS EIN Begriff aus `conditional_excludes` als
+    eigenes Wort in `text` vorkommt UND KEINER der zugehoerigen erlaubten
+    Kontext-/Zustandsbegriffe irgendwo im selben Titel vorkommt.
+
+    conditional_excludes: {Begriff: [erlaubte Kontextbegriffe]}, OR-
+    verknuepft ueber alle Eintraege (analog zu _any_conditional_exclude()).
+    """
+    for term, allowed_context_terms in conditional_excludes.items():
+        if _contains_term(text, term) and not _any_term(text, allowed_context_terms):
+            return True
+    return False
 
 
 def _ist_kompletter_pc(title_lower: str) -> bool:
@@ -876,6 +934,13 @@ def compute_ruleset_signature(rules_cfg: dict) -> str:
             "_category_exclude_unless_preceded_by": rule.get(
                 "_category_exclude_unless_preceded_by"
             ),
+            # Phase 15 (kontrollierter Folge-Review, "Gehäuse/Shell-Fix"):
+            # analog zum Eintrag oben -- eine Aenderung an der Kontext-
+            # begriffsliste aendert das Match-Verhalten (siehe evaluate()),
+            # muss also den Hash aendern.
+            "_category_exclude_unless_also_contains": rule.get(
+                "_category_exclude_unless_also_contains"
+            ),
             "price_history_model": rule.get("price_history_model"),
             "max_price": rule.get("max_price"),
             "min_vram_gb": rule.get("min_vram_gb"),
@@ -1009,6 +1074,20 @@ def evaluate(
             )
             if category_excludes_conditional and _any_conditional_exclude(
                 title_l, category_excludes_conditional
+            ):
+                continue
+            # Phase 15 (kontrollierter Folge-Review, "Gehäuse/Shell-Fix"):
+            # zweiter kontextbewusster Gegenpart -- blockiert einen Begriff
+            # NUR, wenn im GESAMTEN Titel kein erlaubter Kontext-/
+            # Zustandsbegriff vorkommt (siehe
+            # _any_conditional_exclude_presence()-Docstring). Default leeres
+            # Dict -> identisches Verhalten zu vorher fuer Kategorien ohne
+            # dieses Feld.
+            category_excludes_unless_context = rule.get(
+                "_category_exclude_unless_also_contains", {}
+            )
+            if category_excludes_unless_context and _any_conditional_exclude_presence(
+                title_l, category_excludes_unless_context
             ):
                 continue
 

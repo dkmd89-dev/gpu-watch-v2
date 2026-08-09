@@ -88,6 +88,46 @@ exclude_category:
   - "reparatur service"
   - "repair service"
 
+  # Phase 15 (kontrollierter Folge-Review, "Gehäuse/Shell-Fix"): unbedingte
+  # Ausschlüsse für Standalone-Gehäuse-/Shell-Angebote, die nicht über die
+  # kontextbewusste "gehäuse"-Prüfung unten laufen (zusammengesetzte
+  # Wörter/englische Begriffe, siehe handhelds.yaml-Begründung).
+  - "ersatzgehäuse"
+  - "leergehäuse"
+  - "wechselgehäuse"
+  - "replacement shell"
+  - "back shell"
+  - "shell replacement"
+  - "backplate"
+  - "replacement housing"
+  - "housing replacement"
+
+# Phase 15 (kontrollierter Folge-Review, "Gehäuse/Shell-Fix"): "gehäuse"
+# ist zweideutig (lose Ersatzschale/Backcover vs. Zustandsbeschreibung
+# eines kompletten iPhones, z.B. "Gehäuse minimal verkratzt") -- schließt
+# daher nur aus, wenn im GESAMTEN Titel kein Kontextbegriff vorkommt
+# (siehe matcher.py::_any_conditional_exclude_presence(), ausführliche
+# Begründung in handhelds.yaml).
+exclude_category_unless_also_contains:
+  gehäuse:
+    - "vergilbt"
+    - "verkratzt"
+    - "zerkratzt"
+    - "kratzer"
+    - "beschädigt"
+    - "delle"
+    - "dellen"
+    - "macke"
+    - "macken"
+    - "neuwertig"
+    - "gebraucht"
+    - "abgenutzt"
+    - "riss"
+    - "risse"
+    - "gesprungen"
+    - "gebrauchsspuren"
+    - "verfärbt"
+
 scoring_weights:
   price: 0.85
   ausstattung: 0

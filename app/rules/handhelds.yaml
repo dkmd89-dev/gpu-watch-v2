@@ -67,6 +67,53 @@ exclude_category:
   - "reparatur service"
   - "repair service"
 
+  # Phase 15 (kontrollierter Folge-Review, "Gehäuse/Shell-Fix"): unbedingte
+  # Ausschlüsse für Standalone-Gehäuse-/Shell-Angebote, die NICHT über die
+  # kontextbewusste "gehäuse"-Prüfung unten laufen (zusammengesetzte Wörter
+  # -- "ersatzgehäuse" enthält "gehäuse" nicht als eigenes Wort, siehe
+  # matcher.py::_contains_term()-Wortgrenzen-Docstring -- bzw. englische
+  # Begriffe, die "gehäuse" gar nicht enthalten). Alle hier gelisteten
+  # Phrasen sind eindeutige Produktbezeichnungen für lose Ersatzteile,
+  # keine Zustandsbeschreibungen eines kompletten Geräts.
+  - "ersatzgehäuse"
+  - "leergehäuse"
+  - "wechselgehäuse"
+  - "replacement shell"
+  - "back shell"
+  - "shell replacement"
+  - "backplate"
+  - "replacement housing"
+  - "housing replacement"
+
+# Phase 15 (kontrollierter Folge-Review, "Gehäuse/Shell-Fix"): "gehäuse"
+# ist -- anders als die o.g. Begriffe -- ZWEIDEUTIG: es bezeichnet sowohl
+# lose Ersatzschalen ("Nintendo 3DS XL Gehäuse Blau") als auch die
+# Zustandsbeschreibung eines kompletten Geräts ("Gehäuse leicht
+# vergilbt/verkratzt"). Ein bare exclude_category-Eintrag würde daher auch
+# echte Geräte-Angebote fälschlich blockieren (siehe kontrollierter Review,
+# PROJEKTSTAND_KOMPLETT.md). Stattdessen: schließt "gehäuse" nur aus, wenn
+# im GESAMTEN Titel KEIN Begriff aus der Kontextliste vorkommt (siehe
+# matcher.py::_any_conditional_exclude_presence()).
+exclude_category_unless_also_contains:
+  gehäuse:
+    - "vergilbt"
+    - "verkratzt"
+    - "zerkratzt"
+    - "kratzer"
+    - "beschädigt"
+    - "delle"
+    - "dellen"
+    - "macke"
+    - "macken"
+    - "neuwertig"
+    - "gebraucht"
+    - "abgenutzt"
+    - "riss"
+    - "risse"
+    - "gesprungen"
+    - "gebrauchsspuren"
+    - "verfärbt"
+
 scoring_weights:
   price: 0.85
   ausstattung: 0

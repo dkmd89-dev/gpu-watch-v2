@@ -141,6 +141,74 @@ def test_unveraendertes_conditional_exclude_liefert_gleichen_hash():
     assert compute_ruleset_signature(cfg_a) == compute_ruleset_signature(cfg_b)
 
 
+# ============================================================
+# Phase 15 (kontrollierter Folge-Review, "Gehäuse/Shell-Fix"): zweiter
+# kontextbewusster Exclude-Gegenpart (_category_exclude_unless_also_
+# contains) MUSS ebenfalls in die Signatur einfliessen -- eine Aenderung
+# an der Kontextbegriffsliste veraendert das Match-Verhalten von
+# evaluate() (siehe matcher.py::_any_conditional_exclude_presence()).
+# ============================================================
+
+def test_neues_feld_exclude_unless_also_contains_aendert_den_hash():
+    cfg_ohne_feld = _cfg([{
+        "label": "A", "_category": "handhelds",
+        "_category_exclude_unless_also_contains": {},
+    }])
+    hash_ohne_feld = compute_ruleset_signature(cfg_ohne_feld)
+
+    cfg_mit_feld = _cfg([{
+        "label": "A", "_category": "handhelds",
+        "_category_exclude_unless_also_contains": {"gehäuse": ["vergilbt", "verkratzt"]},
+    }])
+    hash_mit_feld = compute_ruleset_signature(cfg_mit_feld)
+
+    assert hash_ohne_feld != hash_mit_feld
+
+
+def test_ausschliesslich_kontextbegriffsliste_veraendert_aendert_den_hash():
+    cfg_alt = _cfg([{
+        "label": "A", "_category": "handhelds",
+        "_category_exclude_unless_also_contains": {"gehäuse": ["vergilbt", "verkratzt"]},
+    }])
+    hash_alt = compute_ruleset_signature(cfg_alt)
+
+    cfg_neu = _cfg([{
+        "label": "A", "_category": "handhelds",
+        "_category_exclude_unless_also_contains": {
+            "gehäuse": ["vergilbt", "verkratzt", "neuwertig"],
+        },
+    }])
+    hash_neu = compute_ruleset_signature(cfg_neu)
+
+    assert hash_alt != hash_neu
+
+
+def test_neuer_begriff_im_unless_also_contains_dict_aendert_den_hash():
+    cfg_alt = _cfg([{
+        "label": "A", "_category": "handhelds",
+        "_category_exclude_unless_also_contains": {"gehäuse": ["vergilbt"]},
+    }])
+    cfg_neu = _cfg([{
+        "label": "A", "_category": "handhelds",
+        "_category_exclude_unless_also_contains": {
+            "gehäuse": ["vergilbt"], "shell": ["scratched"],
+        },
+    }])
+    assert compute_ruleset_signature(cfg_alt) != compute_ruleset_signature(cfg_neu)
+
+
+def test_unveraendertes_unless_also_contains_liefert_gleichen_hash():
+    cfg_a = _cfg([{
+        "label": "A", "_category": "handhelds",
+        "_category_exclude_unless_also_contains": {"gehäuse": ["vergilbt"]},
+    }])
+    cfg_b = _cfg([{
+        "label": "A", "_category": "handhelds",
+        "_category_exclude_unless_also_contains": {"gehäuse": ["vergilbt"]},
+    }])
+    assert compute_ruleset_signature(cfg_a) == compute_ruleset_signature(cfg_b)
+
+
 if __name__ == "__main__":
     import pytest
     raise SystemExit(pytest.main([__file__, "-v"]))
