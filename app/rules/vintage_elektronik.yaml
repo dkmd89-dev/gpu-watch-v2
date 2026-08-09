@@ -67,6 +67,19 @@ rules:
       - "sony pvm"
       - "sony bvm"
       - "sony trinitron"
+    # MATCHING-FIX (Phase 12, Schritt 3): ohne Exclude matchten auch
+    # Vintage-Papier-Werbeanzeigen aus den 1970er/80er-Jahren ("...vintage
+    # advert werbung reklame...") -- Sammler-Papierwaren, keine
+    # funktionsfaehigen Monitore. Bestaetigt durch echte Preishistorie-
+    # Daten (vier der guenstigsten Datenpunkte waren Werbeanzeigen,
+    # siehe PRICE_CALIBRATION_REVIEW.md). "anleitung"/"bedienungsanleitung"
+    # ebenfalls ausgeschlossen (Dokumentation statt Geraet).
+    exclude:
+      - "werbung"
+      - "reklame"
+      - "advert"
+      - "anleitung"
+      - "bedienungsanleitung"
     price_history_model: "crt_profi_monitor"
     max_price: 80
     deal_rating: "Top-Deal"
@@ -76,6 +89,13 @@ rules:
       - "sony pvm"
       - "sony bvm"
       - "sony trinitron"
+    # MATCHING-FIX (Phase 12, Schritt 3): siehe Top-Deal-Regel oben.
+    exclude:
+      - "werbung"
+      - "reklame"
+      - "advert"
+      - "anleitung"
+      - "bedienungsanleitung"
     price_history_model: "crt_profi_monitor"
     max_price: 150
     deal_rating: "Guter Preis"
@@ -85,6 +105,13 @@ rules:
       - "sony pvm"
       - "sony bvm"
       - "sony trinitron"
+    # MATCHING-FIX (Phase 12, Schritt 3): siehe Top-Deal-Regel oben.
+    exclude:
+      - "werbung"
+      - "reklame"
+      - "advert"
+      - "anleitung"
+      - "bedienungsanleitung"
     price_history_model: "crt_profi_monitor"
     max_price: 250
     deal_rating: "Okay"
@@ -97,10 +124,22 @@ rules:
       - "röhrenfernseher"
       - "crt fernseher"
       - "röhren tv"
+    # MATCHING-FIX (Phase 12, Schritt 3): ohne diese Excludes matchten
+    # auch reine Einzelteile/Zubehoer/Dokumentation statt kompletter
+    # Geraete -- bestaetigt durch echte Preishistorie-Daten (guenstigste
+    # Datenpunkte waren Widerstands-Set, Bedienungsanleitung,
+    # Fernbedienung, Netzschalter, siehe PRICE_CALIBRATION_REVIEW.md).
     exclude:
       - "pvm"
       - "bvm"
       - "trinitron"
+      - "ersatzteil"
+      - "anleitung"
+      - "bedienungsanleitung"
+      - "schaltplan"
+      - "fernbedienung"
+      - "netzschalter"
+      - "widerstand"
     price_history_model: "roehrenfernseher"
     max_price: 10
     deal_rating: "Top-Deal"
@@ -110,10 +149,18 @@ rules:
       - "röhrenfernseher"
       - "crt fernseher"
       - "röhren tv"
+    # MATCHING-FIX (Phase 12, Schritt 3): siehe Top-Deal-Regel oben.
     exclude:
       - "pvm"
       - "bvm"
       - "trinitron"
+      - "ersatzteil"
+      - "anleitung"
+      - "bedienungsanleitung"
+      - "schaltplan"
+      - "fernbedienung"
+      - "netzschalter"
+      - "widerstand"
     price_history_model: "roehrenfernseher"
     max_price: 25
     deal_rating: "Guter Preis"
@@ -123,10 +170,18 @@ rules:
       - "röhrenfernseher"
       - "crt fernseher"
       - "röhren tv"
+    # MATCHING-FIX (Phase 12, Schritt 3): siehe Top-Deal-Regel oben.
     exclude:
       - "pvm"
       - "bvm"
       - "trinitron"
+      - "ersatzteil"
+      - "anleitung"
+      - "bedienungsanleitung"
+      - "schaltplan"
+      - "fernbedienung"
+      - "netzschalter"
+      - "widerstand"
     price_history_model: "roehrenfernseher"
     max_price: 45
     deal_rating: "Okay"

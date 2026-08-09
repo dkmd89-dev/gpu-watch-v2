@@ -65,9 +65,25 @@ exclude_category:
 rules:
   - label: "ThinkPad T14/X13 (Ryzen/Modern) ★ Resell-Top"
     price_history_model: "thinkpad_modern"
+    # MATCHING-FIX (Phase 12, Schritt 3): dritte Gruppe ergaenzt --
+    # verlangt eine RAM-/Speicher-Groessenangabe im Titel. Ohne dieses
+    # Kriterium matchten auch reine Einzelteil-Angebote (Power-Button,
+    # Lautsprecher, Gehaeuse, Kuehler/Luefter) statt kompletter Notebooks,
+    # da diese ebenfalls "thinkpad"+Modellcode enthalten koennen --
+    # bestaetigt durch echte Preishistorie-Daten (vier der guenstigsten
+    # Datenpunkte waren Einzelteile ohne jede GB-Angabe, alle echten
+    # Komplettgeraete-Angebote enthielten dagegen durchgaengig eine
+    # RAM-/SSD-Groesse, siehe PRICE_CALIBRATION_REVIEW.md). Deckt gaengige
+    # RAM-/SSD-Groessen ab (4-512GB in ueblichen Zweierpotenz-Schritten
+    # sowie 1TB/2TB) -- exaktes Wort-Grenzen-Matching (_contains_term)
+    # verlangt die Ziffer direkt an "gb"/"tb" angehaengt (z.B. "16gb"),
+    # bewusst KEIN bare "gb"/"ram" als eigener Begriff (wuerde an der
+    # Wortgrenzen-Logik ohnehin nicht an Zahlen andocken, siehe
+    # matcher.py::_contains_term()-Docstring).
     require_all_of:
       - ["thinkpad", "think pad"]
       - ["t14", "t490", "x13", "x390", "l14"]
+      - ["4gb", "8gb", "16gb", "32gb", "64gb", "128gb", "256gb", "512gb", "1tb", "2tb", "ssd", "nvme"]
     exclude:
       - "t420"
       - "t430"
@@ -80,9 +96,11 @@ rules:
 
   - label: "ThinkPad T14/X13 (Ryzen/Modern)"
     price_history_model: "thinkpad_modern"
+    # MATCHING-FIX (Phase 12, Schritt 3): siehe Resell-Top-Regel oben.
     require_all_of:
       - ["thinkpad", "think pad"]
       - ["t14", "t490", "x13", "x390", "l14"]
+      - ["4gb", "8gb", "16gb", "32gb", "64gb", "128gb", "256gb", "512gb", "1tb", "2tb", "ssd", "nvme"]
     exclude:
       - "t420"
       - "t430"

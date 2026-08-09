@@ -154,29 +154,52 @@ rules:
   # ============================================================
 
   - label: "LEGO Star Wars – Darth Revan ★ Top-Deal"
+    # BUG-FIX (Phase 12, Schritt 3): ["lego", "star wars"] als EINE
+    # require_all_of-Gruppe bedeutet "mind. EINES der beiden Woerter"
+    # (ODER-Semantik innerhalb einer Gruppe, siehe matcher.py::_any_term()-
+    # Docstring: "aus JEDER Gruppe muss min. 1 Wort matchen"). Da "lego"
+    # praktisch in jedem LEGO-Titel vorkommt, war die "star wars"-Bedingung
+    # dadurch faktisch wirkungslos -- bestaetigt durch echte Preishistorie-
+    # Daten: u.a. "LEGO Ninjago Limited Edition Minifigur Sawyer" und
+    # "LEGO Nexo Knights Limited Edition Minifigur Merlok" wurden bisher
+    # faelschlich als "lego_sw_rare" gefuehrt (siehe PRICE_CALIBRATION_
+    # REVIEW.md). Fix: zwei GETRENNTE Gruppen -- "lego" UND "star wars"
+    # muessen beide vorkommen (require_all_of verknuepft die Gruppen
+    # bereits UND-artig, siehe evaluate()-Docstring).
     require_all_of:
-      - ["lego", "star wars"]
+      - ["lego"]
+      - ["star wars"]
       - ["darth revan", "revan"]
     price_history_model: "lego_sw_rare"
     max_price: 40
     deal_rating: "Top-Deal"
 
   - label: "LEGO Star Wars – Darth Revan 👍 Guter Preis"
+    # BUG-FIX (Phase 12, Schritt 3): siehe Top-Deal-Regel oben.
     require_all_of:
-      - ["lego", "star wars"]
+      - ["lego"]
+      - ["star wars"]
       - ["darth revan", "revan"]
     price_history_model: "lego_sw_rare"
     max_price: 60
     deal_rating: "Guter Preis"
 
   - label: "LEGO Star Wars – Darth Revan ⚠️ Interessant"
+    # BUG-FIX (Phase 12, Schritt 3): siehe Top-Deal-Regel oben.
     require_all_of:
-      - ["lego", "star wars"]
+      - ["lego"]
+      - ["star wars"]
       - ["darth revan", "revan"]
     price_history_model: "lego_sw_rare"
     max_price: 80
     deal_rating: "Interessant"
 
+  # HINWEIS (Phase 12, Schritt 3): Die folgenden drei Clone-Wars-Regeln
+  # (price_history_model "lego_sw_clone") nutzen DASSELBE ["lego","star
+  # wars"]-Muster und sind vom selben strukturellen Bug betroffen -- aber
+  # NICHT Teil des explizit beauftragten Fix-Umfangs dieses Schritts
+  # (nur lego_sw_rare war angefordert). Bewusst UNVERAENDERT gelassen,
+  # als offener Punkt fuer einen separaten, spaeteren Schritt dokumentiert.
   - label: "LEGO Star Wars – Clone Wars ★ Top-Deal"
     require_all_of:
       - ["lego", "star wars"]
@@ -205,8 +228,10 @@ rules:
     deal_rating: "Interessant"
 
   - label: "LEGO Star Wars – seltene Figur ★ Top-Deal"
+    # BUG-FIX (Phase 12, Schritt 3): siehe Darth-Revan-Regeln oben.
     require_all_of:
-      - ["lego", "star wars"]
+      - ["lego"]
+      - ["star wars"]
       - ["minifigur", "minifig", "figur"]
       - ["rar", "selten", "exclusive", "exklusiv", "limited", "sammler"]
     price_history_model: "lego_sw_rare"
@@ -214,8 +239,10 @@ rules:
     deal_rating: "Top-Deal"
 
   - label: "LEGO Star Wars – seltene Figur 👍 Guter Preis"
+    # BUG-FIX (Phase 12, Schritt 3): siehe Darth-Revan-Regeln oben.
     require_all_of:
-      - ["lego", "star wars"]
+      - ["lego"]
+      - ["star wars"]
       - ["minifigur", "minifig", "figur"]
       - ["rar", "selten", "exclusive", "exklusiv", "limited", "sammler"]
     price_history_model: "lego_sw_rare"
@@ -223,8 +250,10 @@ rules:
     deal_rating: "Guter Preis"
 
   - label: "LEGO Star Wars – seltene Figur ⚠️ Interessant"
+    # BUG-FIX (Phase 12, Schritt 3): siehe Darth-Revan-Regeln oben.
     require_all_of:
-      - ["lego", "star wars"]
+      - ["lego"]
+      - ["star wars"]
       - ["minifigur", "minifig", "figur"]
       - ["rar", "selten", "exclusive", "exklusiv", "limited", "sammler"]
     price_history_model: "lego_sw_rare"
