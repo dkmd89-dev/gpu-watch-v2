@@ -35,20 +35,10 @@ exclude_category:
   - "spiele sammlung"
   - "modul"
   - "cartridge"
-  # Phase 14 (Data-Quality-Fix): bisher fehlende Zubehoer-/Ersatzteil-
-  # Begriffe.
-  - "netzteil"
-  - "ladekabel"
-  - "kabel"
-  - "ladegerät"
-  - "anleitung"
-
-  # Phase 15 (kontrollierter Review, "Service/Modding-Fix").
-  - "modding service"
-  - "reparatur service"
-  - "repair service"
-
-  # Phase 15 (kontrollierter Folge-Review, "Gehäuse/Shell-Fix").
+  - "ersatzdisplay"
+  - "display replacement"
+  - "ersatzakku"
+  - "replacement battery"
   - "ersatzgehäuse"
   - "leergehäuse"
   - "wechselgehäuse"
@@ -58,6 +48,49 @@ exclude_category:
   - "backplate"
   - "replacement housing"
   - "housing replacement"
+  - "adapter"
+  - "hub"
+  - "usb hub"
+  - "sd reader"
+  - "speicherkarte"
+  - "micro sd"
+  - "micro-sd"
+  - "skin"
+  - "sticker"
+  - "aufkleber"
+  - "stand"
+  - "halterung"
+  - "mount"
+  - "ersatzknopf"
+  - "ersatzbuttons"
+  - "ersatzjoystick"
+  - "ersatzstick"
+  - "replacement joystick"
+  - "replacement buttons"
+  - "replacement thumbstick"
+  - "replacement trigger"
+  - "replacement bumper"
+  - "ersatztrigger"
+  - "ersatzbumper"
+  - "modkit"
+  - "mod chip"
+  - "modchip"
+  - "modul kit"
+  - "modding service"
+  - "reparatur service"
+  - "repair service"
+  # Zubehörformulierung, die fast immer ein Angebot FÜR das Gerät beschreibt.
+  - "für steam deck"
+  - "for steam deck"
+  - "für rog ally"
+  - "for rog ally"
+  - "für legion go"
+  - "for legion go"
+  - "für lenovo legion go"
+  - "for lenovo legion go"
+  - "compatible with steam deck"
+  - "compatible with rog ally"
+  - "compatible with legion go"
 
 # "gehäuse" ist zweideutig: lose Ersatzschale vs. Zustandsbeschreibung eines
 # kompletten Geräts. Deshalb nur dann ausschließen, wenn kein Zustandskontext
@@ -82,180 +115,33 @@ exclude_category_unless_also_contains:
     - "gebrauchsspuren"
     - "verfärbt"
 
-# Phase 16: Kontextbewusste Ausschlüsse gegen häufige False-Positive-Quellen.
-# Ein Standalone-Zubehör-/Software-Begriff blockiert den Treffer. Wird derselbe
-# Begriff als Teil eines echten Geräte-Bundles genannt ("mit", "inkl.", "+",
-# "und", "sowie"), bleibt das komplette Handheld-Angebot matchbar.
-# Wichtig: diese Begriffe stehen NICHT in exclude_category, weil dort ein
-# kontextloser Ausschluss auch legitime Bundles fälschlich entfernen würde.
+# Kontextbewusste Ausschlüsse: Zubehör/Software allein blockiert, Zubehör
+# als Bestandteil eines echten Geräte-Bundles bleibt erlaubt. Diese Begriffe
+# stehen deshalb NICHT in exclude_category.
 exclude_category_unless_preceded_by:
-  # Spiele / Software / digitale Inhalte
-  spiele:
-    - "inkl."
-    - "inkl"
-    - "mit"
-    - "+"
-    - "und"
-    - "sowie"
-  game:
-    - "inkl."
-    - "inkl"
-    - "mit"
-    - "+"
-    - "und"
-    - "sowie"
-  games:
-    - "inkl."
-    - "inkl"
-    - "mit"
-    - "+"
-    - "und"
-    - "sowie"
-  software:
-    - "inkl."
-    - "inkl"
-    - "mit"
-    - "+"
-    - "und"
-    - "sowie"
-  download:
-    - "inkl."
-    - "inkl"
-    - "mit"
-    - "+"
-    - "und"
-    - "sowie"
-  "digital code":
-    - "inkl."
-    - "inkl"
-    - "mit"
-    - "+"
-    - "und"
-    - "sowie"
-  key:
-    - "inkl."
-    - "inkl"
-    - "mit"
-    - "+"
-    - "und"
-    - "sowie"
-  dlc:
-    - "inkl."
-    - "inkl"
-    - "mit"
-    - "+"
-    - "und"
-    - "sowie"
-  account:
-    - "inkl."
-    - "inkl"
-    - "mit"
-    - "+"
-    - "und"
-    - "sowie"
-
-  # Typische lose Controller-/Bedien- und Ersatzteile
-  controller:
-    - "inkl."
-    - "inkl"
-    - "mit"
-    - "+"
-    - "und"
-    - "sowie"
-  joystick:
-    - "inkl."
-    - "inkl"
-    - "mit"
-    - "+"
-    - "und"
-    - "sowie"
-  "thumbstick":
-    - "inkl."
-    - "inkl"
-    - "mit"
-    - "+"
-    - "und"
-    - "sowie"
-  "analog stick":
-    - "inkl."
-    - "inkl"
-    - "mit"
-    - "+"
-    - "und"
-    - "sowie"
-  button:
-    - "inkl."
-    - "inkl"
-    - "mit"
-    - "+"
-    - "und"
-    - "sowie"
-  buttons:
-    - "inkl."
-    - "inkl"
-    - "mit"
-    - "+"
-    - "und"
-    - "sowie"
-  trigger:
-    - "inkl."
-    - "inkl"
-    - "mit"
-    - "+"
-    - "und"
-    - "sowie"
-  bumper:
-    - "inkl."
-    - "inkl"
-    - "mit"
-    - "+"
-    - "und"
-    - "sowie"
-  "replacement part":
-    - "inkl."
-    - "inkl"
-    - "mit"
-    - "+"
-    - "und"
-    - "sowie"
-  ersatzteil:
-    - "inkl."
-    - "inkl"
-    - "mit"
-    - "+"
-    - "und"
-    - "sowie"
-
-  # Lade-/Versorgungszubehör: bewusst kontextsensitiv, damit z.B.
-  # "Steam Deck mit Netzteil" als komplettes Gerät nicht verloren geht.
-  netzteil:
-    - "inkl."
-    - "inkl"
-    - "mit"
-    - "+"
-    - "und"
-    - "sowie"
-  ladekabel:
-    - "inkl."
-    - "inkl"
-    - "mit"
-    - "+"
-    - "und"
-    - "sowie"
-  ladegerät:
-    - "inkl."
-    - "inkl"
-    - "mit"
-    - "+"
-    - "und"
-    - "sowie"
-  anleitung:
-    - "inkl."
-    - "inkl"
-    - "mit"
-    - "+"
-    - "und"
-    - "sowie"
+  spiele: ["inkl.", "inkl", "mit", "+", "und", "sowie"]
+  game: ["inkl.", "inkl", "mit", "+", "und", "sowie"]
+  games: ["inkl.", "inkl", "mit", "+", "und", "sowie"]
+  software: ["inkl.", "inkl", "mit", "+", "und", "sowie"]
+  download: ["inkl.", "inkl", "mit", "+", "und", "sowie"]
+  "digital code": ["inkl.", "inkl", "mit", "+", "und", "sowie"]
+  key: ["inkl.", "inkl", "mit", "+", "und", "sowie"]
+  dlc: ["inkl.", "inkl", "mit", "+", "und", "sowie"]
+  account: ["inkl.", "inkl", "mit", "+", "und", "sowie"]
+  controller: ["inkl.", "inkl", "mit", "+", "und", "sowie"]
+  joystick: ["inkl.", "inkl", "mit", "+", "und", "sowie"]
+  thumbstick: ["inkl.", "inkl", "mit", "+", "und", "sowie"]
+  "analog stick": ["inkl.", "inkl", "mit", "+", "und", "sowie"]
+  button: ["inkl.", "inkl", "mit", "+", "und", "sowie"]
+  buttons: ["inkl.", "inkl", "mit", "+", "und", "sowie"]
+  trigger: ["inkl.", "inkl", "mit", "+", "und", "sowie"]
+  bumper: ["inkl.", "inkl", "mit", "+", "und", "sowie"]
+  "replacement part": ["inkl.", "inkl", "mit", "+", "und", "sowie"]
+  ersatzteil: ["inkl.", "inkl", "mit", "+", "und", "sowie"]
+  netzteil: ["inkl.", "inkl", "mit", "+", "und", "sowie"]
+  ladekabel: ["inkl.", "inkl", "mit", "+", "und", "sowie"]
+  ladegerät: ["inkl.", "inkl", "mit", "+", "und", "sowie"]
+  anleitung: ["inkl.", "inkl", "mit", "+", "und", "sowie"]
 
 scoring_weights:
   price: 0.85
@@ -266,18 +152,12 @@ scoring_weights:
   lieferumfang: 0
 
 rules:
-  # ============================================================
-  # NINTENDO 3DS / 2DS XL (Enorm begehrte Sammler/Flipping-Objekte)
-  # ============================================================
   - label: "Nintendo New 3DS / 3DS XL / 2DS XL ★ Top-Deal"
     price_history_model: "handheld_nintendo_3ds"
     require_all_of:
       - ["3ds", "2ds", "3dsxl", "2dsxl"]
       - ["xl", "new 3ds", "new 2ds", "konsole"]
-    exclude:
-      - "defekt"
-      - "bastler"
-      - "ohne funktion"
+    exclude: ["defekt", "bastler", "ohne funktion"]
     min_vram_gb: 0
     max_price: 65
     deal_rating: "Top-Deal"
@@ -287,28 +167,17 @@ rules:
     require_all_of:
       - ["3ds", "2ds", "3dsxl", "2dsxl"]
       - ["xl", "new 3ds", "new 2ds", "konsole"]
-    exclude:
-      - "defekt"
-      - "bastler"
+    exclude: ["defekt", "bastler"]
     min_vram_gb: 0
     max_price: 95
     deal_rating: "Guter Preis"
 
-  # ============================================================
-  # SONY PS VITA (Sehr beliebt bei Sammlern / Homebrew)
-  # ============================================================
   - label: "PlayStation Vita (PCH-1000 / PCH-2000) ★ Top-Deal"
     price_history_model: "handheld_ps_vita"
     require_all_of:
       - ["ps vita", "psvita", "playstation vita"]
       - ["konsole", "bundle", "set", "ovp", "system"]
-    exclude:
-      - "defekt"
-      - "bastler"
-      - "hülle nur"
-      - "tasche"
-      - "display nur"
-      - "tv"
+    exclude: ["defekt", "bastler", "hülle nur", "tasche", "display nur", "tv"]
     min_vram_gb: 0
     max_price: 60
     deal_rating: "Top-Deal"
@@ -318,28 +187,16 @@ rules:
     require_all_of:
       - ["ps vita", "psvita", "playstation vita"]
       - ["konsole", "bundle", "set", "ovp", "system"]
-    exclude:
-      - "defekt"
-      - "bastler"
-      - "hülle nur"
-      - "tasche"
-      - "display nur"
-      - "tv"
+    exclude: ["defekt", "bastler", "hülle nur", "tasche", "display nur", "tv"]
     min_vram_gb: 0
     max_price: 90
     deal_rating: "Guter Preis"
 
-  # ============================================================
-  # VALVE STEAM DECK (LCD / OLED)
-  # ============================================================
   - label: "Valve Steam Deck ★ Top-Deal"
     price_history_model: "handheld_steam_deck"
     require_all_of:
       - ["steam deck", "steamdeck"]
-    exclude:
-      - "defekt"
-      - "bastler"
-      - "dock nur"
+    exclude: ["defekt", "bastler", "dock nur"]
     min_vram_gb: 0
     max_price: 180
     deal_rating: "Top-Deal"
@@ -349,24 +206,16 @@ rules:
     price_history_model: "handheld_steam_deck"
     require_all_of:
       - ["steam deck", "steamdeck"]
-    exclude:
-      - "defekt"
-      - "bastler"
+    exclude: ["defekt", "bastler"]
     min_vram_gb: 0
     max_price: 240
     deal_rating: "Guter Preis"
 
-  # ============================================================
-  # ASUS ROG ALLY / LEGION GO (High-End PC Handhelds)
-  # ============================================================
   - label: "Asus ROG Ally / Lenovo Legion Go ★ Top-Deal"
     price_history_model: "handheld_pc_preator"
     require_all_of:
       - ["rog ally", "legion go"]
-    exclude:
-      - "defekt"
-      - "bastler"
-      - "case"
+    exclude: ["defekt", "bastler", "case"]
     min_vram_gb: 0
     max_price: 250
     deal_rating: "Top-Deal"
@@ -375,9 +224,7 @@ rules:
     price_history_model: "handheld_pc_preator"
     require_all_of:
       - ["rog ally", "legion go"]
-    exclude:
-      - "defekt"
-      - "bastler"
+    exclude: ["defekt", "bastler"]
     min_vram_gb: 0
     max_price: 330
     deal_rating: "Guter Preis"
