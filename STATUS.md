@@ -1480,3 +1480,39 @@ musste inhaltlich abgeschwächt werden.
 
 **Commits:** `5ebd470…1a4d314` (7 Commits), gepusht. Vollständiger
 Abschlussbericht: `document/PHASE15_COMPLETION_REPORT.md`.
+
+## 35. Phase 15 Abschluss: PR #1-Merge + zwei kontrollierte Folge-Reviews — ABGESCHLOSSEN
+
+Abschnitt 34 ist veraltet (PR #1 war dort noch Draft, 979 Tests).
+Volltext siehe `PROJEKTSTAND_KOMPLETT.md` Abschnitt 26. Drei separate,
+jeweils einzeln freigegebene und gemergte PRs auf
+`claude/phase-15-optimierung-i1jncg`:
+
+- **PR [#1](https://github.com/dkmd89-dev/gpu-watch-v2/pull/1)** (merged
+  `7cba0fb`): RX-7600/XT-Fehlklassifizierung behoben (`8f0e601`) +
+  Controller-Zubehör-Fehltreffer generisch gefixt (`023d4a4`, "Variante
+  C" — `exclude_category_unless_preceded_by`, kontextbewusster Exclude
+  via negative Lookbehinds für Bundle-Konnektoren). Tests 979 → 1023.
+- **Dashboard-Bereinigungs-Review (Analyse):** bestätigt, dass die
+  bestehende `filter_valid_entries()`-Revalidierung (Phase 14) alte
+  Fehltreffer beim Lesen automatisch ausblendet, ohne `found.json`
+  anzufassen. Zwei neue, bis dahin ungefixte Fehlerklassen gefunden:
+  Service-/Modding-Dienstleistungsangebote, Gehäuse/Shell-Zweideutigkeit.
+- **PR [#2](https://github.com/dkmd89-dev/gpu-watch-v2/pull/2)** (merged
+  `d273271`): Service-/Modding-Fix (`94a8432`) — Mehrwort-Phrasen
+  `"modding service"`/`"reparatur service"`/`"repair service"` in 6
+  Kategorien ergänzt. Tests 1023 → 1039.
+- **PR [#3](https://github.com/dkmd89-dev/gpu-watch-v2/pull/3)** (merged
+  `855de7c`): Gehäuse/Shell-Fix (`71ac3a8`) — neuer generischer
+  Matcher-Mechanismus `exclude_category_unless_also_contains`
+  (titelweite Kontext-/Zustandsprüfung, andere Semantik als Variante C)
+  für dieselben 6 Kategorien, kein bare `gehäuse`-Exclude. Performance:
+  +5,0 % (~0,3 ms) Overhead. Tests 1039 → 1068.
+
+**Nicht verändert (alle drei PRs):** Deal-Score, Top-Deal, Flip/Resale,
+Notification-Gate, Price-History-Persistenz, Duplicate Detection,
+Presence Tracking, Category Validation. `found.json`/`seen.json`/
+`price_history.jsonl` durchgehend unangetastet.
+
+**Tests gesamt:** 868 → 1068, 0 failed. `rule_analyzer` 0 Findings nach
+jedem Merge.

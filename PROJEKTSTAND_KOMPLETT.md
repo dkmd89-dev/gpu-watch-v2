@@ -1732,3 +1732,114 @@ Schritt 4 korrigierten Testtitel-Annahmen, siehe dortiger Report).
 `1a4d314`, gepusht auf `claude/phase-15-optimierung-i1jncg`, PR #1
 (Draft). Vollständiger Abschlussbericht:
 `document/PHASE15_COMPLETION_REPORT.md`.
+
+## 26. Phase 15 Abschluss: PR #1-Merge + zwei kontrollierte Folge-Reviews (Matcher-Bugfixes, Dashboard-Bereinigung) — ABGESCHLOSSEN
+
+Fortsetzung von Abschnitt 25 (Stand dort veraltet: PR #1 war noch Draft,
+979 Tests). Drei separate, jeweils einzeln vom Nutzer freigegebene und
+gemergte PRs auf demselben Branch `claude/phase-15-optimierung-i1jncg`.
+
+**PR #1 — kontrollierter Review zweier Matcher-Bugs + Merge:**
+Zwei in Abschnitt 25 nur dokumentierte, nicht gefixte Befunde wurden nach
+separater Freigabe und Reproduktion behoben:
+- **Fix 1 (`8f0e601`):** `gpu.yaml` — `"rx 7600"` als redundanter
+  match-Begriff aus der `RX 7600 XT`-Regel (Guter-Preis-Stufe) entfernt;
+  die Regel matchte nie eigenständig (von den davorstehenden `RX 7600`-
+  Regeln first-match-wins abgefangen).
+- **Fix 2 → Variante C (`023d4a4`):** `controller.yaml` — Standalone-
+  Zubehör-Fehltreffer ("PS5 Controller Ladekabel" matchte als Top-Deal,
+  5€/Score 81) zunächst mit bare `exclude_category`-Ergänzung gefixt;
+  ein vom Nutzer selbst durchgeführter Robustheitscheck deckte danach
+  eine Recall-Regression auf (5 von 6 legitimen Bundle-Fällen blockiert).
+  Lösung: neuer genereller, kategorieunabhängiger Matcher-Mechanismus
+  `exclude_category_unless_preceded_by` (`matcher.py::
+  _any_conditional_exclude()`, negative Lookbehinds, ein Fragment pro
+  Bundle-Konnektor wie bei `categories/detectors/lieferumfang.py`
+  vorgezeichnet) — schließt einen Begriff nur aus, wenn KEIN erlaubter
+  Konnektor ("inkl.", "mit", "+", "und", "sowie") unmittelbar davorsteht.
+  In `compute_ruleset_signature()` und `rule_analyzer.py::
+  KNOWN_RULE_FIELDS` berücksichtigt. 44 neue Tests über beide Fixes.
+  Tests: 979 → 1023.
+- **Merge:** `7cba0fb` (Merge-Commit, kein Squash/Rebase, Commits
+  separat erhalten) nach vollständigem 13-Punkte-Pre-Merge-Review gegen
+  `main`.
+
+**Dashboard-Bereinigungs-Review (Analyse, kein Fix):** Nutzeranfrage zu
+zwei konkreten Alt-Fehltreffern im aktiven Bestand ("Nintendo 3DS XL
+Gehäuse Blau", "Modding Service für alle Nintendo Modelle"). Ergebnis:
+`/api/found`/Dashboard lesen `found.json` über die bestehende
+`filter_valid_entries()`-Live-Revalidierung (Phase 14) — `found.json`
+selbst bleibt bei Regel-Fixes unverändert, veraltete Treffer werden beim
+Lesen automatisch ausgeblendet, sobald sie gegen die aktuellen Regeln
+nicht mehr matchen. `price_history.jsonl`/`seen.json` strukturell
+entkoppelt von `found.json` (kein Titel-/URL-Bezug), Entfernen aus dem
+aktiven Bestand hat nachweislich keine Auswirkung auf Deal-Score/
+Top-Deal/Flip/Resale/Presence-Tracking. Beide genannten Titel matchten
+zu diesem Zeitpunkt weiterhin — zwei unterschiedliche, bis dahin
+ungefixte Fehlerklassen identifiziert (Service-/Modding-
+Dienstleistungsangebote; Gehäuse/Shell als zweideutiger Begriff).
+
+**PR #2 — Service/Modding-Fix (`94a8432`, Merge `d273271`):**
+Reparatur-/Modding-**Dienstleistungsangebote** (kein Geräteverkauf)
+matchten fälschlich. Fix: Mehrwort-Phrasen `"modding service"`/
+`"reparatur service"`/`"repair service"` zu `exclude_category` von
+`handhelds`, `controller`, `konsolen_bundles`, `retro_konsolen`,
+`iphone`, `macbook` ergänzt. Bewusst als Phrase statt bare `"service"`
+(Kollisionsrisiko mit legitimen Reparatur-Kandidaten-Regeln, z.B.
+`controller.yaml`-Drift-Regeln). Der "Gehäuse"-Teil wurde bewusst
+zurückgestellt: ein bare `exclude_category: gehäuse` hätte nachweislich
+legitime Zustandsbeschreibungen kompletter Geräte ("Gehäuse leicht
+vergilbt/verkratzt") blockiert. 16 neue Tests. Tests: 1023 → 1039.
+
+**PR #3 — Gehäuse/Shell-Fix (`71ac3a8`, Merge `855de7c`):** kontrollierte
+Folge-Phase für den zurückgestellten Teil, plus zwei weitere reale
+Beispielmuster ("Steam Deck Back Replacement Shell", "Modulares Steam
+Deck Gehäuse mit Kühlventilator und Zubehör"). Neuer generischer
+Matcher-Mechanismus `exclude_category_unless_also_contains`
+(`matcher.py::_any_conditional_exclude_presence()`) — andere Semantik
+als Variante C: schließt einen Begriff nur aus, wenn im **gesamten
+Titel** kein Begriff aus einer Kontext-/Zustandsliste vorkommt (bewusst
+keine Adjazenzregel, da Zustandsbeschreibungen in wechselndem Abstand
+zum Begriff stehen, z.B. "Gehäuse: leicht vergilbt" vs. "... Gehäuse hat
+leichte Kratzer"). Angewendet auf dieselben 6 Kategorien:
+`exclude_category_unless_also_contains: {gehäuse: [17 Zustandsbegriffe]}`.
+Zusätzlich unbedingte `exclude_category`-Ergänzungen für Fälle, die die
+Kontextprüfung strukturell nicht erreichen (zusammengesetzte Wörter wie
+`"ersatzgehäuse"` — enthält "gehäuse" nicht als eigenes Wort, siehe
+Wortgrenzen-Matching — sowie englische Begriffe wie `"replacement
+shell"`/`"backplate"`). In `compute_ruleset_signature()` und
+`rule_analyzer.py::KNOWN_RULE_FIELDS` berücksichtigt. Performance
+(prozessinterner, rauschbereinigter Vergleich mit/ohne Fix): +5,0%
+(~0,3ms) Overhead pro `evaluate()`-Aufruf. 29 neue Tests (26 in
+`test_matcher_gehaeuse_shell_fix.py` + 4 in
+`test_matcher_ruleset_signature.py`). Tests: 1039 → 1068.
+
+**Nicht verändert (durchgehend, alle drei PRs):** Deal-Score, Top-Deal-
+Logik, Flip-/Resale-Berechnung, Notification-Gate, Price-History-
+Persistenz, Duplicate Detection, Presence Tracking, Category Validation.
+`found.json`/`seen.json`/`price_history.jsonl` in keinem der drei PRs
+angefasst.
+
+**Offene, bewusst dokumentierte Restlücken:**
+- Kontext-/Zustandsbegriffsliste (Gehäuse-Fix) ist kuratiert, nicht
+  erschöpfend — ungewöhnliche Formulierungen außerhalb der Liste führen
+  weiterhin zu False Negatives (zulasten von Precision > Recall bewusst
+  in Kauf genommen).
+- Englische Zustandsbeschreibungen sind nicht über den kontextbewussten
+  Mechanismus abgedeckt, nur drei englische Produktphrasen als
+  unbedingte Excludes.
+- Transferierbarkeit von Variante C auf `handhelds.yaml`/
+  `konsolen_bundles.yaml` (identisches Ladekabel-Problem) verifiziert,
+  aber nicht angewendet (außerhalb des jeweils freigegebenen Scopes).
+
+**Tests gesamt:** 868 (Phase-15-Start) → 1068 (aktueller Stand), 0
+failed durchgehend über alle drei Merges. `rule_analyzer.analyze_ruleset()`
+gegen das komplette Ruleset (355 Regeln/19 Kategorien): 0 Findings nach
+jedem der drei Merges.
+
+**PRs:**
+[#1](https://github.com/dkmd89-dev/gpu-watch-v2/pull/1) (merged `7cba0fb`),
+[#2](https://github.com/dkmd89-dev/gpu-watch-v2/pull/2) (merged `d273271`),
+[#3](https://github.com/dkmd89-dev/gpu-watch-v2/pull/3) (merged `855de7c`) —
+alle auf Branch `claude/phase-15-optimierung-i1jncg` gegen `main`, jeweils
+einzeln vom Nutzer freigegeben.
