@@ -1,5 +1,6 @@
 """Wendet die Regel-Matrix aus rules.yaml auf einen (Titel, Preis) an."""
 from __future__ import annotations
+import functools
 import logging
 import re
 import yaml
@@ -391,6 +392,45 @@ def _vram_gb(title_lower: str) -> int | None:
     return int(m.group(1)) if m else None
 
 
+# Regex-Cache (Phase 15, Schritt 7 -- PHASE15_OPTIMIERUNG.md, Abschnitte
+# 22-23). Benchmark vor der Umsetzung (siehe PHASE15_PERFORMANCE_REPORT.md):
+# cProfile ueber 3000 evaluate()-Aufrufe zeigte 83,5% der Gesamtzeit in
+# _contains_term(), davon allein 21,8% in re._compile() und 19,0% in
+# re.escape() -- zusammen ~41% reine Compile-/Escape-Kosten, obwohl JEDE
+# Regel denselben festen Satz an Begriffen (aus den YAML-Dateien) immer
+# wieder gegen wechselnde Titel prueft. compute_ruleset_signature() macht
+# das quantifizierbar: das aktuelle Ruleset enthaelt nur 625 verschiedene
+# (kleingeschriebene) Begriffe insgesamt -- Python re.search() kompiliert
+# denselben Pattern-String bei > 512 verschiedenen Patterns (interner
+# Default-Cache des re-Moduls) im laufenden Betrieb wiederholt neu.
+#
+# maxsize=4096: bewusst NICHT unbounded, aber grosszuegig ueber der
+# aktuellen Begriffsmenge (625) -- Begriffe kommen ausschliesslich aus den
+# vertrauenswuerdigen YAML-Regeln (kein von aussen kontrollierter Input),
+# das Wachstum ist an die Ruleset-Groesse gebunden, nicht an die Anzahl
+# gescrapter Titel. Jeder kompilierte einfache Wortgrenzen-Pattern belegt
+# nur wenige hundert Byte -- 4096 Eintraege sind im einstelligen MB-Bereich,
+# unkritisch.
+#
+# KEINE Invalidierung bei Ruleset-Aenderungen noetig (anders als beim
+# Rules-Cache in rules_loader.py): das kompilierte Pattern fuer einen
+# Begriffs-STRING haengt ausschliesslich vom String selbst ab, nicht davon,
+# aus welcher Regel/welchem Ruleset-Stand er stammt -- "lego" kompiliert
+# immer zum selben Pattern, unabhaengig davon, ob/wie oft/in welcher Regel
+# er aktuell verwendet wird. Alte Eintraege fuer inzwischen entfernte
+# Begriffe sind hoechstens ungenutzter Speicher, nie ein Korrektheitsrisiko.
+#
+# functools.lru_cache ist laut Python-Doku thread-safe (interne Sperre) --
+# keine zusaetzliche Synchronisation noetig.
+#
+# Keine Aenderung der Matcher-Semantik: identisches Pattern, identische
+# re.UNICODE-Flag, nur die Kompilierung wird wiederverwendet statt bei
+# jedem Aufruf neu zu erfolgen.
+@functools.lru_cache(maxsize=4096)
+def _compiled_term_pattern(term_lower: str) -> re.Pattern[str]:
+    return re.compile(r"(?<!\w)" + re.escape(term_lower) + r"(?!\w)", re.UNICODE)
+
+
 def _contains_term(text: str, term: str) -> bool:
     """Prüft, ob `term` als GANZES WORT (bzw. ganze Wortfolge) in `text` vorkommt.
 
@@ -399,8 +439,7 @@ def _contains_term(text: str, term: str) -> bool:
     anschlägt. re.escape() macht auch Terme mit Leerzeichen ("gaming pc")
     oder Sonderzeichen ("nitro+") sicher nutzbar.
     """
-    pattern = r"(?<!\w)" + re.escape(term.lower()) + r"(?!\w)"
-    return re.search(pattern, text, flags=re.UNICODE) is not None
+    return _compiled_term_pattern(term.lower()).search(text) is not None
 
 
 def _any_term(text: str, terms: list[str]) -> bool:

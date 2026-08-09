@@ -1,6 +1,6 @@
-# Phase 15 – Performance Report (Schritt 6: Rules-Cache)
+# Phase 15 – Performance Report (Schritt 6: Rules-Cache, Schritt 7: Regex-Cache)
 
-**Stand:** 2026-08-09 · **Status:** Rules-Cache implementiert, an allen drei Aufrufstellen angebunden. Keine Matcher-/Regel-Semantik verändert.
+**Stand:** 2026-08-09 · **Status:** Beide Caches implementiert und angebunden. Keine Matcher-/Regel-Semantik verändert.
 
 ---
 
@@ -76,10 +76,87 @@ Suite) — konsistent mit dem gemessenen Speedup.
   `test_rules_loader.py`-Tests). Keine bestehende Testdatei musste
   geändert werden.
 
-## 5. Nicht Teil dieses Schritts
+---
 
-- **Regex-Cache (Schritt 7):** noch nicht implementiert. Laut Auftrag
-  erst nach eigenem Benchmark von `matcher.evaluate()` und nur bei
-  messbarem Nutzen (STOP 4) — separater, noch ausstehender Schritt.
+# Schritt 7: Regex-Cache
+
+Auftragsvorgabe (Abschnitt 22): erst benchmarken, nur bei messbarem
+Nutzen implementieren. STOP 4: Baseline-Messung vor der Optimierung.
+
+## 6. Benchmark VOR der Optimierung (Baseline)
+
+`matcher.evaluate()` gegen 15 realistische Titel (Treffer verschiedener
+Kategorien + 1 kompletter Nicht-Treffer), 200 Wiederholungen (3.000
+`evaluate()`-Aufrufe):
+
+```
+Baseline: 3.000 Aufrufe in 22.672,9ms (7,558ms/Aufruf)
+```
+
+`cProfile`-Analyse derselben 3.000 Aufrufe zeigt, wo die Zeit hingeht:
+
+```
+_contains_term()      83,5 % der evaluate()-Gesamtzeit (12.316.200 Aufrufe)
+  davon re._compile()   21,8 % der evaluate()-Gesamtzeit
+  davon re.escape()     19,0 % der evaluate()-Gesamtzeit
+  davon Pattern.search() 15,4 % (die eigentliche Suche -- nicht vermeidbar)
+  davon re.UNICODE-Flag-Lookup (enum) ~10 %
+```
+
+**~41 % der Gesamtzeit ist reines Kompilieren/Escapen desselben, festen
+Begriffs-Vokabulars** (625 verschiedene kleingeschriebene Begriffe im
+aktuellen Regelwerk) bei JEDEM einzelnen Aufruf — obwohl sich die
+Begriffe zwischen zwei Regel-Ladezyklen nicht ändern. Eindeutig über der
+Signifikanzschwelle für einen Regex-Cache.
+
+## 7. Implementierung
+
+`matcher.py::_compiled_term_pattern()` (neu): `functools.lru_cache(maxsize=4096)`
+um die bisherige Pattern-Bau-Logik aus `_contains_term()`. `_contains_term()`
+selbst bleibt in Signatur und Semantik unverändert (Wortgrenzen, Case-
+Insensitivity, Sonderzeichen-Escaping) — nur die Kompilierung wird beim
+zweiten und jedem weiteren Aufruf mit demselben (kleingeschriebenen)
+Begriff wiederverwendet statt neu zu erfolgen. `maxsize=4096` bewusst
+begrenzt (nicht unbounded), aber großzügig über der aktuellen
+Begriffsmenge (625) — Begriffe kommen ausschließlich aus den
+vertrauenswürdigen YAML-Regeln, kein von außen kontrollierter Input.
+Keine Invalidierung bei Ruleset-Änderungen nötig: ein kompiliertes Pattern
+hängt nur vom Begriffs-String selbst ab, nicht davon, aus welcher
+Regel/welchem Ruleset-Stand er stammt.
+
+## 8. Benchmark NACH der Optimierung
+
+Gleicher Aufbau (15 Titel, 200 Wiederholungen, 3.000 Aufrufe, nach
+Cache-Warmup):
+
+```
+Mit Regex-Cache: 3.000 Aufrufe in 10.875,1ms (3,625ms/Aufruf)
+Speedup: ~2,1x
+```
+
+## 9. Sicherheitsprüfung
+
+- Diff in `matcher.py` beschränkt auf: einen neuen Import
+  (`functools`), eine neue, gecachte Hilfsfunktion
+  (`_compiled_term_pattern()`), und zwei geänderte Zeilen in
+  `_contains_term()` (Pattern-Bau ausgelagert). Keine andere Zeile in
+  `matcher.py` verändert.
+- 9 neue, dedizierte Tests (`test_matcher_regex_cache.py`): Cache Hit/
+  Miss, Groß-/Kleinschreibung teilt sich einen Cache-Eintrag, Wortgrenzen/
+  Sonderzeichen/Mehrwort-Phrasen-Korrektheit unverändert, Thread-Sicherheit
+  (parallele Zugriffe mit unterschiedlichen Begriffen).
+- Gesamtsuite (alle 979 Tests, inkl. sämtlicher bestehender
+  Matcher-/Regel-/Deal-Score-/Top-Deal-/Flip-/Notification-Tests): **979
+  passed, 0 failed** (970 vorher + 9 neue). Kein einziger bestehender Test
+  musste angepasst werden — starkes Indiz, dass die Matcher-Semantik
+  tatsächlich unverändert blieb.
+- Als Nebeneffekt sank die Laufzeit der Gesamtsuite weiter: 87s → 82s
+  (Schritt 6) → 78s (Schritt 7, trotz 9 weiterer Tests).
+
+## 10. Nicht Teil dieses Schritts
+
 - Keine Änderung an der Matcher-Semantik, keinen YAML-Regeln, keinen
   `data/`-Dateien.
+- Kein Big-Bang-Refactoring von `_contains_term()`/`_any_term()` — nur
+  die Pattern-Kompilierung wird gecacht, die Funktionslogik/-signatur
+  bleibt identisch.
