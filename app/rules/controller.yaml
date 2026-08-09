@@ -31,6 +31,17 @@ exclude_category:
   - "grip"
   - "aufsatz"
   - "kabel"
+  # FIX (Phase 15, kontrollierter Review): bare "kabel" (oben) matcht laut
+  # Wortgrenzen-Logik (matcher.py::_contains_term()) NICHT das zusammen-
+  # gesetzte Wort "Ladekabel" -- verifiziert, dass Zubehoer-Angebote wie
+  # "PS5 Controller Ladekabel"/"Netzteil"/"Ladegeraet"/"Anleitung" bisher
+  # als vollstaendiger Controller durchgingen (z.B. 5EUR-Ladekabel ->
+  # Top-Deal, Score 81, 4 Sterne). Analog zum bereits bestehenden Muster
+  # in handhelds.yaml/konsolen_bundles.yaml (Phase 14) ergaenzt.
+  - "ladekabel"
+  - "netzteil"
+  - "ladegerät"
+  - "anleitung"
   - "chinesisch"
   - "no name"
   - "noname"

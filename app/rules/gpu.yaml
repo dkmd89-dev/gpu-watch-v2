@@ -438,12 +438,22 @@ rules:
     negotiation_score_component: "hardware_qualitaet"
 
   - label: "RX 7600 XT"
-    match: 
+    # FIX (Phase 15, kontrollierter Review): "rx 7600" wurde hier als
+    # eigener match-Begriff gefuehrt, obwohl "7600 xt"/"7600xt" die XT-
+    # Variante bereits eindeutig identifizieren. Da diese Regel VOR den
+    # "RX 7600"-Regeln (8GB, siehe unten) steht und ihr max_price (230)
+    # deren Preisspannen (160/210) vollstaendig abdeckte, gewann sie IMMER
+    # zuerst -- jede echte Nicht-XT-RX-7600-Karte wurde faelschlich als
+    # rx_7600_xt gespeichert, "rx_7600" war dadurch strukturell 100%
+    # unerreichbar (bestaetigt: 8/8 bisherige price_history.jsonl-
+    # Datenpunkte liefen unter rx_7600_xt, mind. 1 nachweislich eine
+    # Nicht-XT-Karte). "7600 xt"/"7600xt" allein reichen zur Erkennung aus
+    # (siehe Top-Deal-Tier oben, die dieses Muster bereits korrekt nutzt).
+    match:
       - "7600 xt"
       - "7600xt"
-      - "rx 7600"
     price_history_model: "rx_7600_xt"
-    exclude: 
+    exclude:
       - "7700"
       - "7800"
       - "7900"
