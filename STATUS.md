@@ -1430,3 +1430,53 @@ Scan-Zyklus (Intel-ThinkPads kommen jetzt mit rein) — Scan-Dauer kann
 leicht steigen. Keine Breaking Changes, keine API-Änderungen.
 
 **Commit-Nachrichten:** siehe `git log -p 91e20e2 9f79ed3 e834914`.
+
+## 34. Phase 15 (Matcher & Rule Quality Optimization) — Schritte 1–9 abgeschlossen
+
+Eigenständiger Auftrag (`PHASE15_OPTIMIERUNG.md`): Matcher-/Rule-Qualität
+systematisch absichern statt weiter Kategorien/Features auszubauen.
+Priorität: **Precision > Recall**. Branch
+`claude/phase-15-optimierung-i1jncg`, PR
+[#1](https://github.com/dkmd89-dev/gpu-watch-v2/pull/1) (Draft).
+
+Kurzfassung (Volltext siehe `PROJEKTSTAND_KOMPLETT.md` Abschnitt 25 und
+die drei dedizierten Reports unter `document/`):
+
+- **Rule Analyzer** (`app/rule_analyzer.py`, neu): 7 read-only Prüfungen
+  (Struktur/Duplicate/Overlap/Shadow/`require_all_of`-Suspicion/
+  Exclude-Conflicts/Unreachable). Gegen das echte Ruleset (355 Regeln/19
+  Kategorien): 0 Errors, 0 Warnings, 2 Infos. Bestätigter Beobachtungsfall
+  `RX 7600`/`RX 7600 XT` (Regel-Reihenfolge-Problem) — keine YAML-Änderung,
+  separate Freigabe nötig. → `document/PHASE15_RULE_ANALYSIS_REPORT.md`
+- **False-Positive Regression Suite** (38 Tests gegen die echten
+  `rules/*.yaml`): LEGO/CRT/ThinkPad/Retro-Konsolen/Handheld-/
+  Konsolen-Zubehör/Controller. Nebenfund: `controller.yaml` schließt nur
+  bare `"kabel"` aus, nicht `"Ladekabel"` (dokumentiert, nicht gefixt).
+- **Rule Coverage Analysis** (`app/rule_coverage.py`, neu, read-only gegen
+  `price_history.jsonl`): 135 aktive Modelle, 3 Orphan-Modelle
+  (`spielzeug_bundles` existiert nicht mehr), 17,2 % False-Positive-Rate
+  — größtenteils Alt-Kontamination von vor den Phase-12-Fixes.
+  → `document/PHASE15_RULE_COVERAGE_REPORT.md`
+- **Rules-Cache** (`app/rules_loader.py`, angebunden in `app.py`/
+  `api/deals.py`/`api/status.py`): `load_rules()` lief bisher bei JEDEM
+  Request neu — jetzt Datei-Fingerabdruck-Cache, ~1.700x Speedup warm.
+- **Regex-Cache** (`matcher.py::_compiled_term_pattern()`, `lru_cache`):
+  nach Benchmark (83,5 % der `evaluate()`-Zeit in `_contains_term()`,
+  ~41 % davon Compile/Escape) implementiert — ~2,1x Speedup, keine
+  Semantikänderung. → `document/PHASE15_PERFORMANCE_REPORT.md`
+- **`run_scan()`-Analyse:** keine sichere kleine Extraktion gefunden
+  (~700 Zeilen, durchgehend geteilter Zustand) — bewusst kein
+  Refactoring, wie im Auftrag vorgegeben.
+
+**Nicht verändert:** Deal-Score, Top-Deal-Logik, Flip-/Resale-Berechnung,
+Notification-Gate, Price-History-Persistenz, Duplicate Detection,
+Presence Tracking, Category Validation, YAML-Regeln, `data/`-Dateien
+(nur lesend). Branch-Diff gegen `main` verifiziert: nur 4 bestehende
+Dateien mit minimalem Diff (5–43 Zeilen), Rest ausschließlich neue
+Dateien.
+
+**Tests:** 868 → 979 (111 neu), 0 failed, keine bestehende Testdatei
+musste inhaltlich abgeschwächt werden.
+
+**Commits:** `5ebd470…1a4d314` (7 Commits), gepusht. Vollständiger
+Abschlussbericht: `document/PHASE15_COMPLETION_REPORT.md`.
