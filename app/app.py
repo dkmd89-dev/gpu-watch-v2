@@ -9,6 +9,7 @@ from datetime import datetime, timedelta, timezone
 from flask import Flask
 
 from matcher import load_rules, evaluate, compute_ruleset_signature
+from rules_loader import get_rules
 from scrapers import search_kleinanzeigen, search_ebay
 from scrapers.registry import discover_scrapers
 from notify import send_ntfy, emoji_for, rating_stars_for
@@ -334,7 +335,9 @@ def run_scan():
         notification_duration = 0.0
         already_seen_count = 0
 
-        rules_cfg = load_rules(str(Path(__file__).parent / "rules"))
+        # Phase 15, Schritt 6 (rules_loader.py): gecachter Zugriff statt
+        # YAML-Neuparsing bei JEDEM Scan-Zyklus -- identisches Rueckgabeformat.
+        rules_cfg = get_rules(str(Path(__file__).parent / "rules"))
         defaults = rules_cfg["defaults"]
         # Phase 11, Punkt B (sichere Re-Evaluierung): EINMAL pro Scan
         # berechnet, analog zu price_stats_by_model -- siehe

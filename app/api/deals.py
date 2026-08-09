@@ -12,7 +12,7 @@ from typing import Callable
 from flask import Blueprint, render_template, jsonify
 
 from persistence.json_store import _load_json
-from matcher import load_rules
+from rules_loader import get_rules
 from category_validation import filter_valid_entries
 from scoring.profit import MIN_FLIP_MARGIN_PCT
 from top_deal import (
@@ -45,7 +45,9 @@ def build_deals_blueprint(
         # Kategorie-Filter-Dropdown im Template -- siehe matcher.py-Kommentar
         # bei "categories". get(..., []) statt [] direkt, falls load_rules()
         # im Legacy-Einzeldatei-Modus laeuft (dort existiert der Key nicht).
-        rules_cfg = load_rules(str(rules_dir))
+        # Phase 15, Schritt 6 (rules_loader.py): gecachter Zugriff statt
+        # YAML-Neuparsing bei JEDEM Request -- identisches Rueckgabeformat.
+        rules_cfg = get_rules(str(rules_dir))
         # Phase 14, Schritt 2 (PHASE14_DATA_QUALITY_REPORT.md): zentrale
         # Kategorievalidierung -- Eintraege, die bei erneuter Pruefung gegen
         # die AKTUELLEN Regeln nicht mehr (oder einer anderen Kategorie)
@@ -94,7 +96,7 @@ def build_deals_blueprint(
         # damit /api/found (z.B. externe/mobile Clients) nicht von der
         # Dashboard-Ansicht abweicht.
         found = _load_json(found_file, [])
-        rules_cfg = load_rules(str(rules_dir))
+        rules_cfg = get_rules(str(rules_dir))
         return jsonify(filter_valid_entries(found, rules_cfg))
 
     @bp.route("/api/scan-now", methods=["POST"])
