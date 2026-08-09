@@ -1357,3 +1357,91 @@ stand vor Phase 12: 797 passed).
   reparierten Matching-Regeln vorgesehen (Auftraggeber-Vorgabe).
 
 Phase 12 (Schritte 1–5) gilt damit als abgeschlossen.
+
+
+---
+
+## 22. Phase 13 (Production Validation / Validierungs-Scan) — ABGESCHLOSSEN
+
+**Ziel:** prüfen, ob die Phase-12-Preisgrenzen-Kalibrierung in der Praxis
+die gewünschte Wirkung zeigt — Match-Zahlen, Top-Deals, Deal-Score-
+Verteilung, Flip-Kandidaten, Resale-Confidence, False-Positive-
+Anzeichen, `cpu_mainboard_bundle`-Treffer je Kategorie.
+
+**Methodischer Hinweis (wichtig):** kein Netzwerkzugriff auf
+Kleinanzeigen/eBay/Quoka in dieser Sandbox — ein echter Live-Scan war
+nicht möglich. Zusätzlich war seit dem Kalibrierungs-Commit
+(`9daadab`, 2026-08-09 04:36 UTC) real zu wenig Zeit vergangen: der
+jüngste Datenpunkt in `price_history.jsonl` zum Prüfzeitpunkt stammte
+von 04:22 UTC — also noch **vor** der Kalibrierung. Es lag daher keine
+echte "vorher/nachher"-Scan-Beobachtung vor.
+
+**Gewählte Methodik (bestmögliche Alternative):** die komplette
+bestehende `price_history.jsonl` (9.253 Punkte, 8.080 mit `fingerprint`
+simulierbar) wurde **zweimal** durch die echte matcher-/deal_score-/
+top_deal-/Flip-Kandidat-Pipeline gejagt — einmal mit dem Regelwerk
+unmittelbar vor der Preisgrenzen-Kalibrierung (Commit `1a664a4`, bereits
+inkl. der Phase-12-Matching-Fixes), einmal mit dem aktuellen Regelwerk.
+Beide Läufe nutzen denselben Marktkontext (identische `PriceStats`/
+`market_prices`/`resale_prices`/`resale_confidence`), um ausschließlich
+den Effekt der Regeländerungen zu isolieren, nicht Verschiebungen in der
+Preisstatistik selbst.
+
+**Kernbefunde:**
+- **`cpu_mainboard_bundle`: erster echter Produktiv-Treffer** seit
+  Bestehen der Kategorie — ein realer Datenpunkt (175€, Ryzen-5600-
+  Bundle), datiert **nach** dem Phase-11-Re-Evaluierungs-Fix. Die
+  Simulation findet einen zweiten, bisher unter `gaming_pc` verbuchten
+  Punkt, der unter den aktuellen Regeln ebenfalls matchen würde. Der
+  Re-Evaluierungs-Mechanismus aus Phase 11 funktioniert damit
+  nachweislich in der Praxis. i5-12400F-/Ryzen-3600-Combos weiterhin
+  0 Treffer (konsistent mit der Einschätzung zu deren vermutlich zu
+  niedrigen Preisgrenzen).
+- **MacBook Air M4: eindeutigster Einzeleffekt** — die alte Grenze
+  (415€) lag unter dem günstigsten real beobachteten Angebot (499€),
+  Top-Deal war strukturell unmöglich. Nach der Kalibrierung (725€) sind
+  mehrere reale Angebote (bis 720€) jetzt korrekt erkennbar.
+- **iPhone:** 158 Angebote neu als Top-Deal eingestuft (8 kalibrierte
+  Modelle), Gesamt-Match-Zahl je Kategorie **unverändert** (0 Delta) —
+  die Kalibrierung verschiebt nur die Tier-Einstufung (Guter-Preis/Okay
+  → Top-Deal), erzeugt keine neuen Treffer. Stichprobe (günstigste 8,
+  teuerste 5) zeigt keine False Positives.
+- **Aggregierte KPIs:** Top-Deals gesamt 335→347 (+3,6%),
+  Flip-Kandidaten 259→270 (+4,2%), Deal-Score-Verteilung leicht nach
+  oben verschoben (mehr 4-/5-Sterne-, weniger 1-Stern-Bewertungen).
+- **`lego_cmf`: einzige verschärfte Kategorie** — 45 von 189 bisherigen
+  Treffern verlieren die Einstufung (37 verlassen die Kategorie
+  komplett, 8 rutschen in Nachbarregeln wie `lego_promo`).
+  Stichprobenprüfung: durchgängig plausible Einzelfiguren, keine
+  erkennbaren Fehlklassifizierungen. Leichter Rückgang der mittleren
+  Resale-Confidence bei den umklassifizierten Treffern (kleinere
+  Vergleichsgruppen in Nachbarregeln, nicht durch die Kalibrierung
+  selbst verursacht).
+- **Nebenbefund (positiv, kein Bug):** 7 `retro_konsolen`-Treffer (u.a.
+  "Nintendo Switch Controller im N64-Stil") wandern korrekt zu den
+  zwischenzeitlich vom Auftraggeber integrierten neuen Kategorien
+  `handhelds`/`konsolen_bundles` ab — diese waren vorher fälschlich als
+  Retro-Konsole statt als Controller/Bundle einsortiert.
+
+**Sicherheitsprüfung:** keine YAML-Preisgrenze geändert, keine
+Löschung/Manipulation von `price_history.jsonl`/`seen.json`/
+`found.json` (nur lesend verwendet), kein Code angefasst.
+
+**Geänderte Dateien:** nur `PHASE13_VALIDATION_REPORT.md` (neu).
+
+**Teststand:** `pytest app/tests/` → **851 passed, 0 failed**
+(unverändert, keine Code-Änderung in diesem Schritt).
+
+**Empfehlungen für Folgephasen:**
+- Diesen Report mit echten Vorher/Nachher-Zahlen wiederholen, sobald ein
+  echter Produktiv-Scan-Zyklus **nach** dem Kalibrierungs-Commit
+  durchgelaufen ist — die Simulation ist bestmöglich, aber kein Ersatz
+  für echte Beobachtung über mehrere Tage.
+- `cpu_mainboard_bundle` weiter beobachten (n=1–2 noch nicht belastbar).
+- Nintendo-/Sony-Retro-Konsolen weiterhin nicht automatisch anfassen
+  (Phase 12: MANUELLE PRÜFUNG).
+- Kein Bedarf für einen automatischen Selbst-Kalibrierungsmechanismus —
+  die manuelle, schrittweise Kalibrierung war kontrollierbar und zeigte
+  nachvollziehbare, überwiegend positive Effekte.
+
+Phase 13 gilt damit als abgeschlossen.
