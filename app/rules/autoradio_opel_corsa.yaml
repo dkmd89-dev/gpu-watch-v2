@@ -1,0 +1,222 @@
+# rules/autoradio_opel_corsa.yaml
+# Kategorie: Android-Autoradios im Opel-Design für Corsa D (Plug & Play)
+# Unterstützte Marken: JUNSUN, Eonon, A-Sure, Xtrons, Joying, u.a.
+
+category: "autoradio_opel_corsa"
+label: "Autoradio Opel Corsa D"
+notify_max_price: 150  # Vorsichtiger Startwert, später kalibrieren
+
+# ============================================================
+# Kategorie-eigene Deal-Score-Gewichte
+# ============================================================
+# Überschreibt für diese Kategorie die globalen scoring_weights aus
+# _global.yaml (Default: 35% Preis / 15% Ausstattung / 30% Hardware-
+# qualität / 5% Hersteller / 10% Zustand / 5% Lieferumfang).
+# Grund: diese Kategorie matcht ausschließlich über Titel-Stichwörter
+# (require_all_of), es gibt keinen "requirements:"-Block wie bei
+# Office-/Gaming-PC. Damit liefern "ausstattung" (has_ssd/
+# has_dedicated_gpu) und "hardware_qualitaet" (CPU-/RAM-Headroom-Bonus)
+# strukturell KEIN echtes Signal -- beide bleiben beim neutralen
+# Platzhalterwert (60), unabhängig vom tatsächlichen Angebot. Identisches
+# Muster wie in rules/gpu.yaml begründet.
+# Für Autoradios ist der Preis relativ zur Regel-Preisgrenze das mit
+# Abstand aussagekräftigste Signal -- daher hier stark auf Preis (70%)
+# gewichtet, mit 10% Hardwarequalität als grobem Tie-Breaker zwischen
+# Top-Deal/Guter-Preis-Regeln. "profit" (20%) ist auf Sicht angelegt:
+# sobald genug lokale Preishistorie je price_history_model gesammelt
+# wurde (siehe price_history_model in den Regeln unten), fließt die
+# geschätzte Wiederverkaufsmarge mit ein. Bis dahin liefert profit den
+# neutralen Platzhalter (60) -- kein Absturz, kein verzerrtes Signal.
+# hersteller/zustand/lieferumfang bleiben auf 0 (kein Fake-Score), exakt
+# wie im globalen Default für diese drei Komponenten.
+# ============================================================
+scoring_weights:
+  price: 0.7
+  ausstattung: 0
+  hardware_qualitaet: 0.1
+  hersteller: 0
+  zustand: 0
+  lieferumfang: 0
+  profit: 0.2
+
+# Suchbegriffe für die Scraper (breit + markenspezifisch)
+search_terms:
+  # Allgemein
+  - "Opel Corsa D Autoradio"
+  - "Corsa D Radio Android"
+  - "Opel Corsa D Android"
+  - "Corsa D Carplay"
+  - "Autoradio Opel Corsa"
+  - "Corsa D Navigationsradio"
+  - "Opel Corsa D Multimedia"
+  # Marken-spezifisch
+  - "JUNSUN Corsa D"
+  - "Corsa D JUNSUN"
+  - "Eonon Corsa D"
+  - "Corsa D Eonon"
+  - "A-Sure Corsa D"
+  - "Xtrons Corsa D"
+  - "Joying Corsa D"
+  - "Corsa D Android Radio"
+  - "Corsa D Autoradio Android"
+
+# Ausschlüsse, um Fehltreffer zu vermeiden
+exclude_category:
+  - "Einbauschacht"          # Nur Rahmen
+  - "Adapter"                # Nur Kabel
+  - "Lenkradfernbedienung"   # Nur Zubehör
+  - "Antenne"                # Nur Zubehör
+  - "Lautsprecher"
+  - "Subwoofer"
+  - "Verstärker"
+  - "Radiohalterung"         # Nur Halterung
+  - "Lenkradadapter"         # Nur Adapter
+  - "CAN-Bus"                # Nur Adapter
+  - "Facelift"               # Optional: nur Corsa D (vor Facelift)
+  - "Original"               # Keine originalen Opel-Radios
+  - "CD Radio"               # Nur CD-Radio ohne Android
+  - "MP3 Radio"              # Nur MP3-Radio ohne Android
+  - "RDS Radio"              # Nur RDS-Radio (ältere Technik)
+
+# Die eigentlichen Matching-Regeln
+rules:
+  # === ALLGEMEINE REGELN (für alle Marken) ===
+  - label: "Android-Designradio (Top-Deal)"
+    price_history_model: "autoradio_corsa_d_android"
+    max_price: 100
+    deal_rating: "Top-Deal"
+    require_all_of:
+      - ["opel corsa d", "corsa d"]
+      - ["android", "carplay", "multimedia", "navigationsradio"]
+      - ["radio", "autoradio"]
+    exclude:
+      - "original"
+      - "cd"
+      - "mp3"
+      - "rds"
+
+  - label: "Android-Designradio (Guter Preis)"
+    price_history_model: "autoradio_corsa_d_android"
+    max_price: 180
+    deal_rating: "Guter Preis"
+    require_all_of:
+      - ["opel corsa d", "corsa d"]
+      - ["android", "carplay", "multimedia", "navigationsradio"]
+      - ["radio", "autoradio"]
+    exclude:
+      - "original"
+      - "cd"
+      - "mp3"
+      - "rds"
+
+  # === MARKEN-SPEZIFISCHE REGELN ===
+  
+  # JUNSUN (wie auf dem Foto)
+  - label: "JUNSUN (Top-Deal)"
+    price_history_model: "autoradio_corsa_d_junsun"
+    max_price: 120
+    deal_rating: "Top-Deal"
+    require_all_of:
+      - ["opel corsa d", "corsa d"]
+      - ["junsun"]
+      - ["radio", "autoradio"]
+
+  - label: "JUNSUN (Guter Preis)"
+    price_history_model: "autoradio_corsa_d_junsun"
+    max_price: 200
+    deal_rating: "Guter Preis"
+    require_all_of:
+      - ["opel corsa d", "corsa d"]
+      - ["junsun"]
+      - ["radio", "autoradio"]
+
+  # Eonon
+  - label: "Eonon (Top-Deal)"
+    price_history_model: "autoradio_corsa_d_eonon"
+    max_price: 130
+    deal_rating: "Top-Deal"
+    require_all_of:
+      - ["opel corsa d", "corsa d"]
+      - ["eonon"]
+      - ["radio", "autoradio"]
+
+  - label: "Eonon (Guter Preis)"
+    price_history_model: "autoradio_corsa_d_eonon"
+    max_price: 210
+    deal_rating: "Guter Preis"
+    require_all_of:
+      - ["opel corsa d", "corsa d"]
+      - ["eonon"]
+      - ["radio", "autoradio"]
+
+  # A-Sure
+  - label: "A-Sure (Top-Deal)"
+    price_history_model: "autoradio_corsa_d_asure"
+    max_price: 110
+    deal_rating: "Top-Deal"
+    require_all_of:
+      - ["opel corsa d", "corsa d"]
+      - ["a-sure", "asure"]
+      - ["radio", "autoradio"]
+
+  - label: "A-Sure (Guter Preis)"
+    price_history_model: "autoradio_corsa_d_asure"
+    max_price: 190
+    deal_rating: "Guter Preis"
+    require_all_of:
+      - ["opel corsa d", "corsa d"]
+      - ["a-sure", "asure"]
+      - ["radio", "autoradio"]
+
+  # Xtrons
+  - label: "Xtrons (Top-Deal)"
+    price_history_model: "autoradio_corsa_d_xtrons"
+    max_price: 140
+    deal_rating: "Top-Deal"
+    require_all_of:
+      - ["opel corsa d", "corsa d"]
+      - ["xtrons"]
+      - ["radio", "autoradio"]
+
+  - label: "Xtrons (Guter Preis)"
+    price_history_model: "autoradio_corsa_d_xtrons"
+    max_price: 220
+    deal_rating: "Guter Preis"
+    require_all_of:
+      - ["opel corsa d", "corsa d"]
+      - ["xtrons"]
+      - ["radio", "autoradio"]
+
+  # Joying
+  - label: "Joying (Top-Deal)"
+    price_history_model: "autoradio_corsa_d_joying"
+    max_price: 150
+    deal_rating: "Top-Deal"
+    require_all_of:
+      - ["opel corsa d", "corsa d"]
+      - ["joying"]
+      - ["radio", "autoradio"]
+
+  - label: "Joying (Guter Preis)"
+    price_history_model: "autoradio_corsa_d_joying"
+    max_price: 240
+    deal_rating: "Guter Preis"
+    require_all_of:
+      - ["opel corsa d", "corsa d"]
+      - ["joying"]
+      - ["radio", "autoradio"]
+
+  # Allgemeine Markenerkennung (für unbekannte Marken, aber eindeutig Android-Designradio)
+  - label: "Android-Designradio (Markenlos/Top-Deal)"
+    price_history_model: "autoradio_corsa_d_android"
+    max_price: 90
+    deal_rating: "Top-Deal"
+    require_all_of:
+      - ["opel corsa d", "corsa d"]
+      - ["android", "carplay", "multimedia"]
+      - ["radio", "autoradio"]
+      - ["9 zoll", "10 zoll", "touch", "display"]  # Typische Design-Merkmale
+    exclude:
+      - "original"
+      - "cd"
+      - "mp3"

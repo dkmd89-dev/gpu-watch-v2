@@ -31,6 +31,14 @@
 > `_resale_prices_from_stats()`/`compute_profit()`/`_profit_score()` steht aus).
 > Diese Datei dokumentiert nur den Ist-Zustand — die Behebung ist ein
 > eigener, separat freizugebender Schritt.
+>
+> **Update (2026-08-09): neue Kategorie „autoradio_opel_corsa"
+> VORBEREITET, NICHT im Repo committet.** In einer separaten Dev-Session
+> lokal erstellt und gegen eine isolierte Kopie des Matchers verifiziert
+> (siehe Abschnitt 19). **Keine Push-/Schreibrechte auf `origin/main`
+> in dieser Session** — die Aussage „Working Tree clean" oben bezieht
+> sich weiterhin nur auf `d2effe7`. Abschnitt 19 beschreibt einen
+> vorbereiteten, noch nicht eingespielten Änderungsvorschlag.
 
 ---
 
@@ -993,3 +1001,92 @@ Phase 11 + netto 28 neue/aktualisierte).
   echten Produktivdaten nachjustiert werden müssen
 
 Phase 11 gilt damit als abgeschlossen.
+
+---
+
+## 19. Neue Kategorie „autoradio_opel_corsa" — VORBEREITET, NICHT COMMITTET
+
+**Wichtig — Abgrenzung zu allen Abschnitten oben:** Alle bisherigen
+Abschnitte (1–18) beschreiben den tatsächlichen, committeten Zustand von
+`origin/main` (Commit `d2effe7`, Working Tree clean). Dieser Abschnitt
+beschreibt einen in einer separaten Dev-Session **vorbereiteten, lokal
+verifizierten, aber noch nicht ins Repo eingespielten** Änderungsvorschlag.
+Diese Session hatte keinen Schreibzugriff auf `origin/main` — die Datei
+`app/rules/autoradio_opel_corsa.yaml` existiert in `origin/main` bislang
+**nicht**.
+
+**Auslöser:** Nutzerwunsch, eine neue Hardware-Kategorie für Android-
+Autoradios im Opel-Design (Plug & Play, Opel Corsa D) zu ergänzen — als
+Praxistest der bestehenden Plugin-Architektur (Abschnitt „Phase 10",
+Kategorien = reine YAML-Ergänzung, kein Code-Zugriff nötig).
+
+**A) Plugin-Kontrakt verifiziert.** Die vom Nutzer bereitgestellte YAML
+wurde unverändert in eine isolierte Kopie von `rules/` geladen
+(`matcher.load_rules()` + `categories/registry.discover_categories()`)
+und gegen Beispieltitel ausgewertet. Ergebnis: Kategorie wird ohne jede
+Code-Änderung erkannt (`category`, `label`, `search_terms`,
+`exclude_category`, `notify_max_price`, `rules` mit `require_all_of`/
+`exclude`/`max_price`/`deal_rating`/`price_history_model` — identisches
+Schema zu `rules/gpu.yaml`). Bestätigt exakt den in
+`tests/test_rules_category_plugin_contract.py` bewiesenen Kontrakt für
+eine reale, nicht-synthetische Kategorie.
+
+**B) Deal-Score-Gewichtung ergänzt.** Ohne kategorie-eigene
+`scoring_weights` greift der globale Default aus `_global.yaml`
+(Preis 70 % / Ausstattung 15 % / Hardwarequalität 15 % / Hersteller 5 %).
+Da diese Kategorie ausschließlich titelbasiert matcht
+(`require_all_of`, kein `requirements:`-Block wie bei Office-/
+Gaming-PC), liefern `ausstattung` und `hersteller` strukturell nur den
+neutralen Platzhalterwert (`_PLACEHOLDER_SCORE = 60`, siehe
+`scoring/deal_score.py`) — kein echtes Signal. Ergänzt wurde ein
+kategorie-eigener Block, analog zum bereits produktiven Muster in
+`rules/gpu.yaml`:
+
+```yaml
+scoring_weights:
+  price: 0.7
+  ausstattung: 0
+  hardware_qualitaet: 0.1
+  hersteller: 0
+  zustand: 0
+  lieferumfang: 0
+  profit: 0.2
+```
+
+**C) Bekannte Einschränkung (dokumentiert, nicht behoben — identisch zu
+GPU-Kategorie).** Verifiziert gegen Beispieltitel: Der `price`-Score
+(`_rule_based_price_score()`) berechnet sich aus `(1 - Preis/max_price) *
+100`. Bei einem Preis nahe der `max_price`-Grenze der jeweiligen Regel
+(z.B. 95 € gegen `max_price: 100`) bleibt der Preis-Score niedrig
+(~5/100) — unabhängig von der Gewichtung. ★★★★★ (Score ≥ 95) ist mit den
+aktuellen `max_price`-Werten der Regeln praktisch **nicht erreichbar**,
+solange (a) keine Angebote deutlich unter `max_price` liegen oder (b)
+keine lokale Preishistorie/`profit`-Daten für die jeweiligen
+`price_history_model`-Schlüssel aufgebaut sind. Exakt dasselbe
+Verhalten wie bei `rules/gpu.yaml` (dort im YAML-Kommentar begründet) —
+kein neuer Bug, sondern eine bekannte Eigenschaft des Preis-Score-
+Modells bei frisch angelegten Kategorien ohne Marktdaten.
+
+**Geänderte/neue Dateien (lokal, NICHT committet):**
+- `app/rules/autoradio_opel_corsa.yaml` (neu)
+
+**Empfohlene Tests vor dem Einspielen:**
+- `pytest app/tests/test_rules_category_plugin_contract.py -q`
+- Manueller Smoke-Test: `matcher.load_rules()` + `evaluate()` gegen
+  reale Kleinanzeigen-Titel vor Produktivgang
+
+**Offene Punkte:**
+- `max_price`-Werte je Regel (90–240 €, je nach Marke/Rating) sind laut
+  YAML-Kommentar noch nicht mit echten Marktdaten kalibriert — analog zu
+  den in Abschnitt 18 offen dokumentierten Ryzen-3600-/i5-12400F-
+  Bundle-Preisgrenzen.
+- Regelreihenfolge: die allgemeine Regel „Android-Designradio" steht in
+  der YAML VOR den markenspezifischen Regeln (JUNSUN/Eonon/A-Sure/
+  Xtrons/Joying) — bei first-match-wins (`matcher.evaluate()`) fängt die
+  allgemeine Regel Treffer ab, bevor die (großzügigeren) marken-
+  spezifischen `max_price`-Grenzen greifen können. Noch nicht mit dem
+  Auftraggeber geklärt, ob das gewünscht ist.
+- Datei noch nicht committet/gepusht (kein Schreibzugriff in dieser
+  Session) — Integration in `origin/main` steht aus.
+
+Abschnitt 19 gilt als **vorbereitet, Freigabe zur Übernahme steht aus.**
