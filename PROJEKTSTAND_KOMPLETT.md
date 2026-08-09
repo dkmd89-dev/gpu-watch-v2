@@ -47,6 +47,29 @@
 > selbst (`evaluate()`-Kernschleife), lokal verifiziert gegen die volle
 > Testsuite (803/803 grün, 6 neue Tests). Details, zwei dabei gefundene
 > und behobene Bugs sowie offene Punkte: Abschnitt 20.
+>
+> **⚠️ Dokumentationslücke (2026-08-09, beim Hotfix unten festgestellt):**
+> `PHASE14_DATA_QUALITY_REPORT.md` sowie `app/category_validation.py`
+> und `app/app.py` referenzieren bereits eine abgeschlossene „Phase 14,
+> Schritt 1+2" (neue Excludes für handhelds/konsolen_bundles +
+> zentrale Kategorie-Revalidierung beim Lesen von `found.json`) — diese
+> Datei hier dokumentierte Phase 14 bisher an keiner Stelle (letzter
+> Abschnitt war 22/Phase 13). Phase 14 selbst wird hier NICHT
+> nachträglich vollständig aufgearbeitet (nicht Teil des aktuellen
+> Auftrags) — nur der unten in Abschnitt 23 beschriebene Hotfix, der auf
+> Phase 14 Schritt 2 aufsetzt. Empfehlung: Phase 14 in einer eigenen,
+> separat freizugebenden Doku-Session nachtragen.
+>
+> **Update (2026-08-09, Hotfix): Performance-Fix für die Kategorie-
+> Revalidierung aus Phase 14, Schritt 2 — In-Memory Entry+Ruleset-Cache
+> (Layer 1), committet.** Produktions-Vorfall: `/api/status` bei ~2500
+> `found.json`-Einträgen praktisch unerreichbar
+> (`ERR_CONNECTION_ABORTED`), da `filter_valid_entries()` bei JEDEM
+> Request auf `/`, `/api/found`, `/api/status` sämtliche Einträge erneut
+> durch `matcher.evaluate()` schickte (355 Regeln). Details, Root Cause,
+> Performance-Zahlen und Testergebnisse: Abschnitt 23. Layer 2
+> (Regex-Caching in `matcher._contains_term()`) bewusst NICHT umgesetzt
+> — offene Folgeoption, nur bei Bedarf.
 
 ---
 
@@ -1445,3 +1468,109 @@ Löschung/Manipulation von `price_history.jsonl`/`seen.json`/
   nachvollziehbare, überwiegend positive Effekte.
 
 Phase 13 gilt damit als abgeschlossen.
+
+---
+
+## 23. Hotfix: Kategorie-Revalidierung Performance (Entry+Ruleset-Cache) — ABGESCHLOSSEN (Layer 1)
+
+**Auslöser:** Produktions-Vorfall ("DRINGEND — Phase 14 Schritt 2
+blockiert Dashboard"). `docker logs` zeigte parallel dazu ein
+unabhängiges eBay-Rate-Limit-Problem (429 bei ~73 von 90 Suchbegriffen
+pro Scan) — dieser Abschnitt behandelt AUSSCHLIESSLICH die
+`/api/status`-Blockade; das eBay-Problem ist separat offen (siehe
+„Offene Punkte" unten).
+
+**Root Cause (verifiziert gegen den realen Code, `main`-Branch,
+Commit `d2effe7`):** `category_validation.filter_valid_entries()`
+(Phase 14, Schritt 2 — zentrale Kategorie-Revalidierung beim Lesen von
+`found.json`, siehe `PHASE14_DATA_QUALITY_REPORT.md`) lief bislang
+komplett ungecacht bei JEDEM Request auf `/`, `/api/found` UND
+`/api/status` (drei unabhängige Aufrufe, kein gemeinsamer State). Pro
+Aufruf ruft sie für JEDEN `found.json`-Eintrag `matcher.evaluate()`
+neu auf, welches im Worst Case über alle 355 Regeln iteriert; jede
+Teilprüfung (`_any_term`/`_contains_term`) kompiliert dabei pro Aufruf
+ein neues Regex-Pattern (kein `re.compile`-Caching). Bei ~2500
+Produktiv-Einträgen führte das zu einer Blockade von `/api/status` bis
+zum `ERR_CONNECTION_ABORTED` im Browser.
+
+**Fix (Layer 1 — Entry+Ruleset-Cache, `app/category_validation.py`):**
+In-Memory-Cache `_validity_cache` (Modul-Level-Dict + `threading.Lock`,
+kein TTL), Key `(url, title, category, ruleset_hash)`. `ruleset_hash`
+über das bereits bestehende `matcher.compute_ruleset_signature()`
+(Phase 11, Punkt B, dort bereits für die `seen.json`-Re-Evaluierung in
+`presence_tracking.py` genutzt) — keine zweite Hash-Logik. Wird EINMAL
+pro `filter_valid_entries()`-Aufruf berechnet, nicht pro Eintrag.
+`api/status.py` und `api/deals.py` teilen sich denselben Cache
+automatisch (Modul-State), ohne dass diese beiden Dateien geändert
+werden mussten. `is_still_valid_category()` selbst und
+`filter_valid_entries()`-Signatur **byte-identisch unverändert** — der
+Cache sitzt ausschließlich im neuen `_cached_is_still_valid_category()`
+-Wrapper.
+
+**Bewusst NICHT umgesetzt (bewusste Auftraggeber-Entscheidung, offene
+Folgeoption):** Layer 2 (Regex-Caching in `matcher._contains_term()`,
+z.B. via `lru_cache` auf kompilierten Patterns). Grund: der Effekt des
+Entry+Ruleset-Cache sollte zunächst isoliert messbar sein, bevor eine
+zweite Optimierung denselben Codepfad verändert.
+
+**Performance-Messung (2500 synthetische Einträge, realer
+`rules`-Ordner, 355 Regeln):**
+- `filter_valid_entries()` isoliert: cold 22,0 s (2500 `evaluate()`-
+  Aufrufe) → warm 0,0037 s (0 weitere `evaluate()`-Aufrufe), ≈5900×
+- End-to-End über echte `/api/status`-Route (Flask-Testclient, inkl.
+  `load_rules()`, KPI-Aggregation, JSON-Serialisierung): cold 19,4 s →
+  warm 0,29 s, ≈68×
+- Verbleibende ~0,29 s im warmen Fall stammen NICHT mehr aus
+  `evaluate()`, sondern aus `load_rules()` (YAML-Parsing bei jedem
+  Request) — bewusst außerhalb des Scopes von Layer 1, mögliche
+  weitere Folgeoptimierung (Rules-Cache), nicht angefordert/nicht
+  umgesetzt.
+
+**Tests:** `pytest app/tests/` → **890 passed, 0 failed** (bestehende
+880 unverändert grün + 10 neue Tests in
+`app/tests/test_category_validation_cache.py`: Cache Hit, Cache Miss
+bei neuem Entry/geändertem Titel/geänderter Kategorie/geändertem
+Ruleset, geteilter Cache über `/api/status`+`/api/found`+`/`,
+KPI-Ergebnis mit Cache identisch zu ohne Cache, 2500-Einträge-
+Performance cold/warm). Regressionsfälle explizit geprüft und
+weiterhin korrekt: `Netzteil für Steam Deck 45W` bleibt als
+Fehltreffer ausgefiltert, `Steam Deck 256GB` bleibt gültig,
+`Ladekabel für Nintendo Switch Lite` bleibt ausgefiltert, echtes
+`Nintendo Switch Lite`-Angebot bleibt gültig.
+
+**Sicherheitsprüfung:** keine Änderung an `matcher.evaluate()` selbst,
+an Preisgrenzen, Deal-Score, Top-Deal, Flip-/Resale-Logik,
+Notifications oder Price-History. Keine Löschung/Manipulation von
+`found.json`/`seen.json`/`price_history.jsonl` — der Cache wirkt
+ausschließlich auf die pro Request zurückgegebene Liste, exakt wie
+Phase 14 Schritt 2 es bereits vorsah.
+
+**Geänderte/neue Dateien:** `app/category_validation.py` (geändert,
+Cache-Layer ergänzt), `app/tests/test_category_validation_cache.py`
+(neu, 10 Tests). Keine Änderung an `api/status.py`, `api/deals.py`,
+`matcher.py`.
+
+**Nebenwirkungen/Grenzen:**
+- Cache ist unbounded (kein TTL/Max-Size, wie beauftragt) — bei sehr
+  hoher Fluktuation unterschiedlicher `url`/Titel-Kombinationen über
+  sehr lange Laufzeit steigender Speicherbedarf; bei aktuell ~2500
+  Einträgen unkritisch.
+- Cache ist Prozess-lokal. Aktuell unkritisch (Flask-Dev-Server,
+  Single-Process laut `docker logs`) — relevant, falls künftig auf
+  einen Multi-Worker-WSGI-Server umgestellt wird (dann bräuchte jeder
+  Worker-Prozess eigenen Cache-Aufbau).
+- Veraltete Cache-Einträge nach Regeländerung werden nicht aktiv
+  entfernt, nur nicht mehr gelesen (verwaisen im Dict) — für Layer 1
+  unkritisch, kein Korrektheitsproblem.
+
+**Offene Punkte (nicht Teil dieses Hotfixes):**
+- Phase 14 selbst (Schritt 1+2) ist in dieser Datei bisher nicht
+  dokumentiert (siehe Update-Hinweis im Header) — eigener Nachtrag
+  empfohlen.
+- eBay-Rate-Limiting (429 bei ~73/90 Suchbegriffen pro Scan, siehe
+  `docker logs`-Auszug im Auslöser-Ticket) — unabhängiges Problem,
+  Analyse wurde begonnen, aber nicht abgeschlossen.
+- Layer 2 (Regex-Caching) und `load_rules()`-Caching bleiben als
+  mögliche weitere Performance-Stufen offen, nur bei Bedarf.
+
+Hotfix (Layer 1) gilt damit als abgeschlossen.
