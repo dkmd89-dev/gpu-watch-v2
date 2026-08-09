@@ -8533,3 +8533,5 @@
 {"days": 0.09722561909722222, "first_seen": "2026-08-09T00:33:06.402848+00:00", "last_seen": "2026-08-09T02:53:06.696338+00:00", "model": "iphone_13_mini_128gb", "category": "iphone", "detected_at": "2026-08-09T04:22:21.408427+00:00"}
 {"days": 0.2510586226273148, "first_seen": "2026-08-08T21:22:52.968082+00:00", "last_seen": "2026-08-09T03:24:24.433077+00:00", "model": "office_pc", "category": "office_pc", "detected_at": "2026-08-09T04:51:41.871238+00:00"}
 {"days": 0.10077251726851852, "first_seen": "2026-08-09T00:59:17.687585+00:00", "last_seen": "2026-08-09T03:24:24.433077+00:00", "model": "gaming_pc", "category": "gaming_pc", "detected_at": "2026-08-09T04:51:41.871597+00:00"}
+{"days": 0.27086510283564813, "first_seen": "2026-08-08T21:22:52.968082+00:00", "last_seen": "2026-08-09T03:52:55.712967+00:00", "model": "monitor_curved", "category": "monitor_curved", "detected_at": "2026-08-09T05:21:23.463167+00:00"}
+{"days": 0.04153954431712963, "first_seen": "2026-08-09T02:53:06.696338+00:00", "last_seen": "2026-08-09T03:52:55.712967+00:00", "model": "konsole_xbox_one", "category": "konsolen_bundles", "detected_at": "2026-08-09T05:21:23.463862+00:00"}
