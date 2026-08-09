@@ -76,6 +76,9 @@ KNOWN_RULE_FIELDS = {
     # intern von _load_rules_from_dir() angehaengt (siehe matcher.py)
     "_category",
     "_category_exclude_terms",
+    # Phase 15 (kontrollierter Review, "Variante C"): kontextbewusster
+    # Exclude-Gegenpart, siehe matcher.py::_any_conditional_exclude().
+    "_category_exclude_unless_preceded_by",
     "_ignore_global_excludes",
     "_scoring_weights",
     "_notify_max_price",
