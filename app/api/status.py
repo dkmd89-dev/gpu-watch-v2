@@ -14,7 +14,7 @@ from pathlib import Path
 from flask import Blueprint, jsonify
 
 from persistence.json_store import _load_json, _tail_log
-from matcher import load_rules
+from rules_loader import get_rules
 from category_validation import filter_valid_entries
 from scoring.deal_score import stars_meet_minimum
 from scoring.profit import is_robust_flip_candidate
@@ -85,7 +85,9 @@ def build_status_blueprint(
         # api/deals.py -- Single Source of Truth fuer "welche Eintraege
         # zaehlen als sichtbar", damit KPI-Kacheln (category_counts,
         # top_deal_count, ...) und Dashboard-Liste konsistent bleiben.
-        rules_cfg = load_rules(str(rules_dir))
+        # Phase 15, Schritt 6 (rules_loader.py): gecachter Zugriff statt
+        # YAML-Neuparsing bei JEDEM Request -- identisches Rueckgabeformat.
+        rules_cfg = get_rules(str(rules_dir))
         found = filter_valid_entries(found, rules_cfg)
 
         with status_lock:

@@ -53,6 +53,47 @@ exclude_category:
   # (z.B. "Xbox One S 500GB + 1 Controller"), könnte fälschlich hier statt in
   # konsolen_bundles landen. Kalibrierung anhand realer Scan-Treffer empfohlen.
 
+# FIX (Phase 15, kontrollierter Review, "Variante C" -- generische
+# kontextbewusste Exclude-Logik, siehe matcher.py::_any_conditional_
+# exclude()): "ladekabel"/"netzteil"/"ladegerät"/"anleitung" bewusst NICHT
+# in exclude_category oben (das wuerde diese Bedingung wirkungslos machen,
+# da exclude_category unbedingt greift) -- stattdessen hier, damit ein
+# Standalone-Zubehoer-Angebot ("PS5 Controller Ladekabel") weiterhin
+# ausgeschlossen wird, ein echtes Geraet-Angebot mit erwaehntem Zubehoer
+# ("PS5 DualSense Controller inkl. Ladekabel") aber weiterhin matcht.
+# Ursprünglicher, mit bare exclude_category gefixter Bug (5€-Ladekabel als
+# Top-Deal, Score 81, 4 Sterne) bleibt durch den Standalone-Fall
+# ("Controller Ladekabel" ohne Konnektor) weiterhin abgesichert.
+exclude_category_unless_preceded_by:
+  ladekabel:
+    - "inkl."
+    - "inkl"
+    - "mit"
+    - "+"
+    - "und"
+    - "sowie"
+  netzteil:
+    - "inkl."
+    - "inkl"
+    - "mit"
+    - "+"
+    - "und"
+    - "sowie"
+  ladegerät:
+    - "inkl."
+    - "inkl"
+    - "mit"
+    - "+"
+    - "und"
+    - "sowie"
+  anleitung:
+    - "inkl."
+    - "inkl"
+    - "mit"
+    - "+"
+    - "und"
+    - "sowie"
+
 scoring_weights:
   price: 0.85
   ausstattung: 0

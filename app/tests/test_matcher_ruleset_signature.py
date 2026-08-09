@@ -69,6 +69,78 @@ def test_reihenfolge_der_regeln_aendert_den_hash():
     assert compute_ruleset_signature(cfg_a) != compute_ruleset_signature(cfg_b)
 
 
+# ============================================================
+# Phase 15 (kontrollierter Review, "Variante C"): kontextbewusster
+# Exclude-Gegenpart (_category_exclude_unless_preceded_by) MUSS in die
+# Signatur einfliessen -- eine Aenderung ausschliesslich an einer
+# Konnektor-Liste veraendert das Match-Verhalten von evaluate() (siehe
+# matcher.py::_any_conditional_exclude()), muss also erkannt werden.
+# ============================================================
+
+def test_neues_feld_exclude_unless_preceded_by_aendert_den_hash():
+    # 1. Ruleset laden (hier: synthetisch aufgebaut, analog zu allen
+    #    anderen Tests in dieser Datei) 2. Signature berechnen.
+    cfg_ohne_feld = _cfg([{
+        "label": "A", "_category": "controller",
+        "_category_exclude_unless_preceded_by": {},
+    }])
+    hash_ohne_feld = compute_ruleset_signature(cfg_ohne_feld)
+
+    cfg_mit_feld = _cfg([{
+        "label": "A", "_category": "controller",
+        "_category_exclude_unless_preceded_by": {"ladekabel": ["inkl.", "mit"]},
+    }])
+    hash_mit_feld = compute_ruleset_signature(cfg_mit_feld)
+
+    assert hash_ohne_feld != hash_mit_feld
+
+
+def test_ausschliesslich_konnektor_liste_veraendert_aendert_den_hash():
+    # 3. AUSSCHLIESSLICH eine Konnektor-Liste veraendern (alles andere --
+    #    Begriff, Regel, Kategorie -- bleibt identisch).
+    cfg_alt = _cfg([{
+        "label": "A", "_category": "controller",
+        "_category_exclude_unless_preceded_by": {"ladekabel": ["inkl.", "mit"]},
+    }])
+    hash_alt = compute_ruleset_signature(cfg_alt)
+
+    cfg_neu = _cfg([{
+        "label": "A", "_category": "controller",
+        "_category_exclude_unless_preceded_by": {"ladekabel": ["inkl.", "mit", "und"]},
+    }])
+    # 4. Signature erneut berechnen.
+    hash_neu = compute_ruleset_signature(cfg_neu)
+
+    # 5. Assertion: Signature MUSS sich aendern.
+    assert hash_alt != hash_neu
+
+
+def test_neuer_begriff_im_conditional_exclude_aendert_den_hash():
+    cfg_alt = _cfg([{
+        "label": "A", "_category": "controller",
+        "_category_exclude_unless_preceded_by": {"ladekabel": ["inkl.", "mit"]},
+    }])
+    cfg_neu = _cfg([{
+        "label": "A", "_category": "controller",
+        "_category_exclude_unless_preceded_by": {
+            "ladekabel": ["inkl.", "mit"], "netzteil": ["inkl.", "mit"],
+        },
+    }])
+    assert compute_ruleset_signature(cfg_alt) != compute_ruleset_signature(cfg_neu)
+
+
+def test_unveraendertes_conditional_exclude_liefert_gleichen_hash():
+    cfg_a = _cfg([{
+        "label": "A", "_category": "controller",
+        "_category_exclude_unless_preceded_by": {"ladekabel": ["inkl.", "mit"]},
+    }])
+    cfg_b = _cfg([{
+        "label": "A", "_category": "controller",
+        "_category_exclude_unless_preceded_by": {"ladekabel": ["inkl.", "mit"]},
+    }])
+    assert compute_ruleset_signature(cfg_a) == compute_ruleset_signature(cfg_b)
+
+
 if __name__ == "__main__":
     import pytest
     raise SystemExit(pytest.main([__file__, "-v"]))

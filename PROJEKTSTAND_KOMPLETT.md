@@ -1642,3 +1642,93 @@ Gesamtergebnis: **899 passed, 0 failed** (vorher 890/890).
 durchreichen + Marktwert/Rabatt vom is_top_deal-Gate entkoppelt` — nur
 lokal in dieser Session, kein Push nach `origin/main` möglich (siehe
 Abschnitt 19/20-Präzedenzfall: keine Schreibrechte).
+
+## 25. Phase 15 (Matcher & Rule Quality Optimization) — ABGESCHLOSSEN (Schritte 1–9)
+
+Eigenständiger, in `PHASE15_OPTIMIERUNG.md` beauftragter Workstream:
+Matcher-/Rule-Qualität systematisch absichern, bevor weitere Kategorien
+oder Deal-Intelligence-Features hinzukommen. Priorität laut Auftrag:
+**Precision > Recall**. Durchgeführt auf Branch
+`claude/phase-15-optimierung-i1jncg`, PR
+[dkmd89-dev/gpu-watch-v2#1](https://github.com/dkmd89-dev/gpu-watch-v2/pull/1).
+
+**STOP 1 — Repository-/Matcher-Analyse (vor jeder Änderung):**
+Matcher-Semantik vollständig anhand des Codes dokumentiert (`require_all_of`
+= Gruppen-AND/Gruppen-intern-OR, `require_any_of` existiert nicht als Feld,
+`exclude`/`exclude_category`/`exclude_global`/`ignore_global_excludes`-
+Zusammenspiel, Wortgrenzen-Matching ohne Tokenisierung). Der historische
+Phase-12-`require_all_of`-Bug war zum Sessionstart bereits gefixt und
+regressionsgetestet. Ist-Stand dokumentiert: 355 Regeln/19 Kategorien,
+868 Tests (nicht 899+, wie in Abschnitt 24 fälschlich fortgeschrieben).
+
+**Schritt 2+3 — Rule Analyzer (`app/rule_analyzer.py`, neu):** read-only
+Diagnosemodul, sieben Prüfungen (Struktur/Duplicate/Overlap/Shadow/
+`require_all_of`-Suspicion/Exclude-Conflicts/Unreachable), nie
+YAML-Änderungen. Heuristiken zweimal gegen das echte Ruleset kalibriert
+(Erstversion: >14.000 Rauschfunde → nach Kalibrierung: 0 Errors/0
+Warnings/2 Infos). Bestätigter Beobachtungsfall: `RX 7600 XT`-Regel in
+`gpu.yaml` listet `"rx 7600"` als eigenen match-Begriff vor den
+`RX 7600`-Regeln — **keine YAML-Änderung vorgenommen** (STOP 3, separate
+Freigabe nötig). Details: `document/PHASE15_RULE_ANALYSIS_REPORT.md`.
+
+**Schritt 4 — False-Positive Regression Suite** (`app/tests/test_rule_regressions.py`,
+38 Tests gegen die echten `rules/*.yaml`): LEGO Star Wars/Clone Wars/
+Ninjago/Bundles, CRT-Monitor, Röhrenfernseher, ThinkPad, Retro-Konsolen,
+Handheld-/Konsolen-Zubehör, Controller. Nebenfund: `controller.yaml`
+schließt nur das eigenständige Wort `"kabel"` aus, nicht das
+zusammengesetzte `"Ladekabel"` (anders als `handhelds`/`konsolen_bundles`,
+dort in Phase 14 explizit ergänzt) — als Test-Kommentar dokumentiert,
+keine YAML-Änderung.
+
+**Schritt 5 — Rule Coverage Analysis** (`app/rule_coverage.py`, neu,
+read-only gegen `price_history.jsonl`): pro `price_history_model`
+matches/valid/false-positive-indicators/last_seen. Re-Validierung bewusst
+mit Preis 0,0 (nicht dem historischen Preis), um Titel-/Kategoriezuordnung
+von späteren `max_price`-Verschärfungen zu isolieren. Ergebnis gegen
+9.753 Datenpunkte: 135 aktive Modelle (113 mit Daten), 3 Orphan-Modelle
+(Kategorie `spielzeug_bundles` existiert nicht mehr), 17,2 %
+Gesamt-False-Positive-Rate — größtenteils plausible Alt-Kontamination aus
+der Zeit vor den Phase-12-Fixes (Commits vom selben Tag). Bestätigt den
+`RX 7600`/`RX 7600 XT`-Fund mit einem echten Produktivdatenpunkt (ein
+Nicht-XT-Angebot, als `rx_7600_xt` gespeichert). Details:
+`document/PHASE15_RULE_COVERAGE_REPORT.md`.
+
+**Schritt 6 — Rules-Cache** (`app/rules_loader.py`, neu, angebunden in
+`app.py`/`api/deals.py`/`api/status.py`): `load_rules()` parste bisher bei
+JEDEM API-Request/Scan-Zyklus alle YAML-Dateien neu (~272ms). Cache mit
+Datei-Fingerabdruck-Invalidierung (kein TTL), nutzt die bestehende
+`compute_ruleset_signature()` weiter statt einer zweiten
+Hash-Implementierung. Speedup warm: **~1.700x**.
+
+**Schritt 7 — Regex-Cache** (`matcher.py::_compiled_term_pattern()`,
+`functools.lru_cache`): Benchmark zuerst (STOP 4) zeigte 83,5 % der
+`evaluate()`-Zeit in `_contains_term()`, davon ~41 % reines
+Compile/Escape eines festen, 625 Begriffe umfassenden Vokabulars.
+Speedup: 7,558ms → 3,625ms pro `evaluate()`-Aufruf (~2,1x). Keine
+Änderung der Matcher-Semantik. Details zu Schritt 6+7:
+`document/PHASE15_PERFORMANCE_REPORT.md`.
+
+**Schritt 8 — `run_scan()`-Analyse:** ~700 Zeilen, durchgehend geteilter
+lokaler Zustand (Timing-Akkumulatoren, Locks, Preisstatistik-Dicts) von
+der Vorbereitung bis zum Abschluss-Logging. Keine sichere, kleine
+Extraktion identifiziert — kein Refactoring durchgeführt (Auftragsvorgabe:
+"Kein Big-Bang-Refactoring").
+
+**Nicht verändert (durchgehend, gesamte Phase):** Deal-Score-Engine,
+Top-Deal-Logik, Flip-/Resale-Berechnung, Notification-Gate,
+Price-History-Persistenz, Duplicate Detection, Presence Tracking,
+Category Validation, alle YAML-Regeln, `data/price_history.jsonl`/
+`found.json`/`seen.json` (ausschließlich lesend verwendet). Vollständiger
+Branch-Diff gegen `main` verifiziert: nur 4 bestehende Dateien mit
+minimalem Diff verändert (`app.py` 5 Zeilen, `api/deals.py` 8 Zeilen,
+`api/status.py` 6 Zeilen, `matcher.py` 43 Zeilen), alle anderen Änderungen
+sind neue Dateien.
+
+**Tests:** 868 → 979 (111 neue Tests über alle Schritte), 0 failed,
+keine bestehende Testdatei musste geändert werden (außer den zwei in
+Schritt 4 korrigierten Testtitel-Annahmen, siehe dortiger Report).
+
+**Commits:** `5ebd470`/`47905d3`/`a223c67`/`c118e71`/`185bcb7`/`65a0eb7`/
+`1a4d314`, gepusht auf `claude/phase-15-optimierung-i1jncg`, PR #1
+(Draft). Vollständiger Abschlussbericht:
+`document/PHASE15_COMPLETION_REPORT.md`.

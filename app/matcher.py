@@ -1,5 +1,6 @@
 """Wendet die Regel-Matrix aus rules.yaml auf einen (Titel, Preis) an."""
 from __future__ import annotations
+import functools
 import logging
 import re
 import yaml
@@ -274,6 +275,21 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
         # angehängt, damit evaluate() sie ohne zusätzlichen Kategorie-
         # Lookup prüfen kann.
         category_excludes = cat_cfg.get("exclude_category", [])
+        # Phase 15 (kontrollierter Review, generische Loesung "Variante C"):
+        # optionaler, kontextbewusster Gegenpart zu exclude_category. Manche
+        # Zubehoer-Begriffe (z.B. "Ladekabel") sollen eine Regel nur dann
+        # blockieren, wenn sie ALLEIN stehen ("PS5 Controller Ladekabel" =
+        # Standalone-Zubehoer), nicht wenn sie ein echtes Geraet-Angebot
+        # mit erwaehntem Zubehoer beschreiben ("PS5 Controller inkl.
+        # Ladekabel" = Bundle). {Begriff: [erlaubte Bundle-Konnektoren]} --
+        # ein Begriff hier gehoert NICHT zusaetzlich in exclude_category
+        # (siehe evaluate()), sonst waere die Bedingung wirkungslos (die
+        # unbedingte Pruefung dort wuerde ohnehin immer greifen). Default
+        # leeres Dict -> 100% identisches Verhalten zu vorher fuer
+        # Kategorien, die dieses Feld nicht setzen.
+        category_excludes_unless_preceded_by = cat_cfg.get(
+            "exclude_category_unless_preceded_by", {}
+        )
         # Optionaler Gegenpart zu exclude_global (_global.yaml): manche
         # Kategorien bilden ausdrücklich Bastler-/Reparatur-Angebote ab
         # (z.B. "PS5 Controller mit Stick Drift" als eigene, günstigere
@@ -305,6 +321,7 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
             rule = dict(rule)  # Kopie, um das Original-YAML-Objekt nicht zu mutieren
             rule["_category"] = category_name
             rule["_category_exclude_terms"] = category_excludes
+            rule["_category_exclude_unless_preceded_by"] = category_excludes_unless_preceded_by
             rule["_ignore_global_excludes"] = category_ignore_global_excludes
             rule["_scoring_weights"] = category_scoring_weights
             rule["_notify_max_price"] = category_notify_max_price
@@ -391,6 +408,45 @@ def _vram_gb(title_lower: str) -> int | None:
     return int(m.group(1)) if m else None
 
 
+# Regex-Cache (Phase 15, Schritt 7 -- PHASE15_OPTIMIERUNG.md, Abschnitte
+# 22-23). Benchmark vor der Umsetzung (siehe PHASE15_PERFORMANCE_REPORT.md):
+# cProfile ueber 3000 evaluate()-Aufrufe zeigte 83,5% der Gesamtzeit in
+# _contains_term(), davon allein 21,8% in re._compile() und 19,0% in
+# re.escape() -- zusammen ~41% reine Compile-/Escape-Kosten, obwohl JEDE
+# Regel denselben festen Satz an Begriffen (aus den YAML-Dateien) immer
+# wieder gegen wechselnde Titel prueft. compute_ruleset_signature() macht
+# das quantifizierbar: das aktuelle Ruleset enthaelt nur 625 verschiedene
+# (kleingeschriebene) Begriffe insgesamt -- Python re.search() kompiliert
+# denselben Pattern-String bei > 512 verschiedenen Patterns (interner
+# Default-Cache des re-Moduls) im laufenden Betrieb wiederholt neu.
+#
+# maxsize=4096: bewusst NICHT unbounded, aber grosszuegig ueber der
+# aktuellen Begriffsmenge (625) -- Begriffe kommen ausschliesslich aus den
+# vertrauenswuerdigen YAML-Regeln (kein von aussen kontrollierter Input),
+# das Wachstum ist an die Ruleset-Groesse gebunden, nicht an die Anzahl
+# gescrapter Titel. Jeder kompilierte einfache Wortgrenzen-Pattern belegt
+# nur wenige hundert Byte -- 4096 Eintraege sind im einstelligen MB-Bereich,
+# unkritisch.
+#
+# KEINE Invalidierung bei Ruleset-Aenderungen noetig (anders als beim
+# Rules-Cache in rules_loader.py): das kompilierte Pattern fuer einen
+# Begriffs-STRING haengt ausschliesslich vom String selbst ab, nicht davon,
+# aus welcher Regel/welchem Ruleset-Stand er stammt -- "lego" kompiliert
+# immer zum selben Pattern, unabhaengig davon, ob/wie oft/in welcher Regel
+# er aktuell verwendet wird. Alte Eintraege fuer inzwischen entfernte
+# Begriffe sind hoechstens ungenutzter Speicher, nie ein Korrektheitsrisiko.
+#
+# functools.lru_cache ist laut Python-Doku thread-safe (interne Sperre) --
+# keine zusaetzliche Synchronisation noetig.
+#
+# Keine Aenderung der Matcher-Semantik: identisches Pattern, identische
+# re.UNICODE-Flag, nur die Kompilierung wird wiederverwendet statt bei
+# jedem Aufruf neu zu erfolgen.
+@functools.lru_cache(maxsize=4096)
+def _compiled_term_pattern(term_lower: str) -> re.Pattern[str]:
+    return re.compile(r"(?<!\w)" + re.escape(term_lower) + r"(?!\w)", re.UNICODE)
+
+
 def _contains_term(text: str, term: str) -> bool:
     """Prüft, ob `term` als GANZES WORT (bzw. ganze Wortfolge) in `text` vorkommt.
 
@@ -399,12 +455,79 @@ def _contains_term(text: str, term: str) -> bool:
     anschlägt. re.escape() macht auch Terme mit Leerzeichen ("gaming pc")
     oder Sonderzeichen ("nitro+") sicher nutzbar.
     """
-    pattern = r"(?<!\w)" + re.escape(term.lower()) + r"(?!\w)"
-    return re.search(pattern, text, flags=re.UNICODE) is not None
+    return _compiled_term_pattern(term.lower()).search(text) is not None
 
 
 def _any_term(text: str, terms: list[str]) -> bool:
     return any(_contains_term(text, t) for t in terms)
+
+
+# ============================================================
+# Kontextbewusster Exclude (Phase 15, kontrollierter Review, "Variante C")
+# ============================================================
+# Ziel: ein Zubehoer-Begriff wie "ladekabel" soll eine Regel nur dann
+# blockieren, wenn er ALLEIN steht ("PS5 Controller Ladekabel" ->
+# Standalone-Zubehoer), NICHT wenn er ein echtes Geraet mit erwaehntem
+# Zubehoer beschreibt ("PS5 Controller inkl. Ladekabel" -> Bundle).
+# exclude/exclude_category koennen das nicht (reine, kontextfreie
+# Wort-Praesenz-Pruefung, siehe _contains_term()-Docstring) -- dieser
+# Abschnitt ergaenzt eine GENERISCHE, optionale Alternative, die JEDE
+# Kategorie ueber das YAML-Feld "exclude_category_unless_preceded_by"
+# nutzen kann (kein "if category == ...", siehe evaluate()).
+#
+# Technik: Negative Lookbehinds, ein Pattern-Fragment pro erlaubtem
+# "Bundle-Konnektor" (z.B. "inkl.", "mit", "+"). Identisches Prinzip wie
+# bereits produktiv in categories/detectors/lieferumfang.py
+# (_NETZTEIL_POSITIVE: "netzteil" gilt nur als positives Lieferumfang-
+# Signal, wenn NICHT "ohne "/"kein "/"keine " davorsteht) -- hier nur mit
+# umgekehrter Wortliste (Inklusions- statt Negationswoerter) und einem
+# anderen Verwendungszweck (Match-/Exclude-Entscheidung statt Deal-Score-
+# Signal). Bewusst KEINE zweite, andersartige Kontextlogik erfunden.
+#
+# Python re verlangt Lookbehinds fester Laenge (kein "(?<!(?:a|b|c)\\s)"
+# mit unterschiedlich langen Alternativen) -- daher, identisch zum
+# lieferumfang.py-Vorbild, ein eigenes Lookbehind-Fragment pro Konnektor
+# statt einer gemeinsamen Gruppe.
+@functools.lru_cache(maxsize=4096)
+def _compiled_unless_preceded_pattern(
+    term_lower: str, connectors_lower: tuple[str, ...]
+) -> re.Pattern[str]:
+    lookbehinds = "".join(
+        rf"(?<!{re.escape(c)}\s)" for c in connectors_lower
+    )
+    return re.compile(
+        lookbehinds + r"(?<!\w)" + re.escape(term_lower) + r"(?!\w)", re.UNICODE
+    )
+
+
+def _contains_term_unless_preceded_by(
+    text: str, term: str, connectors: list[str] | tuple[str, ...]
+) -> bool:
+    """True, wenn `term` als eigenes Wort in `text` vorkommt UND NICHT
+    unmittelbar (getrennt durch genau ein Leerzeichen) einer der
+    `connectors`-Alternativen vorausgeht.
+
+    Bekannte, vom lieferumfang.py-Vorbild geerbte Einschraenkung: nur
+    GENAU EIN Leerzeichen zwischen Konnektor und Begriff wird erkannt
+    (Python re erlaubt keine Lookbehinds variabler Laenge wie "\\s+") --
+    unueblich formatierte Titel mit mehrfachen Leerzeichen wuerden den
+    Konnektor nicht erkennen und den Begriff daher (konservativ) als
+    Standalone werten.
+    """
+    pattern = _compiled_unless_preceded_pattern(
+        term.lower(), tuple(c.lower() for c in connectors)
+    )
+    return pattern.search(text) is not None
+
+
+def _any_conditional_exclude(text: str, conditional_excludes: dict[str, list[str]]) -> bool:
+    """True, wenn MINDESTENS EIN Begriff aus `conditional_excludes` als
+    Standalone-Vorkommen (siehe _contains_term_unless_preceded_by())
+    in `text` gefunden wird -- OR-Verknuepfung, analog zu _any_term()."""
+    return any(
+        _contains_term_unless_preceded_by(text, term, connectors)
+        for term, connectors in conditional_excludes.items()
+    )
 
 
 def _ist_kompletter_pc(title_lower: str) -> bool:
@@ -712,10 +835,11 @@ def compute_ruleset_signature(rules_cfg: dict) -> str:
 
     Aendert sich, sobald sich Regeln aendern/hinzukommen/wegfallen, die das
     Ergebnis von evaluate() beeinflussen koennten (Label, Kategorie,
-    match/require_all_of/requirements, exclude, price_history_model,
-    max_price) -- NICHT bei rein kosmetischen YAML-Aenderungen
-    (Kommentare, Score-Gewichte, notify_max_price etc.), die das
-    Match-Ergebnis eines Titels nicht beeinflussen koennen.
+    match/require_all_of/requirements, exclude, exclude_category_unless_
+    preceded_by, price_history_model, max_price) -- NICHT bei rein
+    kosmetischen YAML-Aenderungen (Kommentare, Score-Gewichte,
+    notify_max_price etc.), die das Match-Ergebnis eines Titels nicht
+    beeinflussen koennen.
 
     BEWUSST EIN GLOBALER Hash ueber die GESAMTE Regel-Liste, kein
     Hash pro Kategorie: evaluate() iteriert bereits heute linear durch
@@ -743,6 +867,15 @@ def compute_ruleset_signature(rules_cfg: dict) -> str:
             "requirements": rule.get("requirements"),
             "exclude": rule.get("exclude"),
             "_category_exclude_terms": rule.get("_category_exclude_terms"),
+            # Phase 15 (kontrollierter Review, "Variante C"): MUSS hier
+            # enthalten sein -- eine Aenderung ausschliesslich an einer
+            # Konnektor-Liste (z.B. "mit" ergaenzt) aendert das Match-
+            # Verhalten (siehe evaluate()), muss also den Hash aendern,
+            # sonst wuerde sie an presence_tracking/category_validation
+            # unbemerkt vorbeigehen (Auftragsvorgabe).
+            "_category_exclude_unless_preceded_by": rule.get(
+                "_category_exclude_unless_preceded_by"
+            ),
             "price_history_model": rule.get("price_history_model"),
             "max_price": rule.get("max_price"),
             "min_vram_gb": rule.get("min_vram_gb"),
@@ -864,6 +997,19 @@ def evaluate(
         if directory_mode:
             category_excludes = rule.get("_category_exclude_terms", [])
             if category_excludes and _any_term(title_l, category_excludes):
+                continue
+            # Phase 15 (kontrollierter Review, "Variante C"): kontextbewusster
+            # Gegenpart zu category_excludes oben -- blockiert einen Begriff
+            # NUR, wenn er als Standalone-Vorkommen auftritt (siehe
+            # _any_conditional_exclude()-Docstring), nicht wenn ein erlaubter
+            # Bundle-Konnektor unmittelbar davorsteht. Default leeres Dict ->
+            # identisches Verhalten zu vorher fuer Kategorien ohne dieses Feld.
+            category_excludes_conditional = rule.get(
+                "_category_exclude_unless_preceded_by", {}
+            )
+            if category_excludes_conditional and _any_conditional_exclude(
+                title_l, category_excludes_conditional
+            ):
                 continue
 
         # exclude-Begriffe pro Regel
