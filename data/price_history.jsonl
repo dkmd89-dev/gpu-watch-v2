@@ -9250,3 +9250,4 @@
 {"price": 120.0, "date": "2026-08-09T04:22:21.109904+00:00", "source": "Kleinanzeigen", "model": "iphone_11_pro_128gb", "category": "iphone", "deal_score": 42, "fingerprint": "iphone 11 pro 64 gb space grau 90 akku ovp"}
 {"price": 110.0, "date": "2026-08-09T04:22:21.304232+00:00", "source": "Kleinanzeigen", "model": "monitor_curved", "category": "monitor_curved", "deal_score": 31, "fingerprint": "samaung curved gaming monitor 32 zoll 144hz qled"}
 {"price": 270.0, "date": "2026-08-09T04:22:21.401878+00:00", "source": "Kleinanzeigen", "model": "office_pc", "category": "office_pc", "deal_score": 35, "fingerprint": "hp laptop 15 6 ryzen 5 7000er reihe 16gb ddr5 1tb ssd win11"}
+{"price": 230.0, "date": "2026-08-09T04:51:41.863887+00:00", "source": "Kleinanzeigen", "model": "rx_6750_xt", "category": "gpu", "deal_score": 50, "fingerprint": "msi amd radeon rx 6750 xt mech 2x 12gb oc grafikkarte"}

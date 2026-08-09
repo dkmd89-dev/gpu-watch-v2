@@ -1230,3 +1230,130 @@ behoben:**
   siehe Abschnitt 18).
 
 Abschnitt 20 gilt als **vorbereitet, Freigabe zur Übernahme steht aus.**
+
+
+---
+
+## 21. Phase 12 (Preisgrenzen-Kalibrierung) — ABGESCHLOSSEN (Schritte 1–5)
+
+**Auslöser:** Nach Phase 11 (Abschnitt 18) wurde ein systematischer
+Kalibrierungsauftrag für alle `max_price`-Werte über alle Kategorien
+erteilt — mit echten, vom Auftraggeber hochgeladenen
+`price_history.jsonl`-Produktivdaten (9.161 Datenpunkte zu Beginn,
+zwischenzeitlich organisch auf über 9.247 gewachsen — ein externer,
+paralleler Prozess schreibt erkennbar in dieselbe Datei, siehe
+Datenintegritäts-Hinweis in `PRICE_CALIBRATION_REVIEW_V2.md`).
+
+**Schritt 1 — `PRICE_CALIBRATION_REPORT.md`:** 310 Regeln über 113
+`price_history_model`-Werte in 14 Kategorien systematisch inventarisiert
+und gegen echte P10/P25/Median/P75/P90-Perzentile bewertet. Tier-
+differenzierte Empfehlungslogik (Top-Deal→P25, Guter Preis→Median,
+Okay/Interessant→P75), **keine** pauschale "Median=max_price"-Formel.
+Ergebnis: 169 Regeln mit ≥15 Samples auswertbar, davon 13 "zu niedrig",
+28 "zu hoch", 128 plausibel; 141 Regeln mit zu wenig Daten.
+Kernbefund: `lego_sw_rare` teilte sich einen `price_history_model`-
+Schlüssel zwischen zwei völlig unterschiedlichen Produkten (Darth Revan
+vs. generische "seltene Figur") — struktureller Verdacht, noch ohne
+Live-Daten-Bestätigung.
+
+**Schritt 2 — `PRICE_CALIBRATION_REVIEW.md`:** alle 41 auffälligen Regeln
+einzeln anhand echter `fingerprint`-Daten (87% Abdeckung) geprüft, nicht
+nur die Statistik-Zahlen. Ergebnis: 18 Regeln (6 Modelle) klar als
+**ZUERST MATCHING-FIX** identifiziert — u.a. Vintage-Papierwerbung
+matchte als CRT-Monitor, Ersatzteile als ThinkPad, Spiele/Anleitungen als
+Retro-Konsolen. 15 Regeln (10 Modelle) als sauber verifiziertes
+**ÄNDERN** eingestuft, 8 Regeln als **MANUELLE PRÜFUNG**.
+
+**Schritt 3 — Matching-Fixes (6 Kategorien) + `PRICE_CALIBRATION_
+REVIEW_V2.md`:** Root-Cause-Fund bei `lego_sw_rare`: `require_all_of:
+[["lego", "star wars"]]` als EINE Gruppe bedeutet laut Matcher-Semantik
+"mind. eines der beiden Wörter" (ODER), nicht "beide" (UND) — ein
+echter Matching-Bug (`matcher.py::_any_term()`-Semantik), keine reine
+Begriffs-Unschärfe. Behoben durch Aufteilung in zwei Gruppen (6 Regeln).
+Zusätzlich Excludes für `crt_profi_monitor` (Werbung/Papierwaren),
+`roehrenfernseher` (Ersatzteile/Anleitungen), und eine neue
+`require_all_of`-Gruppe für `thinkpad_modern` (RAM-/Speicher-Angabe
+erforderlich). `nintendo_retro_konsole`/`sony_retro_konsole` waren
+bereits durch einen früheren, im Regelwerk dokumentierten Fix behoben —
+per Regressionstest verifiziert, keine Änderung nötig.
+**Verblüffende Simulation** (bestehende Daten erneut gegen die
+reparierten Regeln geprüft, nichts gelöscht/verändert): bei
+`crt_profi_monitor` und `thinkpad_modern` kehrte sich die "ZU HOCH"-
+Einstufung nahezu um — bereinigte P25/Median lagen fast exakt auf den
+bereits bestehenden Grenzen. Bei `lego_sw_rare` blieben nur 14 von 104
+Punkten übrig (87% waren Fehltreffer), bei `roehrenfernseher` nur 4 von
+68 (94%).
+
+**Schritt 4 — Systematische LEGO-Regelstruktur-Bereinigung:** vollständige
+Prüfung aller 15 Regelblöcke in `lego_minifiguren.yaml` (nicht blind
+alle ähnlichen Strukturen geändert, jede Regel einzeln auf tatsächliche
+Fehlerhaftigkeit geprüft). Ergebnis: genau 3 weitere Regelblöcke (9
+Regeln) mit demselben `["lego","THEMA"]`-Bug — `lego_sw_clone` (Clone
+Wars), `lego_ninjago_rare`, `lego_ninjago_bundle`. Alle 11 übrigen
+Blöcke (CMF, Promo, Marvel/DC, Harry Potter/LOTR, Classic, Sammlung,
+Sammler-Minifigur) hatten "lego" bereits korrekt als eigene Gruppe.
+Live-Fehltreffer bestätigt und behoben: "LEGO Marvel Spider-Man
+Minifigur Clone Sammler selten" matchte vor dem Fix fälschlich als
+`lego_sw_clone`. Simulation: `lego_ninjago_rare` hatte 0 verbleibende
+echte Datenpunkte (alle 5 bisherigen waren Fehltreffer), `lego_ninjago_
+bundle` verlor 75% (404 von 537, u.a. Duplo-/Harry-Potter-/Star-Wars-
+Sets fälschlich als Ninjago geführt).
+
+**Schritt 5 — `PRICE_CALIBRATION_APPLIED.md`:** ausschließlich die im
+Review eindeutig als **ÄNDERN** bestätigten 12 Regeln über 10 Modelle
+umgesetzt (tier-differenzierte Werte aus dem Review übernommen, keine
+pauschale Formel):
+- 8× iPhone-Top-Deal-Grenzen (11 Pro Max bis 16 Pro Max), z.B. iPhone 16
+  Pro Max 415€ → 600€
+- MacBook Air M4 (≤512GB) Top-Deal: 415€ → 725€ — besonders robuster
+  Befund, die alte Grenze lag SOGAR UNTER dem günstigsten real
+  beobachteten Angebot (499€), Top-Deal war vorher strukturell
+  unmöglich
+- LEGO CMF (alle 3 Tiers): 8/15/25€ → 5/7/10€
+
+Bewusst NICHT geändert: alle als NICHT ÄNDERN/ZU WENIGE DATEN/MANUELLE
+PRÜFUNG/ZUERST MATCHING-FIX eingestuften Regeln (vollständige Liste in
+`PRICE_CALIBRATION_APPLIED.md`) — insbesondere `crt_profi_monitor`/
+`thinkpad_modern` (bereinigte Daten bestätigen bereits bestehende
+Grenzen), `lego_sw_rare`/`roehrenfernseher`/`cpu_mainboard_bundle` (zu
+wenig Daten nach Bereinigung), Nintendo-/Sony-Retro-Konsolen
+(abgeschwächtes, aber nicht eindeutiges Signal).
+
+**Sicherheitsprüfung (alle fünf Schritte):** keine Zeile Code an
+Deal-Score-/Top-Deal-/Flip-Kandidat-/Resale-/Notification-/Duplicate-
+Detection-/Re-Evaluierungslogik (Phase 11) angefasst — ausschließlich
+`max_price`-Werte und `require_all_of`/`exclude`-Matching-Kriterien in
+`rules/*.yaml`. `price_history.jsonl`/`seen.json`/`found.json` zu
+keinem Zeitpunkt gelöscht oder manipuliert (nur lesend für Simulationen
+verwendet). Kein automatischer Selbst-Kalibrierungsmechanismus gebaut —
+alle Preisgrenzen bleiben explizit in YAML.
+
+**Geänderte Dateien (kumulativ über alle 5 Schritte):** `rules/lego_
+minifiguren.yaml`, `rules/vintage_elektronik.yaml`, `rules/notebook_
+resell.yaml`, `rules/iphone.yaml`, `rules/macbook.yaml`, sowie neu
+`app/tests/test_matcher_price_calibration_matching_fixes.py` (29 Tests)
+und `app/tests/test_matcher_price_calibration_applied.py` (19 Tests).
+Vier Reports: `PRICE_CALIBRATION_REPORT.md`, `PRICE_CALIBRATION_
+REVIEW.md`, `PRICE_CALIBRATION_REVIEW_V2.md`, `PRICE_CALIBRATION_
+APPLIED.md`.
+
+**Teststand:** `pytest app/tests/` → **851 passed, 0 failed** (Ausgangs-
+stand vor Phase 12: 797 passed).
+
+**Offene Punkte:**
+- Nintendo-/Sony-Retro-Konsolen zeigen weiterhin ein (abgeschwächtes)
+  "zu hoch"-Signal — Kandidaten für eine spätere, manuell geprüfte
+  Anpassung nach mehr sauberen Daten.
+- `lego_sw_rare`/`roehrenfernseher`/`cpu_mainboard_bundle` brauchen
+  spürbar mehr Datensammlung unter den jetzt reparierten Matching-Regeln,
+  bevor überhaupt kalibriert werden kann.
+- Derselbe `require_all_of`-Bug-Musterverdacht wurde in keiner anderen
+  Kategorie außer `lego_minifiguren.yaml` systematisch geprüft — falls
+  ähnliche Mehrfach-Wort-Gruppen anderswo vorkommen (z.B. `iphone.yaml`,
+  `retro_konsolen.yaml`), wäre eine analoge Durchsicht ein sinnvoller
+  Folgeschritt.
+- Nächste Kalibrierungsrunde und/oder dynamische Preisgrenzen
+  ausdrücklich erst nach einem echten Validierungs-Scan mit den
+  reparierten Matching-Regeln vorgesehen (Auftraggeber-Vorgabe).
+
+Phase 12 (Schritte 1–5) gilt damit als abgeschlossen.
