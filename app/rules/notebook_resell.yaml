@@ -111,11 +111,21 @@ rules:
     max_price: 240
     deal_rating: "Guter Preis"
 
+  # FIX (kontrollierter Review, found.json-Audit): Gruppe 2 enthielt bisher
+  # zusaetzlich "gaming" als Alternative zu "laptop"/"notebook". Fast jede
+  # Grafikkarte traegt "Gaming" im Produktnamen (ASUS TUF Gaming, MSI
+  # Gaming X Trio, Gigabyte GAMING OC, Zotac Gaming) -- dadurch matchten
+  # 32 von 120 sichtbaren found.json-Eintraegen dieser Kategorie als reine
+  # Standalone-Grafikkarte oder Desktop-Gaming-PC statt als Notebook (u.a.
+  # "MSI GeForce RTX 4060 Ti Gaming X Trio 8GB Top Zustand + OVP", 300EUR
+  # Top-Deal, kein Notebook im Angebot). "gaming" entfernt -- "laptop"/
+  # "notebook" reichen als Geraete-Indikator, echte Gaming-Notebooks
+  # nennen sich im Titel praktisch immer so.
   - label: "Gaming Laptop (RTX 3060) ★ Resell-Top"
     price_history_model: "gaming_laptop_rtx3060"
     require_all_of:
       - ["rtx 3060", "3060m", "3060 gtx"]
-      - ["laptop", "notebook", "gaming"]
+      - ["laptop", "notebook"]
     min_vram_gb: 0
     max_price: 400
     deal_rating: "Top-Deal"
@@ -125,7 +135,7 @@ rules:
     price_history_model: "gaming_laptop_rtx3060"
     require_all_of:
       - ["rtx 3060", "3060m", "3060 gtx"]
-      - ["laptop", "notebook", "gaming"]
+      - ["laptop", "notebook"]
     min_vram_gb: 0
     max_price: 490
     deal_rating: "Guter Preis"
@@ -134,7 +144,7 @@ rules:
     price_history_model: "gaming_laptop_rtx4060"
     require_all_of:
       - ["rtx 4060", "4060m"]
-      - ["laptop", "notebook", "gaming"]
+      - ["laptop", "notebook"]
     min_vram_gb: 0
     max_price: 550
     deal_rating: "Top-Deal"
