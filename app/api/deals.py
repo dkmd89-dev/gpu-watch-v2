@@ -13,6 +13,7 @@ from flask import Blueprint, render_template, jsonify
 
 from persistence.json_store import _load_json
 from matcher import load_rules
+from category_validation import filter_valid_entries
 from scoring.profit import MIN_FLIP_MARGIN_PCT
 from top_deal import (
     TOP_DEAL_SCORE_THRESHOLD_A,
@@ -45,6 +46,12 @@ def build_deals_blueprint(
         # bei "categories". get(..., []) statt [] direkt, falls load_rules()
         # im Legacy-Einzeldatei-Modus laeuft (dort existiert der Key nicht).
         rules_cfg = load_rules(str(rules_dir))
+        # Phase 14, Schritt 2 (PHASE14_DATA_QUALITY_REPORT.md): zentrale
+        # Kategorievalidierung -- Eintraege, die bei erneuter Pruefung gegen
+        # die AKTUELLEN Regeln nicht mehr (oder einer anderen Kategorie)
+        # zugeordnet wuerden, werden hier ausgeblendet. found.json selbst
+        # bleibt unveraendert (siehe category_validation.py-Docstring).
+        found = filter_valid_entries(found, rules_cfg)
         all_categories = rules_cfg.get("categories", [])
         # Dashboard-Kachel-Folgeschritt: Anzeigenamen je Kategorie (YAML-Feld
         # "label") fuers generische KPI-Kachel-Rendering im Template. get(...,
@@ -83,7 +90,12 @@ def build_deals_blueprint(
 
     @bp.route("/api/found")
     def api_found():
-        return jsonify(_load_json(found_file, []))
+        # Phase 14, Schritt 2: dieselbe zentrale Revalidierung wie index(),
+        # damit /api/found (z.B. externe/mobile Clients) nicht von der
+        # Dashboard-Ansicht abweicht.
+        found = _load_json(found_file, [])
+        rules_cfg = load_rules(str(rules_dir))
+        return jsonify(filter_valid_entries(found, rules_cfg))
 
     @bp.route("/api/scan-now", methods=["POST"])
     def api_scan_now():

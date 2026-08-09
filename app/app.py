@@ -47,6 +47,11 @@ DATA_DIR = Path(os.environ.get("DATA_DIR", "/data"))
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 SEEN_FILE = DATA_DIR / "seen.json"
 FOUND_FILE = DATA_DIR / "found.json"
+# Phase 14, Schritt 2: als Konstante herausgezogen, damit api/status.py und
+# api/deals.py (build_status_blueprint/build_deals_blueprint) dieselbe
+# Pfadquelle fuer die zentrale Kategorievalidierung erhalten wie die
+# bereits bestehenden Aufrufstellen (z.B. Zeile ~332, run_scan()).
+RULES_DIR = Path(__file__).parent / "rules"
 LOG_FILE = DATA_DIR / "gpu_watch.log"
 # Phase 7 (Schritt 7.1): append-only Zeitreihe, unabhaengig von FOUND_MAX_ITEMS-
 # Rotation und vom Notification-Gate -- Grundlage fuer Marktpreis-Statistik
@@ -183,7 +188,7 @@ _scan_status: dict = {
 # abgeleitet.
 SOURCES = ["kleinanzeigen", "ebay"]
 app.register_blueprint(build_status_blueprint(
-    FOUND_FILE, LOG_FILE, _scan_status, _status_lock, SOURCES,
+    FOUND_FILE, LOG_FILE, _scan_status, _status_lock, SOURCES, RULES_DIR,
 ))
 
 # Legacy-Fallback: wird NUR verwendet, falls die geladene Regel-Config

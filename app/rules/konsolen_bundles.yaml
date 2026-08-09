@@ -43,6 +43,15 @@ exclude_category:
   - "station"
   - "lüfter"
   - "ständer"
+  # Phase 14 (Data-Quality-Fix): siehe ausfuehrliche Begruendung in
+  # rules/handhelds.yaml (identisches Problem bei "Nintendo Switch Lite" --
+  # eindeutiger, mehrwortiger Produktname ohne generisches Kurzwort, daher
+  # gezielte Exclude-Erweiterung statt zusaetzlicher require_all_of-Gruppe).
+  - "netzteil"
+  - "ladekabel"
+  - "kabel"
+  - "ladegerät"
+  - "anleitung"
 
 scoring_weights:
   price: 0.85

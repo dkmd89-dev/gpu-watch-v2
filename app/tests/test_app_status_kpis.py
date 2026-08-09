@@ -46,7 +46,12 @@ def _entry(
     found_at: str | None = "2026-08-01T00:00:00+00:00",
 ) -> dict:
     return {
-        "title": "Testangebot",
+        # Phase 14, Schritt 2: realistischer, tatsaechlich matchender Titel
+        # noetig (statt Platzhalter "Testangebot"), da /api/status jetzt
+        # ueber category_validation.filter_valid_entries() jeden Eintrag
+        # gegen die echten Regeln revalidiert -- ein frei erfundener Titel
+        # wuerde sonst faelschlich als Fehltreffer ausgeblendet.
+        "title": "Gaming PC Ryzen 5 5600 16GB RAM RTX 3060 Tower",
         "price": 100,
         "category": "gaming_pc",
         "manufacturer": "Eigenbau",
@@ -205,7 +210,8 @@ def test_dashboard_html_zeigt_top_deal_transparenz():
     with tempfile.TemporaryDirectory() as tmpdir:
         app_mod = _load_app_module(tmpdir)
         _write_found(app_mod, [{
-            "title": "Top-Deal-Testangebot",
+            # Phase 14, Schritt 2: siehe Kommentar in _entry() oben.
+            "title": "Gaming PC Ryzen 5 5600 16GB RAM RTX 3060 Tower",
             "price": 265,
             "url": "https://example.invalid/1",
             "location": "Karlsruhe",
@@ -279,7 +285,8 @@ def test_dashboard_html_karten_enthalten_kpi_filter_datenattribute():
     with tempfile.TemporaryDirectory() as tmpdir:
         app_mod = _load_app_module(tmpdir)
         _write_found(app_mod, [{
-            "title": "Filter-Testangebot",
+            # Phase 14, Schritt 2: siehe Kommentar in _entry() oben.
+            "title": "Gaming PC Ryzen 5 5600 16GB RAM RTX 3060 Tower",
             "price": 265,
             "url": "https://example.invalid/1",
             "location": "Karlsruhe",
@@ -309,7 +316,8 @@ def test_dashboard_html_karte_ohne_felder_leere_daten_attribute_kein_fehler():
     with tempfile.TemporaryDirectory() as tmpdir:
         app_mod = _load_app_module(tmpdir)
         _write_found(app_mod, [{
-            "title": "Alter Eintrag ohne neue Felder",
+            # Phase 14, Schritt 2: siehe Kommentar in _entry() oben.
+            "title": "Gaming PC Ryzen 5 5600 16GB RAM RTX 3060 Tower",
             "price": 100,
             "url": "https://example.invalid/2",
             "location": "Karlsruhe",

@@ -14,6 +14,8 @@ from pathlib import Path
 from flask import Blueprint, jsonify
 
 from persistence.json_store import _load_json, _tail_log
+from matcher import load_rules
+from category_validation import filter_valid_entries
 from scoring.deal_score import stars_meet_minimum
 from scoring.profit import is_robust_flip_candidate
 
@@ -24,13 +26,23 @@ def build_status_blueprint(
     scan_status: dict,
     status_lock: threading.Lock,
     sources: list[str],
+    rules_dir: Path,
 ) -> Blueprint:
     """Baut den Blueprint mit den benoetigten Referenzen im Closure auf.
     Aufruf erfolgt einmalig beim App-Start in app.py, z.B.:
 
         app.register_blueprint(build_status_blueprint(
             FOUND_FILE, LOG_FILE, _scan_status, _status_lock, SOURCES,
+            Path(__file__).parent / "rules",
         ))
+
+    rules_dir (Phase 14, Schritt 2, neu): fuer die zentrale
+    Kategorievalidierung (category_validation.filter_valid_entries())
+    benoetigt, BEVOR die KPI-Zaehlung unten laeuft -- category_counts/
+    top_deal_count/flip_candidates_count/etc. sollen dieselbe bereinigte
+    Grundgesamtheit verwenden wie das Dashboard (api/deals.py), sonst
+    koennten Kachel-Zahlen und tatsaechlich angezeigte Eintraege
+    auseinanderlaufen.
     """
     bp = Blueprint("status", __name__)
 
@@ -69,6 +81,12 @@ def build_status_blueprint(
         als "nicht zutreffend" behandelt statt KeyError.
         """
         found = _load_json(found_file, [])
+        # Phase 14, Schritt 2: dieselbe zentrale Revalidierung wie
+        # api/deals.py -- Single Source of Truth fuer "welche Eintraege
+        # zaehlen als sichtbar", damit KPI-Kacheln (category_counts,
+        # top_deal_count, ...) und Dashboard-Liste konsistent bleiben.
+        rules_cfg = load_rules(str(rules_dir))
+        found = filter_valid_entries(found, rules_cfg)
 
         with status_lock:
             status_snapshot = dict(scan_status)

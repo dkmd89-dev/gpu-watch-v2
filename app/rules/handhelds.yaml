@@ -35,6 +35,27 @@ exclude_category:
   - "spiele sammlung"
   - "modul"
   - "cartridge"
+  # Phase 14 (Data-Quality-Fix): bisher fehlende Zubehoer-/Ersatzteil-
+  # Begriffe. Grund: Steam Deck / ROG Ally / Lenovo Legion Go sind -- anders
+  # als "3ds"/"ps vita" -- eindeutige, mehrwortige Produktnamen ohne
+  # generisches Kurzwort. Die Suchbegriffe dieser Kategorie SIND die
+  # Markennamen selbst (siehe search_terms oben), d.h. JEDES gescrapte
+  # Angebot -- ob echtes Geraet oder reines Zubehoer -- enthaelt den
+  # Markennamen zwangslaeufig im Titel. Eine zusaetzliche require_all_of-
+  # Gruppe mit Positivbegriffen (retro_konsolen-Muster) haette hier KEINE
+  # Trennschaerfe: Zubehoer-Anzeigen wie "Netzteil fuer Steam Deck"
+  # enthalten "steam deck" genauso wie echte Geraete-Anzeigen -- eine
+  # zweite Gruppe, die (fuer Fall "nacktes 'Steam Deck'" zwingend noetig)
+  # auch die Markenbegriffe selbst enthalten muesste, waere immer erfuellt
+  # und damit wirkungslos (siehe PHASE14_DATA_QUALITY_REPORT.md /
+  # PHASE14_MATCHING_FIX_REPORT.md). Die einzige wirksame Trennung ist
+  # daher -- analog zum retro_konsolen-Prinzip "praezise Phrasen statt
+  # Pauschal-Exclude" -- eine gezielt erweiterte Exclude-Liste:
+  - "netzteil"
+  - "ladekabel"
+  - "kabel"
+  - "ladegerät"
+  - "anleitung"
 
 scoring_weights:
   price: 0.85
