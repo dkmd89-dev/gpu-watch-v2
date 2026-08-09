@@ -408,7 +408,12 @@ rules:
       - 512gb
       - 512 gb
     price_history_model: macbook_air_m4_512gb
-    max_price: 415
+    # Phase 12, Schritt 5: Preisgrenze kalibriert -- P25 aus Preishistorie
+    # (n=16, Confidence MEDIUM), siehe PRICE_CALIBRATION_APPLIED.md.
+    # Besonders robuster Befund: die alte Grenze (415€) lag SOGAR UNTER
+    # dem guenstigsten real beobachteten Angebot (499€) -- unter der alten
+    # Regel konnte de facto NIE ein Top-Deal erkannt werden.
+    max_price: 725
     deal_rating: Top-Deal
   - label: MacBook Air M4 (≤512GB) 👍 Guter Preis
     require_all_of:

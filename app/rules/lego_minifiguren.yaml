@@ -356,7 +356,9 @@ rules:
       - ["cmf", "collectible minifigure", "sammelfigur", "minifigur"]
       - ["rar", "selten", "exclusive", "exklusiv", "series", "serie", "sammler"]
     price_history_model: "lego_cmf"
-    max_price: 8
+    # Phase 12, Schritt 5: Preisgrenze kalibriert -- P25 aus Preishistorie
+    # (n=175, Confidence HIGH), siehe PRICE_CALIBRATION_APPLIED.md. Alt: 8€.
+    max_price: 5
     deal_rating: "Top-Deal"
 
   - label: "LEGO CMF / Sammelfigur 👍 Guter Preis"
@@ -365,7 +367,9 @@ rules:
       - ["cmf", "collectible minifigure", "sammelfigur", "minifigur"]
       - ["rar", "selten", "exclusive", "exklusiv", "series", "serie", "sammler"]
     price_history_model: "lego_cmf"
-    max_price: 15
+    # Phase 12, Schritt 5: Preisgrenze kalibriert -- Median aus
+    # Preishistorie (n=175, Confidence HIGH). Alt: 15€.
+    max_price: 7
     deal_rating: "Guter Preis"
 
   - label: "LEGO CMF / Sammelfigur ⚠️ Interessant"
@@ -374,7 +378,9 @@ rules:
       - ["cmf", "collectible minifigure", "sammelfigur", "minifigur"]
       - ["rar", "selten", "exclusive", "exklusiv", "series", "serie", "sammler"]
     price_history_model: "lego_cmf"
-    max_price: 25
+    # Phase 12, Schritt 5: Preisgrenze kalibriert -- P75 aus Preishistorie
+    # (n=175, Confidence HIGH). Alt: 25€.
+    max_price: 10
     deal_rating: "Interessant"
 
 

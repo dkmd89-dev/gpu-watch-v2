@@ -271,7 +271,11 @@ rules:
       - 256gb
       - 256 gb
     price_history_model: iphone_11_pro_max_128gb
-    max_price: 100
+    # Phase 12, Schritt 5: Preisgrenze kalibriert -- P25 aus bereinigter
+    # Preishistorie (n=30, Confidence HIGH), siehe PRICE_CALIBRATION_
+    # REVIEW.md/PRICE_CALIBRATION_APPLIED.md. Alt: 100€ (deutlich unter
+    # dem realen unteren Marktsegment).
+    max_price: 150
     deal_rating: Top-Deal
   - label: iPhone 11 Pro Max (≤256GB) 👍 Guter Preis
     require_all_of:
@@ -1081,7 +1085,9 @@ rules:
       - 256gb
       - 256 gb
     price_history_model: iphone_14_plus_128gb
-    max_price: 165
+    # Phase 12, Schritt 5: Preisgrenze kalibriert -- P25 aus Preishistorie
+    # (n=26, Confidence HIGH), siehe PRICE_CALIBRATION_APPLIED.md. Alt: 165€.
+    max_price: 250
     deal_rating: Top-Deal
   - label: iPhone 14 Plus (≤256GB) 👍 Guter Preis
     require_all_of:
@@ -1313,7 +1319,9 @@ rules:
       - 256gb
       - 256 gb
     price_history_model: iphone_15_128gb
-    max_price: 210
+    # Phase 12, Schritt 5: Preisgrenze kalibriert -- P25 aus Preishistorie
+    # (n=155, Confidence HIGH), siehe PRICE_CALIBRATION_APPLIED.md. Alt: 210€.
+    max_price: 310
     deal_rating: Top-Deal
     exclude:
     - plus
@@ -1475,7 +1483,9 @@ rules:
       - 256gb
       - 256 gb
     price_history_model: iphone_15_pro_128gb
-    max_price: 265
+    # Phase 12, Schritt 5: Preisgrenze kalibriert -- P25 aus Preishistorie
+    # (n=129, Confidence HIGH), siehe PRICE_CALIBRATION_APPLIED.md. Alt: 265€.
+    max_price: 380
     deal_rating: Top-Deal
     exclude:
     - pro max
@@ -1559,7 +1569,9 @@ rules:
       - 256gb
       - 256 gb
     price_history_model: iphone_15_pro_max_128gb
-    max_price: 300
+    # Phase 12, Schritt 5: Preisgrenze kalibriert -- P25 aus Preishistorie
+    # (n=72, Confidence HIGH), siehe PRICE_CALIBRATION_APPLIED.md. Alt: 300€.
+    max_price: 450
     deal_rating: Top-Deal
   - label: iPhone 15 Pro Max (≤256GB) 👍 Guter Preis
     require_all_of:
@@ -1635,7 +1647,9 @@ rules:
       - 256gb
       - 256 gb
     price_history_model: iphone_16_128gb
-    max_price: 275
+    # Phase 12, Schritt 5: Preisgrenze kalibriert -- P25 aus Preishistorie
+    # (n=61, Confidence HIGH), siehe PRICE_CALIBRATION_APPLIED.md. Alt: 275€.
+    max_price: 400
     deal_rating: Top-Deal
     exclude:
     - plus
@@ -1797,7 +1811,9 @@ rules:
       - 256gb
       - 256 gb
     price_history_model: iphone_16_pro_128gb
-    max_price: 360
+    # Phase 12, Schritt 5: Preisgrenze kalibriert -- P25 aus Preishistorie
+    # (n=79, Confidence HIGH), siehe PRICE_CALIBRATION_APPLIED.md. Alt: 360€.
+    max_price: 550
     deal_rating: Top-Deal
     exclude:
     - pro max
@@ -1881,7 +1897,9 @@ rules:
       - 256gb
       - 256 gb
     price_history_model: iphone_16_pro_max_128gb
-    max_price: 415
+    # Phase 12, Schritt 5: Preisgrenze kalibriert -- P25 aus Preishistorie
+    # (n=70, Confidence HIGH), siehe PRICE_CALIBRATION_APPLIED.md. Alt: 415€.
+    max_price: 600
     deal_rating: Top-Deal
   - label: iPhone 16 Pro Max (≤256GB) 👍 Guter Preis
     require_all_of:
