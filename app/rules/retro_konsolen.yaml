@@ -105,6 +105,13 @@ exclude_category:
                          # (Bundle-Formulierung), die weiterhin matcht
   - "adapter"            # z.B. RF-Adapter/Netzteil-Adapter als Einzelteil
   - "modulator"          # z.B. RF-Modulator als Einzelteil
+  # Phase 15 (kontrollierter Review, "Service/Modding-Fix"): Reparatur-/
+  # Modding-DIENSTLEISTUNGS-Angebote statt Konsolenverkauf. Bewusst als
+  # Mehrwort-Phrase, NICHT bare "service" -- ein bare Exclude waere fuer
+  # Geraete-Zustandsbeschreibungen riskant (siehe kontrollierter Review).
+  - "modding service"
+  - "reparatur service"
+  - "repair service"
   # Bekannte Restluecke (bewusst nicht weiter ueber Keywords geloest, siehe
   # STATUS.md-Nachtrag): vereinzelte Angebote, die NUR einen Controller
   # verkaufen, aber ohne die Formulierung "für"/"fuer" (z.B. "Original PS2

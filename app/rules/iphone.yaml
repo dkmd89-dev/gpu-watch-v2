@@ -80,6 +80,14 @@ exclude_category:
   - "blacklist"
   - "gesperrt"
 
+  # Phase 15 (kontrollierter Review, "Service/Modding-Fix"): Reparatur-/
+  # Modding-DIENSTLEISTUNGS-Angebote statt Geraeteverkauf. Bewusst als
+  # Mehrwort-Phrase, NICHT bare "service" -- ein bare Exclude waere fuer
+  # Geraete-Zustandsbeschreibungen riskant.
+  - "modding service"
+  - "reparatur service"
+  - "repair service"
+
 scoring_weights:
   price: 0.85
   ausstattung: 0
