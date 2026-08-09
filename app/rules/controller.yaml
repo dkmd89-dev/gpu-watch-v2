@@ -52,6 +52,14 @@ exclude_category:
   # "konsole" noch "playstation" im Titel nennt, aber "Controller" erwähnt
   # (z.B. "Xbox One S 500GB + 1 Controller"), könnte fälschlich hier statt in
   # konsolen_bundles landen. Kalibrierung anhand realer Scan-Treffer empfohlen.
+  # Phase 15 (kontrollierter Review, "Service/Modding-Fix"): Reparatur-/
+  # Modding-DIENSTLEISTUNGS-Angebote statt Controller-Verkauf. Bewusst als
+  # Mehrwort-Phrase, NICHT bare "service" -- ein bare Exclude waere riskant
+  # (z.B. legitime Stick-Drift-Reparatur-KANDIDATEN, die diese Kategorie
+  # bewusst zulaesst, siehe ignore_global_excludes oben).
+  - "modding service"
+  - "reparatur service"
+  - "repair service"
 
 # FIX (Phase 15, kontrollierter Review, "Variante C" -- generische
 # kontextbewusste Exclude-Logik, siehe matcher.py::_any_conditional_

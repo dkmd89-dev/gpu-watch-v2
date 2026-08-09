@@ -57,6 +57,16 @@ exclude_category:
   - "ladegerät"
   - "anleitung"
 
+  # Phase 15 (kontrollierter Review, "Service/Modding-Fix"): Reparatur-/
+  # Modding-DIENSTLEISTUNGS-Angebote ("kein Geraet wechselt den Besitzer")
+  # statt Geraeteverkauf, siehe PHASE15_OPTIMIERUNG.md-Folgereview. Bewusst
+  # als Mehrwort-Phrase, NICHT als bare "service"/"modding" -- ein bare
+  # Exclude waere fuer Geraete-Zustandsbeschreibungen riskant. Reines
+  # Additiv, kein bestehendes Feld veraendert.
+  - "modding service"
+  - "reparatur service"
+  - "repair service"
+
 scoring_weights:
   price: 0.85
   ausstattung: 0
