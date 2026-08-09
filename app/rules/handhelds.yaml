@@ -30,6 +30,11 @@ exclude_category:
   - "display"
   - "akku"
   - "ovp nur"
+  - "spiel"
+  - "spielesammlung"
+  - "spiele sammlung"
+  - "modul"
+  - "cartridge"
 
 scoring_weights:
   price: 0.85
@@ -75,6 +80,7 @@ rules:
     price_history_model: "handheld_ps_vita"
     require_all_of:
       - ["ps vita", "psvita", "playstation vita"]
+      - ["konsole", "bundle", "set", "ovp", "system"]
     exclude:
       - "defekt"
       - "bastler"
@@ -90,6 +96,7 @@ rules:
     price_history_model: "handheld_ps_vita"
     require_all_of:
       - ["ps vita", "psvita", "playstation vita"]
+      - ["konsole", "bundle", "set", "ovp", "system"]
     exclude:
       - "defekt"
       - "bastler"

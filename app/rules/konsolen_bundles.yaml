@@ -36,6 +36,9 @@ exclude_category:
   - "leerkarton"
   - "nur spiele"
   - "spiel für"
+  - "spiel"
+  - "spielesammlung"
+  - "spiele sammlung"
   - "nur controller"
   - "station"
   - "lüfter"
@@ -163,6 +166,7 @@ rules:
     price_history_model: "konsole_xbox_one"
     require_all_of:
       - ["xbox one s", "xbox one x"]
+      - ["konsole", "bundle", "set", "mit spiele", "ovp", "system"]
     exclude:
       - "defekt"
       - "bastler"
@@ -175,6 +179,7 @@ rules:
     price_history_model: "konsole_xbox_one"
     require_all_of:
       - ["xbox one s", "xbox one x"]
+      - ["konsole", "bundle", "set", "mit spiele", "ovp", "system"]
     exclude:
       - "defekt"
       - "bastler"
