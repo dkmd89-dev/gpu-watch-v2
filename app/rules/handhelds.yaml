@@ -85,6 +85,32 @@ exclude_category:
   - "replacement housing"
   - "housing replacement"
 
+  # FIX (kontrollierter Review, found.json-Audit): weitere Standalone-
+  # Zubehör-/Ersatzteil-Muster, die bisher NICHT abgedeckt waren (24 von
+  # 38 sichtbaren found.json-Einträgen dieser Kategorie, u.a. "Original
+  # Valve Steam Deck Docking Station" 119,99EUR Top-Deal, "Lenovo Legion
+  # Go Gaming Mainboard Handheld Reparatur Repair" 229EUR Top-Deal,
+  # "Kingston NV3 2TB SSD M.2 2230 NVMe PCIe 4.0 - Steam Deck, ROG Ally,
+  # etc." 180EUR Top-Deal). "dockingstation"/"docking station" ergänzt
+  # das bestehende bare "dock" (Kompositum-/Wortgrenzen-Lücke, analog
+  # "ladekabel"/"kabel"). "joystick"/"thumbstick" bewusst NICHT hier,
+  # sondern unten in exclude_category_unless_also_contains -- Stick-Drift
+  # ist bei Steam Deck/ROG Ally ein bekanntes, oft in echten
+  # Geräte-Zustandsbeschreibungen genanntes Merkmal (verifiziert: "ROG
+  # Ally X, rechter Joystick minimales Drift, ansonsten neuwertig 512GB"
+  # ist ein echtes Geräteangebot, kein Zubehör), ein bare Exclude wäre
+  # hier riskant (identisches Muster wie beim Gehäuse/Shell-Fix).
+  - "dockingstation"
+  - "docking station"
+  - "memory card"
+  - "microsd"
+  - "m.2 ssd"
+  - "mainboard"
+  - "motherboard"
+  - "for parts"
+  - "not working"
+  - "batterieabdeckung"
+
 # Phase 15 (kontrollierter Folge-Review, "Gehäuse/Shell-Fix"): "gehäuse"
 # ist -- anders als die o.g. Begriffe -- ZWEIDEUTIG: es bezeichnet sowohl
 # lose Ersatzschalen ("Nintendo 3DS XL Gehäuse Blau") als auch die
@@ -113,6 +139,48 @@ exclude_category_unless_also_contains:
     - "gesprungen"
     - "gebrauchsspuren"
     - "verfärbt"
+  # FIX (kontrollierter Review, found.json-Audit): "joystick"/"thumbstick"
+  # sind wie "gehäuse" zweideutig -- Standalone-Ersatzteil-Angebote
+  # ("tmr joysticks für rog ally x") vs. Stick-Drift als übliche
+  # Zustandsbeschreibung eines echten Geräts ("ROG Ally, rechter Joystick
+  # minimales Drift, ansonsten neuwertig"). Gleicher Mechanismus wie oben,
+  # eigene, stick-spezifische Kontextliste (Housing-Zustandswörter wie
+  # "vergilbt" sind hier nicht einschlägig). Pluralform "joysticks"/
+  # "thumbsticks" als eigener Schlüssel noetig -- Wortgrenzen-Matching
+  # (_contains_term()) erkennt "joystick" nicht als Teil von "joysticks"
+  # (identisches Muster wie "spiel"/"spiele").
+  joystick:
+    - "drift"
+    - "ausgeleiert"
+    - "verschlissen"
+    - "neuwertig"
+    - "gebraucht"
+    - "funktioniert"
+    - "funktionsfähig"
+  joysticks:
+    - "drift"
+    - "ausgeleiert"
+    - "verschlissen"
+    - "neuwertig"
+    - "gebraucht"
+    - "funktioniert"
+    - "funktionsfähig"
+  thumbstick:
+    - "drift"
+    - "ausgeleiert"
+    - "verschlissen"
+    - "neuwertig"
+    - "gebraucht"
+    - "funktioniert"
+    - "funktionsfähig"
+  thumbsticks:
+    - "drift"
+    - "ausgeleiert"
+    - "verschlissen"
+    - "neuwertig"
+    - "gebraucht"
+    - "funktioniert"
+    - "funktionsfähig"
 
 scoring_weights:
   price: 0.85

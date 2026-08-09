@@ -105,6 +105,16 @@ exclude_category:
                          # (Bundle-Formulierung), die weiterhin matcht
   - "adapter"            # z.B. RF-Adapter/Netzteil-Adapter als Einzelteil
   - "modulator"          # z.B. RF-Modulator als Einzelteil
+  # FIX (kontrollierter Review, found.json-Audit, "controller"-Ersatz-
+  # Signale): "zubehör paket" verkauft explizit ein Zubehoer-Sammelpaket,
+  # keine Konsole. Vorsorglich ergaenzt (kein aktueller Fehltreffer in den
+  # neuen Geraete-Signalwoertern "kabel"/"slim"/"fat"/"komplett"/"memory
+  # card"/"heimkonsole"/"spielekonsole" -- verifiziert per Testdaten --,
+  # aber eine urspruenglich erwogene Pluralform "konsolen" haette hier
+  # faelschlich gegriffen; dieser Exclude bleibt als Absicherung gegen
+  # aehnliche zukuenftige Formulierungen bestehen).
+  - "zubehör paket"
+  - "zubehörpaket"
   # Phase 15 (kontrollierter Review, "Service/Modding-Fix"): Reparatur-/
   # Modding-DIENSTLEISTUNGS-Angebote statt Konsolenverkauf. Bewusst als
   # Mehrwort-Phrase, NICHT bare "service" -- ein bare Exclude waere fuer
@@ -196,6 +206,33 @@ rules:
   # Nintendo (N64 / GameCube / DS) -- typischerweise Konsole +
   # mind. 1 Controller/Zubehoer
   # ------------------------------------------------------------
+  # FIX (kontrollierter Review, found.json-Audit, Option "praezise
+  # Ergaenzung"): "controller" stand bisher in JEDER Geraete-Indikator-
+  # Gruppe dieser Datei als eigenstaendig ausreichende Alternative zu
+  # "konsole"/"gerät"/"system"/"netzteil" -- dadurch matchte jeder
+  # Standalone-Controller-Verkauf mit Konsolen-Markennamen im Titel
+  # ebenfalls (41 von 190 sichtbaren found.json-Eintraegen dieser
+  # Kategorie, u.a. "Nintendo 64 Controller" fuer 25EUR als Top-Deal,
+  # kein Geraet im Angebot). Ein einfaches Entfernen von "controller"
+  # OHNE Ersatz wurde geprueft und verworfen: es haette zusaetzlich 55
+  # echte Konsole+Controller-Bundles ohne das Wort "Konsole" im Titel
+  # zerstoert (z.B. "Sony PlayStation 2 Slim ... inkl. Controller + 8MB
+  # Memory Card").
+  #
+  # Stattdessen: "controller" entfernt, dafuer die tatsaechlich in den 53
+  # betroffenen echten Bundle-Titeln vorkommenden Geraete-Signalwoerter
+  # datenbasiert ermittelt und ergaenzt -- "kabel" (haeufigstes Signal in
+  # Mehrteile-Bundles), "slim"/"fat" (PS2-Modellvarianten), "komplett"
+  # ("Komplettset"), "memory card" sowie "heimkonsole"/"spielekonsole"
+  # (Kompositum-Varianten von "konsole", die die bestehende
+  # Wortgrenzen-Pruefung sonst nicht erkennt, siehe
+  # matcher.py::_contains_term()-Docstring). Verifiziert: rettet 39 der
+  # 53 echten Bundles zurueck, erzeugt 0 neue Fehltreffer im 41-Eintraege-
+  # Fehltreffer-Set. Bekannte Restluecke (14 verbleibende Bundle-Titel,
+  # z.B. "Nintendo 64 mit Controller" ohne weiteres Bundle-Signalwort)
+  # bewusst nicht weiter verfolgt -- eine vollstaendige Abdeckung wuerde
+  # eine kontextbewusste Matcher-Erweiterung erfordern, die fuer diesen
+  # Review explizit ausgeschlossen wurde.
   - label: "Nintendo Retro-Konsole (N64/GameCube/DS) ★ Top-Deal"
     match:
       - "nintendo 64"
@@ -210,7 +247,7 @@ rules:
     # UND-Bedingung.
     require_all_of:
       - ["nintendo 64", "n64", "gamecube", "nintendo ds"]
-      - ["konsole", "gerät", "system", "controller", "netzteil"]
+      - ["konsole", "heimkonsole", "spielekonsole", "gerät", "system", "netzteil", "kabel", "slim", "fat", "komplett", "memory card"]
     price_history_model: "nintendo_retro_konsole"
     resale_price_group: "retro_konsole_single"
     max_price: 40
@@ -230,7 +267,7 @@ rules:
     # UND-Bedingung.
     require_all_of:
       - ["nintendo 64", "n64", "gamecube", "nintendo ds"]
-      - ["konsole", "gerät", "system", "controller", "netzteil"]
+      - ["konsole", "heimkonsole", "spielekonsole", "gerät", "system", "netzteil", "kabel", "slim", "fat", "komplett", "memory card"]
     price_history_model: "nintendo_retro_konsole"
     resale_price_group: "retro_konsole_single"
     max_price: 70
@@ -250,7 +287,7 @@ rules:
     # UND-Bedingung.
     require_all_of:
       - ["nintendo 64", "n64", "gamecube", "nintendo ds"]
-      - ["konsole", "gerät", "system", "controller", "netzteil"]
+      - ["konsole", "heimkonsole", "spielekonsole", "gerät", "system", "netzteil", "kabel", "slim", "fat", "komplett", "memory card"]
     price_history_model: "nintendo_retro_konsole"
     resale_price_group: "retro_konsole_single"
     max_price: 100
@@ -268,7 +305,7 @@ rules:
     # Optimierung: siehe Nintendo-Block oben (identische Begruendung).
     require_all_of:
       - ["playstation 1", "ps1", "playstation 2", "ps2"]
-      - ["konsole", "gerät", "system", "controller", "netzteil"]
+      - ["konsole", "heimkonsole", "spielekonsole", "gerät", "system", "netzteil", "kabel", "slim", "fat", "komplett", "memory card"]
     price_history_model: "sony_retro_konsole"
     resale_price_group: "retro_konsole_single"
     max_price: 35
@@ -283,7 +320,7 @@ rules:
     # Optimierung: siehe Nintendo-Block oben (identische Begruendung).
     require_all_of:
       - ["playstation 1", "ps1", "playstation 2", "ps2"]
-      - ["konsole", "gerät", "system", "controller", "netzteil"]
+      - ["konsole", "heimkonsole", "spielekonsole", "gerät", "system", "netzteil", "kabel", "slim", "fat", "komplett", "memory card"]
     price_history_model: "sony_retro_konsole"
     resale_price_group: "retro_konsole_single"
     max_price: 60
@@ -298,7 +335,7 @@ rules:
     # Optimierung: siehe Nintendo-Block oben (identische Begruendung).
     require_all_of:
       - ["playstation 1", "ps1", "playstation 2", "ps2"]
-      - ["konsole", "gerät", "system", "controller", "netzteil"]
+      - ["konsole", "heimkonsole", "spielekonsole", "gerät", "system", "netzteil", "kabel", "slim", "fat", "komplett", "memory card"]
     price_history_model: "sony_retro_konsole"
     resale_price_group: "retro_konsole_single"
     max_price: 90
@@ -315,7 +352,7 @@ rules:
       - ["nintendo", "playstation", "ps1", "ps2", "n64", "gamecube", "retro", "konsole"]
       # Optimierung: Konsolen-Indikator zwingend erforderlich, sonst
       # matchen auch reine Spiele-Konvolute (kein Geraet dabei).
-      - ["konsole", "gerät", "system", "controller"]
+      - ["konsole", "heimkonsole", "spielekonsole", "gerät", "system", "kabel", "slim", "fat", "komplett", "memory card"]
     price_history_model: "retro_konvolut"
     # Kalibriert anhand 28 realer price_history.jsonl-Datenpunkte
     # (04.08.2026, burst-bereinigt): p10 = 23,50€ -> Top-Deal-Grenze.
@@ -333,7 +370,7 @@ rules:
       - ["nintendo", "playstation", "ps1", "ps2", "n64", "gamecube", "retro", "konsole"]
       # Optimierung: Konsolen-Indikator zwingend erforderlich, sonst
       # matchen auch reine Spiele-Konvolute (kein Geraet dabei).
-      - ["konsole", "gerät", "system", "controller"]
+      - ["konsole", "heimkonsole", "spielekonsole", "gerät", "system", "kabel", "slim", "fat", "komplett", "memory card"]
     price_history_model: "retro_konvolut"
     # Kalibriert: Marktpreis (getrimmter Mittelwert p10-p90) = 78,75€ ->
     # gerundet 79€. Vorher 100€ (grober Schaetzwert).
@@ -348,7 +385,7 @@ rules:
       - ["nintendo", "playstation", "ps1", "ps2", "n64", "gamecube", "retro", "konsole"]
       # Optimierung: Konsolen-Indikator zwingend erforderlich, sonst
       # matchen auch reine Spiele-Konvolute (kein Geraet dabei).
-      - ["konsole", "gerät", "system", "controller"]
+      - ["konsole", "heimkonsole", "spielekonsole", "gerät", "system", "kabel", "slim", "fat", "komplett", "memory card"]
     price_history_model: "retro_konvolut"
     # Kalibriert: p90 = 117,40€ -> gerundet 117€. Vorher 150€ (grober
     # Schaetzwert). NEUE KONVENTION fuer die dritte ("Okay")-Stufe bei

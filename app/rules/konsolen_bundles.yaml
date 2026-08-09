@@ -75,6 +75,63 @@ exclude_category:
   - "replacement housing"
   - "housing replacement"
 
+  # FIX (kontrollierter Review, found.json-Audit, Option "ovp bleibt
+  # Positivsignal"): "ovp" WURDE bewusst NICHT aus den require_all_of-
+  # Gruppen entfernt (Auftragsvorgabe) -- stattdessen datenbasiert
+  # präzise Phrasen für die beiden konkret gefundenen Fehltreffer-Gruppen
+  # ergänzt (49 von 240 sichtbaren found.json-Einträgen dieser
+  # Kategorie). Jede Phrase wurde gegen den vollständigen sichtbaren
+  # Datensatz verifiziert: 0 Kollisionen mit echten Konsole+Zubehör/
+  # Spiele-Bundles.
+  #
+  # Gruppe 1 -- reine Spiel-Angebote (Spiel-Produktname statt Konsole,
+  # z.B. "Nintendo Switch Mini Arcade - Mushihimesama - Limited Run -
+  # Neu & OVP"): bewusst NICHT bare "für" (9 Kollisionen mit echten
+  # Bundles wie "Wireless Controller für PS4 Slim Pro" verifiziert,
+  # ANDERS als bei den Spiele-Titeln selbst wo "für" den Zubehör-/
+  # Spiel-Charakter anzeigt) -- stattdessen die tatsächlich in den
+  # betroffenen Titeln vorkommenden, eindeutigen Produktlinien-/
+  # Titel-Phrasen:
+  - "mini arcade"
+  - "limited run"
+  - "pro skater"
+  - "spiele-wahl"
+  - "spieleauswahl"
+  - "evolution soccer"
+  # Bekannte Restlücke (bewusst nicht weiter verfolgt, analog
+  # retro_konsolen-Dokumentation): individuelle Spieltitel ohne eines
+  # der obigen Muster (z.B. "Pokémon Purpur", "Minecraft") lassen sich
+  # nicht per endlicher Phrasenliste abdecken, ohne "ovp"/"bundle"/"pro"
+  # als Positivsignal selbst zu verändern -- ausserhalb des Scopes
+  # dieses Reviews.
+  #
+  # Gruppe 2 -- Standalone-Zubehör (Controller/Headset/Lenkrad/Modchip/
+  # Schutzhülle), das über "controller"/"bundle" bereits ohne echte
+  # Konsole matcht:
+  - "controller für"
+  - "controller defekt"
+  - "wireless controller"
+  - "schutzhülle"
+  - "gaming headset"
+  - "dock set"
+  - "modchip"
+  - "scuff"
+  - "racing wheel"
+  - "zubehör-set"
+  - "zubehörset"
+  # Bewusst NICHT "joy-con" (9 Kollisionen mit echten Switch-Bundles wie
+  # "Nintendo Switch Konsole mit grauen Joy-Cons" verifiziert) und NICHT
+  # "dualshock 4" (4 Kollisionen mit echten PS4-Bundles verifiziert).
+  #
+  # Gruppe 3 -- Ersatzteil-Reseller-Muster (Touchscreen-/LCD-
+  # Ersatzteile in mehreren Farbvarianten, z.B. "Nintendo Switch Lite
+  # Touchscreen grau Versand aus Deutschland"): bewusst NICHT bare
+  # "touchscreen" (könnte legitime Zustands-/Funktionsprüfungs-
+  # Beschreibungen eines echten Geräts treffen, z.B. "Touchscreen
+  # reagiert einwandfrei" -- identisches Risiko wie beim Gehäuse/Shell-
+  # Fix) -- stattdessen die tatsächliche, eindeutige Reseller-Phrase:
+  - "versand aus deutschland"
+
 # Phase 15 (kontrollierter Folge-Review, "Gehäuse/Shell-Fix"): "gehäuse"
 # ist zweideutig (lose Ersatzschale vs. Zustandsbeschreibung einer
 # kompletten Konsole, z.B. "Gehäuse leicht vergilbt") -- schließt daher

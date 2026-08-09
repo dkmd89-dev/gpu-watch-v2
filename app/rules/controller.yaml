@@ -60,6 +60,20 @@ exclude_category:
   - "modding service"
   - "reparatur service"
   - "repair service"
+  # FIX (kontrollierter Review, found.json-Audit): "controller reparatur"
+  # (umgekehrte Wortstellung zu "reparatur service" oben) wurde vom
+  # Service/Modding-Fix nicht erfasst -- Reparatur-DIENSTLEISTUNGS-
+  # Angebote wie "PS5 Controller Reparatur Stick Drift TMR/Hall Sticks"
+  # matchten weiterhin. Bewusst als Phrase "controller reparatur", NICHT
+  # bare "reparatur" -- legitime Stick-Drift-Reparatur-KANDIDATEN (siehe
+  # oben) enthalten "defekt"/"drift", nicht das Wort "Reparatur" selbst.
+  - "controller reparatur"
+  # FIX (kontrollierter Review, found.json-Audit): "schutzhülle" ist ein
+  # zusammengesetztes Wort und wird vom bestehenden bare "hülle" NICHT
+  # erfasst (Wortgrenzen-Matching, siehe matcher.py::_contains_term()-
+  # Docstring) -- "Gummi Schutzhülle für PS5 dualsense controller"
+  # matchte dadurch weiterhin als vollständiger Controller.
+  - "schutzhülle"
   # Phase 15 (kontrollierter Folge-Review, "Gehäuse/Shell-Fix"): unbedingte
   # Ausschlüsse für Standalone-Gehäuse-/Shell-Angebote, die nicht über die
   # kontextbewusste "gehäuse"-Prüfung unten laufen (zusammengesetzte
