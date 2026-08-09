@@ -1,0 +1,185 @@
+category: "konsolen_bundles"
+label: "Moderne Konsolen & Bundles"
+
+scan_priority: 8
+notify_max_price: 180
+
+search_terms:
+  - "PS4 Slim"
+  - "PS4 Pro"
+  - "PlayStation 4"
+  - "Xbox One S"
+  - "Xbox One X"
+  - "Nintendo Switch"
+  - "Switch Lite"
+  - "Switch OLED"
+  - "Konsolen Bundle"
+
+# 'defekt' und 'bastler' werden für DIESE Kategorie gezielt von der
+# globalen Sperre (_global.yaml: exclude_global) ausgenommen, siehe neuer
+# Key "ignore_global_excludes" (matcher.py). Die eigentliche Trennung
+# zwischen "Bastler-Bundle" und "voll funktionsfähig" passiert weiterhin
+# über die Regeln selbst: die Bastler-Regel VERLANGT diese Begriffe
+# (require_all_of), alle anderen Regeln in dieser Datei SCHLIESSEN sie
+# weiterhin explizit über ihr eigenes "exclude:" aus -- ignore_global_excludes
+# hebt nur die kategorieweite Blockade auf, nicht die Regel-eigenen Excludes.
+ignore_global_excludes:
+  - "defekt"
+  - "bastler"
+
+exclude_category:
+  - "hülle"
+  - "case"
+  - "tasche"
+  - "ovp nur"
+  - "nur karton"
+  - "leerkarton"
+  - "nur spiele"
+  - "spiel für"
+  - "nur controller"
+  - "station"
+  - "lüfter"
+  - "ständer"
+
+scoring_weights:
+  price: 0.85
+  ausstattung: 0
+  hardware_qualitaet: 0.15
+  hersteller: 0
+  zustand: 0
+  lieferumfang: 0
+
+rules:
+  # ============================================================
+  # BASTLER / REPARATUR (Überhitzung / HDD-Defekt / Kein Bild)
+  # ============================================================
+  - label: "PS4 / Xbox One (Defekt / Bastler) ★ Top-Deal"
+    price_history_model: "konsole_bastler_bundle"
+    require_all_of:
+      - ["ps4", "playstation 4", "xbox one"]
+      - ["defekt", "bastler", "für bastler", "geht nicht an", "laut", "überhitzt", "piept"]
+    exclude:
+      - "controller nur"
+      - "ohne gehäuse"
+    min_vram_gb: 0
+    max_price: 25
+    deal_rating: "Top-Deal"
+
+  - label: "PS4 / Xbox One (Defekt / Bastler) 👍 Guter Preis"
+    price_history_model: "konsole_bastler_bundle"
+    require_all_of:
+      - ["ps4", "playstation 4", "xbox one"]
+      - ["defekt", "bastler", "für bastler", "geht nicht an", "laut", "überhitzt", "piept"]
+    exclude:
+      - "controller nur"
+      - "ohne gehäuse"
+    min_vram_gb: 0
+    max_price: 35
+    deal_rating: "Guter Preis"
+
+  # ============================================================
+  # NINTENDO SWITCH (LCD / LITE / OLED - Voll funktionsfähig)
+  # ============================================================
+  - label: "Nintendo Switch (V1/V2/OLED) ★ Top-Deal"
+    price_history_model: "konsole_switch_standard"
+    require_all_of:
+      - ["nintendo switch", "switch oled", "switch konsole"]
+      - ["konsole", "bundle", "set", "mit spiele", "ovp", "system"]
+    exclude:
+      - "lite"
+      - "defekt"
+      - "bastler"
+    min_vram_gb: 0
+    max_price: 110
+    deal_rating: "Top-Deal"
+    negotiation_tolerance_pct: 15.0
+
+  - label: "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis"
+    price_history_model: "konsole_switch_standard"
+    require_all_of:
+      - ["nintendo switch", "switch oled", "switch konsole"]
+      - ["konsole", "bundle", "set", "mit spiele", "ovp", "system"]
+    exclude:
+      - "lite"
+      - "defekt"
+      - "bastler"
+    min_vram_gb: 0
+    max_price: 150
+    deal_rating: "Guter Preis"
+
+  - label: "Nintendo Switch Lite ★ Top-Deal"
+    price_history_model: "konsole_switch_lite"
+    require_all_of:
+      - ["switch lite", "nintendo switch lite"]
+    exclude:
+      - "defekt"
+      - "bastler"
+    min_vram_gb: 0
+    max_price: 70
+    deal_rating: "Top-Deal"
+
+  - label: "Nintendo Switch Lite 👍 Guter Preis"
+    price_history_model: "konsole_switch_lite"
+    require_all_of:
+      - ["switch lite", "nintendo switch lite"]
+    exclude:
+      - "defekt"
+      - "bastler"
+    min_vram_gb: 0
+    max_price: 95
+    deal_rating: "Guter Preis"
+
+  # ============================================================
+  # PLAYSTATION 4 (SLIM / PRO - Voll funktionsfähig)
+  # ============================================================
+  - label: "PS4 Slim / Pro Bundle ★ Top-Deal"
+    price_history_model: "konsole_ps4_bundle"
+    require_all_of:
+      - ["ps4", "playstation 4"]
+      - ["slim", "pro", "bundle", "1tb", "500gb", "mit spiele"]
+    exclude:
+      - "defekt"
+      - "bastler"
+    min_vram_gb: 0
+    max_price: 75
+    deal_rating: "Top-Deal"
+
+  - label: "PS4 Slim / Pro Bundle 👍 Guter Preis"
+    price_history_model: "konsole_ps4_bundle"
+    require_all_of:
+      - ["ps4", "playstation 4"]
+      - ["slim", "pro", "bundle", "1tb", "500gb", "mit spiele"]
+    exclude:
+      - "defekt"
+      - "bastler"
+    min_vram_gb: 0
+    max_price: 110
+    deal_rating: "Guter Preis"
+
+  # ============================================================
+  # XBOX ONE (S / X - Voll funktionsfähig)
+  # ============================================================
+  - label: "Xbox One S / One X ★ Top-Deal"
+    price_history_model: "konsole_xbox_one"
+    require_all_of:
+      - ["xbox one s", "xbox one x"]
+    exclude:
+      - "defekt"
+      - "bastler"
+      - "series"
+    min_vram_gb: 0
+    max_price: 60
+    deal_rating: "Top-Deal"
+
+  - label: "Xbox One S / One X 👍 Guter Preis"
+    price_history_model: "konsole_xbox_one"
+    require_all_of:
+      - ["xbox one s", "xbox one x"]
+    exclude:
+      - "defekt"
+      - "bastler"
+      - "series"
+    min_vram_gb: 0
+    max_price: 90
+    deal_rating: "Guter Preis"
+    

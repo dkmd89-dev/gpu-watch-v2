@@ -1,0 +1,199 @@
+category: "controller"
+label: "Konsolen-Controller"
+
+scan_priority: 6
+notify_max_price: 35
+
+search_terms:
+  - "PS5 Controller"
+  - "DualSense"
+  - "PS4 Controller"
+  - "DualShock 4"
+  - "Xbox Controller"
+  - "Xbox Series Controller"
+  - "Switch Pro Controller"
+
+# 'defekt' wird für DIESE Kategorie gezielt von der globalen Sperre
+# (_global.yaml: exclude_global) ausgenommen, siehe neuer Key
+# "ignore_global_excludes" (matcher.py). "drift"/"stick drift" standen nie
+# in exclude_global (kein globaler Ausschlussbegriff) und brauchen daher
+# keine Freigabe hier. Die Trennung zwischen Drift-/Reparatur-Controllern
+# und voll funktionsfähigen passiert weiterhin über die Regeln selbst: die
+# Drift-Regeln VERLANGEN "defekt"/"drift" (require_all_of), die
+# funktionsfähigen Regeln SCHLIESSEN sie weiterhin über ihr eigenes
+# "exclude:" aus.
+ignore_global_excludes:
+  - "defekt"
+
+exclude_category:
+  - "hülle"
+  - "case"
+  - "grip"
+  - "aufsatz"
+  - "kabel"
+  - "chinesisch"
+  - "no name"
+  - "noname"
+  - "nachbau"
+  - "kopie"
+  - "holder"
+  - "halterung"
+  - "ladestation"
+  - "dock"
+  - "playstation" # verhindert Treffer mit ganzen Konsolen-Bundles
+  - "konsole" # verhindert Treffer mit ganzen Konsolen-Bundles (auch Xbox/PS-Bundles, die "Konsole" im Titel nennen)
+  # HINWEIS: "xbox" wurde hier bewusst NICHT (mehr) als Blanket-Exclude eingetragen.
+  # Jede Xbox-Regel dieser Kategorie setzt "xbox" zwingend voraus (require_all_of),
+  # ein kategorieweiter Exclude auf "xbox" hätte daher ALLE eigenen Xbox-Regeln
+  # dauerhaft unerreichbar gemacht (verifiziert: "Xbox Series Controller ohne Akku"
+  # matchte mit dem alten Exclude nicht, obwohl keine der Regel-Excludes griff).
+  # Restrisiko (bewusst in Kauf genommen, wie bei anderen Kategorien auch mit
+  # Preisgrenzen-Platzhaltern): ein komplettes Xbox-Konsolen-Bundle, das weder
+  # "konsole" noch "playstation" im Titel nennt, aber "Controller" erwähnt
+  # (z.B. "Xbox One S 500GB + 1 Controller"), könnte fälschlich hier statt in
+  # konsolen_bundles landen. Kalibrierung anhand realer Scan-Treffer empfohlen.
+
+scoring_weights:
+  price: 0.85
+  ausstattung: 0
+  hardware_qualitaet: 0.15
+  hersteller: 0
+  zustand: 0
+  lieferumfang: 0
+
+rules:
+  # ============================================================
+  # BASTLER / REPARATUR (Stick Drift & Leicht defekt)
+  # ============================================================
+  - label: "PS5 DualSense (Stick Drift / Reparatur) ★ Top-Deal"
+    price_history_model: "controller_ps5_drift"
+    require_all_of:
+      - ["ps5", "dualsense"]
+      - ["controller", "gamepad"]
+      - ["drift", "stick drift", "zieht nach", "defekt"]
+    min_vram_gb: 0
+    max_price: 15
+    deal_rating: "Top-Deal"
+
+  - label: "PS5 DualSense (Stick Drift / Reparatur) 👍 Guter Preis"
+    price_history_model: "controller_ps5_drift"
+    require_all_of:
+      - ["ps5", "dualsense"]
+      - ["controller", "gamepad"]
+      - ["drift", "stick drift", "zieht nach", "defekt"]
+    min_vram_gb: 0
+    max_price: 22
+    deal_rating: "Guter Preis"
+
+  - label: "Xbox Series/One (Stick Drift / Reparatur) ★ Top-Deal"
+    price_history_model: "controller_xbox_drift"
+    require_all_of:
+      - ["xbox"]
+      - ["series", "one"]
+      - ["controller", "gamepad"]
+      - ["drift", "stick drift", "zieht nach", "defekt"]
+    min_vram_gb: 0
+    max_price: 12
+    deal_rating: "Top-Deal"
+
+  - label: "Xbox Series/One (Stick Drift / Reparatur) 👍 Guter Preis"
+    price_history_model: "controller_xbox_drift"
+    require_all_of:
+      - ["xbox"]
+      - ["series", "one"]
+      - ["controller", "gamepad"]
+      - ["drift", "stick drift", "zieht nach", "defekt"]
+    min_vram_gb: 0
+    max_price: 18
+    deal_rating: "Guter Preis"
+
+  # ============================================================
+  # PS5 DUALSENSE (Voll funktionsfähig)
+  # ============================================================
+  - label: "PS5 DualSense Controller ★ Top-Deal"
+    price_history_model: "controller_ps5_dualsense"
+    require_all_of:
+      - ["ps5", "dualsense"]
+      - ["controller", "gamepad"]
+    exclude:
+      - "drift"
+      - "defekt"
+      - "bastler"
+    min_vram_gb: 0
+    max_price: 25
+    deal_rating: "Top-Deal"
+    negotiation_tolerance_pct: 15.0
+
+  - label: "PS5 DualSense Controller 👍 Guter Preis"
+    price_history_model: "controller_ps5_dualsense"
+    require_all_of:
+      - ["ps5", "dualsense"]
+      - ["controller", "gamepad"]
+    exclude:
+      - "drift"
+      - "defekt"
+      - "bastler"
+    min_vram_gb: 0
+    max_price: 35
+    deal_rating: "Guter Preis"
+
+  # ============================================================
+  # XBOX SERIES / ONE (Voll funktionsfähig)
+  # ============================================================
+  - label: "Xbox Wireless Controller ★ Top-Deal"
+    price_history_model: "controller_xbox_series"
+    require_all_of:
+      - ["xbox"]
+      - ["series", "one"]
+      - ["controller", "gamepad"]
+    exclude:
+      - "drift"
+      - "defekt"
+      - "bastler"
+    min_vram_gb: 0
+    max_price: 20
+    deal_rating: "Top-Deal"
+
+  - label: "Xbox Wireless Controller 👍 Guter Preis"
+    price_history_model: "controller_xbox_series"
+    require_all_of:
+      - ["xbox"]
+      - ["series", "one"]
+      - ["controller", "gamepad"]
+    exclude:
+      - "drift"
+      - "defekt"
+      - "bastler"
+    min_vram_gb: 0
+    max_price: 30
+    deal_rating: "Guter Preis"
+
+  # ============================================================
+  # NINTENDO SWITCH PRO CONTROLLER (Voll funktionsfähig)
+  # ============================================================
+  - label: "Switch Pro Controller ★ Top-Deal"
+    price_history_model: "controller_switch_pro"
+    require_all_of:
+      - ["switch"]
+      - ["pro controller", "pro-controller"]
+    exclude:
+      - "drift"
+      - "defekt"
+      - "bastler"
+    min_vram_gb: 0
+    max_price: 25
+    deal_rating: "Top-Deal"
+
+  - label: "Switch Pro Controller 👍 Guter Preis"
+    price_history_model: "controller_switch_pro"
+    require_all_of:
+      - ["switch"]
+      - ["pro controller", "pro-controller"]
+    exclude:
+      - "drift"
+      - "defekt"
+      - "bastler"
+    min_vram_gb: 0
+    max_price: 35
+    deal_rating: "Guter Preis"
+    

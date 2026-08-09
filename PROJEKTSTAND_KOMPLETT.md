@@ -39,6 +39,14 @@
 > in dieser Session** — die Aussage „Working Tree clean" oben bezieht
 > sich weiterhin nur auf `d2effe7`. Abschnitt 19 beschreibt einen
 > vorbereiteten, noch nicht eingespielten Änderungsvorschlag.
+>
+> **Update (2026-08-09, Folgeschritt): vier weitere Kategorien
+> (Handhelds, Konsolen-Bundles, M.2-SSD, Controller) + Matcher-Erweiterung
+> `ignore_global_excludes` VORBEREITET, NICHT committet.** Erstmals seit
+> Phase 11 (Abschnitt 18) eine vorbereitete Änderung an `matcher.py`
+> selbst (`evaluate()`-Kernschleife), lokal verifiziert gegen die volle
+> Testsuite (803/803 grün, 6 neue Tests). Details, zwei dabei gefundene
+> und behobene Bugs sowie offene Punkte: Abschnitt 20.
 
 ---
 
@@ -1090,3 +1098,135 @@ Modells bei frisch angelegten Kategorien ohne Marktdaten.
   Session) — Integration in `origin/main` steht aus.
 
 Abschnitt 19 gilt als **vorbereitet, Freigabe zur Übernahme steht aus.**
+
+---
+
+## 20. Vier neue Kategorien (Handhelds, Konsolen-Bundles, M.2-SSD, Controller) + Matcher-Erweiterung — VORBEREITET, NICHT COMMITTET
+
+**Abgrenzung wie Abschnitt 19:** Auch dieser Abschnitt beschreibt lokal
+vorbereitete, verifizierte, aber **nicht committete** Änderungen (kein
+Schreibzugriff auf `origin/main` in dieser Session). Zusätzlich zu den
+vier neuen Kategorien enthält dieser Schritt — anders als Abschnitt 19 —
+erstmals eine **Code-Änderung** in `matcher.py` (siehe C).
+
+**Auslöser:** Nutzer stellte vier neue Kategorie-YAMLs bereit:
+`handhelds.yaml` (3DS/Vita/Steam Deck/ROG Ally/Legion Go),
+`konsolen_bundles.yaml` (PS4/Xbox One/Switch), `m2_ssd.yaml` (M.2 NVMe,
+1TB/2TB), `controller.yaml` (PS5 DualSense/Xbox/Switch Pro Controller,
+inkl. eigener Stick-Drift-/Reparatur-Regeln).
+
+**A) Plugin-Kontrakt + Kollisionsprüfung verifiziert.** Alle vier Dateien
+in isolierter Kopie von `rules/` (19 Kategorien gesamt) geladen und gegen
+16 Beispieltitel ausgewertet, inkl. gezielter Cross-Category-Fälle:
+- Keine Namens-/`price_history_model`-Kollision mit den 15 bestehenden
+  Kategorien (`grep` über alle `rules/*.yaml`).
+- `m2_ssd` vs. `sata_ssd`: kein Overlap — `sata_ssd.yaml` schließt
+  `"nvme"`/`"pcie"` bereits strikt aus (Schritt A, siehe Abschnitt-
+  Historie oben), `m2_ssd.yaml` schließt `"sata"` aus.
+- `konsolen_bundles` vs. `retro_konsolen`: kein Overlap — `retro_konsolen`
+  deckt N64/GameCube/DS/PS1/PS2 ab, keine PS4/Xbox One/Switch-Suchbegriffe.
+- Titel mit sowohl Konsolen- als auch Controller-Bezug (`"PS4 Slim
+  Konsole mit 2 Controllern"`) landen korrekt bei `konsolen_bundles`,
+  nicht bei `controller` (Controller-Regeln verlangen `require_all_of`
+  mit konsolenspezifischen Begriffen wie `"ps5"`/`"dualsense"`, die ein
+  reiner PS4-Bundle-Titel nicht erfüllt).
+
+**B) Zwei Bugs gefunden, gemeinsam mit dem Auftraggeber verifiziert und
+behoben:**
+
+1. **`controller.yaml`: `exclude_category: "xbox"` blockierte alle
+   eigenen Xbox-Regeln.** Jede Xbox-Controller-Regel verlangt selbst
+   `"xbox"` im Titel (`require_all_of`); ein kategorieweiter Exclude auf
+   denselben Begriff machte die Regeln strukturell unerreichbar.
+   Verifiziert: `"Xbox Series Controller ohne Akku"` matchte vor dem Fix
+   nicht, danach korrekt `controller`. **Fix:** Eintrag entfernt,
+   Restrisiko (Komplettbundle ohne Wort „Konsole" im Titel) im
+   YAML-Kommentar dokumentiert statt stillschweigend in Kauf genommen.
+
+2. **`konsolen_bundles.yaml`/`controller.yaml`: Kommentar versprach eine
+   Ausnahme von `exclude_global` (`"defekt"`/`"bastler"` NICHT global
+   ausschließen), die es technisch nicht gab.** `exclude_global` aus
+   `_global.yaml` wurde in `matcher.py::evaluate()` als Blanket-Check VOR
+   der Regel-Schleife geprüft (`return MatchResult(matched=False)`,
+   kategorieunabhängig) — von einer Kategorie-YAML nicht überschreibbar.
+   Die Bastler-/Reparatur-Regeln beider Dateien (`konsole_bastler_bundle`,
+   `controller_ps5_drift`, `controller_xbox_drift`) waren dadurch faktisch
+   tot. Verifiziert: `"Xbox One S ... defekt ... bastler"` und `"PS5
+   DualSense Controller stick drift defekt"` matchten vor dem Fix nicht.
+
+**C) Fix zu B2 — neuer, optionaler Kategorie-Key
+`ignore_global_excludes` (Code-Änderung `matcher.py`).**
+
+- **Laden (`_load_rules_from_dir`):** analog zu `exclude_category` liest
+  jede Kategorie optional `ignore_global_excludes` (Default: leere
+  Liste) und hängt sie als `rule["_ignore_global_excludes"]` an jede
+  ihrer Regeln — kein neuer Ladepfad, exakt dasselbe Muster wie
+  `_category_exclude_terms`.
+- **Auswertung (`evaluate()`):** Der bisherige Blanket-`return` wurde
+  durch `matched_global_excludes = [t for t in global_excludes if
+  _contains_term(title_l, t)]` ersetzt. Der Legacy-Einzeldatei-Modus
+  (kein `directory_mode`) behält das alte Verhalten unverändert bei
+  (Blanket-Return direkt nach Schritt 1/2, `ignore_global_excludes`
+  existiert dort nicht). Im Verzeichnis-Modus wird die Prüfung stattdessen
+  **pro Regel** in der bestehenden Schleife vorgenommen: eine Regel wird
+  nur übersprungen, wenn ihre Kategorie NICHT alle im Titel getroffenen
+  globalen Begriffe freigegeben hat (`set(matched_global_excludes).
+  issubset(set(rule["_ignore_global_excludes"]))`). Andere globale
+  Ausschlüsse (z.B. `"tausch"`), die nicht freigegeben wurden, sperren
+  weiterhin unverändert.
+- **Sicherheitsgarantie:** `ignore_global_excludes` hebt ausschließlich
+  die KATEGORIEWEITE Sperre auf. Regel-eigene `exclude:`-Listen (z.B. bei
+  den „voll funktionsfähig"-Regeln in beiden Dateien, die `"defekt"`/
+  `"bastler"` weiterhin explizit ausschließen) bleiben davon unberührt —
+  per eigenem Test abgesichert (siehe unten).
+- **Rückwärtskompatibilität:** Kategorien ohne den neuen Key (alle 15
+  bestehenden + `autoradio_opel_corsa` aus Abschnitt 19) erhalten eine
+  leere Liste und verhalten sich exakt wie vor dieser Änderung — durch
+  volle Testsuite bestätigt (siehe D).
+
+**D) Testergebnis.**
+- Volle Suite vor dieser Änderung: **797 passed, 0 failed** — keine
+  Regression durch den `matcher.py`-Change.
+- Neue Testdatei `tests/test_matcher_ignore_global_excludes.py` (6 Tests,
+  synthetisches `tmp_path`-Rules-Verzeichnis, analog zu
+  `test_rules_category_plugin_contract.py`): freigegebener Begriff matcht
+  trotz globalem Exclude; nicht freigegebener globaler Begriff (`"tausch"`)
+  sperrt weiterhin; Regel-eigener `exclude:` greift trotz Kategorie-
+  Freigabe; Kategorie ohne den neuen Key bleibt unverändert gesperrt bzw.
+  matcht normal ohne Ausschlussbegriff; Legacy-Einzeldatei-Modus kennt
+  den neuen Key nicht und bleibt unverändert.
+- Gesamt danach: **803 passed, 0 failed** (797 + 6 neue).
+- Zusätzlich 7 manuelle Kontrollfälle gegen alle 19 Kategorien gemeinsam
+  ausgewertet (inkl. der beiden Bugfixe) — alle wie erwartet.
+
+**Geänderte/neue Dateien (lokal, NICHT committet):**
+- `app/matcher.py` (Kern-Change: `ignore_global_excludes`-Mechanismus)
+- `app/rules/controller.yaml` (neu; Xbox-Exclude-Fix +
+  `ignore_global_excludes: [defekt]`)
+- `app/rules/konsolen_bundles.yaml` (neu;
+  `ignore_global_excludes: [defekt, bastler]`)
+- `app/rules/handhelds.yaml` (neu, unverändert wie vom Auftraggeber
+  bereitgestellt)
+- `app/rules/m2_ssd.yaml` (neu, unverändert wie vom Auftraggeber
+  bereitgestellt)
+- `app/tests/test_matcher_ignore_global_excludes.py` (neu, 6 Tests)
+
+**Empfohlene Tests vor dem Einspielen:**
+- `pytest app/tests/ -q` (bereits ausgeführt: 803/803 grün)
+- Manueller Smoke-Test gegen reale Kleinanzeigen-Titel vor Produktivgang,
+  insbesondere für die beiden neuen Bastler-/Drift-Regelpaare
+
+**Offene Punkte:**
+- `max_price`-Werte aller vier neuen Kategorien sind laut Auftraggeber-
+  YAML noch nicht mit echten Marktdaten kalibriert — analog zu den in
+  Abschnitt 18/19 offen dokumentierten Preisgrenzen anderer Kategorien.
+- Restrisiko `controller.yaml` (Xbox-Komplettbundle ohne Wort „Konsole")
+  bleibt bewusst offen, siehe B1 — Kalibrierung nach ersten echten
+  Scan-Daten empfohlen.
+- Vier Dateien + Matcher-Change noch nicht committet/gepusht (kein
+  Schreibzugriff in dieser Session) — Integration in `origin/main` steht
+  aus, inkl. eigener Code-Review für den `matcher.py`-Change (erste
+  produktive Erweiterung der `evaluate()`-Kernschleife seit Phase 11,
+  siehe Abschnitt 18).
+
+Abschnitt 20 gilt als **vorbereitet, Freigabe zur Übernahme steht aus.**

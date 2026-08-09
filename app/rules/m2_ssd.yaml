@@ -1,0 +1,84 @@
+category: "m2_ssd"
+label: "M.2 NVMe SSD"
+
+scan_priority: 7
+notify_max_price: 65
+
+search_terms:
+  - "M2 SSD"
+  - "M.2 SSD"
+  - "NVMe SSD"
+  - "1TB M2"
+  - "1TB NVMe"
+  - "2TB M2"
+  - "2TB NVMe"
+  - "Samsung 970"
+  - "Samsung 980"
+  - "WD Black"
+
+exclude_category:
+  - "sata" # grenzt normale 2,5-Zoll-SSDs strikt aus
+  - "2.5"
+  - "extern"
+  - "gehäuse"
+  - "adapter"
+  - "kühlkörper"
+  - "heatsink"
+  - "macbook"
+  - "gaming pc"
+  - "pc komplett"
+  - "laptop"
+  - "notebook"
+
+scoring_weights:
+  price: 0.85
+  ausstattung: 0
+  hardware_qualitaet: 0.15
+  hersteller: 0
+  zustand: 0
+  lieferumfang: 0
+
+rules:
+  # ============================================================
+  # 1TB M.2 NVMe SSD
+  # ============================================================
+  - label: "1TB M.2 NVMe SSD ★ Top-Deal"
+    price_history_model: "m2_ssd_1tb"
+    require_all_of:
+      - ["1tb", "1 tb", "1000gb", "1000 gb"]
+      - ["m2", "m.2", "nvme"]
+    min_vram_gb: 0
+    max_price: 30
+    deal_rating: "Top-Deal"
+    negotiation_tolerance_pct: 15.0
+
+  - label: "1TB M.2 NVMe SSD 👍 Guter Preis"
+    price_history_model: "m2_ssd_1tb"
+    require_all_of:
+      - ["1tb", "1 tb", "1000gb", "1000 gb"]
+      - ["m2", "m.2", "nvme"]
+    min_vram_gb: 0
+    max_price: 40
+    deal_rating: "Guter Preis"
+
+  # ============================================================
+  # 2TB M.2 NVMe SSD
+  # ============================================================
+  - label: "2TB M.2 NVMe SSD ★ Top-Deal"
+    price_history_model: "m2_ssd_2tb"
+    require_all_of:
+      - ["2tb", "2 tb", "2000gb", "2000 gb"]
+      - ["m2", "m.2", "nvme"]
+    min_vram_gb: 0
+    max_price: 60
+    deal_rating: "Top-Deal"
+
+  - label: "2TB M.2 NVMe SSD 👍 Guter Preis"
+    price_history_model: "m2_ssd_2tb"
+    require_all_of:
+      - ["2tb", "2 tb", "2000gb", "2000 gb"]
+      - ["m2", "m.2", "nvme"]
+    min_vram_gb: 0
+    max_price: 80
+    deal_rating: "Guter Preis"
+    

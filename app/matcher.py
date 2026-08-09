@@ -264,6 +264,17 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
         # angehängt, damit evaluate() sie ohne zusätzlichen Kategorie-
         # Lookup prüfen kann.
         category_excludes = cat_cfg.get("exclude_category", [])
+        # Optionaler Gegenpart zu exclude_global (_global.yaml): manche
+        # Kategorien bilden ausdrücklich Bastler-/Reparatur-Angebote ab
+        # (z.B. "PS5 Controller mit Stick Drift" als eigene, günstigere
+        # Deal-Klasse) und sollen dafür NICHT durch den globalen
+        # "defekt"/"bastler"-Ausschluss blockiert werden. exclude_global
+        # gilt weiterhin für ALLE Kategorien, die diesen Key nicht setzen
+        # (Default: leere Liste -> 100% identisches Verhalten zu vorher).
+        # Nur die hier explizit gelisteten Begriffe werden für diese
+        # Kategorie von der globalen Sperre ausgenommen -- alle anderen
+        # globalen Ausschlüsse (z.B. "tausch") greifen unverändert weiter.
+        category_ignore_global_excludes = cat_cfg.get("ignore_global_excludes", [])
         # Kategorie-eigene Deal-Score-Gewichte (optional). Manche Kategorien
         # (z.B. reine GPU-Angebote) haben strukturell andere Score-Komponenten
         # zur Verfügung als komplette PC-Systeme (siehe gpu.yaml-Kommentar) --
@@ -284,6 +295,7 @@ def _load_rules_from_dir(rules_dir: Path) -> dict:
             rule = dict(rule)  # Kopie, um das Original-YAML-Objekt nicht zu mutieren
             rule["_category"] = category_name
             rule["_category_exclude_terms"] = category_excludes
+            rule["_ignore_global_excludes"] = category_ignore_global_excludes
             rule["_scoring_weights"] = category_scoring_weights
             rule["_notify_max_price"] = category_notify_max_price
             merged_rules.append(rule)
@@ -794,15 +806,25 @@ def evaluate(
         "gpu_value_ratio_threshold_pct", DEFAULT_PART_OUT_THRESHOLD_PCT
     )
 
-    # 1. Globaler Ausschluss (defekt, bastler, etc.) -- gilt für ALLE Kategorien
-    if _any_term(title_l, global_excludes):
-        return MatchResult(matched=False)
+    # 1. Globaler Ausschluss (defekt, bastler, etc.) -- gilt für ALLE Kategorien,
+    #    AUSSER eine Kategorie hat den jeweiligen Begriff explizit über
+    #    "ignore_global_excludes" freigegeben (siehe load_rules()-Kommentar).
+    #    Schnellpfad unverändert: trifft KEIN globaler Ausschlussbegriff zu,
+    #    ist das Verhalten exakt wie vorher (kein Term-Match -> leere Liste
+    #    -> die Prüfung pro Regel unten greift nirgends, identisch zum alten
+    #    Verhalten inkl. Legacy-Einzeldatei-Modus, siehe Schritt 2 unten).
+    matched_global_excludes = [t for t in global_excludes if _contains_term(title_l, t)]
 
     # 2. Legacy-Einzeldatei-Modus (keine Kategorie-Information vorhanden):
     #    komplette PCs weiterhin unconditional ausschließen, exakt wie
-    #    im ursprünglichen Verhalten vor der Kategorie-Aufteilung.
-    if not directory_mode and _ist_kompletter_pc(title_l):
-        return MatchResult(matched=False)
+    #    im ursprünglichen Verhalten vor der Kategorie-Aufteilung. Auch hier
+    #    ändert sich nichts: ignore_global_excludes ist ein Kategorie-Feature
+    #    und existiert im Einzeldatei-Modus nicht.
+    if not directory_mode:
+        if matched_global_excludes:
+            return MatchResult(matched=False)
+        if _ist_kompletter_pc(title_l):
+            return MatchResult(matched=False)
 
     # 3. Regeln durchgehen
     for rule in rules_cfg.get("rules", []):
@@ -813,6 +835,17 @@ def evaluate(
         match_terms = rule.get("match", [])
         if match_terms and not _any_term(title_l, match_terms):
             continue
+
+        # Globaler Ausschluss (siehe oben) -- nur relevant, wenn Schritt 1
+        # überhaupt Treffer hatte. Eine Regel kommt nur dann trotz globalem
+        # Treffer weiter, wenn IHRE Kategorie ALLE getroffenen globalen
+        # Begriffe explizit via ignore_global_excludes freigegeben hat.
+        # Kategorien ohne diesen Key (Default: leere Liste) verhalten sich
+        # exakt wie vor dieser Änderung.
+        if matched_global_excludes:
+            rule_ignore = rule.get("_ignore_global_excludes", [])
+            if not set(matched_global_excludes).issubset(set(rule_ignore)):
+                continue
 
         # Kategorie-spezifischer Ausschluss (nur im Verzeichnis-Modus, z.B.
         # "kein komplettes PC-System" bei GPUs). Jede Kategorie bringt ihre

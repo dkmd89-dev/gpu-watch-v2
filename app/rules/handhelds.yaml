@@ -1,0 +1,155 @@
+category: "handhelds"
+label: "Handheld-Konsolen & PC-Handhelds"
+
+scan_priority: 9
+notify_max_price: 250
+
+search_terms:
+  - "Nintendo 3DS"
+  - "3DS XL"
+  - "New 3DS"
+  - "2DS XL"
+  - "PS Vita"
+  - "PSVita"
+  - "Steam Deck"
+  - "SteamDeck"
+  - "ROG Ally"
+  - "Lenovo Legion Go"
+
+exclude_category:
+  - "hülle"
+  - "case"
+  - "tasche"
+  - "schutzfolie"
+  - "glas"
+  - "grips"
+  - "sd karte"
+  - "dock"
+  - "ladestation"
+  - "ersatzteil"
+  - "display"
+  - "akku"
+  - "ovp nur"
+
+scoring_weights:
+  price: 0.85
+  ausstattung: 0
+  hardware_qualitaet: 0.15
+  hersteller: 0
+  zustand: 0
+  lieferumfang: 0
+
+rules:
+  # ============================================================
+  # NINTENDO 3DS / 2DS XL (Enorm begehrte Sammler/Flipping-Objekte)
+  # ============================================================
+  - label: "Nintendo New 3DS / 3DS XL / 2DS XL ★ Top-Deal"
+    price_history_model: "handheld_nintendo_3ds"
+    require_all_of:
+      - ["3ds", "2ds", "3dsxl", "2dsxl"]
+      - ["xl", "new 3ds", "new 2ds", "konsole"]
+    exclude:
+      - "defekt"
+      - "bastler"
+      - "ohne funktion"
+    min_vram_gb: 0
+    max_price: 65
+    deal_rating: "Top-Deal"
+
+  - label: "Nintendo New 3DS / 3DS XL / 2DS XL 👍 Guter Preis"
+    price_history_model: "handheld_nintendo_3ds"
+    require_all_of:
+      - ["3ds", "2ds", "3dsxl", "2dsxl"]
+      - ["xl", "new 3ds", "new 2ds", "konsole"]
+    exclude:
+      - "defekt"
+      - "bastler"
+    min_vram_gb: 0
+    max_price: 95
+    deal_rating: "Guter Preis"
+
+  # ============================================================
+  # SONY PS VITA (Sehr beliebt bei Sammlern / Homebrew)
+  # ============================================================
+  - label: "PlayStation Vita (PCH-1000 / PCH-2000) ★ Top-Deal"
+    price_history_model: "handheld_ps_vita"
+    require_all_of:
+      - ["ps vita", "psvita", "playstation vita"]
+    exclude:
+      - "defekt"
+      - "bastler"
+      - "hülle nur"
+      - "tasche"
+      - "display nur"
+      - "tv"
+    min_vram_gb: 0
+    max_price: 60
+    deal_rating: "Top-Deal"
+
+  - label: "PlayStation Vita (PCH-1000 / PCH-2000) 👍 Guter Preis"
+    price_history_model: "handheld_ps_vita"
+    require_all_of:
+      - ["ps vita", "psvita", "playstation vita"]
+    exclude:
+      - "defekt"
+      - "bastler"
+      - "hülle nur"
+      - "tasche"
+      - "display nur"
+      - "tv"
+    min_vram_gb: 0
+    max_price: 90
+    deal_rating: "Guter Preis"
+
+  # ============================================================
+  # VALVE STEAM DECK (LCD / OLED)
+  # ============================================================
+  - label: "Valve Steam Deck ★ Top-Deal"
+    price_history_model: "handheld_steam_deck"
+    require_all_of:
+      - ["steam deck", "steamdeck"]
+    exclude:
+      - "defekt"
+      - "bastler"
+      - "dock nur"
+    min_vram_gb: 0
+    max_price: 180
+    deal_rating: "Top-Deal"
+    negotiation_tolerance_pct: 15.0
+
+  - label: "Valve Steam Deck 👍 Guter Preis"
+    price_history_model: "handheld_steam_deck"
+    require_all_of:
+      - ["steam deck", "steamdeck"]
+    exclude:
+      - "defekt"
+      - "bastler"
+    min_vram_gb: 0
+    max_price: 240
+    deal_rating: "Guter Preis"
+
+  # ============================================================
+  # ASUS ROG ALLY / LEGION GO (High-End PC Handhelds)
+  # ============================================================
+  - label: "Asus ROG Ally / Lenovo Legion Go ★ Top-Deal"
+    price_history_model: "handheld_pc_preator"
+    require_all_of:
+      - ["rog ally", "legion go"]
+    exclude:
+      - "defekt"
+      - "bastler"
+      - "case"
+    min_vram_gb: 0
+    max_price: 250
+    deal_rating: "Top-Deal"
+
+  - label: "Asus ROG Ally / Lenovo Legion Go 👍 Guter Preis"
+    price_history_model: "handheld_pc_preator"
+    require_all_of:
+      - ["rog ally", "legion go"]
+    exclude:
+      - "defekt"
+      - "bastler"
+    min_vram_gb: 0
+    max_price: 330
+    deal_rating: "Guter Preis"
