@@ -57,6 +57,45 @@ def test_darth_revan_ohne_star_wars_erwaehnung_matcht_nicht_mehr():
     assert r.price_history_model != "lego_sw_rare"
 
 
+# ---------- lego_sw_clone: BUG-FIX (Phase 12, Schritt 4, gleiches Muster) ----------
+
+def test_marvel_figur_matcht_nicht_mehr_als_lego_sw_clone():
+    r = evaluate("LEGO Marvel Spider-Man Minifigur Clone Sammler selten", 20.0, _rules_cfg())
+    assert r.price_history_model != "lego_sw_clone"
+
+
+def test_echter_clone_trooper_matcht_weiterhin():
+    r = evaluate("LEGO Star Wars Clone Trooper 501st Minifigur", 25.0, _rules_cfg())
+    assert r.matched is True
+    assert r.price_history_model == "lego_sw_clone"
+
+
+# ---------- lego_ninjago_rare / lego_ninjago_bundle: BUG-FIX (Phase 12, Schritt 4) ----------
+
+def test_star_wars_konvolut_matcht_nicht_mehr_als_lego_ninjago_bundle():
+    r = evaluate("LEGO Star Wars Minifiguren Konvolut Sammlung 10 Stück", 30.0, _rules_cfg())
+    assert r.price_history_model != "lego_ninjago_bundle"
+
+
+def test_echte_ninjago_seltene_figur_matcht_weiterhin():
+    r = evaluate("LEGO Ninjago Minifigur Kai selten limited", 15.0, _rules_cfg())
+    assert r.matched is True
+    assert r.price_history_model == "lego_ninjago_rare"
+
+
+def test_echtes_ninjago_konvolut_matcht_weiterhin():
+    r = evaluate("LEGO Ninjago Minifiguren Konvolut Sammlung 20 Stück", 35.0, _rules_cfg())
+    assert r.matched is True
+    assert r.price_history_model == "lego_ninjago_bundle"
+
+
+def test_ninjago_rare_ohne_ninjago_erwaehnung_matcht_nicht_mehr():
+    # Regressionsschutz: "selten"+"minifigur"+"lego" allein (ohne
+    # "ninjago") darf nicht mehr ausreichen.
+    r = evaluate("LEGO Minifigur selten limited", 15.0, _rules_cfg())
+    assert r.price_history_model != "lego_ninjago_rare"
+
+
 # ---------- crt_profi_monitor: MATCHING-FIX (Werbung/Papierwaren ausschliessen) ----------
 
 def test_vintage_werbeanzeige_matcht_nicht_mehr_als_monitor():

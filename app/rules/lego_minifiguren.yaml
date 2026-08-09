@@ -200,9 +200,16 @@ rules:
   # NICHT Teil des explizit beauftragten Fix-Umfangs dieses Schritts
   # (nur lego_sw_rare war angefordert). Bewusst UNVERAENDERT gelassen,
   # als offener Punkt fuer einen separaten, spaeteren Schritt dokumentiert.
+  # BUG-FIX (Phase 12, Schritt 4): dasselbe strukturelle Muster wie bei
+  # lego_sw_rare (Schritt 3) -- ["lego", "star wars"] als EINE Gruppe
+  # bedeutet "mind. eines der beiden Woerter" (ODER), nicht "beide" (UND).
+  # Bestaetigt durch Live-Test: "LEGO Marvel Spider-Man Minifigur Clone
+  # Sammler selten" matchte bisher faelschlich als lego_sw_clone (Marvel,
+  # kein Star Wars). Fix: "lego" als eigene Gruppe.
   - label: "LEGO Star Wars – Clone Wars ★ Top-Deal"
     require_all_of:
-      - ["lego", "star wars"]
+      - ["lego"]
+      - ["star wars"]
       - ["clone wars", "clone trooper", "clone", "501st", "phase 2", "phase ii"]
     price_history_model: "lego_sw_clone"
     resale_price_group: "lego_rare_minifig_common"
@@ -211,7 +218,8 @@ rules:
 
   - label: "LEGO Star Wars – Clone Wars 👍 Guter Preis"
     require_all_of:
-      - ["lego", "star wars"]
+      - ["lego"]
+      - ["star wars"]
       - ["clone wars", "clone trooper", "clone", "501st", "phase 2", "phase ii"]
     price_history_model: "lego_sw_clone"
     resale_price_group: "lego_rare_minifig_common"
@@ -220,7 +228,8 @@ rules:
 
   - label: "LEGO Star Wars – Clone Wars ⚠️ Interessant"
     require_all_of:
-      - ["lego", "star wars"]
+      - ["lego"]
+      - ["star wars"]
       - ["clone wars", "clone trooper", "clone", "501st", "phase 2", "phase ii"]
     price_history_model: "lego_sw_clone"
     resale_price_group: "lego_rare_minifig_common"
@@ -265,9 +274,14 @@ rules:
   # NINJAGO – ältere / seltene / exklusive Figuren
   # ============================================================
 
+  # BUG-FIX (Phase 12, Schritt 4): dasselbe strukturelle Muster wie bei
+  # lego_sw_rare (Schritt 3) -- ["lego", "ninjago"] als EINE Gruppe
+  # bedeutet "mind. eines der beiden Woerter" (ODER), nicht "beide" (UND).
+  # Fix: "lego" als eigene Gruppe.
   - label: "LEGO Ninjago – seltene Figur ★ Top-Deal"
     require_all_of:
-      - ["lego", "ninjago"]
+      - ["lego"]
+      - ["ninjago"]
       - ["minifigur", "minifig", "figur"]
       - ["rar", "selten", "exclusive", "exklusiv", "limited", "sammler", "alt"]
     price_history_model: "lego_ninjago_rare"
@@ -277,7 +291,8 @@ rules:
 
   - label: "LEGO Ninjago – seltene Figur 👍 Guter Preis"
     require_all_of:
-      - ["lego", "ninjago"]
+      - ["lego"]
+      - ["ninjago"]
       - ["minifigur", "minifig", "figur"]
       - ["rar", "selten", "exclusive", "exklusiv", "limited", "sammler", "alt"]
     price_history_model: "lego_ninjago_rare"
@@ -287,7 +302,8 @@ rules:
 
   - label: "LEGO Ninjago – seltene Figur ⚠️ Interessant"
     require_all_of:
-      - ["lego", "ninjago"]
+      - ["lego"]
+      - ["ninjago"]
       - ["minifigur", "minifig", "figur"]
       - ["rar", "selten", "exclusive", "exklusiv", "limited", "sammler", "alt"]
     price_history_model: "lego_ninjago_rare"
@@ -295,9 +311,11 @@ rules:
     max_price: 35
     deal_rating: "Interessant"
 
+  # BUG-FIX (Phase 12, Schritt 4): siehe seltene-Figur-Regeln oben.
   - label: "LEGO Ninjago – Figuren-Konvolut ★ Top-Deal"
     require_all_of:
-      - ["lego", "ninjago"]
+      - ["lego"]
+      - ["ninjago"]
       - ["figuren", "minifiguren", "minifigs"]
       - ["konvolut", "sammlung", "posten", "lot"]
     price_history_model: "lego_ninjago_bundle"
@@ -307,7 +325,8 @@ rules:
 
   - label: "LEGO Ninjago – Figuren-Konvolut 👍 Guter Preis"
     require_all_of:
-      - ["lego", "ninjago"]
+      - ["lego"]
+      - ["ninjago"]
       - ["figuren", "minifiguren", "minifigs"]
       - ["konvolut", "sammlung", "posten", "lot"]
     price_history_model: "lego_ninjago_bundle"
@@ -317,7 +336,8 @@ rules:
 
   - label: "LEGO Ninjago – Figuren-Konvolut ⚠️ Interessant"
     require_all_of:
-      - ["lego", "ninjago"]
+      - ["lego"]
+      - ["ninjago"]
       - ["figuren", "minifiguren", "minifigs"]
       - ["konvolut", "sammlung", "posten", "lot"]
     price_history_model: "lego_ninjago_bundle"
