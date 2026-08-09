@@ -694,6 +694,18 @@ def run_scan():
                         if result.estimated_margin_pct is not None
                         else None
                     ),
+                    # Dashboard-Transparenz (Auftrag "Angebotswert + Marktwert
+                    # + geschaetzter Verkaufspreis"): additive Durchreichung
+                    # des bereits in matcher.evaluate() berechneten Werts
+                    # (siehe MatchResult.estimated_resale_price-Docstring).
+                    # KEINE neue Berechnung. None, wenn keine Preishistorie
+                    # vorliegt -- Template zeigt dann "nicht verfügbar" statt
+                    # den Wert auszublenden (siehe index.html).
+                    "estimated_resale_price": (
+                        round(result.estimated_resale_price, 0)
+                        if result.estimated_resale_price is not None
+                        else None
+                    ),
                     # Phase 11, Punkt A (robuste Flip-Kandidat-Qualifikation):
                     # Confidence der PriceStats-Quelle hinter estimated_
                     # resale_price/estimated_margin_*. Additives Feld, siehe

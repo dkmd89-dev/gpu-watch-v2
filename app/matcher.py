@@ -115,6 +115,16 @@ class MatchResult:
     part_out_gpu_value: float | None = None
     part_out_ratio_pct: float | None = None
     is_part_out_candidate: bool = False
+    # Dashboard-Transparenz (Auftrag "Angebotswert + Marktwert + geschaetzter
+    # Verkaufspreis"): der in evaluate() bereits fuer compute_profit()
+    # berechnete Reselling-Schaetzwert (siehe _resale_prices_from_stats()-
+    # Aufrufer unten), zusaetzlich additiv auf MatchResult mitgegeben, statt
+    # wie bisher nur lokal verwendet und danach verworfen zu werden. KEINE
+    # neue Berechnung -- identischer Wert, der bereits estimated_margin_eur/
+    # -pct zugrunde liegt. None, wenn keine Preishistorie/Resale-Schaetzung
+    # vorliegt (identische Bedingung wie bei estimated_margin_eur). Additives
+    # Feld mit Default, bestehender Code bleibt unveraendert lauffaehig.
+    estimated_resale_price: float | None = None
 
 
 def load_rules(path: str = "rules.yaml") -> dict:
@@ -1072,6 +1082,11 @@ def evaluate(
             part_out_gpu_value=part_out_gpu_value,
             part_out_ratio_pct=part_out_ratio_pct,
             is_part_out_candidate=is_part_out_candidate,
+            # Dashboard-Transparenz: derselbe Wert, der oben bereits an
+            # compute_profit()/compute_deal_score() uebergeben wurde (siehe
+            # estimated_resale_price weiter oben in dieser Funktion) --
+            # KEINE neue Berechnung, nur additive Durchreichung.
+            estimated_resale_price=estimated_resale_price,
         )
 
     return MatchResult(matched=False)

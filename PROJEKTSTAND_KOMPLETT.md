@@ -8,6 +8,14 @@
 > Working Tree clean, keine unversionierten Änderungen.
 > Ersetzt/ergänzt `PHASE_0_ANALYSE_VERIFIZIERT.md`.
 >
+> **Update (2026-08-09): Dashboard-Transparenz `estimated_resale_price` +
+> Marktwert/Rabatt-Entkopplung von `is_top_deal`, committet (`2fd41a8`).**
+> Additive Durchreichung von `MatchResult.estimated_resale_price` bis ins
+> Dashboard, 9 neue Tests (899/899 grün). Details: Abschnitt 24.
+> **Hinweis:** Commit ist nur LOKAL in dieser Session vorhanden — keine
+> Push-Rechte auf `origin/main`. Robin muss die Datei-Änderungen bzw. den
+> Commit selbst nach `origin/main` übertragen.
+>
 > **Update (2026-08-08, nach Root-Cause-Fix der 2 Testfehler):** Beide unten
 > beschriebenen Testfehler waren **Test-eigene Defekte, kein App-Bug**
 > (Details siehe Git-Historie: Fixture ohne `fingerprint` wurde von
@@ -1574,3 +1582,63 @@ Cache-Layer ergänzt), `app/tests/test_category_validation_cache.py`
   mögliche weitere Performance-Stufen offen, nur bei Bedarf.
 
 Hotfix (Layer 1) gilt damit als abgeschlossen.
+
+## 24. Dashboard-Transparenz: `estimated_resale_price` + Marktwert/Rabatt-Entkopplung von `is_top_deal` — ABGESCHLOSSEN
+
+Eigenständiger, separat freigegebener Auftrag ("Angebotswert + Marktwert +
+geschätzter Verkaufspreis"): Deal-Karten sollten die wirtschaftliche
+Situation eines Angebots klarer darstellen (💰 Angebot / 📊 Marktwert /
+🏷️ Verkaufspreis geschätzt / 📈 Rabatt / 💵 Gewinn / 📈 Marge /
+⭐ Deal Score), ausschließlich unter Wiederverwendung bereits vorhandener
+Backend-Werte — keine neue Berechnungslogik.
+
+**Analyse-Ergebnis (vor Umsetzung verifiziert):** `estimated_margin_eur`,
+`estimated_margin_pct`, `deal_score`, `top_deal_market_price`,
+`top_deal_discount_pct` waren bereits in `found.json`/API vorhanden.
+`top_deal_market_price`/`top_deal_discount_pct` waren im Dashboard jedoch
+an `is_top_deal` gekoppelt (nur sichtbar mit Bestpreis-Badge). Einzige
+echte Lücke: `estimated_resale_price` wurde in `matcher.evaluate()`
+(lokale Variable, Zeile ~959/961) berechnet und an `compute_profit()`
+übergeben, aber nie auf `MatchResult` mitgegeben — landete daher nie in
+`found.json`, nie in der API, nie im Dashboard.
+
+**Umsetzung (rein additiv, kleinstmöglicher Eingriff):**
+- `matcher.py`: `MatchResult.estimated_resale_price: float | None = None`
+  ergänzt; `evaluate()` gibt beim `return` den bereits berechneten
+  lokalen Wert mit — keine zweite/abweichende Berechnung.
+- `app.py`: Feld analog zu `estimated_margin_eur` in den `entry`-Dict
+  übernommen (gerundet, `None`-sicher).
+- `api/deals.py`: **keine Änderung nötig** — `/` und `/api/found` reichen
+  `found.json`-Einträge 1:1 durch, neues Feld ist automatisch verfügbar.
+- `templates/index.html` (Jinja + `renderCardHtml()` JS, synchron):
+  - `📊 Marktwert`/`📈 Rabatt` als neue kompakte `.value-line`-Zeilen, aber
+    nur wenn **nicht** `is_top_deal` (die bestehende, ausführlichere
+    `.top-deal-detail`-Zeile zeigt beides bereits für Top-Deal-Karten —
+    keine Dopplung).
+  - `🏷️ Verkaufspreis geschätzt`: neue Zeile, zeigt bei fehlendem Wert
+    bewusst „nicht verfügbar" statt die Zeile auszublenden oder einen
+    Wert zu erfinden.
+  - `⭐ Deal Score: XX`: neue numerische Zeile zusätzlich zu den
+    bestehenden Sternen.
+  - 3 neue CSS-Klassen (`.value-line`, `.value-line.muted`, `.score-line`),
+    gleiche kompakte Größe wie die bestehende `.margin`-Klasse.
+
+**Nicht verändert (bewusst, laut Auftrag):** Deal-Score-Engine,
+Top-Deal-Logik, Flip-Logik, Resale-Berechnung (`scoring/profit.py`),
+Preisgrenzen, Price-History, Matcher-Kernlogik (außer additivem Feld),
+Scraper, Notification-Gate.
+
+**Tests:** 9 neue Tests —
+`tests/test_matcher_estimated_resale_price_field.py` (4, Matcher-Ebene:
+Wert gesetzt / None ohne Historie / None bei explizitem
+Datenqualitäts-Fallback / kein Match) und
+`tests/test_app_resale_price_field.py` (5, App/API/Dashboard-Ebene:
+vollständige Daten in `found.json` / None-Fallback ohne falsche Marge /
+`/api/found`-Durchreichung / Dashboard-Rendering mit Wert / Dashboard-
+Rendering mit „nicht verfügbar"-Fallback + bestehende Karte intakt).
+Gesamtergebnis: **899 passed, 0 failed** (vorher 890/890).
+
+**Commit:** `2fd41a8 feat(dashboard): estimated_resale_price additiv
+durchreichen + Marktwert/Rabatt vom is_top_deal-Gate entkoppelt` — nur
+lokal in dieser Session, kein Push nach `origin/main` möglich (siehe
+Abschnitt 19/20-Präzedenzfall: keine Schreibrechte).

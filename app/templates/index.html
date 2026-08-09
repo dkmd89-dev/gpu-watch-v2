@@ -296,6 +296,12 @@
     .margin { font-size: 0.78rem; font-weight: 600; margin-top: 0.1rem; }
     .margin.positive { color: var(--green); }
     .margin.negative { color: var(--red); }
+    /* Dashboard-Transparenz (Auftrag "Angebotswert + Marktwert + geschaetzter
+       Verkaufspreis"): kompakte Zeilen fuer Marktwert/Verkaufspreis/Rabatt --
+       bewusst gleiche kompakte Groesse wie .margin, kein neuer Kartenbereich. */
+    .value-line { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.05rem; }
+    .value-line.muted { font-style: italic; opacity: 0.75; }
+    .score-line { font-size: 0.78rem; font-weight: 600; color: var(--amber); margin-top: 0.1rem; }
     /* Top-Deal-Transparenz (Abschnitt 19): kompakte Einzeiler-Zeile,
        zeigt Score/Preis/Marktwert/Rabatt/Regel -- nur bei is_top_deal. */
     .top-deal-detail {
@@ -835,12 +841,37 @@
         <span class="price">{{ "%.0f"|format(f.price) }} €</span>
       </div>
       {% if f.deal_stars %}<div class="stars">{{ f.deal_stars }}</div>{% endif %}
+      {#- Dashboard-Transparenz (Auftrag "Angebotswert + Marktwert +
+          geschaetzter Verkaufspreis"): Marktwert/Rabatt hier NICHT mehr an
+          is_top_deal gekoppelt (nur die bestehende, ausfuehrlichere
+          .top-deal-detail-Zeile oben bleibt is_top_deal-exklusiv, um
+          Dopplung auf Top-Deal-Karten zu vermeiden). Verkaufspreis-Zeile
+          zeigt bei fehlendem Wert bewusst "nicht verfügbar" statt die
+          Zeile auszublenden (kein erfundener Wert, aber transparent
+          sichtbar) -- alle Werte kommen 1:1 aus found.json, keine neue
+          Berechnung. #}
+      {%- if not f.is_top_deal and f.top_deal_market_price is defined and f.top_deal_market_price is not none %}
+      <div class="value-line">📊 Marktwert: {{ "%.0f"|format(f.top_deal_market_price) }} €</div>
+      {%- endif %}
+      {%- if f.estimated_resale_price is defined %}
+        {%- if f.estimated_resale_price is not none %}
+      <div class="value-line">🏷️ Verkaufspreis geschätzt: {{ "%.0f"|format(f.estimated_resale_price) }} €</div>
+        {%- else %}
+      <div class="value-line muted">🏷️ Verkaufspreis geschätzt: nicht verfügbar</div>
+        {%- endif %}
+      {%- endif %}
+      {%- if not f.is_top_deal and f.top_deal_discount_pct is defined and f.top_deal_discount_pct is not none %}
+      <div class="value-line">📈 Rabatt: {{ "%.0f"|format(f.top_deal_discount_pct) }} %</div>
+      {%- endif %}
       {%- if f.estimated_margin_eur is defined and f.estimated_margin_eur is not none %}
       <div class="margin {{ 'positive' if f.estimated_margin_eur >= 0 else 'negative' }}">
         💰 {{ "%+.0f"|format(f.estimated_margin_eur) }} €
         {%- if f.estimated_margin_pct is not none %} ({{ "%+.0f"|format(f.estimated_margin_pct) }}%){% endif %}
         geschätzte Marge
       </div>
+      {%- endif %}
+      {%- if f.deal_score is defined and f.deal_score is not none %}
+      <div class="score-line">⭐ Deal Score: {{ f.deal_score }}</div>
       {%- endif %}
       <div class="meta">
         {%- set _src = f.source or 'unbekannt' -%}
@@ -1368,6 +1399,31 @@
         marginHtml = `<div class="margin ${cls}">💰 ${sign}${marginEur.toFixed(0)} €${pctText} geschätzte Marge</div>`;
       }
 
+      // Dashboard-Transparenz (Auftrag "Angebotswert + Marktwert +
+      // geschaetzter Verkaufspreis"): analog zum Jinja-Pfad oben --
+      // Marktwert/Rabatt nur bei NICHT is_top_deal (Dopplung mit
+      // topDealDetailHtml vermeiden), Verkaufspreis mit explizitem
+      // "nicht verfügbar"-Fallback statt Zeile auszublenden.
+      let valueLinesHtml = '';
+      if (!f.is_top_deal && f.top_deal_market_price !== undefined && f.top_deal_market_price !== null) {
+        valueLinesHtml += `<div class="value-line">📊 Marktwert: ${Number(f.top_deal_market_price).toFixed(0)} €</div>`;
+      }
+      if (f.estimated_resale_price !== undefined) {
+        if (f.estimated_resale_price !== null) {
+          valueLinesHtml += `<div class="value-line">🏷️ Verkaufspreis geschätzt: ${Number(f.estimated_resale_price).toFixed(0)} €</div>`;
+        } else {
+          valueLinesHtml += `<div class="value-line muted">🏷️ Verkaufspreis geschätzt: nicht verfügbar</div>`;
+        }
+      }
+      if (!f.is_top_deal && f.top_deal_discount_pct !== undefined && f.top_deal_discount_pct !== null) {
+        valueLinesHtml += `<div class="value-line">📈 Rabatt: ${Number(f.top_deal_discount_pct).toFixed(0)} %</div>`;
+      }
+
+      let scoreLineHtml = '';
+      if (f.deal_score !== undefined && f.deal_score !== null) {
+        scoreLineHtml = `<div class="score-line">⭐ Deal Score: ${escapeHtml(String(f.deal_score))}</div>`;
+      }
+
       const metaParts = [`${escapeHtml(source)} · ${escapeHtml(f.location || '')}`];
       if (f.category) metaParts.push(escapeHtml(f.category));
       if (f.manufacturer) metaParts.push(escapeHtml(f.manufacturer));
@@ -1398,7 +1454,9 @@
       </div>
       ${starsHtml}
       ${topDealDetailHtml}
+      ${valueLinesHtml}
       ${marginHtml}
+      ${scoreLineHtml}
       <div class="meta"><i class="platform-icon ${iconInfo.icon}" style="color: ${iconInfo.color};" title="${escapeHtml(source)}"></i>${metaParts.join(' · ')}${foundAtHtml}
       </div>
       <a href="${escapeHtml(f.url || '#')}" target="_blank">Zum Angebot →</a>
