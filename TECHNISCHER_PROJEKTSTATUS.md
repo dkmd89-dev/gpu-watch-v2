@@ -6,11 +6,11 @@
 > Repository: `dkmd89-dev/gpu-watch-v2`
 > Branch: `main`
 > **Letzter Code-Commit:** `fa218a0826f3b8ae6868c0228c1267a5cd861265`
-> **Letzter Code-Commit:** `fix: reduce false positives across five categories`
+> **Commit:** `fix: reduce false positives across five categories`
 > Ausgangspunkt dieser Konsolidierung: `d2effe7`
 > Vergleich: **61 Commits ahead, 0 behind**
 >
-> Seit `fa218a0` wurden ausschließlich die Dokumentationsänderungen dieser Konsolidierung auf `main` geschrieben. Der technische Code-Stand bleibt daher `fa218a0`.
+> Seit `fa218a0` wurden ausschließlich Dokumentationsänderungen vorgenommen. Der technische Code-Stand bleibt daher `fa218a0`.
 >
 > Diese Datei ersetzt `PROJEKTSTAND_KOMPLETT.md`. Historische Phasenberichte bleiben als Detaildokumentation erhalten; widersprüchliche ältere Ist-Stand-Angaben gelten nicht mehr als aktuell.
 
@@ -36,7 +36,7 @@ Datum: 2026-08-09
 Vergleich d2effe7...fa218a0: 61 Commits ahead, 0 behind
 ```
 
-PR #6 wurde am 2026-08-09 gemergt. Die danach folgenden Commits betreffen ausschließlich die hier vorgenommene Dokumentationskonsolidierung.
+PR #6 wurde am 2026-08-09 gemergt. Die danach folgenden Commits betreffen ausschließlich die Dokumentationskonsolidierung.
 
 ### Teststand
 
@@ -95,7 +95,7 @@ Der Matcher wurde in mehreren kleinen Schritten robuster gemacht:
 
 Das YAML-Regelwerk bleibt die primäre Erweiterungsebene. Neue Kategorien können innerhalb der vorhandenen Matcher-/Detector-Primitive ohne Python-Code ergänzt werden. Neue Detector-Typen erfordern weiterhin Python-Code.
 
-### 3.3 Neue bzw. aktualisierte Kategorien
+### 3.3 Aktive Kategorien
 
 Der aktuelle Stand enthält 19 aktive Kategorien. `_global.yaml` ist dabei keine Kategorie.
 
@@ -284,7 +284,6 @@ Folgende Punkte sind **nicht** durch die Konsolidierung als abgeschlossen zu bet
 
 Die folgenden Dokumente bleiben als Detail-/Arbeitsnachweise bestehen:
 
-- `PHASE15_OPTIMIERUNG.md`
 - `document/PHASE13_VALIDATION_REPORT.md`
 - `document/PHASE14_DATA_QUALITY_REPORT.md`
 - `document/PHASE15_COMPLETION_REPORT.md`
