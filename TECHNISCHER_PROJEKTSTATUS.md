@@ -5,13 +5,13 @@
 > Stand: **2026-08-10**
 > Repository: `dkmd89-dev/gpu-watch-v2`
 > Branch: `main`
-> **Letzter Code-Commit:** `3eed07f8823d1a62e8137b63f26c57f7b0a89de1`
-> **Commit:** `fix: Plattformbegriff/Mainboard/Zubehör-Fehltreffer in drei Kategorien beheben`
-> **HEAD (main, inkl. Doku-Commits):** `0757580aac4c0c579edf2fc160cb6207aabdfa38`
+> **Letzter Code-Commit:** `ca4b35be153c1982187fcae09e5c99b55fbf2b25` (PR #8, squash-gemergt)
+> **Commit:** `fix(konsolen_bundles): GameCube-Controller- und Plattform-Bindestrich-Fehltreffer ausschließen (#8)`
+> **HEAD (main):** `ca4b35be153c1982187fcae09e5c99b55fbf2b25`
 > Ausgangspunkt dieser Konsolidierung: `d2effe7`
-> Vergleich: **61 Commits ahead, 0 behind** bis `fa218a0`; danach `3eed07f` (Code) + 4 reine Doku-/Chore-Commits bis `0757580`
+> Vergleich: **61 Commits ahead, 0 behind** bis `fa218a0`; danach `3eed07f` (Code) + 4 reine Doku-/Chore-Commits bis `0757580`; danach PR #8 (squash) bis `ca4b35b`
 >
-> Seit `3eed07f` wurden auf `main` ausschließlich Dokumentationsänderungen vorgenommen. Der technische Code-Stand von `main` ist daher `3eed07f`. Ein separater, noch nicht gemergter Fix-Batch liegt auf Branch `claude/dashboard-match-validation-q5g86t` (siehe Abschnitt 3.8).
+> PR #8 (Dashboard-Match-Validierung Variante C, siehe Abschnitt 3.8) ist gemergt. Der technische Code-Stand von `main` ist damit `ca4b35b`.
 >
 > Diese Datei ersetzt `PROJEKTSTAND_KOMPLETT.md`. Historische Phasenberichte bleiben als Detaildokumentation erhalten; widersprüchliche ältere Ist-Stand-Angaben gelten nicht mehr als aktuell.
 
@@ -31,15 +31,16 @@ Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und ko
 
 ```text
 Branch: main
-Letzter Code-Commit: 3eed07f
-Commit: fix: Plattformbegriff/Mainboard/Zubehör-Fehltreffer in drei Kategorien beheben
+Letzter Code-Commit: ca4b35b (PR #8, squash-gemergt)
+Commit: fix(konsolen_bundles): GameCube-Controller- und Plattform-Bindestrich-Fehltreffer ausschließen (#8)
 Datum: 2026-08-10
-HEAD (main, inkl. Doku-Commits): 0757580
+Davor: 3eed07f (fix: Plattformbegriff/Mainboard/Zubehör-Fehltreffer in drei Kategorien beheben)
 Vergleich d2effe7...fa218a0: 61 Commits ahead, 0 behind
-fa218a0..3eed07f: 1 Code-Commit; 3eed07f..0757580: 4 reine Doku-/Chore-Commits
+fa218a0..3eed07f: 1 Code-Commit; 3eed07f..0757580: 4 reine Doku-/Chore-Commits;
+0757580..ca4b35b: PR #8 (squash, 3 Commits)
 ```
 
-PR #6 wurde am 2026-08-09 gemergt. `3eed07f` wurde direkt gegen `main` committet (kein separater PR-Merge-Vorgang dokumentiert). Die danach folgenden Commits betreffen ausschließlich die Dokumentationskonsolidierung.
+PR #6 wurde am 2026-08-09 gemergt. `3eed07f` wurde direkt gegen `main` committet (kein separater PR-Merge-Vorgang dokumentiert). PR #8 (Abschnitt 3.8) wurde am 2026-08-10 als Squash-Merge gemergt.
 
 ### Teststand
 
@@ -168,18 +169,20 @@ Gezielt korrigiert wurden:
 
 Die Fixes verwenden vorhandene YAML-Primitiven und den bestehenden kontextbewussten Exclude-Mechanismus; es wurde kein neuer generischer Matcher-Mechanismus eingeführt.
 
-### 3.8 Dashboard-Match-Validierung Variante C (in Arbeit, PR #8, nicht gemergt)
+### 3.8 Dashboard-Match-Validierung Variante C (abgeschlossen, PR #8 gemergt)
 
-Branch `claude/dashboard-match-validation-q5g86t`. Ausgangspunkt: Live-Verifikation der Dashboard-Instanz (`romajagijo.zapto.org`) gegen den `3eed07f`-Fix, ausschließlich über öffentliche HTTP-Endpunkte (`/`, `/api/status`, `/api/found`) — kein SSH-/Docker-Zugriff auf den Produktionshost verfügbar, Git-Commit/Deploy-Zeitpunkt der Live-Instanz daher nicht direkt beweisbar.
+Branch `claude/dashboard-match-validation-q5g86t`, gemergt als Squash-Commit `ca4b35b`. Ausgangspunkt: Live-Verifikation der Dashboard-Instanz (`romajagijo.zapto.org`) gegen den `3eed07f`-Fix, ausschließlich über öffentliche HTTP-Endpunkte (`/`, `/api/status`, `/api/found`) — kein SSH-/Docker-Zugriff auf den Produktionshost verfügbar, Git-Commit/Deploy-Zeitpunkt der Live-Instanz daher nicht direkt beweisbar.
 
-Ergebnis: zwei verbleibende `konsolen_bundles`-Match-Lücken nach `3eed07f` identifiziert und einzeln bewertet:
+Ergebnis: zwei `konsolen_bundles`-Match-Lücken nach `3eed07f` identifiziert und **beide geschlossen**:
 
-1. **"GameCube Controller" ohne "für"/"pro controller"** (z.B. "Nintendo Switch 2 GameCube Controller | OVP | NEU") — **geschlossen**. `app/rules/konsolen_bundles.yaml`: neuer Eintrag unter `exclude_category_unless_preceded_by`, identisches Muster wie der bereits produktive "pro controller"-Eintrag (YAML-Anker `*bundle_konnektoren`), kein neuer Matcher-Code. Verifiziert gegen den vollständigen 318-Fingerprint-Korpus für `konsolen_bundles` aus `data/price_history.jsonl`: genau 2 Treffer ändern sich (beide reale, vorher fälschlich matchende Zubehör-Angebote), 0 Kollisionen mit echten Bundles.
-2. **"Spieltitel + Plattform ohne 'für'"** (z.B. "Nintendo Switch - Minecraft FRA mit OVP", real bestätigt u.a. auch bei "Donkey Kong Bananza", "Metroid Prime Remastered") — **bewusst nicht geschlossen** (Nutzerentscheidung, Option 1: als dokumentierte Restlücke offen lassen). Eine Lösung würde entweder die bereits geschützte Design-Entscheidung "OVP bleibt Positivsignal auch ohne Geräte-Marker" (`3eed07f`) umkehren oder Einzelspieltitel als Excludes sammeln — beides im Projekt bereits explizit verworfen. Braucht eine eigene, separat freigegebene, datengetestete Review-Runde.
+1. **"GameCube Controller" ohne "für"/"pro controller"** (z.B. "Nintendo Switch 2 GameCube Controller | OVP | NEU") — `app/rules/konsolen_bundles.yaml`: neuer Eintrag unter `exclude_category_unless_preceded_by`, identisches Muster wie der bereits produktive "pro controller"-Eintrag (YAML-Anker `*bundle_konnektoren`), kein neuer Matcher-Code. Verifiziert gegen den vollständigen 318-Fingerprint-Korpus für `konsolen_bundles` aus `data/price_history.jsonl`: genau 2 Treffer ändern sich (beide reale, vorher fälschlich matchende Zubehör-Angebote), 0 Kollisionen mit echten Bundles.
+2. **"Plattform + Bindestrich" ohne "für"** (z.B. "Nintendo Switch - Minecraft FRA mit OVP", real bestätigt in `price_history.jsonl`) — zunächst dokumentiert offen gelassen (Nutzerentscheidung, "Option 1"), danach in einer separaten Review-Runde (Schritt 2, auf Ansage des Nutzers) geschlossen: `matcher.py::_contains_term()` prüft den Titel nur per `.lower()`, ohne Interpunktion zu entfernen — der Bindestrich ist damit regulärer Bestandteil eines `exclude_category_unless_also_contains`-Schlüssels, exakt derselbe Mechanismus wie bei "für Plattform", kein neuer Matcher-Code. Beide Strich-Varianten ("-"/"–") abgedeckt. Verifiziert gegen den 318-Fingerprint-Korpus UND einen zusätzlich für diese Review-Runde erschlossenen 186-Titel-Rohkorpus aus `data/gpu_watch.log.{1,2}` (mit erhaltener Interpunktion, da normalisierte Fingerprints Bindestriche verschlucken) — 0 Kollisionen in beiden. Zwei echte Bundle-Titel treffen das neue Muster wörtlich, bleiben aber durch vorhandene Geräte-Marker über die bestehende Ausnahme unverändert erhalten.
 
-Testabdeckung: `app/tests/test_konsolen_bundles_plattform_referenz_fix.py` aktualisiert (18/18 bestanden, manuell per Funktionsaufruf verifiziert, siehe Teststand-Hinweis oben). 8 weitere themennahe Testdateien ebenso manuell geprüft: 194 bestanden, 5 Fehlschläge — ausschließlich durch fehlende Module (`flask`) im Sandbox-Container, nicht durch die Änderung verursacht.
+Beide Fixes verwenden ausschließlich bereits produktive YAML-Primitiven; es wurde kein neuer generischer Matcher-Mechanismus eingeführt.
 
-**Offener Punkt:** PR #8 wurde ohne Merge geschlossen. Der GameCube-Controller-Fix ist damit noch **nicht** Teil von `main`. Weiteres Vorgehen (PR #8 reopen oder neuer PR) ist mit dem Auftraggeber zu klären, bevor dieser Abschnitt als abgeschlossen gilt.
+**Neue, kleinere Restlücke (bewusst nicht geschlossen):** Spieltitel VOR der Plattform OHNE nachfolgenden Bindestrich (z.B. "Donkey Kong Bananza Nintendo Switch 2 2025 OVP", "Metroid Prime Remastered Nintendo Switch 2023 gebraucht in OVP") — dafür gibt es kein Substring-Muster, das nicht auch echte Geräte-Titel träfe; als dokumentierter Testfall festgehalten (`test_bekannte_restluecke_spieltitel_vor_plattform_ohne_bindestrich`).
+
+Testabdeckung: `app/tests/test_konsolen_bundles_plattform_referenz_fix.py` (23/23 bestanden, manuell per Funktionsaufruf verifiziert, siehe Teststand-Hinweis oben, da `pytest` in der Sandbox nicht installierbar war). 8 weitere themennahe Testdateien ebenso manuell geprüft: 194 bestanden, 5 Fehlschläge — ausschließlich durch fehlende Module (`flask`/`pytest`) im Sandbox-Container, nicht durch die Änderung verursacht. `rule_analyzer.py`: 0 Findings.
 
 ---
 
@@ -260,8 +263,7 @@ Folgende Punkte sind **nicht** durch die Konsolidierung als abgeschlossen zu bet
 4. Datenqualitätswarnungen für Kategorien, Regeln und Preisverteilungen sollten langfristig automatisiert werden.
 5. Cross-Platform-Duplicate-Identity ist weiter ausbaufähig.
 6. Die dokumentierten Phase-15-Restlücken (`rx_7600_xt`, `controller.yaml`/`ladekabel`) warten auf eine bewusst getrennte Regeländerung.
-7. `konsolen_bundles`: "Spieltitel + Plattform ohne 'für'"-Restlücke (Abschnitt 3.8) — bewusst offen, braucht eigene datengetestete Review-Runde.
-8. PR #8 (Dashboard-Match-Validierung Variante C, GameCube-Controller-Fix) ist ohne Merge geschlossen — noch nicht Teil von `main`.
+7. `konsolen_bundles`: "Spieltitel VOR Plattform ohne Bindestrich"-Restlücke (Abschnitt 3.8, z.B. "Donkey Kong Bananza Nintendo Switch 2 2025 OVP") — bewusst offen, kein kollisionsfreies Substring-Muster identifiziert.
 
 ---
 
@@ -308,4 +310,4 @@ Die folgenden Dokumente bleiben als Detail-/Arbeitsnachweise bestehen:
 - `document/PRICE_CALIBRATION_REVIEW_V2.md`
 - `document/PRICE_CALIBRATION_APPLIED.md`
 
-Diese Dokumente liefern historische Details. Für den **aktuellen technischen Code-Stand** ist der Code-Commit `fa218a0` maßgeblich; für die technische Projektreferenz ist diese Datei maßgeblich.
+Diese Dokumente liefern historische Details. Für den **aktuellen technischen Code-Stand** ist der Code-Commit `ca4b35b` maßgeblich; für die technische Projektreferenz ist diese Datei maßgeblich.
