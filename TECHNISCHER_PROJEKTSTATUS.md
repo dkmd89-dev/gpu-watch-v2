@@ -5,10 +5,12 @@
 > Stand: **2026-08-10**
 > Repository: `dkmd89-dev/gpu-watch-v2`
 > Branch: `main`
-> HEAD: `fa218a0826f3b8ae6868c0228c1267a5cd861265`
-> HEAD-Commit: `fix: reduce false positives across five categories`
+> **Letzter Code-Commit:** `fa218a0826f3b8ae6868c0228c1267a5cd861265`
+> **Letzter Code-Commit:** `fix: reduce false positives across five categories`
 > Ausgangspunkt dieser Konsolidierung: `d2effe7`
 > Vergleich: **61 Commits ahead, 0 behind**
+>
+> Seit `fa218a0` wurden ausschließlich die Dokumentationsänderungen dieser Konsolidierung auf `main` geschrieben. Der technische Code-Stand bleibt daher `fa218a0`.
 >
 > Diese Datei ersetzt `PROJEKTSTAND_KOMPLETT.md`. Historische Phasenberichte bleiben als Detaildokumentation erhalten; widersprüchliche ältere Ist-Stand-Angaben gelten nicht mehr als aktuell.
 
@@ -20,48 +22,45 @@
 
 Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und kontrollierter Weiterentwicklung**. Seit `d2effe7` wurden insbesondere Datenqualitäts-/Validierungslogik, Rule Analyzer/Coverage, Caching/Performance, neue Kategorien sowie ein umfangreicher False-Positive-Audit integriert.
 
-**Wichtig:** Die Dokumentation war dem Repository-HEAD zuletzt deutlich voraus bzw. hinterher. Diese Datei korrigiert das durch einen auf `main` verifizierten Stand.
-
 ---
 
 ## 2. Verifizierter Repository-Stand
 
-### Git
+### Git / Code
 
 ```text
 Branch: main
-HEAD: fa218a0
+Letzter Code-Commit: fa218a0
 Commit: fix: reduce false positives across five categories
 Datum: 2026-08-09
-Vergleich d2effe7...main: 61 Commits ahead, 0 behind
+Vergleich d2effe7...fa218a0: 61 Commits ahead, 0 behind
 ```
 
-Der aktuelle HEAD ist der Merge von PR #6. Der PR wurde am 2026-08-09 gemergt und ist kein Draft mehr.
+PR #6 wurde am 2026-08-09 gemergt. Die danach folgenden Commits betreffen ausschließlich die hier vorgenommene Dokumentationskonsolidierung.
 
 ### Teststand
 
-Der zuletzt im Repository dokumentierte vollständige Lauf gegen `main` vor dem Merge von PR #6 war **979 passed / 0 failed** (Phase-15-Abschlussbericht). PR #6 fügte 74 Regressionstests hinzu und dokumentiert danach:
+Der zuletzt im Repository dokumentierte vollständige Lauf nach den PR-#6-Änderungen ist:
 
 ```text
 pytest app/tests/
 1142 passed, 0 failed
-```
 
-Zusätzlich wurde das komplette Ruleset nach PR #6 erneut mit dem Rule Analyzer geprüft:
-
-```text
+Rule Analyzer:
 355 Regeln
 19 Kategorien
 0 Findings
 ```
 
-**Hinweis:** Ein neuer lokaler `pytest`-Lauf war in dieser Dokumentationssession nicht möglich, weil kein Repository-Checkout im Ausführungscontainer vorhanden war. Deshalb wird 1142/0 als der zuletzt im GitHub-PR dokumentierte Verifikationsstand geführt und nicht als hier lokal erneut ausgeführt behauptet.
+Der Phase-15-Abschlussbericht dokumentiert zuvor 979/0; PR #6 fügte 74 Regressionstests hinzu und dokumentiert danach 1142/0.
+
+**Hinweis:** Ein neuer lokaler `pytest`-Lauf war in dieser Dokumentationssession nicht möglich, weil kein Repository-Checkout im Ausführungscontainer vorhanden war. 1142/0 wird deshalb als der zuletzt im GitHub-PR dokumentierte Verifikationsstand geführt.
 
 ---
 
 ## 3. Was seit `d2effe7` integriert wurde
 
-Der Vergleich `d2effe7...main` umfasst 61 Commits und enthält mehrere klar erkennbare Workstreams.
+Der Vergleich `d2effe7...fa218a0` umfasst 61 Commits und enthält mehrere klar erkennbare Workstreams.
 
 ### 3.1 Neue Infrastruktur und Services
 
@@ -98,28 +97,9 @@ Das YAML-Regelwerk bleibt die primäre Erweiterungsebene. Neue Kategorien könne
 
 ### 3.3 Neue bzw. aktualisierte Kategorien
 
-Der aktuelle Stand enthält 19 aktive Kategorien:
+Der aktuelle Stand enthält 19 aktive Kategorien. `_global.yaml` ist dabei keine Kategorie.
 
-- `autoradio_opel_corsa`
-- `controller`
-- `cpu_mainboard_bundle`
-- `gaming_pc`
-- `gpu`
-- `handhelds`
-- `iphone`
-- `konsolen_bundles`
-- `lego_minifiguren`
-- `m2_ssd`
-- `macbook`
-- `monitor_curved`
-- `netzteil`
-- `notebook_resell`
-- `office_pc`
-- `retro_konsolen`
-- `sata_ssd`
-- `vintage_elektronik`
-
-Die 19. Kategorie wird im aktuellen Ruleset durch die vollständige Liste der aktiven YAML-Dateien repräsentiert; `_global.yaml` ist dabei keine Kategorie.
+Die aktive Liste wird durch die aktuellen YAML-Dateien unter `app/rules/` bestimmt; historische Kategorienamen aus alten Statusabschnitten sind nicht maßgeblich.
 
 ### 3.4 Preis, Resale und Profit
 
@@ -168,7 +148,7 @@ Phase 15 führte mehrere kontrollierte Caches ein:
 - Entry-/Ruleset-Cache bei der Kategorie-Revalidierung
 - Regex-Cache im Matcher
 
-Dokumentierte Messwerte aus dem Phase-15-Abschlussbericht:
+Dokumentierte Messwerte:
 
 ```text
 load_rules() warm:        0,161 ms
@@ -176,17 +156,9 @@ load_rules() warm:        0,161 ms
 matcher.evaluate():       3,625 ms
 ```
 
-Die dokumentierten Verbesserungen lagen ungefähr bei:
-
-```text
-load_rules():      ~1700x warm
-/api/status:       ~109x
-Regex evaluate():  ~2,1x
-```
-
 ### 3.7 False-Positive-Audit / PR #6
 
-Der letzte Merge (`fa218a0`) basiert auf einem vollständigen Audit von 2.500 `found.json`-Einträgen über 19 Kategorien.
+Der letzte Code-Merge (`fa218a0`) basiert auf einem vollständigen Audit von 2.500 `found.json`-Einträgen über 19 Kategorien.
 
 Gezielt korrigiert wurden:
 
@@ -324,4 +296,4 @@ Die folgenden Dokumente bleiben als Detail-/Arbeitsnachweise bestehen:
 - `document/PRICE_CALIBRATION_REVIEW_V2.md`
 - `document/PRICE_CALIBRATION_APPLIED.md`
 
-Diese Dokumente liefern historische Details. Für den **aktuellen Ist-Zustand** ist ausschließlich diese Datei maßgeblich.
+Diese Dokumente liefern historische Details. Für den **aktuellen technischen Code-Stand** ist der Code-Commit `fa218a0` maßgeblich; für die technische Projektreferenz ist diese Datei maßgeblich.
