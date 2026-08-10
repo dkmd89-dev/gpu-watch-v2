@@ -132,6 +132,38 @@ exclude_category:
   - "ladeadapter"
   - "reisetasche"
 
+  # Nachtrag (Active-False-Positive-Audit, docs/ACTIVE_FALSE_POSITIVE_AUDIT.md,
+  # Realdatenabgleich gegen found.json, 1736 eindeutige Titel): 12 neue
+  # Excludes für 8 real aktuell laufende Standalone-Zubehör-/Ersatzteil-/
+  # Software-Fehltreffer-Muster (zusammen 10 betroffene Titel -- einzelne
+  # Muster wie "Ersatzstift/Touchpen/Stylus" decken mehrere Titel ab),
+  # alle 0 Kollisionen gegen den vollständigen Korpus (jeder Begriff kommt
+  # AUSSCHLIESSLICH in den jeweils gefundenen Fehltreffer-Titeln vor,
+  # verifiziert inkl. aller Handheld-Markennamen). Bewusst nur real
+  # belegte Begriffe -- KEINE hypothetischen Ergänzungen wie
+  # "ersatzknopf"/"leerkarton"/"flashkarte" (0 Treffer im Korpus, nicht
+  # Teil dieses Fixes).
+  - "displayschutz" # Kompositum, von bare "display" nicht erfasst (Wortgrenzen)
+  - "ersatzstift"
+  - "ersatzstifte" # Pluralform, von "ersatzstift" nicht erfasst (Wortgrenzen)
+  - "touchpen"
+  - "stylus"
+  - "schutzhülle" # Kompositum, von bare "hülle" nicht erfasst -- bereits in
+  # controller.yaml/konsolen_bundles.yaml als eigener Begriff etabliert
+  - "grip" # bereits in controller.yaml etabliert, fehlte hier
+  - "leere box" # leere Sammler-Verpackung ohne Gerät, kein "OVP"-Text im Titel
+  - "spielkarte"
+  - "flash karte" # Flashcart-/Speicherkarten-Produkt, kein Gerät
+  - "spiele für" # Pluralform zu "spiel" -- "Spiele für X Konsole" ist ein
+  # Software-Angebot, keine Konsole (identisches Muster wie "spiel für" in
+  # konsolen_bundles.yaml)
+  # "Controller Rechts"/"Controller Links": bei Legion Go trennbare
+  # Controller-Hälften -- ein Angebot nur EINER Hälfte ist Ersatzteil,
+  # kein Komplettgerät. Enge Phrase (kein bare "controller", das würde
+  # echte Bundle-Beschreibungen wie "Legion Go inkl. beide Controller"
+  # treffen).
+  - "controller rechts"
+
 # Phase 15 (kontrollierter Folge-Review, "Gehäuse/Shell-Fix"): "gehäuse"
 # ist -- anders als die o.g. Begriffe -- ZWEIDEUTIG: es bezeichnet sowohl
 # lose Ersatzschalen ("Nintendo 3DS XL Gehäuse Blau") als auch die
