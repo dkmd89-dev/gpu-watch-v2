@@ -125,6 +125,59 @@ def test_modchip_matcht_nicht():
 
 
 # ============================================================
+# 2b. Nachtrag (kontrollierter Review, found.json-Realdatenabgleich):
+#     "Lenkrad" (deutsches Pendant zu "racing wheel", das nur die
+#     englische Phrase abdeckte) und "gamepad" (Standalone-Gamepad ohne
+#     das Wort "controller" im Titel, daher von den bestehenden
+#     "controller für"/"wireless controller"-Phrasen nicht erfasst) --
+#     beide Fälle real in found.json als aktuell laufende Fehltreffer
+#     bestätigt, 0 Kollisionen im vollständigen 1708-Titel-Korpus.
+# ============================================================
+
+def test_lenkrad_standalone_matcht_nicht():
+    # Beide real in found.json bestätigten Fehltreffer.
+    assert _matches_kb("Nitho Drive Pro V200 Lenkrad PS5,PS4 ,Xbox, PC", 25.0) is False
+    assert _matches_kb(
+        "Gaming Lenkrad PNX V3 Pro 180* Grad für PC/PS3/PS4/XBOX", 40.0
+    ) is False
+
+
+def test_gamepad_standalone_ohne_controller_wort_matcht_nicht():
+    # Real in found.json bestätigt -- enthält "controller" NICHT, daher
+    # von den bestehenden Controller-Phrasen nicht erfasst.
+    assert _matches_kb(
+        "Wireless Gamepad PS4 Pro Slim Bluetooth 1000mAh Akku Vibration 6-Achsen",
+        18.0,
+    ) is False
+
+
+def test_pro_slim_ohne_zubehoerwort_matcht_weiterhin():
+    # Sicherheitsprüfung: "pro"/"slim" als Modellbezeichnung eines
+    # echten Geräts bleibt unverändert ein gültiges Positivsignal -- die
+    # neuen Excludes greifen nur bei den spezifischen Zubehörwörtern
+    # "lenkrad"/"gamepad", nicht bei "pro"/"slim" selbst. Reale Titel aus
+    # found.json.
+    for title in [
+        "Sony PlayStation 4 Pro Heimkonsole Schwarz (PS4 Plattform)",
+        "PS4 Slim, 500gb , voll funktionsfähig",
+        "PlayStation 4 pro mit 2 Controller",
+    ]:
+        r = evaluate(title, 0.0, _rules_cfg())
+        assert r.matched is True and r.category == "konsolen_bundles", title
+
+
+def test_pro_controller_bundle_mit_plus_bleibt_unveraendert():
+    # Grenzfall: "Pro Controller" als Teil eines "+"-Bundles bleibt über
+    # die bestehende Konnektor-Ausnahme erlaubt -- unberührt von den
+    # neuen Lenkrad-/Gamepad-Excludes (real aus found.json).
+    r = evaluate(
+        "Nintendo Switch 2 Konsole + 7 Spiele + Pro Controller", 0.0, _rules_cfg()
+    )
+    assert r.matched is True
+    assert r.category == "konsolen_bundles"
+
+
+# ============================================================
 # 3. Gruppe 3 -- Touchscreen-/LCD-Reseller: müssen jetzt blockiert
 #    werden, OHNE bare "touchscreen" zu verwenden.
 # ============================================================

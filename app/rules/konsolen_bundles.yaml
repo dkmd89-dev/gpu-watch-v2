@@ -119,6 +119,29 @@ exclude_category:
   - "racing wheel"
   - "zubehör-set"
   - "zubehörset"
+  # Nachtrag (kontrollierter Review, found.json-Realdatenabgleich gegen
+  # den bereits als Gruppe-2-Zielkategorie dokumentierten Kommentar
+  # "Controller/Headset/Lenkrad/Modchip/Schutzhülle" oben): die
+  # ENGLISCHE Phrase "racing wheel" deckt reale, deutschsprachige
+  # Lenkrad-Angebote nicht ab -- Kleinanzeigen-Titel nutzen durchgängig
+  # "Lenkrad", nie "racing wheel". Verifiziert gegen alle 1708 aktuell
+  # sichtbaren, eindeutigen Titel aus found.json: "lenkrad" kommt genau
+  # zweimal vor, beide Male als Standalone-Zubehör mit Plattform-
+  # Kompatibilitätsliste ("... für PC/PS3/PS4/XBOX", "... PS5,PS4,Xbox,
+  # PC"), 0 Treffer in Kombination mit "konsole"/"system"/einem
+  # Geräte-Marker. Bare Wort, kein Kompositum-/Adjazenzrisiko (analog
+  # "modchip"/"scuff" oben). "gamepad" ergänzt dasselbe Root-Cause-Muster
+  # für Standalone-Gamepads ohne das Wort "controller" im Titel (z.B.
+  # "Wireless Gamepad PS4 Pro Slim ...") -- von den bereits vorhandenen
+  # "controller für"/"wireless controller"-Phrasen nicht erfasst, da
+  # diese Titel "controller" gar nicht enthalten. Von 14 "gamepad"-
+  # Titeln im vollständigen found.json-Korpus sind 13 bereits über
+  # "controller"-Phrasen oder die eigene controller.yaml-Kategorie
+  # (first-match-wins) korrekt abgedeckt; der verbleibende, bisher nicht
+  # abgedeckte Fall ist genau dieses Standalone-Gamepad-Muster. 0
+  # Kollisionen mit echten Konsolen-Bundles im vollständigen Korpus.
+  - "lenkrad"
+  - "gamepad"
   # Bewusst NICHT "joy-con" (9 Kollisionen mit echten Switch-Bundles wie
   # "Nintendo Switch Konsole mit grauen Joy-Cons" verifiziert) und NICHT
   # "dualshock 4" (4 Kollisionen mit echten PS4-Bundles verifiziert).
