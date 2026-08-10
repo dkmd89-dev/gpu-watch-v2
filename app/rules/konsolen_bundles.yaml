@@ -205,6 +205,46 @@ exclude_category_unless_also_contains:
   "für xbox": *plattform_geraete_marker
   "für xbox one": *plattform_geraete_marker
   "für xbox series": *plattform_geraete_marker
+  # Nachtrag (Dashboard-Match-Validierung Variante C, Schritt 2 --
+  # separate Review-Runde): "[Plattform] - [Spieltitel]" ist wie "für
+  # [Plattform]" praktisch immer eine Formulierung fuer ein Spiel/
+  # Zubehoerteil, NICHT fuer das Geraet selbst (z.B. "Nintendo Switch -
+  # Minecraft FRA mit OVP", real bestaetigt in price_history.jsonl).
+  # matcher.py::_contains_term() prueft _title.lower()_ als reinen
+  # Substring-Check OHNE Interpunktions-Normalisierung (title_l =
+  # title.lower(), siehe evaluate()) -- der Bindestrich ist daher ganz
+  # regulaer Teil des Suchbegriffs, kein neuer Matcher-Mechanismus
+  # noetig, identisches Prinzip wie bei "für [Plattform]" oben,
+  # Wiederverwendung desselben Geraete-Marker-Ankers. Zwei Varianten je
+  # Plattform, da Kleinanzeigen-Titel sowohl Viertelgeviertstrich "–"
+  # als auch Bindestrich "-" nutzen (beide real im Log-Korpus
+  # bestaetigt, z.B. "PS4 Slim – funktioniert einwandfrei"). Gegen den
+  # vollstaendigen 186-Titel-Rohkorpus (data/gpu_watch.log.*, mit
+  # Interpunktion, GESPEICHERT-Zeilen der 5 konsolen_bundles-Regeln)
+  # verifiziert: 0 echte Kollisionen -- die beiden Titel mit
+  # uebereinstimmendem Muster ("Nintendo Switch Lite - Gelb - 32GB",
+  # "... - Playstation 4 - Zustand: gut") enthalten jeweils einen
+  # Geraete-Marker (32gb / 500gb+slim) und bleiben ueber die Ausnahme
+  # unveraendert erhalten. Nur fuer Nintendo Switch real als
+  # Fehltreffer bestaetigt; PS4/PS5/Xbox-Varianten strukturell
+  # analog ergaenzt (keine bare "-"-Kollision im Korpus gefunden),
+  # aber ohne eigenen bestaetigten Fehltreffer-Fall.
+  "nintendo switch -": *plattform_geraete_marker
+  "nintendo switch –": *plattform_geraete_marker
+  "switch -": *plattform_geraete_marker
+  "switch –": *plattform_geraete_marker
+  "ps4 -": *plattform_geraete_marker
+  "ps4 –": *plattform_geraete_marker
+  "ps5 -": *plattform_geraete_marker
+  "ps5 –": *plattform_geraete_marker
+  "playstation 4 -": *plattform_geraete_marker
+  "playstation 4 –": *plattform_geraete_marker
+  "playstation 5 -": *plattform_geraete_marker
+  "playstation 5 –": *plattform_geraete_marker
+  "xbox one s -": *plattform_geraete_marker
+  "xbox one s –": *plattform_geraete_marker
+  "xbox one x -": *plattform_geraete_marker
+  "xbox one x –": *plattform_geraete_marker
 
 # FIX (kontrollierter Review, "Plattformbegriff ist kein Hardware-Beweis",
 # Variante C, KONSOLEN_BUNDLES_REVIEW.md Abschnitt 8): "Pro Controller"
