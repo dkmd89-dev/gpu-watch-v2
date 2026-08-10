@@ -3,7 +3,8 @@
 > **Stand:** 2026-08-10  
 > **Repository:** `dkmd89-dev/gpu-watch-v2`  
 > **Branch:** `main`  
-> **HEAD:** `fa218a0826f3b8ae6868c0228c1267a5cd861265`  
+> **HEAD:** `0757580aac4c0c579edf2fc160cb6207aabdfa38`  
+> **Letzter Code-Commit auf `main`:** `3eed07f` (`fa218a0..0757580` sind ausschließlich Doku-Commits)  
 > **Technische Referenz:** `TECHNISCHER_PROJEKTSTATUS.md`
 
 ## Gesamtstatus
@@ -13,21 +14,36 @@
 ## Verifiziert dokumentierter Stand
 
 ```text
-main: fa218a0
-fix: reduce false positives across five categories
+main: 0757580
+docs: document/ komplett aus Repo und lokal entfernen
 
-Vergleich d2effe7...main: 61 Commits ahead, 0 behind
+Letzter Code-Commit (main): 3eed07f
+fix: Plattformbegriff/Mainboard/Zubehör-Fehltreffer in drei Kategorien beheben
+
+Vergleich d2effe7...fa218a0: 61 Commits ahead, 0 behind
+fa218a0..0757580: 5 weitere Commits, davon 1 Code-Commit (3eed07f) + 4 reine Doku-/Chore-Commits
 
 Letzter im Repository dokumentierter vollständiger Testlauf:
-1142 passed, 0 failed
+1175 passed, 0 failed (aus der Commit-Message von 3eed07f; in dieser
+Session nicht erneut lokal verifiziert, siehe Hinweis unten)
 
 Rule Analyzer:
 355 Regeln
 19 Kategorien
-0 Findings
+0 Findings (Stand vor 3eed07f, nach diesem Fix nicht erneut gemessen)
 ```
 
-Der Teststand 1142/0 stammt aus dem gemergten PR #6. In dieser Dokumentationssession wurde kein lokaler `pytest`-Lauf behauptet, weil kein Repository-Checkout im Ausführungscontainer verfügbar war.
+Der Teststand 1175/0 stammt aus der Commit-Message von `3eed07f`. In dieser Dokumentationssession war `pytest` selbst nicht ausführbar (kein PyPI-Zugriff zum Nachinstallieren von `pytest`/`flask`/`pyyaml` im Sandbox-Container); als Ersatz wurden betroffene Testdateien per direktem Funktionsaufruf ausgeführt (siehe Batch-Eintrag unten) — das ersetzt keinen vollständigen `pytest app/tests/`-Lauf.
+
+## Aktueller Batch (in Arbeit, noch nicht auf `main`)
+
+**Dashboard-Match-Validierung Variante C** (Branch `claude/dashboard-match-validation-q5g86t`, PR #8):
+
+- Live-Instanz (`romajagijo.zapto.org`) über öffentliche HTTP-Endpunkte verifiziert, soweit ohne Server-Zugriff möglich (kein SSH/Docker-Zugriff auf den Host).
+- Zwei verbleibende `konsolen_bundles`-Match-Lücken aus `3eed07f` identifiziert:
+  1. **"GameCube Controller" ohne "für"/"pro controller"** — geschlossen (`app/rules/konsolen_bundles.yaml`, `exclude_category_unless_preceded_by`, identisches Muster wie "pro controller"). 0 Kollisionen gegen den vollständigen 318-Fingerprint-Korpus aus `data/price_history.jsonl` verifiziert.
+  2. **"Spieltitel + Plattform ohne 'für'"** (z.B. "Nintendo Switch - Minecraft FRA mit OVP") — bewusst offen gelassen (Nutzerentscheidung, Option 1). Würde sonst die geschützte Design-Entscheidung "OVP bleibt Positivsignal ohne Geräte-Marker" umkehren oder Einzelspieltitel sammeln, beides zuvor explizit verworfen. Als dokumentierte Restlücke im Test-Docstring festgehalten.
+- **Status:** PR #8 wurde ohne Merge geschlossen — Fix für Lücke 1 ist noch **nicht** auf `main`. Weiteres Vorgehen (Reopen vs. neuer PR) mit dem Nutzer zu klären.
 
 ## Abgeschlossen
 
@@ -80,6 +96,7 @@ Wichtige Architekturregeln:
 5. `controller`-`ladekabel`-Exclude separat bewerten.
 6. Resale-Confidence (`HIGH/MEDIUM/LOW`) ist eine mögliche nächste Qualitätsstufe.
 7. automatische Data-Quality-Warnungen weiterentwickeln.
+8. `konsolen_bundles`: "Spieltitel + Plattform ohne 'für'"-Restlücke (siehe Batch-Eintrag oben) — bewusst offen, braucht eigene datengetestete Review-Runde.
 
 ## Nächste Prioritäten
 
