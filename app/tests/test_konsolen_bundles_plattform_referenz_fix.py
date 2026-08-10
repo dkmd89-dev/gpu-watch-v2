@@ -37,17 +37,31 @@ exclude_category_unless_preceded_by, identisches Muster wie "pro
 controller", 0 Kollisionen gegen den vollständigen 318-Fingerprint-
 Korpus der Kategorie aus data/price_history.jsonl verifiziert.
 
-Weiterhin NICHT geschlossen (siehe Dashboard-Match-Validierung Variante
-C, Session 2026-08-10, Antwort an den Auftraggeber): "bare" Spieltitel,
-die den Plattformnamen OHNE "für" nennen (z.B. "Nintendo Switch -
-Minecraft FRA mit OVP", "Donkey Kong Bananza Nintendo Switch 2 2025
-OVP") -- reales, mehrfach in price_history.jsonl bestätigtes Muster,
-aber bewusst nicht mit einem ungeprüften YAML-Heuristik-Vorschlag
-geschlossen: eine Lockerung würde entweder (a) das explizit geschützte
-"OVP bleibt Positivsignal auch ohne Geräte-Marker" umkehren (siehe
-test_bare_ovp_ohne_zusatzangabe_matcht_weiterhin(), Abschnitt 5) oder
-(b) einzelne Spieltitel sammeln (laut Auftragsvorgabe oben explizit
-ausgeschlossen). Erfordert eine eigene, datengetestete Review-Runde.
+Schritt 2 (separate Review-Runde, Session 2026-08-10, Nutzerentscheidung
+"Option 1" -- Lücke vorerst dokumentiert offen lassen, dann diese
+gezielte Review-Runde): die "Spieltitel + Plattform OHNE 'für'"-Lücke
+(z.B. "Nintendo Switch - Minecraft FRA mit OVP") ist jetzt geschlossen,
+OHNE die geschützte "OVP bleibt Positivsignal ohne Geräte-Marker"-
+Entscheidung anzutasten und OHNE Einzelspieltitel zu sammeln:
+matcher.py::_contains_term() prüft den Titel als reinen
+Substring-Check (title.lower(), keine Interpunktions-Normalisierung) --
+der Bindestrich/Halbgeviertstrich ist damit reguläre Titel-Interpunktion
+und über denselben exclude_category_unless_also_contains-Mechanismus
+wie "für Plattform" fassbar ("[Plattform] -"/"[Plattform] –" als neue
+Schlüssel, derselbe Geräte-Marker-Anker). Kein neuer Matcher-Mechanismus.
+
+Verifiziert gegen zwei unabhängige reale Korpora:
+- 318 Fingerprints aus data/price_history.jsonl (normalisiert)
+- 186 rohe, interpunktionserhaltende Titel aus data/gpu_watch.log.{1,2}
+  (GESPEICHERT-Zeilen der 5 konsolen_bundles-Regeln)
+0 Kollisionen in beiden. Zwei echte Bundle-Titel matchen zwar das neue
+"Plattform+Strich"-Muster wörtlich ("Nintendo Switch Lite - Gelb -
+32GB", "... - Playstation 4 - Zustand: gut"), bleiben aber durch
+vorhandene Geräte-Marker (32gb / 500gb+slim) über die Ausnahme
+unverändert erhalten (siehe test_bare_plattform_strich_mit_marker_
+matcht_weiterhin()). Nur für Nintendo Switch real als Fehltreffer
+bestätigt; PS4/PS5/Xbox-Varianten strukturell analog ergänzt, ohne
+eigenen bestätigten Fehltreffer-Fall im Korpus.
 
 Läuft gegen die echten, produktiven rules/*.yaml."""
 import sys
@@ -262,6 +276,58 @@ def test_gamecube_controller_im_echten_bundle_matcht_weiterhin():
     r = evaluate("Nintendo Switch Konsole mit GameCube Controller", 0.0, _rules_cfg())
     assert r.matched is True
     assert r.category == "konsolen_bundles"
+
+
+# ============================================================
+# 8. Schritt 2 (separate Review-Runde, Session 2026-08-10): "Plattform +
+#    Bindestrich/Halbgeviertstrich" ohne "für" -- vormals dokumentierte,
+#    bewusst offen gelassene Restluecke ist jetzt geschlossen.
+# ============================================================
+
+def test_minecraft_fra_matcht_jetzt_nicht_mehr():
+    # Der urspruenglich gemeldete Fall (real bestaetigt in
+    # price_history.jsonl als Fingerprint "nintendo switch minecraft
+    # fra mit ovp").
+    assert _matches_kb("Nintendo Switch - Minecraft FRA mit OVP") is False
+
+
+def test_weitere_plattform_strich_spieltitel_matchen_nicht():
+    # Reale, in price_history.jsonl bestaetigte Fingerprints desselben
+    # Musters ("Plattform" direkt gefolgt von Bindestrich + Spieltitel).
+    assert _matches_kb("Nintendo Switch - Minecraft Dungeons Ultimate Edition Deutsch OVP") is False
+    assert _matches_kb("Xbox One S - FIFA 24 OVP") is False
+    assert _matches_kb("PlayStation 4 - Spider-Man Miles Morales OVP") is False
+
+
+def test_bare_plattform_strich_mit_marker_matcht_weiterhin():
+    # Sicherheitspruefung: reale Bundle-Titel aus dem Log-Rohkorpus, die
+    # das neue "Plattform + Strich"-Muster woertlich enthalten, aber
+    # einen Geraete-Marker tragen -- bleiben ueber die bestehende
+    # Ausnahme (derselbe *plattform_geraete_marker-Anker) erhalten.
+    r = evaluate("Nintendo Switch Lite - Gelb - 32GB", 0.0, _rules_cfg())
+    assert r.matched is True and r.category == "konsolen_bundles"
+
+    r2 = evaluate(
+        "SONY PS4 SLIM Konsole 500GB + Wired Controller - Playstation 4 - Zustand: gut",
+        0.0, _rules_cfg(),
+    )
+    assert r2.matched is True and r2.category == "konsolen_bundles"
+
+
+def test_plattform_strich_mit_halbgeviertstrich_matcht_nicht():
+    # Kleinanzeigen-Titel nutzen haeufig "–" (Halbgeviertstrich) statt
+    # "-" (Bindestrich) -- beide Varianten muessen greifen.
+    assert _matches_kb("Nintendo Switch – Minecraft FRA mit OVP") is False
+
+
+def test_bekannte_restluecke_spieltitel_vor_plattform_ohne_bindestrich():
+    # Dokumentierte, bewusst nicht geschlossene Grenze dieses Fixes:
+    # steht der Spieltitel VOR der Plattform OHNE einen Bindestrich nach
+    # der Plattform-Nennung, greift weder "für [Plattform]" noch
+    # "[Plattform] -" -- unveraendert wie vor diesem Schritt. Reales,
+    # in price_history.jsonl bestaetigtes Beispiel.
+    r = evaluate("Donkey Kong Bananza Nintendo Switch 2 2025 OVP", 0.0, _rules_cfg())
+    assert r.matched is True and r.category == "konsolen_bundles"
 
 
 if __name__ == "__main__":
