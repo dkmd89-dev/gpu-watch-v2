@@ -224,13 +224,31 @@ exclude_category_unless_also_contains:
 # wenn es NICHT unmittelbar einem Bundle-Konnektor folgt (z.B. "mit Pro
 # Controller" bleibt erlaubt, "Nintendo Switch Pro Controller" nicht).
 exclude_category_unless_preceded_by:
-  "pro controller":
+  "pro controller": &bundle_konnektoren
     - "inkl."
     - "inkl"
     - "mit"
     - "+"
     - "und"
     - "sowie"
+  # FIX (Nachtrag, Dashboard-Match-Validierung Variante C, Session
+  # 2026-08-10): identisches Muster wie "Pro Controller" oben --
+  # "GameCube Controller" ist ebenfalls ein spezifischer, feststehender
+  # Zubehoer-Produktname (ein an Switch/Switch 2 anschliessbarer
+  # GameCube-Style-Controller), der als Standalone-Angebot faelschlich
+  # matcht, wenn "Nintendo Switch"+"OVP" ohne echten Geraete-Kontext
+  # auftauchen (bestaetigt an zwei realen price_history.jsonl-Treffern:
+  # "Nintendo Switch 2 GameCube Controller OVP" und "... Nintendo
+  # Classics OVP", vorher nicht durch die "Für Plattform"- oder "Pro
+  # Controller"-Excludes abgedeckt, da weder "für" noch "pro controller"
+  # vorkommt). KEIN bare "controller"-Exclude (unveraendert verworfen,
+  # siehe Begruendung oben) -- "GameCube Controller" ist wie "Pro
+  # Controller" ein enger Zwei-Wort-Ausdruck ohne die dortige
+  # Zahl-vor-"Controller"-Kollisionsgefahr. Wiederverwendung derselben
+  # Konnektor-Liste per Anker (*bundle_konnektoren): "mit GameCube
+  # Controller" bleibt erlaubt, "Nintendo Switch 2 GameCube Controller"
+  # nicht.
+  "gamecube controller": *bundle_konnektoren
 
 scoring_weights:
   price: 0.85

@@ -30,11 +30,24 @@ Auftragsvorgabe (KONSOLEN_BUNDLES_REVIEW.md, freigegebene "Variante C"):
   Kompositum-Ergänzung (bereits in retro_konsolen.yaml für "heimkonsole"/
   "spielekonsole" aktiv) für Gruppe 2 der beiden Nintendo-Switch-Regeln.
 
-Bekannte, bewusst nicht geschlossene Restlücke: "bare" Standalone-
-Zubehör-/Spieltitel, die WEDER "für"/"pro controller" NOCH einen der
-neuen Geräte-Marker enthalten (z.B. "Nintendo Switch 2 GameCube
-Controller OVP" ohne "für" und ohne "Pro") -- unverändert wie vor diesem
-Fix, siehe test_bekannte_restluecke_bare_controller_ohne_fuer_oder_pro().
+Nachtrag (Dashboard-Match-Validierung Variante C, Session 2026-08-10):
+die vormals dokumentierte Restlücke "GameCube Controller" ohne "für"/
+"pro controller" (Abschnitt 7) ist geschlossen -- via
+exclude_category_unless_preceded_by, identisches Muster wie "pro
+controller", 0 Kollisionen gegen den vollständigen 318-Fingerprint-
+Korpus der Kategorie aus data/price_history.jsonl verifiziert.
+
+Weiterhin NICHT geschlossen (siehe Dashboard-Match-Validierung Variante
+C, Session 2026-08-10, Antwort an den Auftraggeber): "bare" Spieltitel,
+die den Plattformnamen OHNE "für" nennen (z.B. "Nintendo Switch -
+Minecraft FRA mit OVP", "Donkey Kong Bananza Nintendo Switch 2 2025
+OVP") -- reales, mehrfach in price_history.jsonl bestätigtes Muster,
+aber bewusst nicht mit einem ungeprüften YAML-Heuristik-Vorschlag
+geschlossen: eine Lockerung würde entweder (a) das explizit geschützte
+"OVP bleibt Positivsignal auch ohne Geräte-Marker" umkehren (siehe
+test_bare_ovp_ohne_zusatzangabe_matcht_weiterhin(), Abschnitt 5) oder
+(b) einzelne Spieltitel sammeln (laut Auftragsvorgabe oben explizit
+ausgeschlossen). Erfordert eine eigene, datengetestete Review-Runde.
 
 Läuft gegen die echten, produktiven rules/*.yaml."""
 import sys
@@ -220,20 +233,35 @@ def test_bereits_vorher_korrekte_faelle_bleiben_unveraendert():
 
 
 # ============================================================
-# 7. Bekannte, bewusst nicht geschlossene Restlücke (Dokumentation, kein
-#    Fehlschlag-Test) -- explizit vom Auftrag ausgenommen: kein bare
-#    "controller"-Exclude, kein neuer Matcher-Mechanismus.
+# 7. Nachtrag (Dashboard-Match-Validierung Variante C, Session
+#    2026-08-10): die vormals bewusst offene Restluecke "GameCube
+#    Controller" ohne "für"/"pro controller" ist jetzt geschlossen --
+#    identisches Muster wie "Pro Controller" (exclude_category_unless_
+#    preceded_by, Variante-C-Konnektor-Mechanismus, kein bare
+#    "controller"-Exclude). Bestaetigt an zwei realen
+#    price_history.jsonl-Treffern ("Nintendo Switch 2 GameCube
+#    Controller OVP" / "... Nintendo Classics OVP"), 0 Kollisionen
+#    gegen den vollstaendigen 318-Fingerprint-Korpus der Kategorie
+#    verifiziert.
 # ============================================================
 
-def test_bekannte_restluecke_bare_controller_ohne_fuer_oder_pro():
-    # "Nintendo Switch 2 GameCube Controller OVP" enthaelt weder "für"
-    # noch "pro controller" -- matcht daher weiterhin (unveraendert) als
-    # konsolen_bundles. Dokumentierte, bewusst akzeptierte Grenze der
-    # Keyword-Matching-Architektur (KONSOLEN_BUNDLES_REVIEW.md Abschnitt
-    # 5/6, Zeile 9 der Pflicht-Regressionsmatrix). Dieser Test haelt den
-    # IST-Zustand fest, ist kein Assertion-Fail.
+def test_gamecube_controller_ohne_fuer_oder_pro_matcht_jetzt_nicht_mehr():
     r = evaluate("Nintendo Switch 2 GameCube Controller OVP", 0.0, _rules_cfg())
-    assert r.matched is True and r.category == "konsolen_bundles"
+    assert not (r.matched and r.category == "konsolen_bundles")
+
+    # Aus dem urspruenglichen Match-Validierungs-Auftrag, mit
+    # Trennzeichen-Variante wie im real gemeldeten Titel.
+    r2 = evaluate("Nintendo Switch 2 GameCube Controller | OVP | NEU", 0.0, _rules_cfg())
+    assert not (r2.matched and r2.category == "konsolen_bundles")
+
+
+def test_gamecube_controller_im_echten_bundle_matcht_weiterhin():
+    # Variante-C-Konnektor-Ausnahme: "mit GameCube Controller" bleibt
+    # als echtes Bundle-Zubehoer erlaubt, identisch zu "mit Pro
+    # Controller".
+    r = evaluate("Nintendo Switch Konsole mit GameCube Controller", 0.0, _rules_cfg())
+    assert r.matched is True
+    assert r.category == "konsolen_bundles"
 
 
 if __name__ == "__main__":
