@@ -53,6 +53,20 @@ exclude_category:
   - "nur ladekabel"
   - "nur tasche"
   - "nur hülle"
+  # FIX (kontrollierter Review, DASHBOARD_MATCH_FORENSICS.md, Fall
+  # "Lenovo ThinkPad X390 Mainboard ... 8GB RAM NM-B891"): ein blosses
+  # Mainboard/Motherboard-Einzelteil traegt haeufig eine eigene
+  # RAM-Groessenangabe (die verloetete/aufgesteckte RAM-Menge des Boards
+  # selbst), die die dritte require_all_of-Gruppe (RAM-/SSD-Groesse,
+  # siehe Regel-Kommentar unten -- urspruenglich gegen Power-Button/
+  # Lautsprecher/Gehaeuse/Kuehler-Einzelteile eingefuehrt) unbeabsichtigt
+  # erfuellt, obwohl kein komplettes Notebook angeboten wird. Bewusst als
+  # bare Wort-Exclude (nicht "nur mainboard" o.ae.): niemand bewirbt ein
+  # komplettes, funktionierendes Notebook mit dem Wort "Mainboard"/
+  # "Motherboard" -- verifiziert gegen alle 59 damals sichtbaren
+  # TRUE_POSITIVE-Treffer dieser Kategorie: 0 Kollisionen.
+  - "mainboard"
+  - "motherboard"
   - "i3"
   - "celeron"
   - "pentium"

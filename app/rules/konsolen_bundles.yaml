@@ -138,6 +138,26 @@ exclude_category:
 # nur aus, wenn im GESAMTEN Titel kein Kontextbegriff vorkommt (siehe
 # matcher.py::_any_conditional_exclude_presence(), ausführliche
 # Begründung in handhelds.yaml).
+#
+# FIX (kontrollierter Review, "Plattformbegriff ist kein Hardware-Beweis",
+# Variante C, KONSOLEN_BUNDLES_REVIEW.md Abschnitt 8): "[Produkt] für
+# [Plattform]" ist praktisch immer eine Formulierung für ein Spiel oder
+# Zubehörteil, das ZUR Plattform passt -- niemals für die Plattform
+# selbst ("Mario Kart für Nintendo Switch", "Wireless Controller für
+# PS4"). Bewusst NICHT als unbedingter exclude_category-Eintrag (das
+# würde auch echte Geräte blockieren, deren Titel "für"+Plattform als
+# reine Kompatibilitäts-/Spec-Angabe nennen, z.B. "Sony PlayStation 4
+# Slim ... HDMI USB-A für PS4 Funktioniert einwandfrei", verifiziert im
+# Forensik-Datensatz) -- stattdessen kontextbewusst über
+# exclude_category_unless_also_contains: blockiert nur, wenn der Titel
+# KEINEN der folgenden Geräte-Marker (Speichergröße, Modellvariante,
+# Modellcode, Generation, Kompositum-Konsolenbegriff) enthält. "ovp"
+# bleibt dadurch unverändert ein gültiges Positivsignal in Gruppe 2 --
+# diese Excludes greifen VOR der require_all_of-Prüfung und sind davon
+# unabhängig. Datengetestet gegen alle 195 damals sichtbaren
+# TRUE_POSITIVE-Treffer: 0 echte Kollisionen (die anfänglich gefundenen
+# 3 Kandidaten waren bei Prüfung selbst Fehltreffer -- ein Spiel und zwei
+# Standalone-Controller-Angebote, siehe Bericht Abschnitt 7).
 exclude_category_unless_also_contains:
   gehäuse:
     - "vergilbt"
@@ -157,6 +177,60 @@ exclude_category_unless_also_contains:
     - "gesprungen"
     - "gebrauchsspuren"
     - "verfärbt"
+  "für nintendo switch": &plattform_geraete_marker
+    - "32gb"
+    - "64gb"
+    - "128gb"
+    - "256gb"
+    - "500gb"
+    - "512gb"
+    - "1tb"
+    - "2tb"
+    - "slim"
+    - "pro"
+    - "hac-001"
+    - "v1"
+    - "v2"
+    - "oled"
+    - "spielkonsole"
+    - "spielekonsole"
+    - "heimkonsole"
+    - "1. generation"
+    - "2. generation"
+  "für switch": *plattform_geraete_marker
+  "für ps4": *plattform_geraete_marker
+  "für ps5": *plattform_geraete_marker
+  "für playstation 4": *plattform_geraete_marker
+  "für playstation 5": *plattform_geraete_marker
+  "für xbox": *plattform_geraete_marker
+  "für xbox one": *plattform_geraete_marker
+  "für xbox series": *plattform_geraete_marker
+
+# FIX (kontrollierter Review, "Plattformbegriff ist kein Hardware-Beweis",
+# Variante C, KONSOLEN_BUNDLES_REVIEW.md Abschnitt 8): "Pro Controller"
+# ist ein spezifischer, bekannter Zubehör-Produktname (z.B. "Nintendo
+# Switch Pro Controller"), der als Standalone-Angebot fälschlich matcht,
+# wenn er zusammen mit dem Plattformnamen und "ovp" auftaucht. Bewusst
+# NICHT als bare "controller"-Exclude (siehe Bericht Abschnitt 4/5,
+# Variante verworfen: gegen alle 195 TRUE_POSITIVE-Titel verifiziert,
+# dass "controller" in vielen echten Bundles von einer ZAHL statt einem
+# Konnektor-Wort eingeleitet wird, z.B. "2 Controller"/"3 Controller" --
+# ein bare-Exclude würde diese Bundles zerstören). "Pro Controller" ist
+# dagegen ein enger, feststehender Zwei-Wort-Ausdruck ohne diese
+# Kollisionsgefahr (0 Kollisionen im vollständigen 195-Titel-Test).
+# Wiederverwendung des bereits in controller.yaml produktiven
+# "Variante C"-Konnektor-Mechanismus (matcher.py::
+# _contains_term_unless_preceded_by()): blockiert "Pro Controller" nur,
+# wenn es NICHT unmittelbar einem Bundle-Konnektor folgt (z.B. "mit Pro
+# Controller" bleibt erlaubt, "Nintendo Switch Pro Controller" nicht).
+exclude_category_unless_preceded_by:
+  "pro controller":
+    - "inkl."
+    - "inkl"
+    - "mit"
+    - "+"
+    - "und"
+    - "sowie"
 
 scoring_weights:
   price: 0.85
@@ -199,9 +273,16 @@ rules:
   # ============================================================
   - label: "Nintendo Switch (V1/V2/OLED) ★ Top-Deal"
     price_history_model: "konsole_switch_standard"
+    # FIX (kontrollierter Review, Variante C, KONSOLEN_BUNDLES_REVIEW.md
+    # Abschnitt 8d): "spielkonsole"/"spielekonsole"/"heimkonsole" sind
+    # Kompositum-Varianten von "konsole", die die Wortgrenzen-Pruefung
+    # (matcher.py::_contains_term()) bisher nicht als Vorkommen von
+    # "konsole" erkannte (identisches, bereits in retro_konsolen.yaml
+    # geloestes Muster). Rein additiv -- rettet echte Geraete-Angebote
+    # wie "Nintendo Switch Spielkonsole mit Set", schliesst nichts aus.
     require_all_of:
       - ["nintendo switch", "switch oled", "switch konsole"]
-      - ["konsole", "bundle", "set", "mit spiele", "ovp", "system"]
+      - ["konsole", "spielkonsole", "spielekonsole", "heimkonsole", "bundle", "set", "mit spiele", "ovp", "system"]
     exclude:
       - "lite"
       - "defekt"
@@ -213,9 +294,11 @@ rules:
 
   - label: "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis"
     price_history_model: "konsole_switch_standard"
+    # FIX (kontrollierter Review, Variante C, KONSOLEN_BUNDLES_REVIEW.md
+    # Abschnitt 8d): siehe Top-Deal-Regel oben, identische Begruendung.
     require_all_of:
       - ["nintendo switch", "switch oled", "switch konsole"]
-      - ["konsole", "bundle", "set", "mit spiele", "ovp", "system"]
+      - ["konsole", "spielkonsole", "spielekonsole", "heimkonsole", "bundle", "set", "mit spiele", "ovp", "system"]
     exclude:
       - "lite"
       - "defekt"

@@ -111,6 +111,27 @@ exclude_category:
   - "not working"
   - "batterieabdeckung"
 
+  # FIX (kontrollierter Review, DASHBOARD_MATCH_FORENSICS.md): weitere
+  # Standalone-Zubehör-Muster, die bei Regeln mit nur EINER
+  # require_all_of-Gruppe (Steam Deck, ROG Ally/Legion Go -- siehe
+  # Begründung oben, Markenname selbst ist die einzige Bedingung)
+  # bisher durchrutschten, u.a. "USB-C HUB für Steam Deck HDMI 4k 60Hz
+  # USB 3.0 PD" und "Steam Deck Skin Faceplate Schutz Klebefolie Design
+  # Vinyl Aufkleber Skins OLED". Alle sechs Begriffe eindeutige
+  # Zubehör-Produktbezeichnungen (kein Zustands-/Bundle-Wort, keine
+  # Doppeldeutigkeit wie "gehäuse"/"joystick" oben -- daher bare Excludes,
+  # kein exclude_category_unless_...-Mechanismus nötig). Verifiziert
+  # gegen alle 22 damals sichtbaren TRUE_POSITIVE-Treffer dieser
+  # Kategorie: 0 Kollisionen.
+  - "hub"
+  - "skin"
+  - "faceplate"
+  - "vinyl"
+  - "klebefolie"
+  - "aufkleber"
+  - "ladeadapter"
+  - "reisetasche"
+
 # Phase 15 (kontrollierter Folge-Review, "Gehäuse/Shell-Fix"): "gehäuse"
 # ist -- anders als die o.g. Begriffe -- ZWEIDEUTIG: es bezeichnet sowohl
 # lose Ersatzschalen ("Nintendo 3DS XL Gehäuse Blau") als auch die
