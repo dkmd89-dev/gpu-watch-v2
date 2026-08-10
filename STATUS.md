@@ -3,8 +3,8 @@
 > **Stand:** 2026-08-10  
 > **Repository:** `dkmd89-dev/gpu-watch-v2`  
 > **Branch:** `main`  
-> **HEAD:** `0757580aac4c0c579edf2fc160cb6207aabdfa38`  
-> **Letzter Code-Commit auf `main`:** `3eed07f` (`fa218a0..0757580` sind ausschließlich Doku-Commits)  
+> **HEAD:** `ca4b35be153c1982187fcae09e5c99b55fbf2b25`  
+> **Letzter Code-Commit auf `main`:** `ca4b35b` (PR #8, squash-gemergt) — davor `3eed07f`  
 > **Technische Referenz:** `TECHNISCHER_PROJEKTSTATUS.md`
 
 ## Gesamtstatus
@@ -14,14 +14,16 @@
 ## Verifiziert dokumentierter Stand
 
 ```text
-main: 0757580
-docs: document/ komplett aus Repo und lokal entfernen
+main: ca4b35b
+fix(konsolen_bundles): GameCube-Controller- und Plattform-Bindestrich-Fehltreffer ausschließen (#8)
 
-Letzter Code-Commit (main): 3eed07f
+Letzter Code-Commit davor (main): 3eed07f
 fix: Plattformbegriff/Mainboard/Zubehör-Fehltreffer in drei Kategorien beheben
 
 Vergleich d2effe7...fa218a0: 61 Commits ahead, 0 behind
-fa218a0..0757580: 5 weitere Commits, davon 1 Code-Commit (3eed07f) + 4 reine Doku-/Chore-Commits
+fa218a0..3eed07f: 1 Code-Commit; danach 4 Doku-/Chore-Commits bis 0757580,
+0757580..ca4b35b: PR #8 (squash-gemergt, 3 Commits: GameCube-Controller-Fix,
+Doku-Batch, Plattform-Bindestrich-Fix)
 
 Letzter im Repository dokumentierter vollständiger Testlauf:
 1175 passed, 0 failed (aus der Commit-Message von 3eed07f; in dieser
@@ -30,20 +32,21 @@ Session nicht erneut lokal verifiziert, siehe Hinweis unten)
 Rule Analyzer:
 355 Regeln
 19 Kategorien
-0 Findings (Stand vor 3eed07f, nach diesem Fix nicht erneut gemessen)
+0 Findings (letzte Messung: nach PR #8 in dieser Session, siehe Batch-Eintrag)
 ```
 
 Der Teststand 1175/0 stammt aus der Commit-Message von `3eed07f`. In dieser Dokumentationssession war `pytest` selbst nicht ausführbar (kein PyPI-Zugriff zum Nachinstallieren von `pytest`/`flask`/`pyyaml` im Sandbox-Container); als Ersatz wurden betroffene Testdateien per direktem Funktionsaufruf ausgeführt (siehe Batch-Eintrag unten) — das ersetzt keinen vollständigen `pytest app/tests/`-Lauf.
 
-## Aktueller Batch (in Arbeit, noch nicht auf `main`)
+## Zuletzt abgeschlossener Batch
 
-**Dashboard-Match-Validierung Variante C** (Branch `claude/dashboard-match-validation-q5g86t`, PR #8):
+**Dashboard-Match-Validierung Variante C** (PR #8, gemergt via Squash auf `main` als `ca4b35b`):
 
 - Live-Instanz (`romajagijo.zapto.org`) über öffentliche HTTP-Endpunkte verifiziert, soweit ohne Server-Zugriff möglich (kein SSH/Docker-Zugriff auf den Host).
-- Zwei verbleibende `konsolen_bundles`-Match-Lücken aus `3eed07f` identifiziert:
-  1. **"GameCube Controller" ohne "für"/"pro controller"** — geschlossen (`app/rules/konsolen_bundles.yaml`, `exclude_category_unless_preceded_by`, identisches Muster wie "pro controller"). 0 Kollisionen gegen den vollständigen 318-Fingerprint-Korpus aus `data/price_history.jsonl` verifiziert.
-  2. **"Spieltitel + Plattform ohne 'für'"** (z.B. "Nintendo Switch - Minecraft FRA mit OVP") — bewusst offen gelassen (Nutzerentscheidung, Option 1). Würde sonst die geschützte Design-Entscheidung "OVP bleibt Positivsignal ohne Geräte-Marker" umkehren oder Einzelspieltitel sammeln, beides zuvor explizit verworfen. Als dokumentierte Restlücke im Test-Docstring festgehalten.
-- **Status:** PR #8 wurde ohne Merge geschlossen — Fix für Lücke 1 ist noch **nicht** auf `main`. Weiteres Vorgehen (Reopen vs. neuer PR) mit dem Nutzer zu klären.
+- Zwei `konsolen_bundles`-Match-Lücken aus `3eed07f` identifiziert und **beide geschlossen**:
+  1. **"GameCube Controller" ohne "für"/"pro controller"** — `exclude_category_unless_preceded_by`, identisches Muster wie "pro controller". 0 Kollisionen gegen den vollständigen 318-Fingerprint-Korpus aus `data/price_history.jsonl`.
+  2. **"Plattform + Bindestrich" ohne "für"** (z.B. "Nintendo Switch - Minecraft FRA mit OVP") — nach separater, datengetesteter Review-Runde (erst als Restlücke dokumentiert offen gelassen, dann auf Ansage des Nutzers gezielt geschlossen) über `exclude_category_unless_also_contains` mit Bindestrich/Halbgeviertstrich als Teil des Suchbegriffs (kein neuer Matcher-Mechanismus). 0 Kollisionen gegen 318-Fingerprint- und einen zusätzlich erschlossenen 186-Titel-Rohkorpus (`data/gpu_watch.log.*`, mit Interpunktion).
+- Beide Fixes verwenden ausschließlich bereits produktive YAML-Primitiven, kein neuer Matcher-Code.
+- **Weiterhin bewusst offen (neue, kleinere Restlücke):** Spieltitel VOR der Plattform OHNE nachfolgenden Bindestrich (z.B. "Donkey Kong Bananza Nintendo Switch 2 2025 OVP") — dafür gibt es kein Substring-Muster, das nicht auch echte Geräte-Titel träfe.
 
 ## Abgeschlossen
 
@@ -96,7 +99,7 @@ Wichtige Architekturregeln:
 5. `controller`-`ladekabel`-Exclude separat bewerten.
 6. Resale-Confidence (`HIGH/MEDIUM/LOW`) ist eine mögliche nächste Qualitätsstufe.
 7. automatische Data-Quality-Warnungen weiterentwickeln.
-8. `konsolen_bundles`: "Spieltitel + Plattform ohne 'für'"-Restlücke (siehe Batch-Eintrag oben) — bewusst offen, braucht eigene datengetestete Review-Runde.
+8. `konsolen_bundles`: "Spieltitel VOR Plattform ohne Bindestrich"-Restlücke (siehe Batch-Eintrag oben, z.B. "Donkey Kong Bananza Nintendo Switch 2 2025 OVP") — bewusst offen, kein Substring-Muster ohne Kollisionsrisiko mit echten Geräte-Titeln identifiziert.
 
 ## Nächste Prioritäten
 
