@@ -20,3 +20,4 @@ data/*.txt
 data/time_to_sell.jsonl
 *.backup
 .env.*.tmp
+.claude/
