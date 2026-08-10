@@ -8,7 +8,6 @@ __pycache__/
 .pytest_cache/
 
 # Laufzeit-Daten & Logs
-data/*.json
 data/*.log
 data/*.txt
 
