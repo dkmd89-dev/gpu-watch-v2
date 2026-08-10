@@ -11,6 +11,8 @@ Chat-Anweisung des Nutzers — aber nur für den aktuellen Schritt.
 Vor Beginn jeder Session: beide Dateien lesen. Sie überschreiben ggf. den
 in dieser CLAUDE.md dokumentierten Stand (Commit-Hash, Testzahlen, Kategorienzahl).
 
+- Always respond and write code comments in German.
+
 ---
 
 ## 1. Projekt in einem Satz
