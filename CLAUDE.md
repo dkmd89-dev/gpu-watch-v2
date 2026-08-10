@@ -29,9 +29,16 @@ Diese Regeln gelten für **jede** Aufgabe, unabhängig davon wie sie formuliert 
 2. **Rückwärtskompatibilität ist Pflicht.** Bestehende APIs, YAML-Felder und
    Funktionssignaturen bleiben erhalten, außer eine Änderung ist zwingend nötig
    — dann explizit ankündigen und begründen.
-3. **Keine bestehenden Funktionen entfernen.**
-4. **Keine Threshold-/Score-/Preisgrenzen-Änderung ohne Datenbasis.** Score-Gewichte,
-   Preisgrenzen, `min_rating` etc. werden nicht "gefühlt" angepasst.
+3. **Keine bestehenden Funktionen entfernen ohne vorherige Freigabe.**
+   Wenn du eine bestehende Funktion, ein YAML-Feld, einen Test oder ein
+   Verhalten ändern/entfernen möchtest, das nicht offensichtlich ein Bug ist:
+   - Analyse geben (Was ist betroffen? Warum?)
+   - Alternative vorschlagen
+   - **Auf Freigabe warten.** Nicht selbstständig umsetzen.
+4. **Keine Threshold-/Score-/Preisgrenzen-Änderung ohne Datenbasis.**
+   Score-Gewichte, Preisgrenzen, `min_rating` etc. werden nicht "gefühlt"
+   angepasst. Ausnahme: Der Nutzer gibt explizit eine Datenbasis oder
+   Freigabe für eine Anpassung.
 5. **Keine Tests löschen oder abschwächen**, auch nicht um eine Änderung grün zu bekommen.
 6. **Keine Performance-Optimierung ohne vorherige Messung.**
 7. **Keine bestehende Business-Logik duplizieren** — vorhandene Matcher-/Detector-/
