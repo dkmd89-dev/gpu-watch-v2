@@ -27,10 +27,17 @@ ersetzt.
 | autoradio_opel_corsa | ✅ abgeschlossen | 1 | 2 | 0 | 0 | `-k "autoradio"`: 2/2 |
 | macbook | ✅ abgeschlossen (0 Findings) | 0 | 0 | 0 | 0 | — (kein Fix nötig) |
 | gaming_pc | ✅ abgeschlossen | 3 | 6 | 0 | 0 | `-k "gaming_pc"`: 11/11 |
-| **Kumulativ (alle bisher abgeschlossenen Kategorien)** | | **42** | **113** | **9** | **27** | |
+| m2_ssd | ✅ abgeschlossen (0 Findings) | 0 | 0 | 0 | 0 | — (kein Fix nötig) |
+| cpu_mainboard_bundle | ✅ abgeschlossen (0 Findings) | 0 | 0 | 0 | 0 | — (kein Fix nötig) |
+| **Kumulativ (alle 19 Kategorien des Rulesets, vollständig auditiert)** | | **42** | **113** | **9** | **27** | |
+
+Mit m2_ssd und cpu_mainboard_bundle ist der **komplette Regelsatz**
+(19 Kategorien, `app/rules/*.yaml`) einmal vollständig auditiert —
+entweder in diesem mehrteiligen Durchlauf oder (konsolen_bundles) in
+einem vorherigen Arbeitsblock.
 
 Die kumulative Zeile zählt die vierzehn in diesem Gesamtprojekt gefixten
-Kategorien (gpu und macbook ohne Fix, da je 0 Findings — zählen daher nicht mit,
+Kategorien (gpu, macbook, m2_ssd und cpu_mainboard_bundle ohne Fix, da je 0 Findings — zählen daher nicht mit,
 Zeile bleibt zur Nachvollziehbarkeit trotzdem stehen). Ein weiterer,
 bereits aus einem vorherigen Arbeitsblock bekannter Fall in
 `konsolen_bundles` (1 Titel, "Display Ersatz Konsole...") ist bewusst
@@ -868,6 +875,25 @@ Begriffe wie beim office_pc-Fix.
 **TRUE_POSITIVE-Kollisionen:** 0 — gegen den vollständigen
 18-Titel-Match-Korpus geprüft.
 
+## M2 SSD & CPU-Mainboard-Bundle
+
+**Auswahlgrund:** letzte beiden noch nicht auditierten Kategorien des
+gesamten Rulesets — mit 2 bzw. 1 aktuell matchenden Titeln die mit
+Abstand kleinsten Kategorien, geprüft zur Vollständigkeit des
+Gesamt-Audits.
+
+**m2_ssd** (2 Titel): `ADATA Swordfish 1TB M.2 2280 SSD Speicher`,
+`WD Blue SN5100 NVMe SSD - 1 TB ; Neuwertig` — beide eindeutig echte
+M.2-NVMe-SSDs, korrekt kategorisiert.
+
+**cpu_mainboard_bundle** (1 Titel): `Asus prime b450 m k II + amd
+ryzen 5 5600 prozessor` — ein echtes CPU+Mainboard-Bundle, korrekt
+kategorisiert.
+
+**Ergebnis: 0 reale aktive Fehltreffer** in beiden Kategorien. Kein
+Fix nötig. Damit ist der komplette 19-Kategorien-Regelsatz einmal
+vollständig auditiert.
+
 ## Routing / First-Match-Wins
 
 **Untersuchter Fall:** `Microsoft Xbox One X 1TB Schwarz Inkl OVP Ohne
@@ -1239,16 +1265,19 @@ Desktop-Gaming-PC-Titel).
   `test_matcher_ssd_capacity_requirement.py`,
   `test_notebook_resell_gaming_fix.py`)
 
+**m2_ssd / cpu_mainboard_bundle:** kein separater Testlauf nötig
+(kein Code-/YAML-Änderung, 0 Findings in beiden Kategorien).
+
 **Rule Analyzer (nach allen Schritten):** `0 Findings, 355 Regeln,
 19 Kategorien` (unverändert).
 
 **Volle Suite (Zwischenstand nach den ersten zwölf Kategorien dieses
-Gesamtprojekts, auf Freigabe ausgeführt):** `pytest app/tests/` —
-**1233/1233 passed, 0 failed** (620,33s). Vorheriger dokumentierter
-Stand (vor diesem Durchlauf, Basis PR #10): 1197/1197 passed — die
-Differenz (36 neue Tests) entspricht den bis dahin neu hinzugekommenen
-Regressionstestdateien je auditierter Kategorie. **controller** (3
-weitere neue Tests), **autoradio_opel_corsa** (2 weitere neue Tests)
-und **gaming_pc** (3 weitere neue Tests) sind in diesem Suite-Lauf
-noch NICHT enthalten — laufen in der finalen Suite mit, sobald dieser
-fortgesetzte Durchlauf abgeschlossen und erneut freigegeben wird.
+Gesamtprojekts):** `pytest app/tests/` — 1233/1233 passed, 0 failed
+(620,33s).
+
+**Volle Suite (finaler Stand nach Abschluss des kompletten
+19-Kategorien-Rulesets, auf Freigabe ausgeführt):** `pytest
+app/tests/` — **1241/1241 passed, 0 failed** (622,17s). Differenz zum
+Zwischenstand (8 neue Tests) entspricht den in controller (3),
+autoradio_opel_corsa (2) und gaming_pc (3) neu hinzugekommenen
+Regressionstests.
