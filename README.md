@@ -90,6 +90,12 @@ Vor jeder Regeländerung empfiehlt sich ein Lauf des read-only
 Diagnose-Moduls `app/rule_analyzer.py` (prüft u.a. auf unerreichbare
 Regeln, Duplikate und Exclude-Konflikte) sowie die Testsuite.
 
+Alle 19 Kategorien wurden im Rahmen eines systematischen
+Active-False-Positive-Audits einmal vollständig gegen den echten
+Produktivkorpus geprüft (113 real bestätigte Fehltreffer über 14
+Kategorien behoben, 4 Kategorien ohne Befund) — Details und
+Methodik in `docs/ACTIVE_FALSE_POSITIVE_AUDIT.md`.
+
 ## Entwicklung
 
 ```bash
@@ -120,5 +126,5 @@ Geschützte Kernsysteme (Deal-Score, Top-Deal-Logik, Flip-/Resale-
 Berechnung, Notification-Gate, Price-History-Persistenz, Duplicate
 Detection, Presence Tracking, Category Validation) werden nur bei
 nachgewiesenen Matcher-Bugs gezielt angepasst — Details zur
-Entwicklungshistorie stehen in `PROJEKTSTAND_KOMPLETT.md` und
+Entwicklungshistorie stehen in `TECHNISCHER_PROJEKTSTATUS.md` und
 `STATUS.md`.

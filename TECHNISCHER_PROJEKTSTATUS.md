@@ -2,18 +2,18 @@
 
 > **Single Source of Truth für den technischen Ist-Zustand.**
 >
-> Stand: **2026-08-10**
+> Stand: **2026-08-11**
 > Repository: `dkmd89-dev/gpu-watch-v2`
 > Branch: `main`
-> **Letzter Code-Commit:** `ca4b35be153c1982187fcae09e5c99b55fbf2b25` (PR #8, squash-gemergt)
-> **Commit:** `fix(konsolen_bundles): GameCube-Controller- und Plattform-Bindestrich-Fehltreffer ausschließen (#8)`
-> **HEAD (main):** `ca4b35be153c1982187fcae09e5c99b55fbf2b25`
+> **Letzter Code-Commit:** `1f6555317152b453415e8f74f043a2bcdd758095` (PR #25, Merge-Commit)
+> **Commit:** `docs: kompletten 19-Kategorien-Ruleset-Audit abschließen (#25)`
+> **HEAD (main):** `1f6555317152b453415e8f74f043a2bcdd758095`
 > Ausgangspunkt dieser Konsolidierung: `d2effe7`
-> Vergleich: **61 Commits ahead, 0 behind** bis `fa218a0`; danach `3eed07f` (Code) + 4 reine Doku-/Chore-Commits bis `0757580`; danach PR #8 (squash) bis `ca4b35b`
+> Vergleich zum vorherigen dokumentierten Stand (`ca4b35b`, PR #8): 17 gemergte PRs (#9–#25) — 15 mit Code-/Regeländerung (PR #10–#24), 3 reine Doku-Commits (#9, #21, #25)
 >
-> PR #8 (Dashboard-Match-Validierung Variante C, siehe Abschnitt 3.8) ist gemergt. Der technische Code-Stand von `main` ist damit `ca4b35b`.
+> PR #11–#25 (systematischer Active-False-Positive-Audit über alle 19 Kategorien, siehe Abschnitt 3.9) sind gemergt. Der technische Code-Stand von `main` ist damit `1f65553`.
 >
-> Diese Datei ersetzt `PROJEKTSTAND_KOMPLETT.md`. Historische Phasenberichte bleiben als Detaildokumentation erhalten; widersprüchliche ältere Ist-Stand-Angaben gelten nicht mehr als aktuell.
+> Diese Datei ersetzt `PROJEKTSTAND_KOMPLETT.md` (Datei mittlerweile aus dem Repository entfernt). Historische Phasenberichte bleiben als Detaildokumentation erhalten; widersprüchliche ältere Ist-Stand-Angaben gelten nicht mehr als aktuell.
 
 ---
 
@@ -31,29 +31,37 @@ Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und ko
 
 ```text
 Branch: main
-Letzter Code-Commit: ca4b35b (PR #8, squash-gemergt)
-Commit: fix(konsolen_bundles): GameCube-Controller- und Plattform-Bindestrich-Fehltreffer ausschließen (#8)
-Datum: 2026-08-10
-Davor: 3eed07f (fix: Plattformbegriff/Mainboard/Zubehör-Fehltreffer in drei Kategorien beheben)
-Vergleich d2effe7...fa218a0: 61 Commits ahead, 0 behind
-fa218a0..3eed07f: 1 Code-Commit; 3eed07f..0757580: 4 reine Doku-/Chore-Commits;
-0757580..ca4b35b: PR #8 (squash, 3 Commits)
+Letzter Code-Commit: 1f65553 (PR #25, Merge-Commit)
+Commit: docs: kompletten 19-Kategorien-Ruleset-Audit abschließen (#25)
+Datum: 2026-08-11
+Davor: 158f2ed (docs: kompletten 19-Kategorien-Ruleset-Audit abschließen)
+Vorheriger dokumentierter Stand: ca4b35b (PR #8)
+ca4b35b..1f65553: 17 gemergte PRs (#9-#25) -- #9/#21/#25 reine
+Doku-Commits, #10-#24 mit Code-/Regeländerung (#10 konsolen_bundles,
+#11 handhelds, #12 office_pc+retro_konsolen, #13 gpu+lego_minifiguren,
+#14 iphone, #15 monitor_curved, #16 vintage_elektronik, #17 netzteil,
+#18 notebook_resell, #19 ram, #20 sata_ssd, #22 controller, #23
+autoradio_opel_corsa, #24 gaming_pc+macbook)
 ```
 
-PR #6 wurde am 2026-08-09 gemergt. `3eed07f` wurde direkt gegen `main` committet (kein separater PR-Merge-Vorgang dokumentiert). PR #8 (Abschnitt 3.8) wurde am 2026-08-10 als Squash-Merge gemergt.
+PR #6 wurde am 2026-08-09 gemergt, PR #8 am 2026-08-10. PR #11–#25 (systematischer Active-False-Positive-Audit über alle 19 Kategorien, siehe Abschnitt 3.9) wurden zwischen 2026-08-10 und 2026-08-11 gemergt, jeweils als eigener Feature-Branch → PR → Merge-Commit auf `main`.
 
 ### Teststand
 
-Der zuletzt dokumentierte vollständige Lauf, direkt aus der Commit-Message von `3eed07f` übernommen:
+In dieser Session tatsächlich lokal ausgeführt und verifiziert (kein Sandbox-Installationsproblem mehr, `pytest`/`flask`/`pyyaml` verfügbar):
 
 ```text
-Vollständige Testsuite: 1175/1175 bestanden
-(PR #6 / fa218a0 dokumentierte zuvor 1142/0; 3eed07f fügte 3 neue
-Regressions-Testdateien für den Plattformbegriff-/Mainboard-/
-Zubehör-Fix hinzu)
+Zwischenstand (nach den ersten 12 der 19 Kategorien):
+pytest app/tests/ -> 1233 passed, 0 failed (620,33s)
+
+Finaler Stand (nach Abschluss aller 19 Kategorien, PR #25):
+pytest app/tests/ -> 1241 passed, 0 failed (622,17s)
+
+rule_analyzer.py (nach jedem Einzel-Fix erneut verifiziert):
+355 Regeln, 19 Kategorien, 0 Findings -- durchgehend unverändert
 ```
 
-**Hinweis:** Ein neuer lokaler `pytest`-Lauf war in dieser Dokumentationssession nicht möglich — `pytest` selbst ließ sich im Sandbox-Container nicht installieren (kein PyPI-Zugriff, 403 beim Nachinstallieren von `pytest`/`flask`/`pyyaml`). 1175/0 wird deshalb als der zuletzt im Commit dokumentierte Verifikationsstand geführt, nicht als in dieser Session selbst reproduziert. Für den separaten, noch nicht gemergten Batch (Abschnitt 3.8) wurden die betroffenen Testdateien stattdessen per direktem Funktionsaufruf (ohne `pytest`-Runner) ausgeführt.
+Vorheriger dokumentierter Stand (`3eed07f`, aus Commit-Message übernommen, nicht selbst reproduziert): 1175/1175. Die volle Suite wurde in diesem Durchlauf bewusst nicht nach jeder Einzelkategorie ausgeführt (Vorgabe des Nutzers), sondern nur an den beiden genannten Batch-Grenzen — nach jedem Einzel-Fix lief stattdessen ausschließlich der kategorienbezogene Testlauf (`pytest app/tests/ -k "<kategorie>"`).
 
 ---
 
@@ -184,6 +192,46 @@ Beide Fixes verwenden ausschließlich bereits produktive YAML-Primitiven; es wur
 
 Testabdeckung: `app/tests/test_konsolen_bundles_plattform_referenz_fix.py` (23/23 bestanden, manuell per Funktionsaufruf verifiziert, siehe Teststand-Hinweis oben, da `pytest` in der Sandbox nicht installierbar war). 8 weitere themennahe Testdateien ebenso manuell geprüft: 194 bestanden, 5 Fehlschläge — ausschließlich durch fehlende Module (`flask`/`pytest`) im Sandbox-Container, nicht durch die Änderung verursacht. `rule_analyzer.py`: 0 Findings.
 
+### 3.9 Systematischer Active-False-Positive-Audit über alle 19 Kategorien (abgeschlossen, PR #11–#25 gemergt)
+
+Direkte methodische Fortsetzung von Abschnitt 3.7/3.8, jetzt aber **vollständig statt exemplarisch**: statt einzelner, punktuell gemeldeter Fehltreffer wurde für jede der 19 Kategorien in `app/rules/` der komplette aktuell live matchende `found.json`-Korpus einzeln gegen die produktiven Regeln geprüft — nicht nur eine Stichprobe. Reihenfolge der Kategorien: evidenzbasiert nach aktuellem Matchvolumen (höchstes zuerst), neu bestimmt nach jeder abgeschlossenen Kategorie, nicht nach Gefühl vorab festgelegt.
+
+**Methodik je Kategorie:**
+
+1. Live-Auswertung aller aktuell matchenden Titel via `matcher.load_rules()` + `matcher.evaluate()` gegen die produktiven `app/rules/*.yaml`, mit dem **echten** `found.json`-Preis (nicht `price=0.0` — ein früher Testartefakt zeigte, dass `price=0.0` First-Match-Wins bei preisgedeckelten Regeln systematisch verzerrt, siehe `docs/ACTIVE_FALSE_POSITIVE_AUDIT.md`, Abschnitt "Routing / First-Match-Wins").
+2. Jeder Treffer einzeln auf reale Fehlklassifikation geprüft (kein Ruleset-Review auf Verdacht).
+3. Root-Cause-Analyse je gefundenem Muster, Kollisionsprüfung gegen den vollständigen Korpus der Kategorie vor jeder Änderung.
+4. Fix ausschließlich additiv über bestehende YAML-Primitiven (`exclude_category`, `exclude_category_unless_also_contains`, `exclude_category_unless_preceded_by`) — kein neuer Matcher-Mechanismus, keine neue Detector-Logik.
+5. Dedizierte Regressionstestdatei pro Kategorie (`app/tests/test_<kategorie>_active_fp_audit_fix.py`), kategorienbezogener Testlauf sofort danach.
+6. Ergebnis in `docs/ACTIVE_FALSE_POSITIVE_AUDIT.md` dokumentiert statt in einer neuen Report-Datei je Kategorie.
+
+**Ergebnis (14 Kategorien mit realen Fixes, 42 Muster / 113 Titel):**
+
+| Kategorie | Muster | Titel | Kernbefund |
+|---|---:|---:|---|
+| handhelds | 8 | 10 | Displayschutz/Ersatzstift/Schutzhülle-Komposita, "Spiele für"-Software statt Gerät |
+| office_pc | 2 | 27 | Bare Mainboard/Aufrüstkit-Bundles ohne Gehäuse (Kategorie hatte bisher bewusst kein `exclude_category`) |
+| retro_konsolen | 3 | 9 | Standalone Memory Cards (kontextbewusst gelöst, ohne 2 echte Bundles zu zerstören) |
+| lego_minifiguren | 1 | 1 | Negation "Ohne Figuren" vor bare "figuren" |
+| iphone | 1 | 1 | "Leere Originalverpackung" ohne Gerät |
+| monitor_curved | 2 | 2 | PS-Konsolen-Kurzform ("ps4slim"), Heimtrainer-Display |
+| vintage_elektronik | 11 | 40 | **Größter Einzelfund** — Sony-PVM/BVM-Ersatzteile (Platine/Akku/Chip), da die "Profi-CRT-Monitor"-Regel die Excludes der Schwesterregel "Röhrenfernseher" nicht geerbt hatte |
+| netzteil | 1 | 2 | HiFi-Verstärker mit Watt-Angabe, vom PSU-Detector fehlinterpretiert |
+| notebook_resell | 1 | 2 | "Ohne SSD/RAM" — Negation vor bare "ssd" |
+| ram | 2 | 2 | Pluralform "Laptops", Schreibweise "SO- DIMM" |
+| sata_ssd | 1 | 3 | Externe USB-SSDs ("Portable", "Externer Speicher") |
+| controller | 5 | 6 | Zubehör (Halter/Akku/Empfänger/Ersatzteile) + real bestätigtes, im Code bereits dokumentiertes Konsolen-Bundle-Restrisiko |
+| autoradio_opel_corsa | 1 | 2 | OEM-Werksteile über generisches "multimedia"-Signalwort |
+| gaming_pc | 3 | 6 | Gaming-Laptops + bares Mainboard-Bundle (identische Root Cause wie office_pc, dort bereits real widerlegte "kein exclude_category"-Annahme) |
+
+**4 Kategorien mit verifiziert 0 Findings** (kein Fix, dokumentiert statt stillschweigend übersprungen): `gpu`, `macbook`, `m2_ssd`, `cpu_mainboard_bundle`.
+
+**9 Muster / 27 Titel real belegt, aber bewusst zurückgestellt** (P1/P2 — zu dünne Evidenz für eine verallgemeinerbare Regel oder ungelöstes Kollisionsrisiko, z.B. `iphone` "Zubehörpaket" mit widersprüchlicher Evidenz auf beiden Seiten). Vollständige Liste mit Einzelbegründung: `docs/ACTIVE_FALSE_POSITIVE_AUDIT.md`.
+
+**Methodischer Nebenbefund:** `data/found.json` wird von einem laufenden Produktiv-Scanner (Docker Compose) live verändert — Titelzahlen zwischen Audit-Schritten sind Momentaufnahmen, keine stabilen, exakt reproduzierbaren Werte. Ohne Einfluss auf die Korrektheit der einzelnen Fixes (jeder Fund wurde zum jeweiligen Auswertungszeitpunkt einzeln real verifiziert).
+
+Testabdeckung: 14 neue Regressionstestdateien. Innerhalb dieses Audit-Durchlaufs (PR #11–#24, ab dem zu Beginn selbst verifizierten Stand 1197/1197 nach handhelds) wuchs die volle Suite auf **1241/1241** — 44 neue Tests. Der ältere Referenzwert 1175/1175 (`3eed07f`, vor PR #8/#10) ist nicht direkt vergleichbar, da die volle Suite zwischen `3eed07f` und dem Start dieses Durchlaufs nicht durchgehend lokal reproduziert wurde (siehe Abschnitt 3.8, Teststand-Hinweis dort). `rule_analyzer.py`: durchgehend 0 Findings, 355 Regeln, 19 Kategorien — unverändert über den gesamten Durchlauf.
+
 ---
 
 ## 4. Datenqualität
@@ -198,7 +246,7 @@ Phase 15 dokumentierte:
 - 3 Orphan-Modelle aus der nicht mehr vorhandenen Kategorie `spielzeug_bundles` mit zusammen 663 historischen Datenpunkten
 - eine damalige Gesamt-False-Positive-Rate von 17,2 % in der Coverage-Analyse; diese Zahl ist wegen Alt-/Neudatenvermischung ausdrücklich nur als Beobachtungswert zu verstehen
 
-Der anschließende PR-#6-Audit adressiert bereits mehrere konkrete False Positives. Eine erneute Coverage-Messung nach ausreichend neuer Datensammlung bleibt sinnvoll.
+Der anschließende PR-#6-Audit adressiert bereits mehrere konkrete False Positives; der systematische Active-False-Positive-Audit (Abschnitt 3.9, PR #11–#25) hat diese Arbeit auf **alle 19 Kategorien** ausgeweitet und dabei 113 weitere reale Fehltreffer-Titel beseitigt (u.a. den mit 40 Titeln größten Einzelfund des Projekts in `vintage_elektronik`). `price_history.jsonl` ist inzwischen auf 11.799 Datenpunkte gewachsen (Stand 2026-08-11, reine Zeilenzählung — keine erneute vollständige Coverage-/Model-Abdeckungsanalyse in dieser Session durchgeführt). Eine erneute Coverage-Messung mit überwiegend Post-Audit-Daten bleibt der nächste sinnvolle Schritt (siehe Abschnitt 7, P0).
 
 ### Offene Datenqualitätsfragen
 
@@ -206,6 +254,8 @@ Der anschließende PR-#6-Audit adressiert bereits mehrere konkrete False Positiv
 - 22 Regeln ohne Produktivdaten weiter beobachten
 - Orphan-Daten der entfernten `spielzeug_bundles`-Kategorie nicht ohne expliziten Auftrag löschen
 - `RX 7600 XT`/`RX 7600`-Überlappung und `controller`-`ladekabel`-Exclude als dokumentierte Restlücken aus Phase 15
+- 9 Muster / 27 Titel aus dem Active-False-Positive-Audit (Abschnitt 3.9) bewusst zurückgestellt (P1/P2) — vollständige Liste: `docs/ACTIVE_FALSE_POSITIVE_AUDIT.md`
+- Coverage-/False-Positive-Rate erneut messen, sobald überwiegend Post-Audit-Daten vorliegen (letzter Beobachtungswert 17,2 % gilt weiterhin als nicht belastbar, siehe oben)
 
 ---
 
@@ -264,6 +314,8 @@ Folgende Punkte sind **nicht** durch die Konsolidierung als abgeschlossen zu bet
 5. Cross-Platform-Duplicate-Identity ist weiter ausbaufähig.
 6. Die dokumentierten Phase-15-Restlücken (`rx_7600_xt`, `controller.yaml`/`ladekabel`) warten auf eine bewusst getrennte Regeländerung.
 7. `konsolen_bundles`: "Spieltitel VOR Plattform ohne Bindestrich"-Restlücke (Abschnitt 3.8, z.B. "Donkey Kong Bananza Nintendo Switch 2 2025 OVP") — bewusst offen, kein kollisionsfreies Substring-Muster identifiziert.
+8. 9 Muster / 27 Titel aus dem Active-False-Positive-Audit (Abschnitt 3.9) bewusst zurückgestellt (P1/P2), nicht gefixt — vollständige Liste mit Einzelbegründung: `docs/ACTIVE_FALSE_POSITIVE_AUDIT.md`.
+9. Coverage-/False-Positive-Rate-Neumessung nach dem Audit (Abschnitt 3.9) steht noch aus — der 17,2-%-Beobachtungswert aus Phase 15 bleibt bis dahin nicht belastbar.
 
 ---
 
