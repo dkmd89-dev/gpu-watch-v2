@@ -24,9 +24,10 @@ ersetzt.
 | ram | ✅ abgeschlossen | 2 | 2 | 0 | 0 | `-k "ram"`: 42/42 |
 | sata_ssd | ✅ abgeschlossen | 1 | 3 | 0 | 0 | `-k "sata_ssd"`: 20/20 |
 | controller | ✅ abgeschlossen | 5 | 6 | 0 | 0 | `-k "controller"`: 69/69 |
-| **Kumulativ (handhelds + office_pc + retro_konsolen + lego_minifiguren + iphone + monitor_curved + vintage_elektronik + netzteil + notebook_resell + ram + sata_ssd + controller)** | | **38** | **105** | **9** | **27** | |
+| autoradio_opel_corsa | ✅ abgeschlossen | 1 | 2 | 0 | 0 | `-k "autoradio"`: 2/2 |
+| **Kumulativ (alle bisher abgeschlossenen Kategorien)** | | **39** | **107** | **9** | **27** | |
 
-Die kumulative Zeile zählt die zwölf in diesem Durchlauf gefixten
+Die kumulative Zeile zählt die dreizehn in diesem Gesamtprojekt gefixten
 Kategorien (gpu ohne Fix, da 0 Findings — zählt daher nicht mit,
 Zeile bleibt zur Nachvollziehbarkeit trotzdem stehen). Ein weiterer,
 bereits aus einem vorherigen Arbeitsblock bekannter Fall in
@@ -63,7 +64,8 @@ synonym verwendet):
   notebook_resell-Titel (notebook_resell-Schritt), 81 damals matchende
   ram-Titel (ram-Schritt), 75 damals matchende sata_ssd-Titel
   (sata_ssd-Schritt), 56 damals matchende controller-Titel
-  (controller-Schritt).
+  (controller-Schritt), 55 damals matchende autoradio_opel_corsa-Titel
+  (autoradio_opel_corsa-Schritt).
 - **Methodik-Hinweis, neu entdeckt im iphone-Schritt (wichtig):**
   `data/found.json` wird von einem laufenden Produktiv-Scanner (Docker
   Compose) live verändert — zwei Live-Auswertungen im Abstand weniger
@@ -221,6 +223,13 @@ Einzelfund dieses gesamten Durchlaufs:**
 | controller | Konsolen-Bundle über Speicherkapazität (bereits im Regel-Kommentar dokumentiertes Restrisiko, jetzt real bestätigt) | `XBOX Series S 1TB + 2 Controller[...]` | 1 |
 | **Summe controller** | **5 Muster** | | **6 Titel** |
 
+**Gefixt im autoradio_opel_corsa-Schritt (1 Muster / 2 Titel):**
+
+| Kategorie | Muster | Betroffene Titel (Beispiel) | Anzahl Titel |
+|---|---|---|---:|
+| autoradio_opel_corsa | OEM-Werksteile (Steuergerät/CD-Player-Modul) über generisches "multimedia"-Signalwort | `Opel Corsa D Radio Multimedia Steuergerät MMI 13289918`, `...CP Player 13357124` | 2 |
+| **Summe autoradio_opel_corsa** | **1 Muster** | | **2 Titel** |
+
 **Zurückgestellt, real bestätigt, aktuell noch offen (P1/P2, 9 Fälle / 27 Titel):**
 
 | Kategorie | Priorität | Muster | Anzahl Titel | Grund für Zurückstellung |
@@ -245,10 +254,11 @@ Durchlaufs (nicht in der Summe oben):**
 
 **Kumulativ (handhelds + office_pc + retro_konsolen + gpu +
 lego_minifiguren + iphone + monitor_curved + vintage_elektronik +
-netzteil + notebook_resell + ram + sata_ssd + controller, alle
-dreizehn in diesem Gesamtprojekt abgeschlossenen Kategorien): 10 + 27 +
-9 + 0 + 1 + 1 + 2 + 40 + 2 + 2 + 2 + 3 + 6 = 105 Titel gefixt, 3 + 7 +
-14 + 0 + 0 + 2 + 0 + 1 + 0 + 0 + 0 + 0 + 0 = 27 Titel zurückgestellt.**
+netzteil + notebook_resell + ram + sata_ssd + controller +
+autoradio_opel_corsa, alle vierzehn in diesem Gesamtprojekt
+abgeschlossenen Kategorien): 10 + 27 + 9 + 0 + 1 + 1 + 2 + 40 + 2 + 2 +
+2 + 3 + 6 + 2 = 107 Titel gefixt, 3 + 7 + 14 + 0 + 0 + 2 + 0 + 1 + 0 +
+0 + 0 + 0 + 0 + 0 = 27 Titel zurückgestellt.**
 
 ## Handhelds
 
@@ -743,6 +753,34 @@ Titel** gefunden:
 **TRUE_POSITIVE-Kollisionen:** 0 — gegen den vollständigen
 56-Titel-Match-Korpus geprüft, inkl. des "TMR Sticks"-Grenzfalls.
 
+## Autoradio Opel Corsa
+
+**Auswahlgrund:** evidenzbasiert — Fortsetzung mit den verbleibenden
+kleineren Kategorien; `autoradio_opel_corsa` hatte mit 55 aktuell
+matchenden Titeln das höchste Matchvolumen der verbleibenden
+Kategorien (vor macbook 50).
+
+**Vollständiger Active-FP-Audit:** alle 55 damals live matchenden
+Titel einzeln durchgesehen — eine sehr homogene Nischen-Kategorie (fast
+alle Titel folgen demselben Muster: Android-Aftermarket-Autoradio für
+Opel Corsa D/Astra H/Zafira B, chinesische No-Name-Hersteller,
+Carplay/GPS/DAB+-Ausstattung).
+
+**Kernfund:** 2 Titel — `Opel Corsa D Radio Multimedia Steuergerät MMI
+13289918` (40€) und `Opel Corsa D Radio Multimedia CP Player 13357124`
+(80,50€) — matchen als Android-Designradio, obwohl es sich um
+OEM-Werksteile handelt (Original-Steuergerät bzw. CD-Player-Modul mit
+Opel-Werksteilenummer im Titel, keinerlei Android-/Carplay-/
+Navigationsradio-Erwähnung). Root Cause: beide Titel erfüllen die
+zweite `require_all_of`-Gruppe ausschließlich über das generische
+Signalwort `"multimedia"` — ein Begriff, den Opel selbst für die
+Bezeichnung des werksseitigen Infotainment-Steuergeräts verwendet, der
+aber in der Kategorie ursprünglich als Signal für ein
+Android-Aftermarket-Gerät gedacht war.
+
+**TRUE_POSITIVE-Kollisionen:** 0 — gegen den vollständigen
+55-Titel-Match-Korpus geprüft.
+
 ## Routing / First-Match-Wins
 
 **Untersuchter Fall:** `Microsoft Xbox One X 1TB Schwarz Inkl OVP Ohne
@@ -979,6 +1017,17 @@ Ersatzteil-Fehltreffer, 1 FP-Regressionstest für den Konsolen-Bundle-
 Fehltreffer, 1 Sammel-TP-Sicherheitstest inkl. des "TMR Sticks"-
 Grenzfalls).
 
+**autoradio_opel_corsa:** `app/rules/autoradio_opel_corsa.yaml`,
+`exclude_category`: **2 neue** bare-word/phrase Excludes für das **1
+gefixte Muster** (`steuergerät`, `cp player`). 0 Kollisionen gegen den
+vollständigen 55-Titel-Match-Korpus. Reine additive
+`exclude_category`-Ergänzung, kein neuer Matcher-Mechanismus.
+
+Neue Regressionstestdatei: `app/tests/test_autoradio_opel_corsa_active_fp_audit_fix.py`
+(2 Tests: 1 FP-Regressionstest für beide real bestätigten OEM-
+Werksteile-Fehltreffer, 1 Sammel-TP-Sicherheitstest für 3 reale
+Android-Designradio-Titel).
+
 ## Testergebnis
 
 **handhelds:**
@@ -1071,6 +1120,11 @@ Grenzfalls).
   `test_retro_konsolen_controller_signal_fix.py`,
   `test_rule_regressions.py`, `test_rule_service_modding_fix.py`)
 
+**autoradio_opel_corsa:**
+- `pytest app/tests/ -k "autoradio" -v`: **2/2 passed** (beide neu,
+  keine bestehenden autoradio_opel_corsa-spezifischen Tests vor diesem
+  Schritt vorhanden)
+
 **Rule Analyzer (nach allen Schritten):** `0 Findings, 355 Regeln,
 19 Kategorien` (unverändert).
 
@@ -1080,7 +1134,8 @@ Gesamtprojekts, auf Freigabe ausgeführt):** `pytest app/tests/` —
 Stand (vor diesem Durchlauf, Basis PR #10): 1197/1197 passed — die
 Differenz (36 neue Tests) entspricht den bis dahin neu hinzugekommenen
 Regressionstestdateien je auditierter Kategorie. **controller** (3
-weitere neue Tests) ist in diesem Suite-Lauf noch NICHT enthalten —
-läuft in der finalen Suite mit, sobald der fortgesetzte Durchlauf mit
-den verbleibenden kleineren Kategorien erneut abgeschlossen und
-freigegeben wird.
+weitere neue Tests) und **autoradio_opel_corsa** (2 weitere neue
+Tests) sind in diesem Suite-Lauf noch NICHT enthalten — laufen in der
+finalen Suite mit, sobald der fortgesetzte Durchlauf mit den
+verbleibenden kleineren Kategorien erneut abgeschlossen und freigegeben
+wird.

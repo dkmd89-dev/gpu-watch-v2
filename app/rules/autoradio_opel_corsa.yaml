@@ -78,6 +78,18 @@ exclude_category:
   - "MP3 Radio"              # Nur MP3-Radio ohne Android
   - "RDS Radio"              # Nur RDS-Radio (ältere Technik)
 
+  # FIX (Active-False-Positive-Audit, docs/ACTIVE_FALSE_POSITIVE_AUDIT.md):
+  # OEM-Werksteile (Original-Steuergerät/CD-Player-Modul mit Opel-
+  # Teilenummer) matchten fälschlich über das generische "multimedia"-
+  # Signalwort in Gruppe 2, obwohl es sich nicht um ein Android-Aftermarket-
+  # Designradio handelt. Real bestätigt gegen found.json (2 Titel im
+  # vollständigen 55-Titel-Match-Korpus): "Opel Corsa D Radio Multimedia
+  # Steuergerät MMI 13289918" (40€), "Opel Corsa D Radio Multimedia CP
+  # Player 13357124" (80,50€) -- beide ohne jede Android-/Carplay-/
+  # Navigationsradio-Erwähnung, mit Opel-Werksteilenummer im Titel.
+  - "steuergerät"
+  - "cp player"
+
 # Die eigentlichen Matching-Regeln
 rules:
   # === ALLGEMEINE REGELN (für alle Marken) ===
