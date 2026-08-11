@@ -996,9 +996,9 @@ Fehltreffer, 1 Sammel-TP-Sicherheitstest für 3 reale SATA-SSD-Titel).
 **Rule Analyzer (nach allen Schritten):** `0 Findings, 355 Regeln,
 19 Kategorien` (unverändert).
 
-**Volle Suite:** noch nicht erneut ausgeführt seit dem handhelds-Fix —
-läuft laut Teststrategie dieses Durchlaufs erst am Ende dieses
-Optimierungsdurchlaufs, auf explizite Freigabe. Letzter dokumentierter
-vollständiger Lauf (vor office_pc/retro_konsolen/gpu/lego_minifiguren/
-iphone/monitor_curved/vintage_elektronik/netzteil/notebook_resell/ram/
-sata_ssd): **1197/1197 passed, 0 failed** (604s).
+**Volle Suite (nach Abschluss aller zwölf Kategorien dieses
+Durchlaufs, auf Freigabe ausgeführt):** `pytest app/tests/` —
+**1233/1233 passed, 0 failed** (620,33s). Vorheriger dokumentierter
+Stand (vor diesem Durchlauf, Basis PR #10): 1197/1197 passed — die
+Differenz (36 neue Tests) entspricht den in diesem Durchlauf neu
+hinzugekommenen Regressionstestdateien je auditierter Kategorie.
