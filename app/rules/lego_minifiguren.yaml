@@ -139,6 +139,23 @@ exclude_category:
   - "nachbau"
   - "custom"          # verhindert viele nicht originale Custom-Figuren
 
+  # FIX (Active-False-Positive-Audit, docs/ACTIVE_FALSE_POSITIVE_AUDIT.md):
+  # Negation direkt vor "figur"/"figuren" wird von den require_all_of-
+  # Gruppen nicht erkannt -- "Ohne Figuren" enthält das Wort "figuren"
+  # genauso wie ein echtes Figuren-Angebot. Real bestätigt gegen
+  # found.json (1 Titel im vollständigen 1750-Titel-Korpus, exakt dieses
+  # Muster): "Lego Star Wars Sammlung, 75082,7959,9488, Komplett Ohne
+  # Figuren" (reines Set-/Fahrzeug-Konvolut OHNE Minifiguren, matchte
+  # bisher als "LEGO Minifiguren-Sammlung"). Singular/Plural beider
+  # Wortformen ("figur"/"minifigur") als bare Phrase ergänzt, analog zum
+  # bereits etablierten Singular/Plural-Muster (siehe handhelds.yaml,
+  # "ersatzstift"/"ersatzstifte") -- kein Beleg für andere Negationswörter
+  # ("keine"/"kein") im Korpus, daher bewusst nicht ergänzt.
+  - "ohne figur"
+  - "ohne figuren"
+  - "ohne minifigur"
+  - "ohne minifiguren"
+
 scoring_weights:
   price: 0.70
   ausstattung: 0
