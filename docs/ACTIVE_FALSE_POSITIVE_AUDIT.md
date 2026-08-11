@@ -20,9 +20,10 @@ ersetzt.
 | monitor_curved | ✅ abgeschlossen | 2 | 2 | 0 | 0 | `-k "monitor_curved"`: 4/4 |
 | vintage_elektronik | ✅ abgeschlossen | 11 | 40 | 1 | 1 | `-k "vintage_elektronik"`: 5/5 |
 | netzteil | ✅ abgeschlossen | 1 | 2 | 0 | 0 | `-k "netzteil"`: 20/20 |
-| **Kumulativ (handhelds + office_pc + retro_konsolen + lego_minifiguren + iphone + monitor_curved + vintage_elektronik + netzteil)** | | **29** | **92** | **9** | **27** | |
+| notebook_resell | ✅ abgeschlossen | 1 | 2 | 0 | 0 | `-k "notebook_resell"`: 21/21 |
+| **Kumulativ (handhelds + office_pc + retro_konsolen + lego_minifiguren + iphone + monitor_curved + vintage_elektronik + netzteil + notebook_resell)** | | **30** | **94** | **9** | **27** | |
 
-Die kumulative Zeile zählt die acht in diesem Durchlauf gefixten
+Die kumulative Zeile zählt die neun in diesem Durchlauf gefixten
 Kategorien (gpu ohne Fix, da 0 Findings — zählt daher nicht mit,
 Zeile bleibt zur Nachvollziehbarkeit trotzdem stehen). Ein weiterer,
 bereits aus einem vorherigen Arbeitsblock bekannter Fall in
@@ -55,7 +56,8 @@ synonym verwendet):
   damals matchende iphone-Titel (iphone-Schritt), 133 damals matchende
   monitor_curved-Titel (monitor_curved-Schritt), 108 damals matchende
   vintage_elektronik-Titel (vintage_elektronik-Schritt), 94 damals
-  matchende netzteil-Titel (netzteil-Schritt).
+  matchende netzteil-Titel (netzteil-Schritt), 84 damals matchende
+  notebook_resell-Titel (notebook_resell-Schritt).
 - **Methodik-Hinweis, neu entdeckt im iphone-Schritt (wichtig):**
   `data/found.json` wird von einem laufenden Produktiv-Scanner (Docker
   Compose) live verändert — zwei Live-Auswertungen im Abstand weniger
@@ -180,6 +182,13 @@ Einzelfund dieses gesamten Durchlaufs:**
 | netzteil | HiFi-Verstärker mit Watt-Angabe (psu.py-Detector interpretiert Verstärker-Ausgangs-Watt als PSU-Watt) | `1000W Verstärker Stereo Amplifier HIFI...`, `600W Bluetooth Mini Verstärker HiFi...` | 2 |
 | **Summe netzteil** | **1 Muster** | | **2 Titel** |
 
+**Gefixt im notebook_resell-Schritt (1 Muster / 2 Titel):**
+
+| Kategorie | Muster | Betroffene Titel (Beispiel) | Anzahl Titel |
+|---|---|---|---:|
+| notebook_resell | "Ohne SSD/RAM" — Negation vor bare "ssd" nicht erkannt (Gruppe-3-Alternative) | `Lenovo ThinkPad L14 Gen 3...BIOS OK \| Ohne SSD/RAM` (2×) | 2 |
+| **Summe notebook_resell** | **1 Muster** | | **2 Titel** |
+
 **Zurückgestellt, real bestätigt, aktuell noch offen (P1/P2, 9 Fälle / 27 Titel):**
 
 | Kategorie | Priorität | Muster | Anzahl Titel | Grund für Zurückstellung |
@@ -204,9 +213,10 @@ Durchlaufs (nicht in der Summe oben):**
 
 **Kumulativ (handhelds + office_pc + retro_konsolen + gpu +
 lego_minifiguren + iphone + monitor_curved + vintage_elektronik +
-netzteil, alle neun in diesem Durchlauf abgeschlossenen Kategorien):
-10 + 27 + 9 + 0 + 1 + 1 + 2 + 40 + 2 = 92 Titel gefixt, 3 + 7 + 14 + 0 +
-0 + 2 + 0 + 1 + 0 = 27 Titel zurückgestellt.**
+netzteil + notebook_resell, alle zehn in diesem Durchlauf
+abgeschlossenen Kategorien): 10 + 27 + 9 + 0 + 1 + 1 + 2 + 40 + 2 + 2 =
+94 Titel gefixt, 3 + 7 + 14 + 0 + 0 + 2 + 0 + 1 + 0 + 0 = 27 Titel
+zurückgestellt.**
 
 ## Handhelds
 
@@ -578,6 +588,38 @@ Fehlklassifikations-Fall.
 **TRUE_POSITIVE-Kollisionen:** 0 — `"verstärker"`/`"amplifier"`
 kommen in keinem der 92 verbleibenden echten Netzteil-Titel vor.
 
+## Notebook Resell
+
+**Auswahlgrund:** evidenzbasiert — nach netzteil erneuter
+Matchvolumen-Vergleich; `notebook_resell` lag mit 84 aktuell
+matchenden Titeln vorn (vor ram 81, sata_ssd 75, controller 56).
+
+**Vollständiger Active-FP-Audit:** alle 84 damals live matchenden
+Titel einzeln durchgesehen. Die dritte `require_all_of`-Gruppe der
+ThinkPad-Regel akzeptiert bare `"ssd"`/`"nvme"` als Alternative zu
+einer konkreten Speichergrößenangabe (ursprünglich eingeführt, um
+Einzelteil-Angebote ohne jede GB-Angabe abzufangen, siehe bestehender
+Regel-Kommentar) — eine vorangestellte Negation wird dabei nicht
+erkannt.
+
+**Kernfund:** 2 Titel (Duplikate desselben Angebots unter
+verschiedenen IDs) — `Lenovo ThinkPad L14 Gen 3 | Ryzen 5 PRO 5675U |
+BIOS OK | Ohne SSD/RAM #TR326`/`#TR343` — matchen als komplettes
+Notebook, obwohl der Titel explizit **weder RAM noch SSD** installiert
+ausweist (bloßes Mainboard+CPU-Gehäuse). "ssd" matcht als Teilstring
+von "SSD/RAM" identisch wie in einem echten Angebot.
+
+**Bewusst NICHT generalisiert:** 2 weitere, strukturell ähnliche Titel
+(`...8GB RAM OHNE SSD...`, `...8GB RAM ohne SSD ohne Netzteil...`)
+haben echtes RAM und erfüllen die Gruppe bereits unabhängig über die
+RAM-Größe (`"8gb"`) — ein bare `"ohne ssd"`-Exclude hätte diese
+echten Barebone-mit-RAM-Angebote fälschlich blockiert. Stattdessen die
+exakte Phrase `"ohne ssd/ram"` verwendet, die nur beide fehlenden
+Komponenten gemeinsam trifft.
+
+**TRUE_POSITIVE-Kollisionen:** 0 — gegen den vollständigen
+84-Titel-Match-Korpus geprüft, inkl. der beiden Barebone-mit-RAM-Titel.
+
 ## Routing / First-Match-Wins
 
 **Untersuchter Fall:** `Microsoft Xbox One X 1TB Schwarz Inkl OVP Ohne
@@ -767,6 +809,19 @@ Neue Regressionstestdatei: `app/tests/test_netzteil_active_fp_audit_fix.py`
 HiFi-Verstärker-Fehltreffer, 1 Sammel-TP-Sicherheitstest für 4 reale
 Netzteil-Titel).
 
+**notebook_resell:** `app/rules/notebook_resell.yaml`,
+`exclude_category`: **1 neue** bare-phrase Exclude für das **1 gefixte
+Muster** (`ohne ssd/ram`, exakte Phrase statt generischem `ohne ssd`,
+um die 2 realen Barebone-mit-RAM-TRUE_POSITIVES nicht zu treffen). 0
+Kollisionen gegen den vollständigen 84-Titel-Match-Korpus. Reine
+additive `exclude_category`-Ergänzung, kein neuer Matcher-Mechanismus.
+
+Neue Regressionstestdatei: `app/tests/test_notebook_resell_active_fp_audit_fix.py`
+(3 Tests: 1 FP-Regressionstest für beide real bestätigten "Ohne
+SSD/RAM"-Fehltreffer, 1 gezielter Kollisionstest für die 2 echten
+Barebone-mit-RAM-Titel, 1 Sammel-TP-Sicherheitstest für 2 reale
+ThinkPad-Titel).
+
 ## Testergebnis
 
 **handhelds:**
@@ -825,6 +880,12 @@ Netzteil-Titel).
   `test_matcher_psu_requirement.py`, `test_notebook_resell_mainboard_fix.py`,
   `test_retro_konsolen_active_fp_audit_fix.py`)
 
+**notebook_resell:**
+- `pytest app/tests/ -k "notebook_resell" -v`: **21/21 passed** (3 neue
+  Tests + 18 bereits bestehende notebook_resell-relevante Tests aus
+  `test_notebook_resell_gaming_fix.py`,
+  `test_notebook_resell_mainboard_fix.py`)
+
 **Rule Analyzer (nach allen Schritten):** `0 Findings, 355 Regeln,
 19 Kategorien` (unverändert).
 
@@ -832,5 +893,5 @@ Netzteil-Titel).
 läuft laut Teststrategie dieses Durchlaufs erst am Ende dieses
 Optimierungsdurchlaufs, auf explizite Freigabe. Letzter dokumentierter
 vollständiger Lauf (vor office_pc/retro_konsolen/gpu/lego_minifiguren/
-iphone/monitor_curved/vintage_elektronik/netzteil): **1197/1197
-passed, 0 failed** (604s).
+iphone/monitor_curved/vintage_elektronik/netzteil/notebook_resell):
+**1197/1197 passed, 0 failed** (604s).
