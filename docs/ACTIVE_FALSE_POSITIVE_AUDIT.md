@@ -18,9 +18,10 @@ ersetzt.
 | lego_minifiguren | ✅ abgeschlossen | 1 | 1 | 0 | 0 | `-k "lego"`: 25/25 |
 | iphone | ✅ abgeschlossen | 1 | 1 | 1 | 2 | `-k "iphone"`: 15/15 |
 | monitor_curved | ✅ abgeschlossen | 2 | 2 | 0 | 0 | `-k "monitor_curved"`: 4/4 |
-| **Kumulativ (handhelds + office_pc + retro_konsolen + lego_minifiguren + iphone + monitor_curved)** | | **17** | **50** | **8** | **26** | |
+| vintage_elektronik | ✅ abgeschlossen | 11 | 40 | 1 | 1 | `-k "vintage_elektronik"`: 5/5 |
+| **Kumulativ (handhelds + office_pc + retro_konsolen + lego_minifiguren + iphone + monitor_curved + vintage_elektronik)** | | **28** | **90** | **9** | **27** | |
 
-Die kumulative Zeile zählt die sechs in diesem Durchlauf gefixten
+Die kumulative Zeile zählt die sieben in diesem Durchlauf gefixten
 Kategorien (gpu ohne Fix, da 0 Findings — zählt daher nicht mit,
 Zeile bleibt zur Nachvollziehbarkeit trotzdem stehen). Ein weiterer,
 bereits aus einem vorherigen Arbeitsblock bekannter Fall in
@@ -51,7 +52,8 @@ synonym verwendet):
   eindeutige Titel / 46 damals matchende gpu-Titel (gpu-Schritt), 455
   damals matchende lego_minifiguren-Titel (lego_minifiguren-Schritt), 210
   damals matchende iphone-Titel (iphone-Schritt), 133 damals matchende
-  monitor_curved-Titel (monitor_curved-Schritt).
+  monitor_curved-Titel (monitor_curved-Schritt), 108 damals matchende
+  vintage_elektronik-Titel (vintage_elektronik-Schritt).
 - **Methodik-Hinweis, neu entdeckt im iphone-Schritt (wichtig):**
   `data/found.json` wird von einem laufenden Produktiv-Scanner (Docker
   Compose) live verändert — zwei Live-Auswertungen im Abstand weniger
@@ -151,7 +153,25 @@ Abschnitt "GPU" unten für Details.
 | monitor_curved | Fitnessgerät mit eigenem curved-Display | `Klappbarer Heimtrainer F‑Bike CURVED LCD-Display Fahrrad Top` | 1 |
 | **Summe monitor_curved** | **2 Muster** | | **2 Titel** |
 
-**Zurückgestellt, real bestätigt, aktuell noch offen (P1/P2, 8 Fälle / 26 Titel):**
+**Gefixt im vintage_elektronik-Schritt (11 Muster / 40 Titel) — größter
+Einzelfund dieses gesamten Durchlaufs:**
+
+| Kategorie | Muster | Betroffene Titel (Beispiel) | Anzahl Titel |
+|---|---|---|---:|
+| vintage_elektronik | Sony PVM/BVM-Ersatzteile (Platine/Transformator/Chip/Widerstand) | `SONY PVM-14M4U CRT Monitor Transformer Assy Flyback...` u.a. | 13 |
+| vintage_elektronik | Sony PVM/BVM-Akkus/Ladegeräte | `2x Li-Ion Akku 95Wh...für Sony PVM-9040ME...`, `Charger für SONY BVM-D9...` | 5 |
+| vintage_elektronik | Sony PVM/BVM-Kabel/Adapter/Schutzblende/Einbauset | `Netzkabel für Sony BVM F250...`, `SCART zu BNC Breakout Adapter...`, `SONY BKM-23M Protection Panel...`, `Sony BVM PVM Monitor Einbauset...` | 4 |
+| vintage_elektronik | Fernbedienungen für Profi-CRT-Monitor (fehlender Exclude ggü. Röhrenfernseher-Regel) | `Sony Trinitron RM 694 Fernbedienung` u.a. | 4 |
+| vintage_elektronik | Sammlerfotos/Postkarten ("- Altes Foto"/"- Foto") | `Giraffe auf Röhrenfernseher 1954 - Altes Foto 1950er` u.a. | 6 |
+| vintage_elektronik | Subwoofer-Zubehör für ein Gerät | `Subwoofer von/für SONY Trinitron KV-E2911A Fernseher` | 1 |
+| vintage_elektronik | T-Shirt/Merchandise | `Testbild T-Shirt Fernseher Shirt Retro Fun...` | 1 |
+| vintage_elektronik | Wandhalterung (Montage-Zubehör) | `17"- 21" meliconi...Wandhalterung silber A21` | 1 |
+| vintage_elektronik | Kippsicherung (Sicherheits-Zubehör) | `TV Kippsicherung zum Verschrauben...Kippschutz` | 1 |
+| vintage_elektronik | Schulkarte/Rollkarte (Lehrmaterial) | `Rollkarte Schulkarte Fernsehbildröhre...` | 1 |
+| vintage_elektronik | Dokumentation/Vertreterkoffer/Adapter-Konvolut (Funktionsbeschreibung, Werbekoffer, SCART-Cinch-Konvolut) | `Philips Service Fernsehgeräte Funktionsbeschreibung 1964/65...`, `KENWOOD HiFi Vintage Werbekoffer...`, `37x SCART Cinch Adapter Konvolut...` | 3 |
+| **Summe vintage_elektronik** | **11 Muster** | | **40 Titel** |
+
+**Zurückgestellt, real bestätigt, aktuell noch offen (P1/P2, 9 Fälle / 27 Titel):**
 
 | Kategorie | Priorität | Muster | Anzahl Titel | Grund für Zurückstellung |
 |---|---|---|---:|---|
@@ -163,7 +183,8 @@ Abschnitt "GPU" unten für Details.
 | retro_konsolen | P2 | `Nintendo DS ... Display LCD Bildschirm oben oder unten` (Ersatzteil) | 1 | nur 1 bestätigter Fall, zu wenig Evidenz für eine verallgemeinerbare Regel |
 | retro_konsolen | P2 | `Flohmarkt, Trödel Konvolut, Vtech, Konsole, Kleidung, Dvds` (generisches Konvolut, bare "konsole"/"nintendo" als Gruppe-1-Signal zu breit) | 1 | Fix würde Gruppe-1-Logik der Konvolut-Regel anfassen — eigener, strukturell größerer Arbeitsschritt |
 | iphone | P2/NO-FIX | bare "Zubehörpaket" — 2 gegensätzliche Titel im Korpus (`iPhone 15 Pro...91% Akku...*Zubehörpaket*` = echtes Gerät + Bonus-Zubehör, vs. `iPhone 11 128GB Weiß - Zubehörpaket` = evtl. reines Zubehör ohne Gerät) | 2 | kein sicheres Unterscheidungsmerkmal ohne Beschreibungstext, n=1 je Fall — zu wenig Evidenz für eine verallgemeinerbare Regel |
-| **Summe** | | **8 Fälle** | **26 Titel** | |
+| vintage_elektronik | P2/NO-FIX | `SONY IC VG-469 LXP-P75ST for Sony BVM-20F1 Monitor BVM RGB Broadcast PVM` (Ersatzteil-IC) | 1 | bare "ic" als 2-Zeichen-Begriff zu generisch/riskant für einen einzelnen Beleg |
+| **Summe** | | **9 Fälle** | **27 Titel** | |
 
 **Weiterhin offen, aus vorherigem Kontext bekannt, kein Schritt dieses
 Durchlaufs (nicht in der Summe oben):**
@@ -173,9 +194,10 @@ Durchlaufs (nicht in der Summe oben):**
 | konsolen_bundles | P1 | `Display Ersatz Konsole...DISPLAY ONLY` trotz Geräte-Marker (V2/HAC-001) | 1 | eigener Arbeitsschritt, noch nicht terminiert |
 
 **Kumulativ (handhelds + office_pc + retro_konsolen + gpu +
-lego_minifiguren + iphone + monitor_curved, alle sieben in diesem
-Durchlauf abgeschlossenen Kategorien): 10 + 27 + 9 + 0 + 1 + 1 + 2 = 50
-Titel gefixt, 3 + 7 + 14 + 0 + 0 + 2 + 0 = 26 Titel zurückgestellt.**
+lego_minifiguren + iphone + monitor_curved + vintage_elektronik, alle
+acht in diesem Durchlauf abgeschlossenen Kategorien): 10 + 27 + 9 + 0 +
+1 + 1 + 2 + 40 = 90 Titel gefixt, 3 + 7 + 14 + 0 + 0 + 2 + 0 + 1 = 27
+Titel zurückgestellt.**
 
 ## Handhelds
 
@@ -463,6 +485,55 @@ Curved-PC-Monitore (Marke + Modell + Zoll/Hz-Angabe).
 **TRUE_POSITIVE-Kollisionen:** 0 — gegen den vollständigen
 133-Titel-Match-Korpus geprüft.
 
+## Vintage Elektronik
+
+**Auswahlgrund:** evidenzbasiert — nach monitor_curved erneuter
+Matchvolumen-Vergleich; `vintage_elektronik` lag mit 108 aktuell
+matchenden Titeln vorn (vor netzteil 94, notebook_resell 84, ram 81,
+sata_ssd 75).
+
+**Größter Einzelfund dieses gesamten Durchlaufs:** vollständiger
+Active-FP-Audit über alle 108 damals live matchenden Titel ergab **11
+Muster über 40 Titel** — mehr als bei jeder anderen bisher auditierten
+Kategorie außer office_pc.
+
+**Root Cause:** Die "Profi-CRT-Monitor"-Regeln (Sony PVM/BVM/Trinitron)
+hatten — anders als die direkt darunterstehenden
+"Röhrenfernseher"-Regeln — **keinerlei** Excludes für Ersatzteile,
+Zubehör oder Fernbedienungen. Die Röhrenfernseher-Regeln excludieren
+bereits seit Phase 12 `"fernbedienung"`/`"ersatzteil"`/
+`"netzschalter"`/`"widerstand"`/`"schaltplan"` — dieser Schutz wurde
+beim Hinzufügen der Profi-CRT-Monitor-Regeln (höheres Preissegment,
+dieselbe Produktklasse) nicht mit übernommen. Sony-Broadcast-Monitore
+(PVM/BVM) haben einen aktiven Ersatzteilmarkt (Platinen, Transformatoren,
+Chips, Akkus, Ladegeräte, Kabel) — genau diese Ersatzteile matchten
+bisher als komplettes Gerät.
+
+**Zusätzlich ein kategorieweiter, regelunabhängiger Fund:** 6
+Sammlerfoto-/Postkarten-Titel (`"- Altes Foto"`/`"- Foto"` als
+Titelsuffix, z.B. `Giraffe auf Röhrenfernseher 1954 - Altes Foto
+1950er`) sowie vereinzelte Merchandise-/Dokumentations-/Zubehör-Titel
+(T-Shirt, Wandhalterung, Kippsicherung, Schulkarte,
+Funktionsbeschreibung, Werbekoffer, SCART-Cinch-Adapter-Konvolut) — alle
+matchten unabhängig von der Profi-CRT-Lücke über die generischen
+Röhrenfernseher-Suchbegriffe.
+
+**Kollisionsschutz besonders geprüft bei zwei Begriffen:**
+- Bare `"subwoofer"` hätte einen echten TRUE_POSITIVE-Röhrenverstärker
+  mit Subwoofer-Ausgang getroffen (`HiFi Bluetooth Hybrid Röhren
+  Verstärker Stereo Subwoofer Tube Power Amplifier`) — stattdessen die
+  engere Phrase `"subwoofer für"`/`"subwoofer von"` verwendet.
+- Bare `"netzkabel"` hätte potenziell ein reales Komplettgerät treffen
+  können, das "inkl. Netzkabel" bewirbt — stattdessen die engere Phrase
+  `"netzkabel für"` verwendet.
+
+**Bewusst zurückgestellt (P2/NO-FIX):** `SONY IC VG-469 LXP-P75ST for
+Sony BVM-20F1 Monitor` (1 Titel) — bare `"ic"` als 2-Zeichen-Begriff zu
+generisch/riskant für einen einzelnen Beleg.
+
+**TRUE_POSITIVE-Kollisionen:** 0 — gegen den vollständigen
+108-Titel-Match-Korpus geprüft.
+
 ## Routing / First-Match-Wins
 
 **Untersuchter Fall:** `Microsoft Xbox One X 1TB Schwarz Inkl OVP Ohne
@@ -616,6 +687,29 @@ PS-Kurzform-Geschwisterfälle, 1 FP-Regressionstest für den real
 bestätigten Heimtrainer-Fehltreffer, 1 Sammel-TP-Sicherheitstest für 4
 reale Curved-Monitor-Titel).
 
+**vintage_elektronik:** `app/rules/vintage_elektronik.yaml`,
+`exclude_category`: **25 neue** bare-word/phrase Excludes für die **11
+gefixten Muster** — auf Kategorie-Ebene ergänzt statt dreifach pro
+Rating-Stufe der Profi-CRT-Monitor-Regel dupliziert (`board`,
+`semiconductor`, `akku`, `charger`, `assy`, `protection panel`,
+`breakout adapter`, `einbauset`, `netzkabel für` für Ersatzteile/Zubehör;
+`fernbedienung`, `ersatzfernbedienung` für Fernbedienungen; `subwoofer
+für`, `subwoofer von` für Subwoofer-Zubehör statt bare `subwoofer`;
+`foto`, `t-shirt`, `shirt`, `wandhalterung`, `kippsicherung`,
+`kippschutz`, `schulkarte`, `rollkarte`, `funktionsbeschreibung`,
+`werbekoffer`, `vertreterkoffer`, `cinch adapter` für Sammler-/
+Merchandise-/Dokumentations-Artikel). Alle 0 Kollisionen gegen den
+vollständigen 108-Titel-Match-Korpus, zwei Begriffe (`subwoofer`,
+`netzkabel`) bewusst NICHT bare verwendet, um reale TRUE_POSITIVE-
+Kollisionen zu vermeiden (siehe Abschnitt "Vintage Elektronik" oben).
+Reine additive `exclude_category`-Ergänzung, kein neuer
+Matcher-Mechanismus.
+
+Neue Regressionstestdatei: `app/tests/test_vintage_elektronik_active_fp_audit_fix.py`
+(5 Tests: 4 FP-Regressions-Testfunktionen, die zusammen alle 40 real
+bestätigten Fehltreffer-Titel über alle 11 Muster abdecken, 1
+Sammel-TP-Sicherheitstest inkl. des Subwoofer-Grenzfalls).
+
 ## Testergebnis
 
 **handhelds:**
@@ -659,6 +753,11 @@ reale Curved-Monitor-Titel).
   keine bestehenden monitor_curved-spezifischen Tests vor diesem
   Schritt vorhanden)
 
+**vintage_elektronik:**
+- `pytest app/tests/ -k "vintage_elektronik" -v`: **5/5 passed** (alle
+  neu, keine bestehenden vintage_elektronik-spezifischen Tests vor
+  diesem Schritt vorhanden)
+
 **Rule Analyzer (nach allen Schritten):** `0 Findings, 355 Regeln,
 19 Kategorien` (unverändert).
 
@@ -666,4 +765,5 @@ reale Curved-Monitor-Titel).
 läuft laut Teststrategie dieses Durchlaufs erst am Ende dieses
 Optimierungsdurchlaufs, auf explizite Freigabe. Letzter dokumentierter
 vollständiger Lauf (vor office_pc/retro_konsolen/gpu/lego_minifiguren/
-iphone/monitor_curved): **1197/1197 passed, 0 failed** (604s).
+iphone/monitor_curved/vintage_elektronik): **1197/1197 passed, 0
+failed** (604s).
