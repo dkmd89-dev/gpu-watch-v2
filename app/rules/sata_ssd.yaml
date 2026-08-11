@@ -53,6 +53,17 @@ exclude_category:
   - "fuer bastler"
   - "externe festplatte"
   - "externes gehaeuse"
+  # FIX (Active-False-Positive-Audit, docs/ACTIVE_FALSE_POSITIVE_AUDIT.md):
+  # "externe festplatte"/"externes gehaeuse" deckten nur diese beiden
+  # exakten Phrasen ab -- externe USB-SSDs mit anderer Formulierung
+  # ("Portable SSD", "Externer Speicher") matchten weiterhin faelschlich
+  # als interne 2.5" SATA-SSD. Real bestaetigt gegen found.json (3 Titel
+  # im vollstaendigen 75-Titel-Match-Korpus): "SanDisk Portable SSD 1 TB
+  # Speicher", "Seagate Expansion SSD, 500GB, Portable External Solid
+  # State Drive...", "SSK Pro 1TB SSD Externer Speicher USB-Stick" --
+  # alle USB-Laufwerke, kein SATA-Interface.
+  - "portable"
+  - "externer speicher"
   - "hdd"
   - "3.5"
 

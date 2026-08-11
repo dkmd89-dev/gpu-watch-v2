@@ -22,9 +22,10 @@ ersetzt.
 | netzteil | ✅ abgeschlossen | 1 | 2 | 0 | 0 | `-k "netzteil"`: 20/20 |
 | notebook_resell | ✅ abgeschlossen | 1 | 2 | 0 | 0 | `-k "notebook_resell"`: 21/21 |
 | ram | ✅ abgeschlossen | 2 | 2 | 0 | 0 | `-k "ram"`: 42/42 |
-| **Kumulativ (handhelds + office_pc + retro_konsolen + lego_minifiguren + iphone + monitor_curved + vintage_elektronik + netzteil + notebook_resell + ram)** | | **32** | **96** | **9** | **27** | |
+| sata_ssd | ✅ abgeschlossen | 1 | 3 | 0 | 0 | `-k "sata_ssd"`: 20/20 |
+| **Kumulativ (handhelds + office_pc + retro_konsolen + lego_minifiguren + iphone + monitor_curved + vintage_elektronik + netzteil + notebook_resell + ram + sata_ssd)** | | **33** | **99** | **9** | **27** | |
 
-Die kumulative Zeile zählt die zehn in diesem Durchlauf gefixten
+Die kumulative Zeile zählt die elf in diesem Durchlauf gefixten
 Kategorien (gpu ohne Fix, da 0 Findings — zählt daher nicht mit,
 Zeile bleibt zur Nachvollziehbarkeit trotzdem stehen). Ein weiterer,
 bereits aus einem vorherigen Arbeitsblock bekannter Fall in
@@ -59,7 +60,8 @@ synonym verwendet):
   vintage_elektronik-Titel (vintage_elektronik-Schritt), 94 damals
   matchende netzteil-Titel (netzteil-Schritt), 84 damals matchende
   notebook_resell-Titel (notebook_resell-Schritt), 81 damals matchende
-  ram-Titel (ram-Schritt).
+  ram-Titel (ram-Schritt), 75 damals matchende sata_ssd-Titel
+  (sata_ssd-Schritt).
 - **Methodik-Hinweis, neu entdeckt im iphone-Schritt (wichtig):**
   `data/found.json` wird von einem laufenden Produktiv-Scanner (Docker
   Compose) live verändert — zwei Live-Auswertungen im Abstand weniger
@@ -199,6 +201,13 @@ Einzelfund dieses gesamten Durchlaufs:**
 | ram | "SO- DIMM" (Bindestrich+Leerzeichen-Variante) | `SK hynix16GB(2x8GB) DDR4 SO- DIMM 1Rx8...` | 1 |
 | **Summe ram** | **2 Muster** | | **2 Titel** |
 
+**Gefixt im sata_ssd-Schritt (1 Muster / 3 Titel):**
+
+| Kategorie | Muster | Betroffene Titel (Beispiel) | Anzahl Titel |
+|---|---|---|---:|
+| sata_ssd | Externe USB-SSDs ("Portable"/"Externer Speicher", kein SATA-Interface) | `SanDisk Portable SSD 1 TB Speicher`, `SSK Pro 1TB SSD Externer Speicher USB-Stick` u.a. | 3 |
+| **Summe sata_ssd** | **1 Muster** | | **3 Titel** |
+
 **Zurückgestellt, real bestätigt, aktuell noch offen (P1/P2, 9 Fälle / 27 Titel):**
 
 | Kategorie | Priorität | Muster | Anzahl Titel | Grund für Zurückstellung |
@@ -223,10 +232,10 @@ Durchlaufs (nicht in der Summe oben):**
 
 **Kumulativ (handhelds + office_pc + retro_konsolen + gpu +
 lego_minifiguren + iphone + monitor_curved + vintage_elektronik +
-netzteil + notebook_resell + ram, alle elf in diesem Durchlauf
-abgeschlossenen Kategorien): 10 + 27 + 9 + 0 + 1 + 1 + 2 + 40 + 2 + 2 +
-2 = 96 Titel gefixt, 3 + 7 + 14 + 0 + 0 + 2 + 0 + 1 + 0 + 0 + 0 = 27
-Titel zurückgestellt.**
+netzteil + notebook_resell + ram + sata_ssd, alle zwölf in diesem
+Durchlauf abgeschlossenen Kategorien): 10 + 27 + 9 + 0 + 1 + 1 + 2 + 40
++ 2 + 2 + 2 + 3 = 99 Titel gefixt, 3 + 7 + 14 + 0 + 0 + 2 + 0 + 1 + 0 +
+0 + 0 + 0 = 27 Titel zurückgestellt.**
 
 ## Handhelds
 
@@ -655,6 +664,31 @@ neues Konzept, reine Vervollständigung):
 **TRUE_POSITIVE-Kollisionen:** 0 — gegen den vollständigen
 81-Titel-Match-Korpus geprüft.
 
+## SATA SSD
+
+**Auswahlgrund:** evidenzbasiert — nach ram erneuter
+Matchvolumen-Vergleich; `sata_ssd` lag mit 75 aktuell matchenden
+Titeln vorn (vor controller 56, autoradio_opel_corsa 55).
+
+**Vollständiger Active-FP-Audit:** alle 75 damals live matchenden
+Titel einzeln durchgesehen. Die Kategorie hat bereits einen sehr
+umfangreichen, mehrfach nachgeschärften `exclude_category`-Block
+(Laptop-Modellreihen, Komplett-PC-Modellreihen, HDD-Modellreihen,
+Server) — die Mehrheit der 75 Titel sind eindeutig echte interne 2,5"-
+SATA-SSDs.
+
+**Kernfund:** 3 Titel — `SanDisk Portable SSD 1 TB Speicher`, `Seagate
+Expansion SSD, 500GB, Portable External Solid State Drive for PC and
+Mac`, `SSK Pro 1TB SSD Externer Speicher USB-Stick` — matchen als
+interne SATA-SSD, obwohl es sich um externe USB-Laufwerke handelt
+(kein SATA-Interface). Root Cause: die bestehenden Excludes
+`"externe festplatte"`/`"externes gehaeuse"` decken nur diese beiden
+exakten Phrasen ab — die im Handel gängigen Produktbezeichnungen
+"Portable SSD" und "Externer Speicher" fallen nicht darunter.
+
+**TRUE_POSITIVE-Kollisionen:** 0 — `"portable"`/`"externer speicher"`
+kommen in keinem der 72 verbleibenden echten SATA-SSD-Titel vor.
+
 ## Routing / First-Match-Wins
 
 **Untersuchter Fall:** `Microsoft Xbox One X 1TB Schwarz Inkl OVP Ohne
@@ -867,6 +901,16 @@ Neue Regressionstestdatei: `app/tests/test_ram_active_fp_audit_fix.py`
 (3 Tests: 2 FP-Regressions-Testfunktionen für beide real bestätigten
 Fehltreffer, 1 Sammel-TP-Sicherheitstest für 3 reale RAM-Titel).
 
+**sata_ssd:** `app/rules/sata_ssd.yaml`, `exclude_category`: **2 neue**
+bare-word/phrase Excludes für das **1 gefixte Muster** (`portable`,
+`externer speicher`) — Ergänzung der bereits bestehenden, aber zu eng
+gefassten Excludes `externe festplatte`/`externes gehaeuse`. 0
+Kollisionen gegen den vollständigen 75-Titel-Match-Korpus.
+
+Neue Regressionstestdatei: `app/tests/test_sata_ssd_active_fp_audit_fix.py`
+(2 Tests: 1 FP-Regressionstest für alle 3 real bestätigten
+Fehltreffer, 1 Sammel-TP-Sicherheitstest für 3 reale SATA-SSD-Titel).
+
 ## Testergebnis
 
 **handhelds:**
@@ -941,6 +985,14 @@ Fehltreffer, 1 Sammel-TP-Sicherheitstest für 3 reale RAM-Titel).
   `test_notify_max_price_and_sata_ssd_fix.py`, `test_rule_regressions.py`,
   `test_scraper_ebay.py`)
 
+**sata_ssd:**
+- `pytest app/tests/ -k "sata_ssd" -v`: **20/20 passed** (2 neue Tests
+  + 18 bereits bestehende sata_ssd-relevante Tests aus
+  `test_app_category_grouped_scan.py`, `test_detector_storage.py`,
+  `test_matcher_ssd_capacity_requirement.py`,
+  `test_notify_max_price_and_sata_ssd_fix.py`,
+  `test_sata_ssd_search_improvements.py`)
+
 **Rule Analyzer (nach allen Schritten):** `0 Findings, 355 Regeln,
 19 Kategorien` (unverändert).
 
@@ -948,5 +1000,5 @@ Fehltreffer, 1 Sammel-TP-Sicherheitstest für 3 reale RAM-Titel).
 läuft laut Teststrategie dieses Durchlaufs erst am Ende dieses
 Optimierungsdurchlaufs, auf explizite Freigabe. Letzter dokumentierter
 vollständiger Lauf (vor office_pc/retro_konsolen/gpu/lego_minifiguren/
-iphone/monitor_curved/vintage_elektronik/netzteil/notebook_resell/ram):
-**1197/1197 passed, 0 failed** (604s).
+iphone/monitor_curved/vintage_elektronik/netzteil/notebook_resell/ram/
+sata_ssd): **1197/1197 passed, 0 failed** (604s).
