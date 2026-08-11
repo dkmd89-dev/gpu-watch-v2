@@ -68,11 +68,39 @@ search_terms:
 # auch echte Komplettsystem-Angebote mit Zubehoer-Bundle treffen
 # (Kollisionsrisiko nicht ausgeschlossen, kein sicherer Fix ohne
 # zusaetzlichen Gehaeuse-Nachweis-Mechanismus).
+#
+# FIX (Cross-Category Routing Audit, docs/CROSS_CATEGORY_ROUTING_AUDIT.md,
+# Abschnitt 5.1/9.1, auf explizite Nutzer-Freigabe umgesetzt): dieselbe
+# Case-Detector-Luecke wie oben (kein erkennbares Gehaeuse = neutral
+# erfuellt) laesst auch Notebooks durch -- ein Notebook hat naturgemaess
+# keine separate Gehaeuse-Beschreibung. 21 reale, aktuell matchende
+# found.json-Titel bestaetigt (ThinkPad/MacBook/Alienware/Lifebook/
+# IdeaPad/ACEMAGIC u.a., 149,95-339,00€). Root Cause identisch zum
+# bereits in gaming_pc.yaml gefixten Muster (dort: "Diese Kategorie
+# WILL komplette PC-Systeme", identische Begruendung). Preisdeckel-
+# Alternative (notebook_resell.yaml auf 300€ anheben) explizit gegen
+# den vollen 97-Titel-ThinkPad-Realkorpus geprueft und verworfen: 89%
+# der realen Angebote liegen bereits innerhalb der bestehenden
+# 180/240€-Grenzen, keine Datenbasis fuer eine Anhebung (siehe Audit-
+# Doku Abschnitt 9.1). Bare-Markenbegriffe statt "laptop"/"notebook"
+# allein, weil mehrere reale Titel keines dieser beiden Woerter
+# enthalten (z.B. "Lenovo ThinkPad X390 | 13,3\" | i5-8365U..." ohne
+# "laptop"/"notebook"). 0 Kollisionen gegen die verbleibenden ca. 22
+# echten Desktop-/Tower-/Bundle-Treffer geprueft (kein Fujitsu-Esprimo-,
+# Terra-, Dell-Optiplex/Precision- oder Bundle-Titel nennt einen dieser
+# Begriffe).
 exclude_category:
   - "mainboard"
   - "motherboard"
   - "aufrüstkit"
   - "aufrüstbundle"
+  - "laptop"
+  - "notebook"
+  - "thinkpad"
+  - "macbook"
+  - "ideapad"
+  - "alienware"
+  - "lifebook"
 
 rules:
   - label: "Office-PC (Mindestanforderung erfüllt)"

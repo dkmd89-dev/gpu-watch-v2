@@ -31,6 +31,21 @@ sind vom selben Root-Cause betroffen, haben aber kein eindeutiges
 Signalwort und könnten bei einem bare Exclude echte Komplettsystem-
 Angebote mit Zubehör-Bundle treffen.
 
+FOLGE-FIX (Cross-Category Routing Audit,
+docs/CROSS_CATEGORY_ROUTING_AUDIT.md, Abschnitt 5.1/9.1, auf explizite
+Nutzer-Freigabe): dieselbe Case-Detector-Lücke (kein Gehäuse = neutral
+erfüllt) ließ auch Notebooks/Laptops durchrutschen -- 21 reale Titel
+bestätigt (ThinkPad/MacBook/Alienware/Lifebook/IdeaPad/ACEMAGIC u.a.).
+`exclude_category` um `laptop`/`notebook`/`thinkpad`/`macbook`/
+`ideapad`/`alienware`/`lifebook` erweitert. Die ursprüngliche
+`test_reale_true_positives_matchen_weiterhin()` unten enthielt zwei
+Titel ("ACEMAGIC ... Laptop ...", "Lenovo ThinkPad X390 | 13,3\" |
+..."), die genau diesem jetzt behobenen Muster entsprechen -- bewusst
+durch echte Desktop-/Tower-Titel aus demselben Korpus ersetzt, damit
+der Test weiterhin ausschließlich unveränderte TRUE_POSITIVE-Fälle
+prüft. Dedizierte Regressionstests für den Notebook-Exclude selbst:
+`test_office_pc_notebook_cross_category_fix.py`.
+
 Läuft gegen die echten, produktiven rules/*.yaml."""
 import sys
 from pathlib import Path
@@ -114,11 +129,14 @@ def test_aufruestbundle_varianten_matchen_nicht():
 # ============================================================
 
 def test_reale_true_positives_matchen_weiterhin():
+    # ACEMAGIC-Laptop und ThinkPad X390 wurden hier bewusst entfernt --
+    # siehe FOLGE-FIX im Modul-Docstring: beide matchen seit dem
+    # Notebook-Exclude (Cross-Category Routing Audit) nicht mehr
+    # office_pc, das ist jetzt der gewünschte Fall (Regressionstest
+    # dafür: test_office_pc_notebook_cross_category_fix.py). Ersetzt
+    # durch zwei weitere reale, unveränderte Desktop-TRUE_POSITIVES aus
+    # demselben found.json-Korpus.
     for title, price in [
-        (
-            "ACEMAGIC 16'' AX16Pro Laptop AMD Ryzen 7 5700U 16GB DDR4 RAM 512GB SSD Win11P",
-            289.0,
-        ),
         (
             "Büro PC Fujitsu Business Computer i5 8400 16GB RAM 512GB SSD Win11 Office 2024",
             259.0,
@@ -128,11 +146,18 @@ def test_reale_true_positives_matchen_weiterhin():
             "Fujitsu Esprimo D7010 Intel Core i7-10700 16GB RAM Business Desktop-PC",
             278.0,
         ),
-        ("Lenovo ThinkPad X390 | 13,3\" | i5-8365U | 8 GB RAM | 512 GB SSD", 293.0),
         ("Office PC Fujitsu Esprimo P558/E85, Core i5 9400, 16GB DDR4 RAM", 100.0),
         (
             "Terra Business PC Core i5-8500 3,0GHz 8GB RAM 250GB SSD Win 10 Pro (mk)",
             109.90,
+        ),
+        (
+            "Dell Precision 3450 I7 11700 16GB DDR4 Office PC",
+            300.0,
+        ),
+        (
+            "Custom Gaming PC Intel i5-9400, 8GB RAM, Corsair RM750x",
+            180.0,
         ),
     ]:
         r = evaluate(title, price, _rules_cfg())
