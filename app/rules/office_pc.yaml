@@ -30,8 +30,49 @@ search_terms:
   - "PC Komplettsystem"
   - "Business PC"
 
-# Diese Kategorie WILL komplette PC-Systeme -- bewusst KEIN
-# exclude_category (anders als bei gpu.yaml, wo PCs ausgeschlossen werden).
+# Diese Kategorie WILL komplette PC-Systeme. Ursprünglich bewusst KEIN
+# exclude_category (anders als bei gpu.yaml, wo PCs ausgeschlossen
+# werden) -- das galt so lange, wie kein realer Fehltreffer belegt war.
+#
+# FIX (Active-False-Positive-Audit, docs/ACTIVE_FALSE_POSITIVE_AUDIT.md):
+# Die "requirements:"-Regel unten prüft RAM-Größe, CPU-Tier und dass das
+# Gehäuse NICHT als Tiny/Mini/USFF/SFF/AiO erkannt wird (case.exclude_
+# categories) -- sie verlangt aber nicht, dass überhaupt ein Gehäuse
+# vorhanden ist. matcher.py::_case_meets_requirement() behandelt "kein
+# erkennbares Gehäuse" bewusst als ERFÜLLT (Kommentar dort: neutral, kein
+# Fehlverhalten des Detectors). Für bare Komponenten-Bundles (Mainboard +
+# CPU + RAM, kein Gehäuse im Angebot) ist das aber genau der Fall, der
+# fälschlich durchrutscht -- ein "Aufrüstkit" ersetzt per Definition nur
+# Teile eines bereits vorhandenen PCs, ist aber kein "komplettes System".
+# Bestätigt gegen den echten found.json-Korpus (69 aktuell matchende
+# Titel, echte Preise): 27 reale Fehltreffer über 2 Muster, 0 Kollisionen
+# mit den verbleibenden 42 echten Notebook-/Business-PC-Treffern (auch
+# explizit gegen Gehäuse-/Tower-Nennungen in den geflaggten Titeln
+# geprüft).
+#
+# 1. "mainboard"/"motherboard" (bare Wort): identisches, bereits in
+#    notebook_resell.yaml etabliertes Muster (siehe dortige Begründung,
+#    "Lenovo ThinkPad X390 Mainboard..." NM-B891) -- ein bares Mainboard-
+#    Ersatzteil trägt oft eine eigene RAM-Angabe, die hier faelschlich
+#    als RAM-Anforderung des Gesamtsystems gewertet wird.
+# 2. "aufrüstkit"/"aufrüstbundle" (bare Wort, NEU -- kein Aequivalent in
+#    notebook_resell.yaml): "Aufrüstkit"/"Aufrüstbundle" ist ein
+#    eindeutiger deutscher Fachbegriff fuer ein Nachruest-Set (Mainboard+
+#    CPU+RAM, ohne Gehaeuse) -- bezeichnet nie ein komplettes System.
+#    21+3 reale Treffer, alle nach identischem Muster "PC Aufrüstkit
+#    Bundle [CPU] bis [RAM] mit [Mainboard-Modell]", keiner davon nennt
+#    ein Gehaeuse.
+#
+# Bewusst NICHT (P1/P2, siehe Audit-Doku, gleiche Root-Cause aber kein
+# eindeutiges Signalwort): bare "bundle"/"kit" -- zu generisch, würde
+# auch echte Komplettsystem-Angebote mit Zubehoer-Bundle treffen
+# (Kollisionsrisiko nicht ausgeschlossen, kein sicherer Fix ohne
+# zusaetzlichen Gehaeuse-Nachweis-Mechanismus).
+exclude_category:
+  - "mainboard"
+  - "motherboard"
+  - "aufrüstkit"
+  - "aufrüstbundle"
 
 rules:
   - label: "Office-PC (Mindestanforderung erfüllt)"
