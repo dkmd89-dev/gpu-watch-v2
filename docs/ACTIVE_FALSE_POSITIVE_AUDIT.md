@@ -16,9 +16,10 @@ ersetzt.
 | retro_konsolen | ✅ abgeschlossen | 3 | 9 | 4 | 14 | `-k "retro_konsolen"`: 31/31 |
 | gpu | ✅ abgeschlossen (0 Findings) | 0 | 0 | 0 | 0 | — (kein Fix nötig) |
 | lego_minifiguren | ✅ abgeschlossen | 1 | 1 | 0 | 0 | `-k "lego"`: 25/25 |
-| **Kumulativ (handhelds + office_pc + retro_konsolen + lego_minifiguren)** | | **14** | **47** | **7** | **24** | |
+| iphone | ✅ abgeschlossen | 1 | 1 | 1 | 2 | `-k "iphone"`: 15/15 |
+| **Kumulativ (handhelds + office_pc + retro_konsolen + lego_minifiguren + iphone)** | | **15** | **48** | **8** | **26** | |
 
-Die kumulative Zeile zählt die vier in diesem Durchlauf gefixten
+Die kumulative Zeile zählt die fünf in diesem Durchlauf gefixten
 Kategorien (gpu ohne Fix, da 0 Findings — zählt daher nicht mit,
 Zeile bleibt zur Nachvollziehbarkeit trotzdem stehen). Ein weiterer,
 bereits aus einem vorherigen Arbeitsblock bekannter Fall in
@@ -47,7 +48,20 @@ synonym verwendet):
   Schritt), 69 damals matchende office_pc-Titel (office_pc-Schritt), 91
   damals matchende retro_konsolen-Titel (retro_konsolen-Schritt), 1750
   eindeutige Titel / 46 damals matchende gpu-Titel (gpu-Schritt), 455
-  damals matchende lego_minifiguren-Titel (lego_minifiguren-Schritt).
+  damals matchende lego_minifiguren-Titel (lego_minifiguren-Schritt), 210
+  damals matchende iphone-Titel (iphone-Schritt).
+- **Methodik-Hinweis, neu entdeckt im iphone-Schritt (wichtig):**
+  `data/found.json` wird von einem laufenden Produktiv-Scanner (Docker
+  Compose) live verändert — zwei Live-Auswertungen im Abstand weniger
+  Minuten lieferten unterschiedliche eindeutige Titelzahlen (1750 vs.
+  1754) und unterschiedliche iphone-Trefferzahlen. Jeder Audit-Schritt
+  ist daher eine **Momentaufnahme** zum jeweiligen Ausführungszeitpunkt,
+  nicht ein stabiler, wiederholbar identischer Korpus — Titelzahlen aus
+  früheren Schritten dieses Reports können bei einer erneuten Live-
+  Auswertung geringfügig abweichen. Kein Einfluss auf die Korrektheit
+  der einzelnen Fixes (jeder Fund wurde zum jeweiligen Auswertungs-
+  zeitpunkt einzeln real verifiziert), nur auf die exakte
+  Reproduzierbarkeit der genannten Gesamtzahlen.
 - **Methodik-Hinweis (wichtig):** Alle Titel wurden mit ihrem **echten**
   `found.json`-Preis ausgewertet, nicht mit `price=0.0`. Ein Test mit
   `price=0.0` verzerrt First-Match-Wins bei preisgedeckelten Regeln
@@ -120,7 +134,14 @@ Abschnitt "GPU" unten für Details.
 | lego_minifiguren | Negation vor "Figur(en)" ("Ohne Figuren") | `Lego Star Wars Sammlung, 75082,7959,9488, Komplett Ohne Figuren` | 1 |
 | **Summe lego_minifiguren** | **1 Muster** | | **1 Titel** |
 
-**Zurückgestellt, real bestätigt, aktuell noch offen (P1/P2, 7 Fälle / 24 Titel):**
+**Gefixt im iphone-Schritt (1 Muster / 1 Titel):**
+
+| Kategorie | Muster | Betroffene Titel (Beispiel) | Anzahl Titel |
+|---|---|---|---:|
+| iphone | leere Sammler-Originalverpackung ohne Gerät | `Titel: Leere Originalverpackung Apple iPhone 11 - 128GB - Schwarz (Black)` (5€) | 1 |
+| **Summe iphone** | **1 Muster** | | **1 Titel** |
+
+**Zurückgestellt, real bestätigt, aktuell noch offen (P1/P2, 8 Fälle / 26 Titel):**
 
 | Kategorie | Priorität | Muster | Anzahl Titel | Grund für Zurückstellung |
 |---|---|---|---:|---|
@@ -131,7 +152,8 @@ Abschnitt "GPU" unten für Details.
 | retro_konsolen | P1 | `Nintendo Netzteil für Nintendo DS USG-002...` ("[Zubehör] für [Plattform]") | 1 | identisches, bereits in konsolen_bundles gelöstes Muster, bräuchte aber den vollen Geräte-Marker-Mechanismus — eigener Arbeitsschritt |
 | retro_konsolen | P2 | `Nintendo DS ... Display LCD Bildschirm oben oder unten` (Ersatzteil) | 1 | nur 1 bestätigter Fall, zu wenig Evidenz für eine verallgemeinerbare Regel |
 | retro_konsolen | P2 | `Flohmarkt, Trödel Konvolut, Vtech, Konsole, Kleidung, Dvds` (generisches Konvolut, bare "konsole"/"nintendo" als Gruppe-1-Signal zu breit) | 1 | Fix würde Gruppe-1-Logik der Konvolut-Regel anfassen — eigener, strukturell größerer Arbeitsschritt |
-| **Summe** | | **7 Fälle** | **24 Titel** | |
+| iphone | P2/NO-FIX | bare "Zubehörpaket" — 2 gegensätzliche Titel im Korpus (`iPhone 15 Pro...91% Akku...*Zubehörpaket*` = echtes Gerät + Bonus-Zubehör, vs. `iPhone 11 128GB Weiß - Zubehörpaket` = evtl. reines Zubehör ohne Gerät) | 2 | kein sicheres Unterscheidungsmerkmal ohne Beschreibungstext, n=1 je Fall — zu wenig Evidenz für eine verallgemeinerbare Regel |
+| **Summe** | | **8 Fälle** | **26 Titel** | |
 
 **Weiterhin offen, aus vorherigem Kontext bekannt, kein Schritt dieses
 Durchlaufs (nicht in der Summe oben):**
@@ -141,9 +163,9 @@ Durchlaufs (nicht in der Summe oben):**
 | konsolen_bundles | P1 | `Display Ersatz Konsole...DISPLAY ONLY` trotz Geräte-Marker (V2/HAC-001) | 1 | eigener Arbeitsschritt, noch nicht terminiert |
 
 **Kumulativ (handhelds + office_pc + retro_konsolen + gpu +
-lego_minifiguren, alle fünf in diesem Durchlauf abgeschlossenen
-Kategorien): 10 + 27 + 9 + 0 + 1 = 47 Titel gefixt, 3 + 7 + 14 + 0 + 0 =
-24 Titel zurückgestellt.**
+lego_minifiguren + iphone, alle sechs in diesem Durchlauf
+abgeschlossenen Kategorien): 10 + 27 + 9 + 0 + 1 + 1 = 48 Titel gefixt,
+3 + 7 + 14 + 0 + 0 + 2 = 26 Titel zurückgestellt.**
 
 ## Handhelds
 
@@ -344,6 +366,52 @@ Verallgemeinerbarkeit selbst unsicher war, nicht nur die Fallzahl.
 "ohne"/"keine"/"kein" unmittelbar vor "figur"/"figuren"/"minifigur"/
 "minifiguren".
 
+## iPhone
+
+**Auswahlgrund:** evidenzbasiert — nach gpu (0 Findings) und
+lego_minifiguren wurde erneut das Matchvolumen aller noch nicht
+auditierten Kategorien verglichen; `iphone` lag mit 210 aktuell
+matchenden Titeln mit Abstand vorn unter den verbleibenden Kandidaten
+(monitor_curved 133, vintage_elektronik 108, netzteil 94,
+notebook_resell 84, ram 81, sata_ssd 75).
+
+**Vollständiger Active-FP-Audit:** alle 210 damals live matchenden
+Titel einzeln durchgesehen, zusätzlich gezielte Suche nach
+Ersatzteil-/Defekt-/Verpackungs-/Zubehör-Signalwörtern über den
+gesamten iPhone-Teilkorpus. Die deutliche Mehrheit sind eindeutig echte
+Gerätverkäufe (Modell + Speichergröße + Zustand/Akku-Prozent/Zubehör-
+Angaben) — Akku-Prozentwerte, Displayrisse, Rückseitenrisse o.ä.
+beschreiben den Zustand eines real angebotenen, funktionierenden (oder
+explizit als "Teildefekt" gekennzeichneten) Geräts und sind **keine**
+Fehltreffer, auch wenn sie riskante Käufe darstellen könnten — das
+Ruleset filtert Kategorie-Zugehörigkeit, keine Kaufrisiken.
+
+**Kernfund:** 1 Titel — `Titel: Leere Originalverpackung Apple iPhone
+11 - 128GB - Schwarz (Black)` (5€) — matcht als "iPhone 11 (≤256GB) ★
+Top-Deal", obwohl der Titel explizit eine **leere** Verpackung ohne
+Gerät beschreibt (der Preis von 5€ ist selbst schon ein starkes Indiz).
+Identisches Muster zum bereits in `handhelds.yaml` gelösten
+"leere box"-Fall.
+
+**Zurückgestellter Zweitfund (P2/NO-FIX):** 2 Titel mit "Zubehörpaket"
+im gesamten iPhone-Korpus, mit **gegensätzlichem** Befund: `iPhone 15
+Pro 128GB Titan Grau 91% Akku Iphone 17 Pro Umbau *Zubehörpaket*`
+(429,99€) nennt eine Akku-Prozentangabe — klar ein echtes Gerät mit
+zusätzlichem Bonus-Zubehör. `iPhone 11 128GB Weiß - Zubehörpaket` (91€)
+enthält dagegen keinerlei Zustands-/Akku-Angabe — könnte ein reines
+Zubehörpaket ohne Gerät sein, ist aber aus dem Titeltext allein nicht
+sicher zu entscheiden (kein Zugriff auf den Beschreibungstext). Mit
+je 1 Beleg pro (widersprüchlicher) Seite keine belastbare Evidenzbasis
+für eine verallgemeinerbare Regel — anders als bei retro_konsolens
+"memory card"-Fall gibt es hier keinen klar erkennbaren
+Rettungs-Kontextbegriff, der zuverlässig zwischen beiden Fällen
+unterscheidet.
+
+**TRUE_POSITIVE-Kollisionen:** 0 — explizit gegen reale Titel mit
+"OVP"/Verpackungsbezug im Gerätekontext geprüft (`iPhone 12 Blau 64gb
+mit OVP und Ladekabel`, `iPhone 16 Pro 128 GB Titan Weiß | Top Zustand
+| OVP + Rechnung` u.a.), alle bleiben unverändert TRUE_POSITIVE.
+
 ## Routing / First-Match-Wins
 
 **Untersuchter Fall:** `Microsoft Xbox One X 1TB Schwarz Inkl OVP Ohne
@@ -469,6 +537,19 @@ Titel, 1 Test für die 3 unbelegten aber strukturell identischen
 Singular/Plural-Geschwisterformen, 1 Sammel-TP-Sicherheitstest inkl.
 der positiven Gegenprobe "Mit Figuren" statt "Ohne Figuren").
 
+**iphone:** `app/rules/iphone.yaml`, `exclude_category`: **1 neue**
+bare-phrase Exclude für das **1 gefixte Muster** (`leere
+originalverpackung`), identisches Muster/identische Begründung wie
+`"leere box"` in `handhelds.yaml`. 0 Kollisionen gegen den
+vollständigen 210-Titel-Match-Korpus, explizit gegen reale OVP-/
+Verpackungs-Titel im Gerätekontext geprüft. Reine additive
+`exclude_category`-Ergänzung, kein neuer Matcher-Mechanismus.
+
+Neue Regressionstestdatei: `app/tests/test_iphone_active_fp_audit_fix.py`
+(2 Tests: 1 FP-Regressionstest für den real bestätigten Fehltreffer-
+Titel, 1 Sammel-TP-Sicherheitstest für 4 reale OVP-/Verpackungs-Titel
+im Gerätekontext).
+
 ## Testergebnis
 
 **handhelds:**
@@ -500,11 +581,18 @@ der positiven Gegenprobe "Mit Figuren" statt "Ohne Figuren").
   `test_matcher_resale_price_groups.py`, `test_rule_analyzer.py`,
   `test_rule_regressions.py`)
 
+**iphone:**
+- `pytest app/tests/ -k "iphone" -v`: **15/15 passed** (2 neue Tests +
+  13 bereits bestehende iphone-relevante Tests aus
+  `test_matcher_gehaeuse_shell_fix.py`,
+  `test_matcher_price_calibration_applied.py`,
+  `test_rule_service_modding_fix.py`)
+
 **Rule Analyzer (nach allen Schritten):** `0 Findings, 355 Regeln,
 19 Kategorien` (unverändert).
 
 **Volle Suite:** noch nicht erneut ausgeführt seit dem handhelds-Fix —
 läuft laut Teststrategie dieses Durchlaufs erst am Ende dieses
 Optimierungsdurchlaufs, auf explizite Freigabe. Letzter dokumentierter
-vollständiger Lauf (vor office_pc/retro_konsolen/gpu/lego_minifiguren):
-**1197/1197 passed, 0 failed** (604s).
+vollständiger Lauf (vor office_pc/retro_konsolen/gpu/lego_minifiguren/
+iphone): **1197/1197 passed, 0 failed** (604s).

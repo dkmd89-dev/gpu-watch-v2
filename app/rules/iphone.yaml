@@ -102,6 +102,15 @@ exclude_category:
   - "replacement housing"
   - "housing replacement"
 
+  # FIX (Active-False-Positive-Audit, docs/ACTIVE_FALSE_POSITIVE_AUDIT.md):
+  # leere Sammler-/Wiederverkaufs-Originalverpackung ohne Gerät, kein
+  # "OVP"-Text im Titel -- identisches Muster wie bereits in
+  # handhelds.yaml gelöst ("leere box"). Real bestätigt gegen found.json
+  # (1 Titel im vollständigen 1750-Titel-Korpus): "Titel: Leere
+  # Originalverpackung Apple iPhone 11 - 128GB - Schwarz (Black)" (5€ --
+  # Preis allein schon ein starkes Indiz gegen ein echtes Gerät).
+  - "leere originalverpackung"
+
 # Phase 15 (kontrollierter Folge-Review, "Gehäuse/Shell-Fix"): "gehäuse"
 # ist zweideutig (lose Ersatzschale/Backcover vs. Zustandsbeschreibung
 # eines kompletten iPhones, z.B. "Gehäuse minimal verkratzt") -- schließt
