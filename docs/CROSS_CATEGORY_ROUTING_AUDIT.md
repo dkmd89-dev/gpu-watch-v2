@@ -585,3 +585,64 @@ Nutzer-Freigabe für diesen Schritt.
 **Volle Testsuite:** noch nicht ausgeführt (Vorgabe Phase 13: erst nach
 Abschluss des gesamten Cross-Category-Durchlaufs oder auf explizite
 Anfrage, nicht nach jedem Einzelfix).
+
+## 11. Umgesetzter Fix: macbook-"1024GB"-Speichergrößen-Lücke (P2 aus Abschnitt 5.2)
+
+Auf Nutzer-Freigabe vertieft und behoben.
+
+**Root Cause (Deep-Dive `macbook.yaml`):** die ≥1TB-`require_all_of`-
+Gruppe kannte bisher nur `"1tb"`/`"1 tb"`/`"2tb"`/`"2 tb"` als
+Speichergrößen-Signal — nicht die (v. a. bei "About This
+Mac"/Finder-Anzeigen übliche) `"1024GB"`-Schreibweise für exakt
+dieselbe 1TB-Speichergröße. Der Titel `"Apple MacBook Pro 16.1 |
+i9-9880H | 16GB RAM 1024GB SSD OHNE OS QWERTY | Nr. 1"` (299€) erfüllte
+Marke (`"macbook pro"`) und Chip (`"i9"`) korrekt, fiel aber mangels
+passender Speichergrößen-Alternative durch **alle** 60 macbook-Regeln
+— empirisch verifiziert (`_contains_term()` liefert `False` für alle
+sechs bisherigen Storage-Terme bei diesem Titel). Kein Cross-Category-
+Problem mehr (der Titel landete vor dem office_pc-Fix aus Abschnitt 10
+in `office_pc`, jetzt korrekt `unmatched`, aber eben auch nicht in der
+eigens dafür vorhandenen `macbook`-Kategorie) — sondern eine
+klassische, einkategorielle Schreibweisen-Lücke, identisch im Muster
+zum bereits im ursprünglichen Active-FP-Audit gelösten `ram.yaml`
+"SO- DIMM"/"Laptops"-Fix.
+
+**Korpus-Check:** nur **1 realer Titel** im vollständigen `found.json`-
+Korpus mit `"macbook"` + `"1024"` (kein Cluster, Einzelfall — trotzdem
+umgesetzt, da strukturelle Schreibweisen-Vervollständigung, kein neues
+Matching-Konzept, siehe Begründung in `macbook.yaml`).
+
+**Fix:** `"1024gb"`/`"1024 gb"` als zusätzliches Storage-Synonym in
+**allen 30** betroffenen ≥1TB-`require_all_of`-Gruppen ergänzt (Air +
+Pro, je Intel/M1/M2/M3/M4, je drei Preisstufen) — gleichmäßig
+angewendet, weil die Schreibweisen-Lücke strukturell ist (jede
+1TB-Variante kann so beschriftet sein), nicht chip- oder
+preisstufenspezifisch.
+
+**Geänderte Dateien:**
+- `app/rules/macbook.yaml` — 30× `"1024gb"`/`"1024 gb"` ergänzt +
+  erklärender Kommentar.
+- `app/tests/test_macbook_1024gb_storage_fix.py` (neu) — 8 Tests: 3
+  reale FP-Regressionstests (Pro Intel, Air M2, Pro M3, je mit
+  1024GB-Schreibweise), 3 TP-Sicherheitstests (bestehende 1TB/512GB/2TB-
+  Schreibweisen bleiben unverändert funktionsfähig), 2 Grenzfälle
+  (Modellnummer "A1024" kollidiert nicht mit dem Storage-Signal;
+  1024GB ohne Chip-Angabe matcht weiterhin korrekt nicht).
+
+**Verifikation gegen den vollständigen Korpus:**
+```
+macbook-Treffer vorher: 50
+macbook-Treffer nachher: 51 (genau der 1 real bestätigte Titel neu)
+Alle 18 übrigen Kategorien: unverändert (kein neues Fehlrouting)
+```
+
+**Tests:** `pytest tests/ -k "macbook" -v` → **16/16 passed** (8 neue +
+8 bereits bestehende macbook-relevante Tests aus
+`test_matcher_gehaeuse_shell_fix.py`, `test_matcher_price_calibration_applied.py`,
+`test_office_pc_notebook_cross_category_fix.py`,
+`test_rule_service_modding_fix.py`). `rule_analyzer.py` → weiterhin **0
+Findings, 355 Regeln, 19 Kategorien**.
+
+**Damit ist der in Abschnitt 5.2 dokumentierte P2-Fall vollständig
+geschlossen** — keine offenen Cross-Category- oder Coverage-Funde mehr
+aus diesem Audit-Durchlauf.
