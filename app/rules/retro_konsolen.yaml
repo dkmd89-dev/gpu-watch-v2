@@ -115,6 +115,19 @@ exclude_category:
   # aehnliche zukuenftige Formulierungen bestehen).
   - "zubehör paket"
   - "zubehörpaket"
+  # FIX (Active-False-Positive-Audit, docs/ACTIVE_FALSE_POSITIVE_AUDIT.md):
+  # "Zubehör-Set" (Bindestrich-Variante, andere Formulierung als das
+  # bereits vorhandene "zubehörpaket"/"zubehör paket") und
+  # "Ersatznetzteil" (Kompositum, von bare "netzteil" -- das als
+  # Bundle-Signal in Gruppe 2 bewusst erhalten bleibt -- nicht erfasst)
+  # sind eindeutige Standalone-Zubehör-Verkaufsformulierungen, real
+  # bestätigt gegen found.json ("N64 / Nintendo 64 Zubehör-Set Auswahl
+  # ... Netzteil, Kabel, Expansion, Jumper Pak", "PS2 / PlayStation 2
+  # ORIGINAL Zubehör-Set Auswahl: Netzkabel Anschluss AV Kabel", "N64
+  # USB-C Netzteil für Nintendo 64 Ersatznetzteil"). 0 Kollisionen gegen
+  # den vollständigen 91-Titel-Korpus der Kategorie.
+  - "zubehör-set"
+  - "ersatznetzteil"
   # Phase 15 (kontrollierter Review, "Service/Modding-Fix"): Reparatur-/
   # Modding-DIENSTLEISTUNGS-Angebote statt Konsolenverkauf. Bewusst als
   # Mehrwort-Phrase, NICHT bare "service" -- ein bare Exclude waere fuer
@@ -169,6 +182,24 @@ exclude_category_unless_also_contains:
     - "gesprungen"
     - "gebrauchsspuren"
     - "verfärbt"
+  # FIX (Active-False-Positive-Audit, docs/ACTIVE_FALSE_POSITIVE_AUDIT.md):
+  # "memory card" ist als Gruppe-2-Geräte-Signal weiter oben in den
+  # require_all_of-Regeln bewusst erhalten (rettet reale Bundles wie
+  # "Playstation 1 original mit Controller, Spielen und Memory Card",
+  # die sonst über kein anderes Gruppe-2-Wort verfügen) -- reicht aber
+  # bislang auch für Standalone-Speicherkarten-Angebote OHNE jedes
+  # Gerät aus (6 reale Fehltreffer in found.json, u.a. "Nintendo
+  # Gamecube Memory Card", "PS2 / PlayStation 2 ORIGINAL Sony 8 MB
+  # Memory Card Speicherkarte Getestet"). Analog zum "gehäuse"-Mechanismus
+  # oben: blockiert "memory card" nur, wenn im GESAMTEN Titel kein
+  # Geräte-Kontextbegriff vorkommt. Verifiziert gegen alle aktuell
+  # matchenden memory-card-Titel der Kategorie: 6 Fehltreffer korrekt
+  # blockiert, alle 5 Titel mit "memory card" UND echtem Geräte-Kontext
+  # (Controller/Konsole/Ersatzkonsole) bleiben unverändert TRUE_POSITIVE.
+  "memory card":
+    - "controller"
+    - "konsole"
+    - "ersatzkonsole"
 
 # Scoring: kein Hardware-Detector anwendbar (analog sata_ssd.yaml) --
 # Preis ist das mit Abstand aussagekraeftigste Signal. Ausstattung/
