@@ -25,10 +25,12 @@ ersetzt.
 | sata_ssd | ✅ abgeschlossen | 1 | 3 | 0 | 0 | `-k "sata_ssd"`: 20/20 |
 | controller | ✅ abgeschlossen | 5 | 6 | 0 | 0 | `-k "controller"`: 69/69 |
 | autoradio_opel_corsa | ✅ abgeschlossen | 1 | 2 | 0 | 0 | `-k "autoradio"`: 2/2 |
-| **Kumulativ (alle bisher abgeschlossenen Kategorien)** | | **39** | **107** | **9** | **27** | |
+| macbook | ✅ abgeschlossen (0 Findings) | 0 | 0 | 0 | 0 | — (kein Fix nötig) |
+| gaming_pc | ✅ abgeschlossen | 3 | 6 | 0 | 0 | `-k "gaming_pc"`: 11/11 |
+| **Kumulativ (alle bisher abgeschlossenen Kategorien)** | | **42** | **113** | **9** | **27** | |
 
-Die kumulative Zeile zählt die dreizehn in diesem Gesamtprojekt gefixten
-Kategorien (gpu ohne Fix, da 0 Findings — zählt daher nicht mit,
+Die kumulative Zeile zählt die vierzehn in diesem Gesamtprojekt gefixten
+Kategorien (gpu und macbook ohne Fix, da je 0 Findings — zählen daher nicht mit,
 Zeile bleibt zur Nachvollziehbarkeit trotzdem stehen). Ein weiterer,
 bereits aus einem vorherigen Arbeitsblock bekannter Fall in
 `konsolen_bundles` (1 Titel, "Display Ersatz Konsole...") ist bewusst
@@ -65,7 +67,9 @@ synonym verwendet):
   ram-Titel (ram-Schritt), 75 damals matchende sata_ssd-Titel
   (sata_ssd-Schritt), 56 damals matchende controller-Titel
   (controller-Schritt), 55 damals matchende autoradio_opel_corsa-Titel
-  (autoradio_opel_corsa-Schritt).
+  (autoradio_opel_corsa-Schritt), 50 damals matchende macbook-Titel
+  (macbook-Schritt), 18 damals matchende gaming_pc-Titel
+  (gaming_pc-Schritt).
 - **Methodik-Hinweis, neu entdeckt im iphone-Schritt (wichtig):**
   `data/found.json` wird von einem laufenden Produktiv-Scanner (Docker
   Compose) live verändert — zwei Live-Auswertungen im Abstand weniger
@@ -230,6 +234,23 @@ Einzelfund dieses gesamten Durchlaufs:**
 | autoradio_opel_corsa | OEM-Werksteile (Steuergerät/CD-Player-Modul) über generisches "multimedia"-Signalwort | `Opel Corsa D Radio Multimedia Steuergerät MMI 13289918`, `...CP Player 13357124` | 2 |
 | **Summe autoradio_opel_corsa** | **1 Muster** | | **2 Titel** |
 
+**Gefixt im macbook-Schritt (0 Muster / 0 Titel):**
+
+Vollständiger Deep-Dive über alle 50 damals live matchenden
+macbook-Titel plus gezielte Suche nach Zubehör-/Ersatzteil-/
+Negations-Signalwörtern ("ohne akku", "ohne display", "nur netzteil",
+"ersatzteil", "defekt", "schrott" u.a.) — **0 reale aktive
+Fehltreffer** gefunden. Kein Fix in dieser Kategorie nötig.
+
+**Gefixt im gaming_pc-Schritt (3 Muster / 6 Titel):**
+
+| Kategorie | Muster | Betroffene Titel (Beispiel) | Anzahl Titel |
+|---|---|---|---:|
+| gaming_pc | Gaming-Laptops (bare "laptop"/"notebook", Kategorie hatte bisher bewusst kein exclude_category) | `Lenovo Legion 5...Gaming Laptop...`, `HP OMEN 15-dc1003ng Gaming Notebook...` u.a. | 4 |
+| gaming_pc | Lenovo-Laptop-Produktlinie ohne "laptop"/"notebook" im Titel | `Lenovo IdeaPad Gaming 3 15IMH05...` | 1 |
+| gaming_pc | Bares Mainboard-Bundle ohne Gehäuse (identisches Muster wie office_pc.yaml) | `Bundle Mainboard B760 + CPU i5-13400F + Lüfter + RAM 16GB (extra RTX 3060 Ti)` | 1 |
+| **Summe gaming_pc** | **3 Muster** | | **6 Titel** |
+
 **Zurückgestellt, real bestätigt, aktuell noch offen (P1/P2, 9 Fälle / 27 Titel):**
 
 | Kategorie | Priorität | Muster | Anzahl Titel | Grund für Zurückstellung |
@@ -255,10 +276,11 @@ Durchlaufs (nicht in der Summe oben):**
 **Kumulativ (handhelds + office_pc + retro_konsolen + gpu +
 lego_minifiguren + iphone + monitor_curved + vintage_elektronik +
 netzteil + notebook_resell + ram + sata_ssd + controller +
-autoradio_opel_corsa, alle vierzehn in diesem Gesamtprojekt
-abgeschlossenen Kategorien): 10 + 27 + 9 + 0 + 1 + 1 + 2 + 40 + 2 + 2 +
-2 + 3 + 6 + 2 = 107 Titel gefixt, 3 + 7 + 14 + 0 + 0 + 2 + 0 + 1 + 0 +
-0 + 0 + 0 + 0 + 0 = 27 Titel zurückgestellt.**
+autoradio_opel_corsa + macbook + gaming_pc, alle sechzehn in diesem
+Gesamtprojekt abgeschlossenen Kategorien): 10 + 27 + 9 + 0 + 1 + 1 + 2
++ 40 + 2 + 2 + 2 + 3 + 6 + 2 + 0 + 6 = 113 Titel gefixt, 3 + 7 + 14 + 0
++ 0 + 2 + 0 + 1 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 = 27 Titel
+zurückgestellt.**
 
 ## Handhelds
 
@@ -781,6 +803,71 @@ Android-Aftermarket-Gerät gedacht war.
 **TRUE_POSITIVE-Kollisionen:** 0 — gegen den vollständigen
 55-Titel-Match-Korpus geprüft.
 
+## MacBook
+
+**Auswahlgrund:** evidenzbasiert — Fortsetzung mit den verbleibenden
+kleineren Kategorien; `macbook` hatte mit 50 aktuell matchenden
+Titeln das höchste Matchvolumen der verbleibenden Kategorien (vor
+gaming_pc 18).
+
+**Vollständiger Active-FP-Audit:** alle 50 damals live matchenden
+Titel einzeln durchgesehen — durchgängig echte MacBook-Air-/
+-Pro-Verkaufsangebote (Modell + Chip-Generation + Speichergröße).
+Ergänzende gezielte Suche nach Zubehör-/Ersatzteil-/Negations-
+Signalwörtern (`ohne akku`, `ohne display`, `nur netzteil`, `nur
+ladegerät`, `ersatzteil`, `defekt`, `schrott`, `ohne funktion`, `nur
+gehäuse`, `nur tastatur`, `nur akku`, `ohne ssd`, `ohne ram`): 0
+Treffer.
+
+**Ergebnis: 0 reale aktive Fehltreffer.** Kein Fix in dieser Kategorie
+nötig.
+
+## Gaming PC
+
+**Auswahlgrund:** evidenzbasiert — nach macbook (0 Findings) letzte
+verbleibende Kategorie mit nennenswertem Matchvolumen; `gaming_pc`
+hatte 18 aktuell matchende Titel (vor m2_ssd 2, cpu_mainboard_bundle
+1).
+
+**Vollständiger Active-FP-Audit:** alle 18 damals live matchenden
+Titel einzeln durchgesehen. `gaming_pc.yaml` nutzt denselben
+`requirements:`-Mechanismus wie `office_pc.yaml` und hatte — mit
+identischer ursprünglicher Begründung ("Diese Kategorie WILL komplette
+PC-Systeme") — bisher ebenfalls **kein** `exclude_category`. Bei
+`office_pc.yaml` wurde diese Annahme bereits im office_pc-Schritt
+dieses Durchlaufs real widerlegt (PR #12); hier bestätigt sich
+strukturell derselbe Befund erneut.
+
+**Kernfund:** 6 Titel über 3 Muster:
+
+1. **4 Gaming-Laptops** (`Lenovo Legion 5...Gaming Laptop...`, `MSI
+   GF63 Thin Gaming Laptop...`, `Gaming Notebook Ryzen 7 4800H...`,
+   `HP OMEN 15-dc1003ng Gaming Notebook...`) — ein funktionsfähiges
+   Notebook ist kein Desktop-Gaming-PC-System.
+2. **1 Lenovo-Laptop-Produktlinie ohne "laptop"/"notebook" im Titel**
+   (`Lenovo IdeaPad Gaming 3 15IMH05...`) — "IdeaPad" ist exklusiv
+   Lenovos Laptop-Produktreihe.
+3. **1 bares Mainboard-Bundle ohne Gehäuse** (`Bundle Mainboard B760 +
+   CPU i5-13400F + Lüfter + RAM 16GB (extra RTX 3060 Ti)`) —
+   identische Root Cause wie beim office_pc-Fix
+   (`matcher.py::_case_meets_requirement()` wertet "kein erkennbares
+   Gehäuse" als erfüllt).
+
+**Sonstige Auffälligkeit, bewusst NICHT als Fehltreffer gewertet:**
+`Office PC | i5-8400, GTX 1050ti, 16GB DDR4, 1,2TB SSD+HDD WIN11` —
+der Verkäufer nennt den Titel selbst "Office PC", das Gerät erfüllt
+aber funktional alle Gaming-PC-Kriterien (dedizierte GPU, ausreichend
+RAM/CPU). Eine Selbstbezeichnung des Verkäufers ist kein
+Kategorisierungsfehler des Rulesets — echtes Gerät, kein Zubehör/keine
+Dokumentation.
+
+**Fix:** 4 neue bare `exclude_category`-Terme (`laptop`, `notebook`,
+`ideapad`, `mainboard`) — identischer Mechanismus, teils identische
+Begriffe wie beim office_pc-Fix.
+
+**TRUE_POSITIVE-Kollisionen:** 0 — gegen den vollständigen
+18-Titel-Match-Korpus geprüft.
+
 ## Routing / First-Match-Wins
 
 **Untersuchter Fall:** `Microsoft Xbox One X 1TB Schwarz Inkl OVP Ohne
@@ -1028,6 +1115,23 @@ Neue Regressionstestdatei: `app/tests/test_autoradio_opel_corsa_active_fp_audit_
 Werksteile-Fehltreffer, 1 Sammel-TP-Sicherheitstest für 3 reale
 Android-Designradio-Titel).
 
+**macbook:** kein Fix — 0 reale aktive Fehltreffer, keine
+Regelanpassung.
+
+**gaming_pc:** `app/rules/gaming_pc.yaml`, neu eingeführtes
+`exclude_category` (Kategorie hatte bisher bewusst keins, identische
+Begründung wie ursprünglich bei office_pc.yaml): **4 neue** bare-word
+Excludes für die **3 gefixten Muster** (`laptop`, `notebook`,
+`ideapad`, `mainboard`). 0 Kollisionen gegen den vollständigen
+18-Titel-Match-Korpus. Reine additive `exclude_category`-Ergänzung,
+kein neuer Matcher-Mechanismus.
+
+Neue Regressionstestdatei: `app/tests/test_gaming_pc_active_fp_audit_fix.py`
+(3 Tests: 1 FP-Regressionstest für alle 5 real bestätigten
+Gaming-Laptop-Fehltreffer, 1 FP-Regressionstest für den bares-
+Mainboard-Bundle-Fehltreffer, 1 Sammel-TP-Sicherheitstest für 3 reale
+Desktop-Gaming-PC-Titel).
+
 ## Testergebnis
 
 **handhelds:**
@@ -1125,6 +1229,16 @@ Android-Designradio-Titel).
   keine bestehenden autoradio_opel_corsa-spezifischen Tests vor diesem
   Schritt vorhanden)
 
+**macbook:** kein separater Testlauf nötig (kein Code-/YAML-Änderung).
+
+**gaming_pc:**
+- `pytest app/tests/ -k "gaming_pc" -v`: **11/11 passed** (3 neue
+  Tests + 8 bereits bestehende gaming_pc-relevante Tests aus
+  `test_detector_cpu.py`, `test_matcher_deal_score_integration.py`,
+  `test_matcher_price_history_model.py`, `test_matcher_psu_requirement.py`,
+  `test_matcher_ssd_capacity_requirement.py`,
+  `test_notebook_resell_gaming_fix.py`)
+
 **Rule Analyzer (nach allen Schritten):** `0 Findings, 355 Regeln,
 19 Kategorien` (unverändert).
 
@@ -1134,8 +1248,7 @@ Gesamtprojekts, auf Freigabe ausgeführt):** `pytest app/tests/` —
 Stand (vor diesem Durchlauf, Basis PR #10): 1197/1197 passed — die
 Differenz (36 neue Tests) entspricht den bis dahin neu hinzugekommenen
 Regressionstestdateien je auditierter Kategorie. **controller** (3
-weitere neue Tests) und **autoradio_opel_corsa** (2 weitere neue
-Tests) sind in diesem Suite-Lauf noch NICHT enthalten — laufen in der
-finalen Suite mit, sobald der fortgesetzte Durchlauf mit den
-verbleibenden kleineren Kategorien erneut abgeschlossen und freigegeben
-wird.
+weitere neue Tests), **autoradio_opel_corsa** (2 weitere neue Tests)
+und **gaming_pc** (3 weitere neue Tests) sind in diesem Suite-Lauf
+noch NICHT enthalten — laufen in der finalen Suite mit, sobald dieser
+fortgesetzte Durchlauf abgeschlossen und erneut freigegeben wird.
