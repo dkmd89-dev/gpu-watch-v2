@@ -56,6 +56,32 @@ search_terms:
 
 # Diese Kategorie WILL komplette PC-Systeme -- bewusst KEIN
 # exclude_category (identisch zur Begründung in office_pc.yaml).
+#
+# FIX (Active-False-Positive-Audit, docs/ACTIVE_FALSE_POSITIVE_AUDIT.md):
+# Die o.g. Begründung ("kein exclude_category") stammte aus derselben
+# initialen Annahme wie bei office_pc.yaml -- dort real widerlegt (siehe
+# office_pc.yaml-Fix, PR #12) und hier identisch real bestätigt (5
+# Gaming-LAPTOPS + 1 bares Mainboard-Bundle im vollständigen
+# 18-Titel-Match-Korpus, alle ohne dieses exclude_category
+# fälschlich als Desktop-Gaming-PC durchgerutscht):
+# - "laptop"/"notebook" (bare): "Gaming Notebook Ryzen 7 4800H...",
+#   "Lenovo Legion 5...Gaming Laptop...", "MSI GF63 Thin Gaming
+#   Laptop...", "HP OMEN 15-dc1003ng Gaming Notebook..." -- ein
+#   funktionsfähiges Notebook ist kein Desktop-Gaming-PC-System.
+# - "ideapad" (bare, Lenovo-Laptop-Produktlinie ohne "laptop"/
+#   "notebook" im Titel): "Lenovo IdeaPad Gaming 3 15IMH05...".
+# - "mainboard" (bare, identisches Muster wie office_pc.yaml/
+#   notebook_resell.yaml): "Bundle Mainboard B760 + CPU i5-13400F +
+#   Lüfter + RAM 16GB (extra RTX 3060 Ti)" -- ein Komponenten-Bundle
+#   ohne Gehäuse ist kein Komplettsystem (identische Root-Cause:
+#   matcher.py::_case_meets_requirement() wertet "kein erkennbares
+#   Gehäuse" als erfüllt).
+# 0 Kollisionen gegen den vollständigen Korpus.
+exclude_category:
+  - "laptop"
+  - "notebook"
+  - "ideapad"
+  - "mainboard"
 
 rules:
   - label: "Gaming-PC (Top-Deal, bevorzugte GPU)"
