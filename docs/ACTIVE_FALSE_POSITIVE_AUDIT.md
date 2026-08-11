@@ -14,14 +14,18 @@ ersetzt.
 | handhelds | ✅ abgeschlossen | 8 | 10 | 2 | 3 | `-k "handheld"`: 59/59 |
 | office_pc | ✅ abgeschlossen | 2 | 27 | 1 | 7 | `-k "office_pc"`: 11/11 |
 | retro_konsolen | ✅ abgeschlossen | 3 | 9 | 4 | 14 | `-k "retro_konsolen"`: 31/31 |
-| **Kumulativ (handhelds + office_pc + retro_konsolen)** | | **13** | **46** | **7** | **24** | |
+| gpu | ✅ abgeschlossen (0 Findings) | 0 | 0 | 0 | 0 | — (kein Fix nötig) |
+| lego_minifiguren | ✅ abgeschlossen | 1 | 1 | 0 | 0 | `-k "lego"`: 25/25 |
+| **Kumulativ (handhelds + office_pc + retro_konsolen + lego_minifiguren)** | | **14** | **47** | **7** | **24** | |
 
-Die kumulative Zeile zählt die drei in diesem Durchlauf abgeschlossenen
-Kategorien. Ein weiterer, bereits aus einem vorherigen Arbeitsblock
-bekannter Fall in `konsolen_bundles` (1 Titel, "Display Ersatz
-Konsole...") ist bewusst NICHT eingerechnet, da für diese Kategorie
-kein eigener Schritt in diesem Durchlauf stattfand — siehe Tabelle
-"Weiterhin offen" weiter unten.
+Die kumulative Zeile zählt die vier in diesem Durchlauf gefixten
+Kategorien (gpu ohne Fix, da 0 Findings — zählt daher nicht mit,
+Zeile bleibt zur Nachvollziehbarkeit trotzdem stehen). Ein weiterer,
+bereits aus einem vorherigen Arbeitsblock bekannter Fall in
+`konsolen_bundles` (1 Titel, "Display Ersatz Konsole...") ist bewusst
+NICHT eingerechnet, da für diese Kategorie kein eigener Schritt in
+diesem Durchlauf stattfand — siehe Tabelle "Weiterhin offen" weiter
+unten.
 
 **Begriffsdefinitionen** (gelten für den ganzen Report, nicht mehr
 synonym verwendet):
@@ -41,7 +45,9 @@ synonym verwendet):
   Zeitpunkt des jeweiligen Schritts aktuellen Korpusstand: 1736
   eindeutige Titel / 22 damals matchende handhelds-Titel (handhelds-
   Schritt), 69 damals matchende office_pc-Titel (office_pc-Schritt), 91
-  damals matchende retro_konsolen-Titel (retro_konsolen-Schritt).
+  damals matchende retro_konsolen-Titel (retro_konsolen-Schritt), 1750
+  eindeutige Titel / 46 damals matchende gpu-Titel (gpu-Schritt), 455
+  damals matchende lego_minifiguren-Titel (lego_minifiguren-Schritt).
 - **Methodik-Hinweis (wichtig):** Alle Titel wurden mit ihrem **echten**
   `found.json`-Preis ausgewertet, nicht mit `price=0.0`. Ein Test mit
   `price=0.0` verzerrt First-Match-Wins bei preisgedeckelten Regeln
@@ -58,6 +64,12 @@ synonym verwendet):
 - Bereits gelöste Muster (siehe `docs/KONSOLEN_BUNDLES_REVIEW.md`,
   `docs/KONSOLEN_BUNDLES_OVP_ANALYSE.md`, bestehende Regressionstests)
   wurden nicht erneut als Findings gemeldet.
+- **Auswahl der Kategorie nach gpu:** evidenzbasiert statt nach Gefühl —
+  Anzahl aktuell matchender Titel je noch nicht auditierter Kategorie
+  ermittelt (Live-Auswertung über den vollständigen `found.json`-
+  Korpus), `lego_minifiguren` fiel mit **455** Treffern deutlich aus dem
+  Rahmen der übrigen unauditierten Kategorien (typischerweise 40–210)
+  und wurde deshalb als nächster Deep-Dive gewählt.
 
 ## Aktive echte Fehltreffer
 
@@ -92,6 +104,22 @@ synonym verwendet):
 | retro_konsolen | "Ersatznetzteil" (Kompositum) | `N64 USB-C Netzteil für Nintendo 64 Ersatznetzteil` | 1 |
 | **Summe retro_konsolen** | **3 Muster** | | **9 Titel** |
 
+**Gefixt im gpu-Schritt (0 Muster / 0 Titel):**
+
+Vollständiger Deep-Dive über alle 46 damals live matchenden gpu-Titel
+(echte Preise) plus gezielte Suche nach Zubehör-/Bundle-/Ersatzteil-/
+Tausch-Signalwörtern ("wasserblock", "riser", "netzteil", "kabel",
+"adapter", "mainboard", "bundle", "defekt" u.a.) — **0 reale aktive
+Fehltreffer** gefunden. Kein Fix in dieser Kategorie nötig; siehe
+Abschnitt "GPU" unten für Details.
+
+**Gefixt im lego_minifiguren-Schritt (1 Muster / 1 Titel):**
+
+| Kategorie | Muster | Betroffene Titel (Beispiel) | Anzahl Titel |
+|---|---|---|---:|
+| lego_minifiguren | Negation vor "Figur(en)" ("Ohne Figuren") | `Lego Star Wars Sammlung, 75082,7959,9488, Komplett Ohne Figuren` | 1 |
+| **Summe lego_minifiguren** | **1 Muster** | | **1 Titel** |
+
 **Zurückgestellt, real bestätigt, aktuell noch offen (P1/P2, 7 Fälle / 24 Titel):**
 
 | Kategorie | Priorität | Muster | Anzahl Titel | Grund für Zurückstellung |
@@ -112,9 +140,10 @@ Durchlaufs (nicht in der Summe oben):**
 |---|---|---|---:|---|
 | konsolen_bundles | P1 | `Display Ersatz Konsole...DISPLAY ONLY` trotz Geräte-Marker (V2/HAC-001) | 1 | eigener Arbeitsschritt, noch nicht terminiert |
 
-**Kumulativ (handhelds + office_pc + retro_konsolen, alle drei in
-diesem Durchlauf abgeschlossenen Kategorien): 10 + 27 + 9 = 46 Titel
-gefixt, 3 + 7 + 14 = 24 Titel zurückgestellt.**
+**Kumulativ (handhelds + office_pc + retro_konsolen + gpu +
+lego_minifiguren, alle fünf in diesem Durchlauf abgeschlossenen
+Kategorien): 10 + 27 + 9 + 0 + 1 = 47 Titel gefixt, 3 + 7 + 14 + 0 + 0 =
+24 Titel zurückgestellt.**
 
 ## Handhelds
 
@@ -251,6 +280,70 @@ Konvolut-Regel anfassen (Kategorie A: Regel-Gruppe selbst zu breit),
 das ist ein strukturell größerer, eigener Schritt und wurde bewusst
 nicht im Rahmen dieses additiven Excludes mitgelöst.
 
+## GPU
+
+**Vollständiger Active-FP-Audit:** alle 46 damals live matchenden
+gpu-Titel einzeln geprüft (echte Preise). Alle 46 Titel sind eindeutig
+reale Einzelkarten-Angebote (Marke + Modell + VRAM-Angabe), keine
+PC-Systeme, Laptops, Konsolen oder Zubehörteile darunter — die
+bestehenden `exclude_category`-Blöcke (PCs, Laptops, Konsolen,
+Monitore/Peripherie, Kühl-Zubehör, defekte Ware) greifen sichtbar
+korrekt.
+
+**Ergänzende gezielte Suche** über den gesamten 1750-Titel-Korpus nach
+GPU-Keyword-Titeln (`rtx`/`geforce`/`radeon`/`grafikkarte`/`rx`/`gpu`)
+kombiniert mit Zubehör-/Bundle-/Ersatzteil-/Tausch-Signalwörtern
+(`wasserblock`, `riser`, `netzteil`, `kabel`, `adapter`, `halterung`,
+`slotblende`, `bios`, `mining`, `ersatzteil`, `defekt`, `tausch`,
+`mainboard`, `bundle`, `kit` u.a.): 3 rohe Treffer, alle bei genauerer
+Prüfung keine echten Fehltreffer (2× reine Teilstring-Kollision der
+eigenen Suchheuristik mit "VRAM", 1× ein legitimes Tauschangebot für
+eine echte Einzelkarte, kein Bundle).
+
+**Ergebnis: 0 reale aktive Fehltreffer.** Kein Fix in dieser Kategorie
+nötig — ein valides, dokumentiertes Ergebnis eines systematischen
+Audits, keine Lücke in der Prüfung.
+
+## LEGO Minifiguren
+
+**Auswahlgrund:** kein vorab bekannter Kandidat wie bei office_pc —
+evidenzbasiert über einen Matchvolumen-Vergleich aller noch nicht
+auditierten Kategorien ermittelt (455 aktuell matchende Titel, deutlich
+über dem Durchschnitt der übrigen Kategorien).
+
+**Vollständiger Active-FP-Audit:** alle 455 damals live matchenden
+Titel einzeln durchgesehen. Die deutliche Mehrheit sind eindeutig echte
+LEGO-Minifiguren-/Konvolut-Angebote (Star-Wars-Clone-Trooper-Einzelfiguren,
+Ninjago-/CMF-/Promo-Figuren, Sammlungs-/Konvolut-Angebote mit Marken- und
+Themenbezug) — die hohe Absolutzahl ist strukturell erklärbar (LEGO-
+Minifiguren sind ein sehr häufiger Kleinanzeigen-Angebotstyp), kein
+Hinweis auf systematische Fehlklassifikation.
+
+**Kernfund:** 1 Titel — `Lego Star Wars Sammlung, 75082,7959,9488,
+Komplett Ohne Figuren` (34,99€) — matcht als "LEGO Minifiguren-Sammlung",
+obwohl der Titel explizit **"Ohne Figuren"** aussagt (reines Set-/
+Fahrzeug-Konvolut ohne Minifiguren). Root Cause: die
+`require_all_of`-Gruppen prüfen nur, ob das Wort "figur"/"figuren" im
+Titel vorkommt — eine vorangestellte Negation wird nicht erkannt, da
+"figuren" als Teilstring von "Ohne Figuren" identisch matcht wie in
+einem echten Figuren-Angebot.
+
+**Evidenzstärke bewusst benannt:** mit n=1 im vollständigen
+1750-Titel-Korpus deutlich dünner belegt als alle bisher in diesem
+Durchlauf gefixten Muster (office_pc: 27, retro_konsolen: 9,
+handhelds: 3–10 je Muster) und schwächer als einzelne bereits
+zurückgestellte P1/P2-Fälle anderer Kategorien. Auf explizite Anfrage
+trotzdem umgesetzt, da das Muster strukturell eindeutig und praktisch
+kollisionsfrei ist (eine Negationsphrase wie "ohne Figuren" kommt in
+keinem denkbaren echten Figuren-Verkaufsangebot vor) — anders als z.B.
+die zurückgestellten retro_konsolen-Einzelfälle, bei denen die
+Verallgemeinerbarkeit selbst unsicher war, nicht nur die Fallzahl.
+
+**TRUE_POSITIVE-Kollisionen:** 0 — gegen den vollständigen
+455-Titel-Match-Korpus geprüft; keine anderen Titel enthalten
+"ohne"/"keine"/"kein" unmittelbar vor "figur"/"figuren"/"minifigur"/
+"minifiguren".
+
 ## Routing / First-Match-Wins
 
 **Untersuchter Fall:** `Microsoft Xbox One X 1TB Schwarz Inkl OVP Ohne
@@ -358,6 +451,24 @@ für die 5 memory-card-Bundles inkl. der 2 ausschließlich davon
 abhängigen TRUE_POSITIVES —, 1 Grenzfalltest gegen eine
 Bindestrich-Kollision).
 
+**gpu:** kein Fix — 0 reale aktive Fehltreffer, keine Regelanpassung.
+
+**lego_minifiguren:** `app/rules/lego_minifiguren.yaml`, `exclude_category`:
+**4 neue** bare-phrase Excludes für das **1 gefixte Muster**
+(`ohne figur`, `ohne figuren`, `ohne minifigur`, `ohne minifiguren`) —
+Singular/Plural beider Wortformen, analog zum bereits etablierten
+Singular/Plural-Muster in `handhelds.yaml` (`ersatzstift`/
+`ersatzstifte`). Bewusst NICHT ergänzt: andere Negationswörter
+("keine"/"kein") — kein Korpusbeleg dafür. 0 Kollisionen gegen den
+vollständigen 455-Titel-Match-Korpus. Reine additive
+`exclude_category`-Ergänzung, kein neuer Matcher-Mechanismus.
+
+Neue Regressionstestdatei: `app/tests/test_lego_minifiguren_active_fp_audit_fix.py`
+(3 Tests: 1 FP-Regressionstest für den real bestätigten Fehltreffer-
+Titel, 1 Test für die 3 unbelegten aber strukturell identischen
+Singular/Plural-Geschwisterformen, 1 Sammel-TP-Sicherheitstest inkl.
+der positiven Gegenprobe "Mit Figuren" statt "Ohne Figuren").
+
 ## Testergebnis
 
 **handhelds:**
@@ -379,11 +490,21 @@ Bindestrich-Kollision).
   `test_rule_service_modding_fix.py` — inkl. des bereits bestehenden
   `test_signal_memory_card_positiv`, unverändert grün)
 
-**Rule Analyzer (nach allen drei Schritten):** `0 Findings, 355 Regeln,
+**gpu:** kein separater Testlauf nötig (kein Code-/YAML-Änderung).
+
+**lego_minifiguren:**
+- `pytest app/tests/ -k "lego" -v`: **25/25 passed** (3 neue Tests + 22
+  bereits bestehende lego_minifiguren-relevante Tests aus
+  `test_matcher_price_calibration_applied.py`,
+  `test_matcher_price_calibration_matching_fixes.py`,
+  `test_matcher_resale_price_groups.py`, `test_rule_analyzer.py`,
+  `test_rule_regressions.py`)
+
+**Rule Analyzer (nach allen Schritten):** `0 Findings, 355 Regeln,
 19 Kategorien` (unverändert).
 
 **Volle Suite:** noch nicht erneut ausgeführt seit dem handhelds-Fix —
 läuft laut Teststrategie dieses Durchlaufs erst am Ende dieses
 Optimierungsdurchlaufs, auf explizite Freigabe. Letzter dokumentierter
-vollständiger Lauf (vor office_pc/retro_konsolen): **1197/1197 passed,
-0 failed** (604s).
+vollständiger Lauf (vor office_pc/retro_konsolen/gpu/lego_minifiguren):
+**1197/1197 passed, 0 failed** (604s).
