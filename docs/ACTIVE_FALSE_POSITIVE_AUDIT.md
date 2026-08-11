@@ -23,9 +23,10 @@ ersetzt.
 | notebook_resell | ✅ abgeschlossen | 1 | 2 | 0 | 0 | `-k "notebook_resell"`: 21/21 |
 | ram | ✅ abgeschlossen | 2 | 2 | 0 | 0 | `-k "ram"`: 42/42 |
 | sata_ssd | ✅ abgeschlossen | 1 | 3 | 0 | 0 | `-k "sata_ssd"`: 20/20 |
-| **Kumulativ (handhelds + office_pc + retro_konsolen + lego_minifiguren + iphone + monitor_curved + vintage_elektronik + netzteil + notebook_resell + ram + sata_ssd)** | | **33** | **99** | **9** | **27** | |
+| controller | ✅ abgeschlossen | 5 | 6 | 0 | 0 | `-k "controller"`: 69/69 |
+| **Kumulativ (handhelds + office_pc + retro_konsolen + lego_minifiguren + iphone + monitor_curved + vintage_elektronik + netzteil + notebook_resell + ram + sata_ssd + controller)** | | **38** | **105** | **9** | **27** | |
 
-Die kumulative Zeile zählt die elf in diesem Durchlauf gefixten
+Die kumulative Zeile zählt die zwölf in diesem Durchlauf gefixten
 Kategorien (gpu ohne Fix, da 0 Findings — zählt daher nicht mit,
 Zeile bleibt zur Nachvollziehbarkeit trotzdem stehen). Ein weiterer,
 bereits aus einem vorherigen Arbeitsblock bekannter Fall in
@@ -61,7 +62,8 @@ synonym verwendet):
   matchende netzteil-Titel (netzteil-Schritt), 84 damals matchende
   notebook_resell-Titel (notebook_resell-Schritt), 81 damals matchende
   ram-Titel (ram-Schritt), 75 damals matchende sata_ssd-Titel
-  (sata_ssd-Schritt).
+  (sata_ssd-Schritt), 56 damals matchende controller-Titel
+  (controller-Schritt).
 - **Methodik-Hinweis, neu entdeckt im iphone-Schritt (wichtig):**
   `data/found.json` wird von einem laufenden Produktiv-Scanner (Docker
   Compose) live verändert — zwei Live-Auswertungen im Abstand weniger
@@ -208,6 +210,17 @@ Einzelfund dieses gesamten Durchlaufs:**
 | sata_ssd | Externe USB-SSDs ("Portable"/"Externer Speicher", kein SATA-Interface) | `SanDisk Portable SSD 1 TB Speicher`, `SSK Pro 1TB SSD Externer Speicher USB-Stick` u.a. | 3 |
 | **Summe sata_ssd** | **1 Muster** | | **3 Titel** |
 
+**Gefixt im controller-Schritt (5 Muster / 6 Titel):**
+
+| Kategorie | Muster | Betroffene Titel (Beispiel) | Anzahl Titel |
+|---|---|---|---:|
+| controller | Controller-Halter/-Ständer + Wandhalterung (Kompositum) | `Controller Halter "Fight" Faust Design`, `PS5 Wandhalterung für PS5 Controller...` | 2 |
+| controller | Ersatz-Akku für Controller | `Controller Akku für Xbox One/Xbox Series X&S...` | 1 |
+| controller | Wireless-Empfänger/-Dongle für PC | `...Controller Adapter Empfänger Stick Windows 10 11 PC USB DE` | 1 |
+| controller | Ersatzteil (Analog-Sticks) | `2x Ersatz Analog Sticks für PS5 Controller DualSense...` | 1 |
+| controller | Konsolen-Bundle über Speicherkapazität (bereits im Regel-Kommentar dokumentiertes Restrisiko, jetzt real bestätigt) | `XBOX Series S 1TB + 2 Controller[...]` | 1 |
+| **Summe controller** | **5 Muster** | | **6 Titel** |
+
 **Zurückgestellt, real bestätigt, aktuell noch offen (P1/P2, 9 Fälle / 27 Titel):**
 
 | Kategorie | Priorität | Muster | Anzahl Titel | Grund für Zurückstellung |
@@ -232,10 +245,10 @@ Durchlaufs (nicht in der Summe oben):**
 
 **Kumulativ (handhelds + office_pc + retro_konsolen + gpu +
 lego_minifiguren + iphone + monitor_curved + vintage_elektronik +
-netzteil + notebook_resell + ram + sata_ssd, alle zwölf in diesem
-Durchlauf abgeschlossenen Kategorien): 10 + 27 + 9 + 0 + 1 + 1 + 2 + 40
-+ 2 + 2 + 2 + 3 = 99 Titel gefixt, 3 + 7 + 14 + 0 + 0 + 2 + 0 + 1 + 0 +
-0 + 0 + 0 = 27 Titel zurückgestellt.**
+netzteil + notebook_resell + ram + sata_ssd + controller, alle
+dreizehn in diesem Gesamtprojekt abgeschlossenen Kategorien): 10 + 27 +
+9 + 0 + 1 + 1 + 2 + 40 + 2 + 2 + 2 + 3 + 6 = 105 Titel gefixt, 3 + 7 +
+14 + 0 + 0 + 2 + 0 + 1 + 0 + 0 + 0 + 0 + 0 = 27 Titel zurückgestellt.**
 
 ## Handhelds
 
@@ -689,6 +702,47 @@ exakten Phrasen ab — die im Handel gängigen Produktbezeichnungen
 **TRUE_POSITIVE-Kollisionen:** 0 — `"portable"`/`"externer speicher"`
 kommen in keinem der 72 verbleibenden echten SATA-SSD-Titel vor.
 
+## Controller
+
+**Auswahlgrund:** evidenzbasiert — Fortsetzung des Durchlaufs mit den
+verbleibenden, kleineren Kategorien nach dem ersten Abschluss-Report
+(12 Kategorien). `controller` hatte mit 56 aktuell matchenden Titeln
+das höchste Matchvolumen der verbleibenden Kategorien (vor
+autoradio_opel_corsa 55, macbook 50).
+
+**Vollständiger Active-FP-Audit:** alle 56 damals live matchenden
+Titel einzeln durchgesehen. **5 unabhängige reale Muster über 6
+Titel** gefunden:
+
+1. Controller-Halter/-Ständer (`Controller Halter "Fight" Faust
+   Design`) und Wandhalterung (`PS5 Wandhalterung für PS5 Controller
+   mit Controller-Halter...` — Kompositum, von der bereits
+   bestehenden bare `"halterung"`-Exclude wegen fehlender Wortgrenze
+   nicht erfasst) — Zubehör, kein Controller selbst.
+2. Ersatz-Akku für einen Controller.
+3. Wireless-Empfänger/-Dongle für PC (`...Adapter Empfänger Stick
+   Windows 10 11 PC USB DE`).
+4. Ersatzteil-Angebot (`2x Ersatz Analog Sticks für PS5 Controller
+   DualSense`, 2,95€ — der Preis allein ist schon ein starkes Indiz).
+   Bewusst NICHT bare `"sticks"` verwendet: würde den echten
+   TRUE_POSITIVE-Titel `TMR Sticks! Nintendo Switch 1 Pro
+   Controller...` treffen (Stick-Technologie als Verkaufsargument,
+   kein Ersatzteil-Angebot).
+5. **Bereits im bestehenden Regel-Kommentar dokumentiertes Restrisiko,
+   jetzt real bestätigt:** `XBOX Series S 1TB + 2
+   Controller[BITTE BESCHREIBUNG LESEN]` — ein komplettes
+   Konsolen-Bundle, das weder `"konsole"` noch `"playstation"` im
+   Titel nennt (nur `"xbox"`, das aus den bereits im Code
+   dokumentierten Gründen nicht blanket-excludiert werden kann). Der
+   YAML-Kommentar hatte diesen genauen Fall bereits vorab als
+   Restrisiko benannt und eine Kalibrierung "anhand realer
+   Scan-Treffer" empfohlen — dieser Audit-Schritt liefert den ersten
+   realen Beleg. Fix: `"1tb"` als Speicherkapazitäts-Signal (kein
+   echter Standalone-Controller-Titel nennt eine Speicherkapazität).
+
+**TRUE_POSITIVE-Kollisionen:** 0 — gegen den vollständigen
+56-Titel-Match-Korpus geprüft, inkl. des "TMR Sticks"-Grenzfalls.
+
 ## Routing / First-Match-Wins
 
 **Untersuchter Fall:** `Microsoft Xbox One X 1TB Schwarz Inkl OVP Ohne
@@ -911,6 +965,20 @@ Neue Regressionstestdatei: `app/tests/test_sata_ssd_active_fp_audit_fix.py`
 (2 Tests: 1 FP-Regressionstest für alle 3 real bestätigten
 Fehltreffer, 1 Sammel-TP-Sicherheitstest für 3 reale SATA-SSD-Titel).
 
+**controller:** `app/rules/controller.yaml`, `exclude_category`: **5
+neue** bare-word Excludes für die **5 gefixten Muster** (`halter`,
+`akku`, `empfänger`, `ersatz`, `1tb`). Bewusst NICHT bare `"sticks"`
+(Kollisionsrisiko mit einem echten TRUE_POSITIVE-Titel, siehe Abschnitt
+"Controller" oben). Alle 0 Kollisionen gegen den vollständigen
+56-Titel-Match-Korpus. Reine additive `exclude_category`-Ergänzung,
+kein neuer Matcher-Mechanismus.
+
+Neue Regressionstestdatei: `app/tests/test_controller_active_fp_audit_fix.py`
+(3 Tests: 1 FP-Regressionstest für die 5 real bestätigten Zubehör-/
+Ersatzteil-Fehltreffer, 1 FP-Regressionstest für den Konsolen-Bundle-
+Fehltreffer, 1 Sammel-TP-Sicherheitstest inkl. des "TMR Sticks"-
+Grenzfalls).
+
 ## Testergebnis
 
 **handhelds:**
@@ -993,12 +1061,26 @@ Fehltreffer, 1 Sammel-TP-Sicherheitstest für 3 reale SATA-SSD-Titel).
   `test_notify_max_price_and_sata_ssd_fix.py`,
   `test_sata_ssd_search_improvements.py`)
 
+**controller:**
+- `pytest app/tests/ -k "controller" -v`: **69/69 passed** (3 neue
+  Tests + 66 bereits bestehende controller-relevante Tests aus
+  `test_konsolen_bundles_precision_phrases_fix.py`,
+  `test_matcher_context_aware_exclude.py`,
+  `test_matcher_controller_accessory_fix.py`,
+  `test_matcher_gehaeuse_shell_fix.py`,
+  `test_retro_konsolen_controller_signal_fix.py`,
+  `test_rule_regressions.py`, `test_rule_service_modding_fix.py`)
+
 **Rule Analyzer (nach allen Schritten):** `0 Findings, 355 Regeln,
 19 Kategorien` (unverändert).
 
-**Volle Suite (nach Abschluss aller zwölf Kategorien dieses
-Durchlaufs, auf Freigabe ausgeführt):** `pytest app/tests/` —
+**Volle Suite (Zwischenstand nach den ersten zwölf Kategorien dieses
+Gesamtprojekts, auf Freigabe ausgeführt):** `pytest app/tests/` —
 **1233/1233 passed, 0 failed** (620,33s). Vorheriger dokumentierter
 Stand (vor diesem Durchlauf, Basis PR #10): 1197/1197 passed — die
-Differenz (36 neue Tests) entspricht den in diesem Durchlauf neu
-hinzugekommenen Regressionstestdateien je auditierter Kategorie.
+Differenz (36 neue Tests) entspricht den bis dahin neu hinzugekommenen
+Regressionstestdateien je auditierter Kategorie. **controller** (3
+weitere neue Tests) ist in diesem Suite-Lauf noch NICHT enthalten —
+läuft in der finalen Suite mit, sobald der fortgesetzte Durchlauf mit
+den verbleibenden kleineren Kategorien erneut abgeschlossen und
+freigegeben wird.

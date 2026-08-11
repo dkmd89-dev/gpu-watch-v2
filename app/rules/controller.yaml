@@ -88,6 +88,34 @@ exclude_category:
   - "replacement housing"
   - "housing replacement"
 
+  # FIX (Active-False-Positive-Audit, docs/ACTIVE_FALSE_POSITIVE_AUDIT.md):
+  # Zubehör-/Ersatzteil-Angebote ohne kompletten Controller, real
+  # bestätigt gegen found.json (5 Titel im vollständigen 56-Titel-
+  # Match-Korpus):
+  # - "halter" (bare, ergänzt "halterung"): Controller-Ständer/-Halter
+  #   ("Controller Halter 'Fight' Faust Design") und Wandhalterung
+  #   (Kompositum "Wandhalterung", von bare "halterung" wegen fehlender
+  #   Wortgrenze nicht erfasst) sind Zubehör, kein Controller selbst.
+  - "halter"
+  # - "akku" (bare): Ersatz-Akku für einen Controller, kein Controller.
+  - "akku"
+  # - "empfänger" (bare): Wireless-Empfänger/-Dongle für PC, kein
+  #   Controller ("...Controller Adapter Empfänger Stick...").
+  - "empfänger"
+  # - "ersatz" (bare): Ersatzteil-Angebote ("2x Ersatz Analog Sticks für
+  #   PS5 Controller DualSense"), kein kompletter Controller. Bewusst
+  #   NICHT bare "sticks" -- würde den echten TRUE_POSITIVE-Titel "TMR
+  #   Sticks! Nintendo Switch 1 Pro Controller..." treffen (Stick-
+  #   Technologie als Verkaufsargument, kein Ersatzteil-Angebot).
+  - "ersatz"
+  # - "1tb" (bare): reales, im Regel-Kommentar oben bereits dokumentiertes
+  #   Restrisiko ("ein komplettes Xbox-Konsolen-Bundle, das weder
+  #   'konsole' noch 'playstation' im Titel nennt") jetzt real bestätigt:
+  #   "XBOX Series S 1TB + 2 Controller[...]" ist ein Konsolen-Bundle,
+  #   kein Controller-Einzelangebot -- die Speicherkapazitätsangabe
+  #   kommt bei keinem echten Standalone-Controller-Titel vor.
+  - "1tb"
+
 # FIX (Phase 15, kontrollierter Review, "Variante C" -- generische
 # kontextbewusste Exclude-Logik, siehe matcher.py::_any_conditional_
 # exclude()): "ladekabel"/"netzteil"/"ladegerät"/"anleitung" bewusst NICHT
