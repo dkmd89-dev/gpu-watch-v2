@@ -97,6 +97,17 @@ exclude_category:
   - "laptop"
   - "notebook"
 
+  # FIX (Active-False-Positive-Audit, docs/ACTIVE_FALSE_POSITIVE_AUDIT.md):
+  # Pluralform "Laptops" wird von bare "laptop" wegen fehlender
+  # Wortgrenze nicht erfasst (siehe matcher.py::_contains_term()) --
+  # real bestätigt gegen found.json: "Samsung 8GB DDR4 RAM Riegel für
+  # Laptops" (SODIMM-Formfaktor, matchte bisher als Desktop-RAM).
+  # "SO- DIMM" (Bindestrich+Leerzeichen-Variante) zusätzlich noetig,
+  # da weder "so-dimm" noch "so dimm" exakt matcht: "SK hynix...DDR4
+  # SO- DIMM 1Rx8...".
+  - "laptops"
+  - "so- dimm"
+
   # Komplette PCs (RAM nur als Bundle-Bestandteil erwähnt, kein
   # eigenständiges RAM-Angebot) -- gleiches Muster wie sata_ssd.yaml.
   - "gaming pc"
