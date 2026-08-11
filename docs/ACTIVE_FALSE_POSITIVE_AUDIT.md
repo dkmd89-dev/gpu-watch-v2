@@ -17,9 +17,10 @@ ersetzt.
 | gpu | ✅ abgeschlossen (0 Findings) | 0 | 0 | 0 | 0 | — (kein Fix nötig) |
 | lego_minifiguren | ✅ abgeschlossen | 1 | 1 | 0 | 0 | `-k "lego"`: 25/25 |
 | iphone | ✅ abgeschlossen | 1 | 1 | 1 | 2 | `-k "iphone"`: 15/15 |
-| **Kumulativ (handhelds + office_pc + retro_konsolen + lego_minifiguren + iphone)** | | **15** | **48** | **8** | **26** | |
+| monitor_curved | ✅ abgeschlossen | 2 | 2 | 0 | 0 | `-k "monitor_curved"`: 4/4 |
+| **Kumulativ (handhelds + office_pc + retro_konsolen + lego_minifiguren + iphone + monitor_curved)** | | **17** | **50** | **8** | **26** | |
 
-Die kumulative Zeile zählt die fünf in diesem Durchlauf gefixten
+Die kumulative Zeile zählt die sechs in diesem Durchlauf gefixten
 Kategorien (gpu ohne Fix, da 0 Findings — zählt daher nicht mit,
 Zeile bleibt zur Nachvollziehbarkeit trotzdem stehen). Ein weiterer,
 bereits aus einem vorherigen Arbeitsblock bekannter Fall in
@@ -49,7 +50,8 @@ synonym verwendet):
   damals matchende retro_konsolen-Titel (retro_konsolen-Schritt), 1750
   eindeutige Titel / 46 damals matchende gpu-Titel (gpu-Schritt), 455
   damals matchende lego_minifiguren-Titel (lego_minifiguren-Schritt), 210
-  damals matchende iphone-Titel (iphone-Schritt).
+  damals matchende iphone-Titel (iphone-Schritt), 133 damals matchende
+  monitor_curved-Titel (monitor_curved-Schritt).
 - **Methodik-Hinweis, neu entdeckt im iphone-Schritt (wichtig):**
   `data/found.json` wird von einem laufenden Produktiv-Scanner (Docker
   Compose) live verändert — zwei Live-Auswertungen im Abstand weniger
@@ -141,6 +143,14 @@ Abschnitt "GPU" unten für Details.
 | iphone | leere Sammler-Originalverpackung ohne Gerät | `Titel: Leere Originalverpackung Apple iPhone 11 - 128GB - Schwarz (Black)` (5€) | 1 |
 | **Summe iphone** | **1 Muster** | | **1 Titel** |
 
+**Gefixt im monitor_curved-Schritt (2 Muster / 2 Titel):**
+
+| Kategorie | Muster | Betroffene Titel (Beispiel) | Anzahl Titel |
+|---|---|---|---:|
+| monitor_curved | Konsolen-Bundle über PS-Kurzform ("ps4slim" statt "playstation") | `Ps4slim + curved Samsung Monitor+controller+Wandhalterung` | 1 |
+| monitor_curved | Fitnessgerät mit eigenem curved-Display | `Klappbarer Heimtrainer F‑Bike CURVED LCD-Display Fahrrad Top` | 1 |
+| **Summe monitor_curved** | **2 Muster** | | **2 Titel** |
+
 **Zurückgestellt, real bestätigt, aktuell noch offen (P1/P2, 8 Fälle / 26 Titel):**
 
 | Kategorie | Priorität | Muster | Anzahl Titel | Grund für Zurückstellung |
@@ -163,9 +173,9 @@ Durchlaufs (nicht in der Summe oben):**
 | konsolen_bundles | P1 | `Display Ersatz Konsole...DISPLAY ONLY` trotz Geräte-Marker (V2/HAC-001) | 1 | eigener Arbeitsschritt, noch nicht terminiert |
 
 **Kumulativ (handhelds + office_pc + retro_konsolen + gpu +
-lego_minifiguren + iphone, alle sechs in diesem Durchlauf
-abgeschlossenen Kategorien): 10 + 27 + 9 + 0 + 1 + 1 = 48 Titel gefixt,
-3 + 7 + 14 + 0 + 0 + 2 = 26 Titel zurückgestellt.**
+lego_minifiguren + iphone + monitor_curved, alle sieben in diesem
+Durchlauf abgeschlossenen Kategorien): 10 + 27 + 9 + 0 + 1 + 1 + 2 = 50
+Titel gefixt, 3 + 7 + 14 + 0 + 0 + 2 + 0 = 26 Titel zurückgestellt.**
 
 ## Handhelds
 
@@ -412,6 +422,47 @@ unterscheidet.
 mit OVP und Ladekabel`, `iPhone 16 Pro 128 GB Titan Weiß | Top Zustand
 | OVP + Rechnung` u.a.), alle bleiben unverändert TRUE_POSITIVE.
 
+## Monitor Curved
+
+**Auswahlgrund:** evidenzbasiert — nach iphone erneuter Matchvolumen-
+Vergleich der verbleibenden unauditierten Kategorien; `monitor_curved`
+lag mit 133 aktuell matchenden Titeln deutlich vorn (vor
+vintage_elektronik 108, netzteil 94, notebook_resell 84, ram 81,
+sata_ssd 75).
+
+**Vollständiger Active-FP-Audit:** alle 133 damals live matchenden
+Titel einzeln durchgesehen. Die Kategorie war bereits aus einer
+früheren Preiskalibrierungs-Phase vorgehärtet (Handy-/Smartwatch-
+Zubehör-Excludes wie `folie`/`spudger`/`smartwatch` bereits vorhanden)
+— die deutliche Mehrheit der 133 Titel sind eindeutig echte
+Curved-PC-Monitore (Marke + Modell + Zoll/Hz-Angabe).
+
+**Zwei unabhängige reale Funde:**
+
+1. `Ps4slim + curved Samsung Monitor+controller+Wandhalterung` (110€)
+   — ein PS4-Konsolen-Bundle, der Monitor ist nur Bundle-Beilage.
+   Identischer Ausschlussgrund wie der bereits bestehende
+   "Konsolen"-Exclude-Block (`playstation`/`xbox`/`nintendo`/`switch`)
+   — die dortige Absicht ("Komplette PCs/Laptops (Monitor nur als
+   Bundle-Beilage erwähnt)") gilt hier 1:1, aber `"playstation"` allein
+   deckt die verbreitete Kurzform `"ps4"`/`"ps4slim"` nicht ab. Root
+   Cause identifiziert: `"ps4slim"` ist als zusammengeschriebenes Wort
+   ohne Wortgrenze zwischen `"ps4"` und `"slim"` — ein bare
+   `"ps4"`-Exclude hätte NICHT gegriffen (siehe
+   `matcher.py::_contains_term()`-Wortgrenzenlogik). Zusätzlich
+   `"ps1"`-`"ps5"` ergänzt, analog zum bereits in `gpu.yaml`
+   etablierten Muster für denselben Ausschlussgrund — 0 Kollisionen
+   gegen den vollständigen Korpus geprüft (u.a. keine "PS/2"-
+   Anschluss-Nennung vorhanden, die fälschlich anschlagen könnte).
+2. `Klappbarer Heimtrainer F‑Bike CURVED LCD-Display Fahrrad Top` (79€)
+   — ein Fitnessgerät mit eigenem gebogenem Trainingscomputer-Display,
+   kein PC-Monitor. Strukturell identisches Muster zu den bereits
+   bestehenden Handy-/Smartwatch-Zubehör-Excludes (Klasse "Nicht-PC-
+   Gerät mit eigenem 'curved'-Display").
+
+**TRUE_POSITIVE-Kollisionen:** 0 — gegen den vollständigen
+133-Titel-Match-Korpus geprüft.
+
 ## Routing / First-Match-Wins
 
 **Untersuchter Fall:** `Microsoft Xbox One X 1TB Schwarz Inkl OVP Ohne
@@ -550,6 +601,21 @@ Neue Regressionstestdatei: `app/tests/test_iphone_active_fp_audit_fix.py`
 Titel, 1 Sammel-TP-Sicherheitstest für 4 reale OVP-/Verpackungs-Titel
 im Gerätekontext).
 
+**monitor_curved:** `app/rules/monitor_curved.yaml`, `exclude_category`:
+**7 neue** bare-phrase Excludes für die **2 gefixten Muster**
+(`ps4slim`, `ps1`, `ps2`, `ps3`, `ps4`, `ps5` im bestehenden
+"Konsolen"-Block; `heimtrainer` im bestehenden Handy-/Smartwatch-
+Zubehör-Block). Alle 0 Kollisionen gegen den vollständigen
+133-Titel-Match-Korpus. Reine additive `exclude_category`-Ergänzung,
+kein neuer Matcher-Mechanismus.
+
+Neue Regressionstestdatei: `app/tests/test_monitor_curved_active_fp_audit_fix.py`
+(4 Tests: 1 FP-Regressionstest für den real bestätigten PS4-Bundle-
+Fehltreffer, 1 Test für 2 unbelegte aber strukturell identische
+PS-Kurzform-Geschwisterfälle, 1 FP-Regressionstest für den real
+bestätigten Heimtrainer-Fehltreffer, 1 Sammel-TP-Sicherheitstest für 4
+reale Curved-Monitor-Titel).
+
 ## Testergebnis
 
 **handhelds:**
@@ -588,6 +654,11 @@ im Gerätekontext).
   `test_matcher_price_calibration_applied.py`,
   `test_rule_service_modding_fix.py`)
 
+**monitor_curved:**
+- `pytest app/tests/ -k "monitor_curved" -v`: **4/4 passed** (alle neu,
+  keine bestehenden monitor_curved-spezifischen Tests vor diesem
+  Schritt vorhanden)
+
 **Rule Analyzer (nach allen Schritten):** `0 Findings, 355 Regeln,
 19 Kategorien` (unverändert).
 
@@ -595,4 +666,4 @@ im Gerätekontext).
 läuft laut Teststrategie dieses Durchlaufs erst am Ende dieses
 Optimierungsdurchlaufs, auf explizite Freigabe. Letzter dokumentierter
 vollständiger Lauf (vor office_pc/retro_konsolen/gpu/lego_minifiguren/
-iphone): **1197/1197 passed, 0 failed** (604s).
+iphone/monitor_curved): **1197/1197 passed, 0 failed** (604s).

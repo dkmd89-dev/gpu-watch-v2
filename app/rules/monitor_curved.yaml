@@ -96,6 +96,24 @@ exclude_category:
   - "xbox"
   - "nintendo"
   - "switch"
+  # FIX (Active-False-Positive-Audit, docs/ACTIVE_FALSE_POSITIVE_AUDIT.md):
+  # "playstation" allein deckt gaengige Kurzformen nicht ab -- reale
+  # Kollision: "Ps4slim + curved Samsung Monitor+controller+Wandhalterung"
+  # (Monitor nur als Bundle-Beilage zu einer Konsole, identisches Muster
+  # zum bereits oben dokumentierten "Konsolen"-Ausschlussgrund). "ps4slim"
+  # als eigener Begriff noetig, da als zusammengeschriebenes Wort ohne
+  # Wortgrenze zwischen "ps4" und "slim" -- ein bare "ps4"-Exclude wuerde
+  # NICHT greifen (siehe matcher.py::_contains_term()-Wortgrenzenlogik).
+  # "ps1"-"ps5" zusaetzlich ergaenzt, analog zum bereits etablierten
+  # Muster in gpu.yaml (identische Kurzform-Abdeckung fuer denselben
+  # Ausschlussgrund "Konsole"), 0 Kollisionen gegen den vollstaendigen
+  # 133-Titel-Match-Korpus (keine "PS/2"-Anschluss-Nennung vorhanden).
+  - "ps4slim"
+  - "ps1"
+  - "ps2"
+  - "ps3"
+  - "ps4"
+  - "ps5"
 
   # Handy-/Smartwatch-Zubehoer mit "curved ... display" im Titel (z.B.
   # "Full Cover Schutzfolie ... 3D Curved Edge Display", "Smartwatch
@@ -108,6 +126,14 @@ exclude_category:
   - "spudger"
   - "öffnungswerkzeug"
   - "smartwatch"
+
+  # FIX (Active-False-Positive-Audit, docs/ACTIVE_FALSE_POSITIVE_AUDIT.md):
+  # Fitnessgeraete mit eigenem "curved"-LCD-Anzeigedisplay (Trainings-
+  # computer), kein PC-Monitor. Real bestaetigt gegen found.json (1 Titel
+  # im vollstaendigen 133-Titel-Match-Korpus): "Klappbarer Heimtrainer
+  # F-Bike CURVED LCD-Display Fahrrad Top" (79€) -- matchte bisher als
+  # "Curved Monitor Top-Deal".
+  - "heimtrainer"
 
 rules:
   # ============================================================
