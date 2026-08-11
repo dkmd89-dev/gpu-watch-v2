@@ -19,9 +19,10 @@ ersetzt.
 | iphone | ✅ abgeschlossen | 1 | 1 | 1 | 2 | `-k "iphone"`: 15/15 |
 | monitor_curved | ✅ abgeschlossen | 2 | 2 | 0 | 0 | `-k "monitor_curved"`: 4/4 |
 | vintage_elektronik | ✅ abgeschlossen | 11 | 40 | 1 | 1 | `-k "vintage_elektronik"`: 5/5 |
-| **Kumulativ (handhelds + office_pc + retro_konsolen + lego_minifiguren + iphone + monitor_curved + vintage_elektronik)** | | **28** | **90** | **9** | **27** | |
+| netzteil | ✅ abgeschlossen | 1 | 2 | 0 | 0 | `-k "netzteil"`: 20/20 |
+| **Kumulativ (handhelds + office_pc + retro_konsolen + lego_minifiguren + iphone + monitor_curved + vintage_elektronik + netzteil)** | | **29** | **92** | **9** | **27** | |
 
-Die kumulative Zeile zählt die sieben in diesem Durchlauf gefixten
+Die kumulative Zeile zählt die acht in diesem Durchlauf gefixten
 Kategorien (gpu ohne Fix, da 0 Findings — zählt daher nicht mit,
 Zeile bleibt zur Nachvollziehbarkeit trotzdem stehen). Ein weiterer,
 bereits aus einem vorherigen Arbeitsblock bekannter Fall in
@@ -53,7 +54,8 @@ synonym verwendet):
   damals matchende lego_minifiguren-Titel (lego_minifiguren-Schritt), 210
   damals matchende iphone-Titel (iphone-Schritt), 133 damals matchende
   monitor_curved-Titel (monitor_curved-Schritt), 108 damals matchende
-  vintage_elektronik-Titel (vintage_elektronik-Schritt).
+  vintage_elektronik-Titel (vintage_elektronik-Schritt), 94 damals
+  matchende netzteil-Titel (netzteil-Schritt).
 - **Methodik-Hinweis, neu entdeckt im iphone-Schritt (wichtig):**
   `data/found.json` wird von einem laufenden Produktiv-Scanner (Docker
   Compose) live verändert — zwei Live-Auswertungen im Abstand weniger
@@ -171,6 +173,13 @@ Einzelfund dieses gesamten Durchlaufs:**
 | vintage_elektronik | Dokumentation/Vertreterkoffer/Adapter-Konvolut (Funktionsbeschreibung, Werbekoffer, SCART-Cinch-Konvolut) | `Philips Service Fernsehgeräte Funktionsbeschreibung 1964/65...`, `KENWOOD HiFi Vintage Werbekoffer...`, `37x SCART Cinch Adapter Konvolut...` | 3 |
 | **Summe vintage_elektronik** | **11 Muster** | | **40 Titel** |
 
+**Gefixt im netzteil-Schritt (1 Muster / 2 Titel):**
+
+| Kategorie | Muster | Betroffene Titel (Beispiel) | Anzahl Titel |
+|---|---|---|---:|
+| netzteil | HiFi-Verstärker mit Watt-Angabe (psu.py-Detector interpretiert Verstärker-Ausgangs-Watt als PSU-Watt) | `1000W Verstärker Stereo Amplifier HIFI...`, `600W Bluetooth Mini Verstärker HiFi...` | 2 |
+| **Summe netzteil** | **1 Muster** | | **2 Titel** |
+
 **Zurückgestellt, real bestätigt, aktuell noch offen (P1/P2, 9 Fälle / 27 Titel):**
 
 | Kategorie | Priorität | Muster | Anzahl Titel | Grund für Zurückstellung |
@@ -194,10 +203,10 @@ Durchlaufs (nicht in der Summe oben):**
 | konsolen_bundles | P1 | `Display Ersatz Konsole...DISPLAY ONLY` trotz Geräte-Marker (V2/HAC-001) | 1 | eigener Arbeitsschritt, noch nicht terminiert |
 
 **Kumulativ (handhelds + office_pc + retro_konsolen + gpu +
-lego_minifiguren + iphone + monitor_curved + vintage_elektronik, alle
-acht in diesem Durchlauf abgeschlossenen Kategorien): 10 + 27 + 9 + 0 +
-1 + 1 + 2 + 40 = 90 Titel gefixt, 3 + 7 + 14 + 0 + 0 + 2 + 0 + 1 = 27
-Titel zurückgestellt.**
+lego_minifiguren + iphone + monitor_curved + vintage_elektronik +
+netzteil, alle neun in diesem Durchlauf abgeschlossenen Kategorien):
+10 + 27 + 9 + 0 + 1 + 1 + 2 + 40 + 2 = 92 Titel gefixt, 3 + 7 + 14 + 0 +
+0 + 2 + 0 + 1 + 0 = 27 Titel zurückgestellt.**
 
 ## Handhelds
 
@@ -534,6 +543,41 @@ generisch/riskant für einen einzelnen Beleg.
 **TRUE_POSITIVE-Kollisionen:** 0 — gegen den vollständigen
 108-Titel-Match-Korpus geprüft.
 
+## Netzteil
+
+**Auswahlgrund:** evidenzbasiert — nach vintage_elektronik erneuter
+Matchvolumen-Vergleich; `netzteil` lag mit 94 aktuell matchenden
+Titeln vorn (vor notebook_resell 84, ram 81, sata_ssd 75).
+
+**Vollständiger Active-FP-Audit:** alle 94 damals live matchenden
+Titel einzeln durchgesehen. Anders als bei den bisherigen Kategorien
+mit Titel-Keyword-Matching nutzt `netzteil.yaml` einen
+Hardware-Detector (`categories/detectors/psu.py`,
+`min_psu_watt`/`max_psu_watt`) — die Wattzahl im Titel entscheidet über
+die Preisstufe, unabhängig vom Produkttyp.
+
+**Kernfund:** 2 Titel — `1000W Verstärker Stereo Amplifier HIFI
+Digital Bluetooth FM USB Vollverstärker` und `600W Bluetooth Mini
+Verstärker HiFi Power Audio Stereo Bass Amplifier USB MP3 FM` — matchen
+als PC-Netzteil, obwohl es sich um HiFi-Verstärker handelt. Root Cause:
+der `psu.py`-Detector interpretiert jede Wattzahl im Titel als
+PSU-Leistung, ohne zwischen "Netzteil-Watt" und
+"Verstärker-Ausgangs-Watt" zu unterscheiden — ein strukturelles Muster,
+nicht auf diese beiden Titel beschränkt (jeder HiFi-Verstärker mit
+Watt-Angabe im 550-1100W-Bereich wäre potenziell betroffen), aber
+aktuell nur mit 2 realen Belegen im Korpus.
+
+**Sonstige Auffälligkeit, bewusst NICHT als Fehltreffer gewertet:** `Pc
+Gehäuse Crosair inkl Netzteil 750w` — ein PC-Gehäuse-Angebot mit
+eingebautem 750W-Netzteil als Bundle-Bestandteil. Anders als bei den
+"Monitor nur als Bundle-Beilage"-Fällen in anderen Kategorien ist das
+Netzteil hier ein echtes, mitverkauftes Bauteil (kein reines
+Zubehör-Anhängsel eines Fremdprodukts) — kein eindeutiger
+Fehlklassifikations-Fall.
+
+**TRUE_POSITIVE-Kollisionen:** 0 — `"verstärker"`/`"amplifier"`
+kommen in keinem der 92 verbleibenden echten Netzteil-Titel vor.
+
 ## Routing / First-Match-Wins
 
 **Untersuchter Fall:** `Microsoft Xbox One X 1TB Schwarz Inkl OVP Ohne
@@ -710,6 +754,19 @@ Neue Regressionstestdatei: `app/tests/test_vintage_elektronik_active_fp_audit_fi
 bestätigten Fehltreffer-Titel über alle 11 Muster abdecken, 1
 Sammel-TP-Sicherheitstest inkl. des Subwoofer-Grenzfalls).
 
+**netzteil:** `app/rules/netzteil.yaml`, `exclude_category`: **2 neue**
+bare-word Excludes für das **1 gefixte Muster** (`verstärker`,
+`amplifier`). 0 Kollisionen gegen den vollständigen 94-Titel-Match-
+Korpus. Reine additive `exclude_category`-Ergänzung, kein Eingriff in
+`categories/detectors/psu.py` selbst (strukturelle Root Cause bleibt
+dokumentiert, aber unangetastet — Detector-Änderung wäre ein größerer,
+eigener Schritt).
+
+Neue Regressionstestdatei: `app/tests/test_netzteil_active_fp_audit_fix.py`
+(2 Tests: 1 FP-Regressionstest für beide real bestätigten
+HiFi-Verstärker-Fehltreffer, 1 Sammel-TP-Sicherheitstest für 4 reale
+Netzteil-Titel).
+
 ## Testergebnis
 
 **handhelds:**
@@ -758,6 +815,16 @@ Sammel-TP-Sicherheitstest inkl. des Subwoofer-Grenzfalls).
   neu, keine bestehenden vintage_elektronik-spezifischen Tests vor
   diesem Schritt vorhanden)
 
+**netzteil:**
+- `pytest app/tests/ -k "netzteil" -v`: **20/20 passed** (2 neue Tests
+  + 18 bereits bestehende netzteil-relevante Tests aus
+  `test_detector_lieferumfang.py`, `test_detector_psu.py`,
+  `test_matcher_context_aware_exclude.py`,
+  `test_matcher_controller_accessory_fix.py`,
+  `test_matcher_handheld_false_positives.py`,
+  `test_matcher_psu_requirement.py`, `test_notebook_resell_mainboard_fix.py`,
+  `test_retro_konsolen_active_fp_audit_fix.py`)
+
 **Rule Analyzer (nach allen Schritten):** `0 Findings, 355 Regeln,
 19 Kategorien` (unverändert).
 
@@ -765,5 +832,5 @@ Sammel-TP-Sicherheitstest inkl. des Subwoofer-Grenzfalls).
 läuft laut Teststrategie dieses Durchlaufs erst am Ende dieses
 Optimierungsdurchlaufs, auf explizite Freigabe. Letzter dokumentierter
 vollständiger Lauf (vor office_pc/retro_konsolen/gpu/lego_minifiguren/
-iphone/monitor_curved/vintage_elektronik): **1197/1197 passed, 0
-failed** (604s).
+iphone/monitor_curved/vintage_elektronik/netzteil): **1197/1197
+passed, 0 failed** (604s).
