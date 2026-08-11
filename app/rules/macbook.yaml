@@ -28,6 +28,21 @@
 # ICLOUD-/AKTIVIERUNGSSPERRE ("Find My Mac"): gleiche Problematik wie
 # bei iPhone (Wiederverkaufsrisiko) -- kategorie-eigener Ausschluss.
 #
+# FIX (Cross-Category Routing Audit, docs/CROSS_CATEGORY_ROUTING_AUDIT.md,
+# Abschnitt 5.2): "1024gb"/"1024 gb" als Schreibweisen-Synonym zu
+# "1tb"/"2tb" in allen ≥1TB-Speichergruppen ergaenzt. Root Cause: die
+# ≥1TB-require_all_of-Gruppe kannte bisher nur "1tb"/"1 tb"/"2tb"/"2 tb",
+# nicht aber die (besonders bei "About This Mac"/Finder-Anzeigen
+# uebliche) 1024GB-Schreibweise fuer exakt dieselbe 1TB-Speichergroesse
+# -- ein realer Titel ("Apple MacBook Pro 16.1 | i9-9880H | 16GB RAM
+# 1024GB SSD OHNE OS QWERTY | Nr. 1", 299€) fiel dadurch durch ALLE
+# macbook-Regeln (Marke/Chip erkannt, Speichergroesse nicht). Reine
+# Schreibweisen-Vervollstaendigung derselben physischen Speichergroesse
+# (kein neues Konzept, identisches Vorgehen wie ram.yaml "SO- DIMM"/
+# "Laptops"-Fix) -- gleichmaessig auf alle 30 betroffenen ≥1TB-Regeln
+# (Air+Pro, Intel/M1-M4, alle drei Preisstufen) angewendet, da die
+# Schreibweisen-Luecke strukturell ist, nicht chip-/preisstufenspezifisch.
+#
 # min_vram_gb: 0 -- Speichergroessen-Zahlen ("512GB") sollen nicht
 # faelschlich als zu niedriger VRAM-Wert interpretiert werden.
 #
@@ -180,6 +195,8 @@ rules:
       - i9
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_air_intel_1tb
@@ -194,6 +211,8 @@ rules:
       - i9
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_air_intel_1tb
@@ -208,6 +227,8 @@ rules:
       - i9
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_air_intel_1tb
@@ -262,6 +283,8 @@ rules:
     - - m1
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_air_m1_1tb
@@ -273,6 +296,8 @@ rules:
     - - m1
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_air_m1_1tb
@@ -284,6 +309,8 @@ rules:
     - - m1
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_air_m1_1tb
@@ -338,6 +365,8 @@ rules:
     - - m2
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_air_m2_1tb
@@ -349,6 +378,8 @@ rules:
     - - m2
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_air_m2_1tb
@@ -360,6 +391,8 @@ rules:
     - - m2
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_air_m2_1tb
@@ -414,6 +447,8 @@ rules:
     - - m3
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_air_m3_1tb
@@ -425,6 +460,8 @@ rules:
     - - m3
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_air_m3_1tb
@@ -436,6 +473,8 @@ rules:
     - - m3
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_air_m3_1tb
@@ -495,6 +534,8 @@ rules:
     - - m4
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_air_m4_1tb
@@ -506,6 +547,8 @@ rules:
     - - m4
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_air_m4_1tb
@@ -517,6 +560,8 @@ rules:
     - - m4
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_air_m4_1tb
@@ -583,6 +628,8 @@ rules:
       - i9
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_pro_intel_1tb
@@ -597,6 +644,8 @@ rules:
       - i9
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_pro_intel_1tb
@@ -611,6 +660,8 @@ rules:
       - i9
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_pro_intel_1tb
@@ -665,6 +716,8 @@ rules:
     - - m1
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_pro_m1_1tb
@@ -676,6 +729,8 @@ rules:
     - - m1
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_pro_m1_1tb
@@ -687,6 +742,8 @@ rules:
     - - m1
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_pro_m1_1tb
@@ -741,6 +798,8 @@ rules:
     - - m2
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_pro_m2_1tb
@@ -752,6 +811,8 @@ rules:
     - - m2
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_pro_m2_1tb
@@ -763,6 +824,8 @@ rules:
     - - m2
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_pro_m2_1tb
@@ -817,6 +880,8 @@ rules:
     - - m3
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_pro_m3_1tb
@@ -828,6 +893,8 @@ rules:
     - - m3
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_pro_m3_1tb
@@ -839,6 +906,8 @@ rules:
     - - m3
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_pro_m3_1tb
@@ -893,6 +962,8 @@ rules:
     - - m4
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_pro_m4_1tb
@@ -904,6 +975,8 @@ rules:
     - - m4
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_pro_m4_1tb
@@ -915,6 +988,8 @@ rules:
     - - m4
     - - 1tb
       - 1 tb
+      - 1024gb
+      - 1024 gb
       - 2tb
       - 2 tb
     price_history_model: macbook_pro_m4_1tb
