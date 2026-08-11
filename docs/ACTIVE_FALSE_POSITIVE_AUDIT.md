@@ -21,9 +21,10 @@ ersetzt.
 | vintage_elektronik | ✅ abgeschlossen | 11 | 40 | 1 | 1 | `-k "vintage_elektronik"`: 5/5 |
 | netzteil | ✅ abgeschlossen | 1 | 2 | 0 | 0 | `-k "netzteil"`: 20/20 |
 | notebook_resell | ✅ abgeschlossen | 1 | 2 | 0 | 0 | `-k "notebook_resell"`: 21/21 |
-| **Kumulativ (handhelds + office_pc + retro_konsolen + lego_minifiguren + iphone + monitor_curved + vintage_elektronik + netzteil + notebook_resell)** | | **30** | **94** | **9** | **27** | |
+| ram | ✅ abgeschlossen | 2 | 2 | 0 | 0 | `-k "ram"`: 42/42 |
+| **Kumulativ (handhelds + office_pc + retro_konsolen + lego_minifiguren + iphone + monitor_curved + vintage_elektronik + netzteil + notebook_resell + ram)** | | **32** | **96** | **9** | **27** | |
 
-Die kumulative Zeile zählt die neun in diesem Durchlauf gefixten
+Die kumulative Zeile zählt die zehn in diesem Durchlauf gefixten
 Kategorien (gpu ohne Fix, da 0 Findings — zählt daher nicht mit,
 Zeile bleibt zur Nachvollziehbarkeit trotzdem stehen). Ein weiterer,
 bereits aus einem vorherigen Arbeitsblock bekannter Fall in
@@ -57,7 +58,8 @@ synonym verwendet):
   monitor_curved-Titel (monitor_curved-Schritt), 108 damals matchende
   vintage_elektronik-Titel (vintage_elektronik-Schritt), 94 damals
   matchende netzteil-Titel (netzteil-Schritt), 84 damals matchende
-  notebook_resell-Titel (notebook_resell-Schritt).
+  notebook_resell-Titel (notebook_resell-Schritt), 81 damals matchende
+  ram-Titel (ram-Schritt).
 - **Methodik-Hinweis, neu entdeckt im iphone-Schritt (wichtig):**
   `data/found.json` wird von einem laufenden Produktiv-Scanner (Docker
   Compose) live verändert — zwei Live-Auswertungen im Abstand weniger
@@ -189,6 +191,14 @@ Einzelfund dieses gesamten Durchlaufs:**
 | notebook_resell | "Ohne SSD/RAM" — Negation vor bare "ssd" nicht erkannt (Gruppe-3-Alternative) | `Lenovo ThinkPad L14 Gen 3...BIOS OK \| Ohne SSD/RAM` (2×) | 2 |
 | **Summe notebook_resell** | **1 Muster** | | **2 Titel** |
 
+**Gefixt im ram-Schritt (2 Muster / 2 Titel):**
+
+| Kategorie | Muster | Betroffene Titel (Beispiel) | Anzahl Titel |
+|---|---|---|---:|
+| ram | Pluralform "Laptops" (Wortgrenzen-Lücke ggü. bare "laptop") | `Samsung 8GB DDR4 RAM Riegel für Laptops` | 1 |
+| ram | "SO- DIMM" (Bindestrich+Leerzeichen-Variante) | `SK hynix16GB(2x8GB) DDR4 SO- DIMM 1Rx8...` | 1 |
+| **Summe ram** | **2 Muster** | | **2 Titel** |
+
 **Zurückgestellt, real bestätigt, aktuell noch offen (P1/P2, 9 Fälle / 27 Titel):**
 
 | Kategorie | Priorität | Muster | Anzahl Titel | Grund für Zurückstellung |
@@ -213,10 +223,10 @@ Durchlaufs (nicht in der Summe oben):**
 
 **Kumulativ (handhelds + office_pc + retro_konsolen + gpu +
 lego_minifiguren + iphone + monitor_curved + vintage_elektronik +
-netzteil + notebook_resell, alle zehn in diesem Durchlauf
-abgeschlossenen Kategorien): 10 + 27 + 9 + 0 + 1 + 1 + 2 + 40 + 2 + 2 =
-94 Titel gefixt, 3 + 7 + 14 + 0 + 0 + 2 + 0 + 1 + 0 + 0 = 27 Titel
-zurückgestellt.**
+netzteil + notebook_resell + ram, alle elf in diesem Durchlauf
+abgeschlossenen Kategorien): 10 + 27 + 9 + 0 + 1 + 1 + 2 + 40 + 2 + 2 +
+2 = 96 Titel gefixt, 3 + 7 + 14 + 0 + 0 + 2 + 0 + 1 + 0 + 0 + 0 = 27
+Titel zurückgestellt.**
 
 ## Handhelds
 
@@ -620,6 +630,31 @@ Komponenten gemeinsam trifft.
 **TRUE_POSITIVE-Kollisionen:** 0 — gegen den vollständigen
 84-Titel-Match-Korpus geprüft, inkl. der beiden Barebone-mit-RAM-Titel.
 
+## RAM
+
+**Auswahlgrund:** evidenzbasiert — nach notebook_resell erneuter
+Matchvolumen-Vergleich; `ram` lag mit 81 aktuell matchenden Titeln vorn
+(vor sata_ssd 75, controller 56).
+
+**Vollständiger Active-FP-Audit:** alle 81 damals live matchenden
+Titel einzeln durchgesehen. Zwei unabhängige Wortgrenzen-/
+Schreibweisen-Lücken bei bereits bestehenden Excludes gefunden (kein
+neues Konzept, reine Vervollständigung):
+
+1. `Samsung 8GB DDR4 RAM Riegel für Laptops` — die Pluralform
+   `"Laptops"` wird von der bereits bestehenden bare `"laptop"`-Exclude
+   wegen fehlender Wortgrenze nicht erfasst (`_contains_term()`
+   verlangt ein Wortende direkt nach "laptop"; das trailing "s" in
+   "Laptops" bricht die Grenze).
+2. `SK hynix16GB(2x8GB) DDR4 SO- DIMM 1Rx8 PC4-3200AA-SA2-11` — die
+   Schreibweise `"SO- DIMM"` (Bindestrich direkt nach "SO", dann
+   Leerzeichen vor "DIMM") wird von keinem der drei bereits
+   bestehenden Varianten (`"sodimm"`/`"so-dimm"`/`"so dimm"`) exakt
+   getroffen.
+
+**TRUE_POSITIVE-Kollisionen:** 0 — gegen den vollständigen
+81-Titel-Match-Korpus geprüft.
+
 ## Routing / First-Match-Wins
 
 **Untersuchter Fall:** `Microsoft Xbox One X 1TB Schwarz Inkl OVP Ohne
@@ -822,6 +857,16 @@ SSD/RAM"-Fehltreffer, 1 gezielter Kollisionstest für die 2 echten
 Barebone-mit-RAM-Titel, 1 Sammel-TP-Sicherheitstest für 2 reale
 ThinkPad-Titel).
 
+**ram:** `app/rules/ram.yaml`, `exclude_category`: **2 neue**
+bare-word/phrase Excludes für die **2 gefixten Muster** (`laptops`,
+`so- dimm`) — reine Vervollständigung bereits bestehender Excludes
+(`laptop`, `sodimm`/`so-dimm`/`so dimm`), kein neues Konzept. 0
+Kollisionen gegen den vollständigen 81-Titel-Match-Korpus.
+
+Neue Regressionstestdatei: `app/tests/test_ram_active_fp_audit_fix.py`
+(3 Tests: 2 FP-Regressions-Testfunktionen für beide real bestätigten
+Fehltreffer, 1 Sammel-TP-Sicherheitstest für 3 reale RAM-Titel).
+
 ## Testergebnis
 
 **handhelds:**
@@ -886,6 +931,16 @@ ThinkPad-Titel).
   `test_notebook_resell_gaming_fix.py`,
   `test_notebook_resell_mainboard_fix.py`)
 
+**ram:**
+- `pytest app/tests/ -k "ram" -v`: **42/42 passed** (3 neue Tests + 39
+  bereits bestehende ram-relevante Tests aus `test_detector_ram.py`,
+  `test_detector_storage.py`, `test_matcher_deal_score_integration.py`,
+  `test_matcher_hardware_requirements.py`,
+  `test_matcher_price_calibration_matching_fixes.py`,
+  `test_notebook_resell_active_fp_audit_fix.py`,
+  `test_notify_max_price_and_sata_ssd_fix.py`, `test_rule_regressions.py`,
+  `test_scraper_ebay.py`)
+
 **Rule Analyzer (nach allen Schritten):** `0 Findings, 355 Regeln,
 19 Kategorien` (unverändert).
 
@@ -893,5 +948,5 @@ ThinkPad-Titel).
 läuft laut Teststrategie dieses Durchlaufs erst am Ende dieses
 Optimierungsdurchlaufs, auf explizite Freigabe. Letzter dokumentierter
 vollständiger Lauf (vor office_pc/retro_konsolen/gpu/lego_minifiguren/
-iphone/monitor_curved/vintage_elektronik/netzteil/notebook_resell):
+iphone/monitor_curved/vintage_elektronik/netzteil/notebook_resell/ram):
 **1197/1197 passed, 0 failed** (604s).
