@@ -1,52 +1,53 @@
 # STATUS — Aktueller technischer Projektstatus
 
-> **Stand:** 2026-08-10  
+> **Stand:** 2026-08-11  
 > **Repository:** `dkmd89-dev/gpu-watch-v2`  
 > **Branch:** `main`  
-> **HEAD:** `ca4b35be153c1982187fcae09e5c99b55fbf2b25`  
-> **Letzter Code-Commit auf `main`:** `ca4b35b` (PR #8, squash-gemergt) — davor `3eed07f`  
+> **HEAD:** `1f6555317152b453415e8f74f043a2bcdd758095`  
+> **Letzter Code-Commit auf `main`:** `1f65553` (PR #25, Merge-Commit) — davor `158f2ed`  
 > **Technische Referenz:** `TECHNISCHER_PROJEKTSTATUS.md`
 
 ## Gesamtstatus
 
-**Stabil / aktiv weiterentwickelbar.** Die zentralen Architekturbausteine sind vorhanden und durch eine umfangreiche Testsuite abgesichert. Der aktuelle Schwerpunkt liegt auf Precision, Datenqualität, Performance-Messung und kontrollierter Modularisierung – nicht auf einem Rewrite.
+**Stabil / aktiv weiterentwickelbar.** Die zentralen Architekturbausteine sind vorhanden und durch eine umfangreiche Testsuite abgesichert. Seit dem letzten dokumentierten Stand (`ca4b35b`, PR #8) wurde ein vollständiger, systematischer Active-False-Positive-Audit über **alle 19 Kategorien** des Rulesets durchgeführt und abgeschlossen (PR #11–#25). Der aktuelle Schwerpunkt bleibt Precision, Datenqualität und kontrollierte Weiterentwicklung – nicht auf einem Rewrite.
 
 ## Verifiziert dokumentierter Stand
 
 ```text
-main: ca4b35b
-fix(konsolen_bundles): GameCube-Controller- und Plattform-Bindestrich-Fehltreffer ausschließen (#8)
+main: 1f65553
+Merge pull request #25 from dkmd89-dev/claude/final-categories-active-fp-audit-complete
 
-Letzter Code-Commit davor (main): 3eed07f
-fix: Plattformbegriff/Mainboard/Zubehör-Fehltreffer in drei Kategorien beheben
+Letzter Code-Commit davor (main): 158f2ed
+docs: kompletten 19-Kategorien-Ruleset-Audit abschließen
 
-Vergleich d2effe7...fa218a0: 61 Commits ahead, 0 behind
-fa218a0..3eed07f: 1 Code-Commit; danach 4 Doku-/Chore-Commits bis 0757580,
-0757580..ca4b35b: PR #8 (squash-gemergt, 3 Commits: GameCube-Controller-Fix,
-Doku-Batch, Plattform-Bindestrich-Fix)
+Vergleich ca4b35b...1f65553: 17 gemergte PRs (#9–#25), davon 15 mit
+Code-/Regeländerung (PR #10–#24) und 3 reine Doku-Commits (#9, #21, #25)
 
-Letzter im Repository dokumentierter vollständiger Testlauf:
-1175 passed, 0 failed (aus der Commit-Message von 3eed07f; in dieser
-Session nicht erneut lokal verifiziert, siehe Hinweis unten)
+Vollständiger Testlauf (in dieser Session lokal ausgeführt und
+verifiziert, nicht nur aus einer Commit-Message übernommen):
+pytest app/tests/ -> 1241 passed, 0 failed (622,17s)
 
 Rule Analyzer:
 355 Regeln
 19 Kategorien
-0 Findings (letzte Messung: nach PR #8 in dieser Session, siehe Batch-Eintrag)
+0 Findings (nach jedem einzelnen Fix in PR #11–#24 erneut verifiziert)
 ```
 
-Der Teststand 1175/0 stammt aus der Commit-Message von `3eed07f`. In dieser Dokumentationssession war `pytest` selbst nicht ausführbar (kein PyPI-Zugriff zum Nachinstallieren von `pytest`/`flask`/`pyyaml` im Sandbox-Container); als Ersatz wurden betroffene Testdateien per direktem Funktionsaufruf ausgeführt (siehe Batch-Eintrag unten) — das ersetzt keinen vollständigen `pytest app/tests/`-Lauf.
+Der Teststand 1241/0 wurde in dieser Session tatsächlich per `pytest app/tests/` ausgeführt (kein Ersatz durch Einzel-Funktionsaufrufe), zweimal: einmal als Zwischenstand nach den ersten zwölf Kategorien (1233/1233), einmal final nach Abschluss aller 19 Kategorien (1241/1241).
 
 ## Zuletzt abgeschlossener Batch
 
-**Dashboard-Match-Validierung Variante C** (PR #8, gemergt via Squash auf `main` als `ca4b35b`):
+**Systematischer Active-False-Positive-Audit über alle 19 Kategorien** (PR #11–#25, alle auf `main` gemergt), Fortsetzung des in PR #6/#8 begonnenen Audit-Ansatzes, jetzt aber vollständig statt exemplarisch: pro Kategorie wurde der komplette aktuell live matchende `found.json`-Korpus einzeln gegen die produktiven Regeln geprüft (nicht nur Stichproben), evidenzbasiert nach Matchvolumen priorisiert (höchstes Matchvolumen zuerst), jeder Fix ausschließlich additiv über bestehende YAML-Primitiven (`exclude_category`, `exclude_category_unless_also_contains`, `exclude_category_unless_preceded_by`) ohne neuen Matcher-Code umgesetzt und mit dedizierter Regressionstestdatei abgesichert.
 
-- Live-Instanz (`romajagijo.zapto.org`) über öffentliche HTTP-Endpunkte verifiziert, soweit ohne Server-Zugriff möglich (kein SSH/Docker-Zugriff auf den Host).
-- Zwei `konsolen_bundles`-Match-Lücken aus `3eed07f` identifiziert und **beide geschlossen**:
-  1. **"GameCube Controller" ohne "für"/"pro controller"** — `exclude_category_unless_preceded_by`, identisches Muster wie "pro controller". 0 Kollisionen gegen den vollständigen 318-Fingerprint-Korpus aus `data/price_history.jsonl`.
-  2. **"Plattform + Bindestrich" ohne "für"** (z.B. "Nintendo Switch - Minecraft FRA mit OVP") — nach separater, datengetesteter Review-Runde (erst als Restlücke dokumentiert offen gelassen, dann auf Ansage des Nutzers gezielt geschlossen) über `exclude_category_unless_also_contains` mit Bindestrich/Halbgeviertstrich als Teil des Suchbegriffs (kein neuer Matcher-Mechanismus). 0 Kollisionen gegen 318-Fingerprint- und einen zusätzlich erschlossenen 186-Titel-Rohkorpus (`data/gpu_watch.log.*`, mit Interpunktion).
-- Beide Fixes verwenden ausschließlich bereits produktive YAML-Primitiven, kein neuer Matcher-Code.
-- **Weiterhin bewusst offen (neue, kleinere Restlücke):** Spieltitel VOR der Plattform OHNE nachfolgenden Bindestrich (z.B. "Donkey Kong Bananza Nintendo Switch 2 2025 OVP") — dafür gibt es kein Substring-Muster, das nicht auch echte Geräte-Titel träfe.
+**Ergebnis:**
+
+- **14 Kategorien mit realen Fixes:** handhelds, office_pc, retro_konsolen, lego_minifiguren, iphone, monitor_curved, vintage_elektronik, netzteil, notebook_resell, ram, sata_ssd, controller, autoradio_opel_corsa, gaming_pc — zusammen **42 distinkte Fehltreffer-Muster über 113 real bestätigte Titel** ausgeschlossen.
+- **4 Kategorien mit 0 Findings** (bewusst dokumentiert, kein Fix nötig): gpu, macbook, m2_ssd, cpu_mainboard_bundle.
+- **9 Muster / 27 Titel real belegt, aber bewusst zurückgestellt** (P1/P2 — zu dünne Evidenz für eine verallgemeinerbare Regel oder ungelöstes Kollisionsrisiko), vollständig dokumentiert statt stillschweigend ignoriert.
+- Größter Einzelfund: `vintage_elektronik` (11 Muster / 40 Titel — Sony-PVM/BVM-Ersatzteile, die über die fehlende Excludes-Übernahme aus der Schwesterregel "Röhrenfernseher" durchrutschten).
+- Zwei unabhängig bestätigte Instanzen desselben strukturellen Musters: `office_pc.yaml` und `gaming_pc.yaml` hatten beide ursprünglich bewusst **kein** `exclude_category` ("Diese Kategorie WILL komplette PC-Systeme") — in beiden Fällen widerlegten reale Gaming-Notebook-/bare-Mainboard-Bundle-Funde diese Annahme.
+- Vollständige Dokumentation inkl. aller zurückgestellten Fälle, Root-Cause-Analysen und Testergebnisse je Kategorie: `docs/ACTIVE_FALSE_POSITIVE_AUDIT.md`.
+- Volle Testsuite zweimal auf explizite Freigabe ausgeführt (nicht nach jeder Einzelkategorie, wie vom Nutzer vorgegeben): 1233/1233 (Zwischenstand), final 1241/1241, 0 Fehlschläge.
 
 ## Abgeschlossen
 
@@ -65,7 +66,7 @@ Der Teststand 1175/0 stammt aus der Commit-Message von `3eed07f`. In dieser Doku
 - Condition-/Lieferumfang-Detektoren
 - mehrere neue Kategorien ohne Python-Code
 - Phase-15-Performance-Optimierungen
-- False-Positive-Audit für `notebook_resell`, `retro_konsolen`, `handhelds`, `konsolen_bundles` und `controller`
+- Systematischer Active-False-Positive-Audit über **alle 19 Kategorien** des Rulesets (PR #11–#25): 14 Kategorien mit realen Fixes (42 Muster / 113 Titel), 4 Kategorien mit verifiziert 0 Findings — Details siehe Batch-Eintrag oben und `docs/ACTIVE_FALSE_POSITIVE_AUDIT.md`
 
 ## Aktuelle Systemkette
 
@@ -100,6 +101,8 @@ Wichtige Architekturregeln:
 6. Resale-Confidence (`HIGH/MEDIUM/LOW`) ist eine mögliche nächste Qualitätsstufe.
 7. automatische Data-Quality-Warnungen weiterentwickeln.
 8. `konsolen_bundles`: "Spieltitel VOR Plattform ohne Bindestrich"-Restlücke (siehe Batch-Eintrag oben, z.B. "Donkey Kong Bananza Nintendo Switch 2 2025 OVP") — bewusst offen, kein Substring-Muster ohne Kollisionsrisiko mit echten Geräte-Titeln identifiziert.
+9. 9 real belegte, aber bewusst zurückgestellte Fehltreffer-Muster (27 Titel) aus dem Active-FP-Audit (PR #11–#25) — u.a. `office_pc` bare "bundle"/"kit", `retro_konsolen` Spieltitel-vor-Plattform via "komplett", `iphone` "Zubehörpaket" (gegensätzliche Evidenz). Vollständige Liste mit Begründung je Fall: `docs/ACTIVE_FALSE_POSITIVE_AUDIT.md`, Abschnitt "Aktive echte Fehltreffer" (Tabelle "Zurückgestellt").
+10. Restliche unauditierte Nischen-Feinheiten innerhalb bereits geprüfter Kategorien (z.B. weitere Marken-/Formfaktor-Varianten) nur bei neuem Datenpunkt erneut aufgreifen, kein proaktives Nachschärfen ohne Beleg.
 
 ## Nächste Prioritäten
 
