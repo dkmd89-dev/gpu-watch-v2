@@ -49,6 +49,24 @@ exclude_category:
   - "halterung"
   - "ladestation"
   - "dock"
+  # FIX (Datenqualität Nr. 5, Phase-15-Restlücke "controller.yaml/ladekabel"
+  # separat bewertet, Ruleset-Qualitätssystem-Folgeschritt 2026-08-14): das
+  # bestehende exclude_category_unless_preceded_by fuer "ladekabel" (weiter
+  # unten) faengt Standalone-Kabel korrekt ab, deckt aber keine
+  # Lade-STATIONEN/-GERAETE ab -- ein anderer Zubehoer-Typ (Dock-artiges
+  # Geraet statt Kabel), real bestaetigt: "PS5 Controller USB Dual-Charger
+  # Station" (6,99€), "PowerA Twin Charging Station für PS5 Controller"
+  # (15€), "5in1 Switch Aufladegerät für 4 Joycons und 1 Pro Controller"
+  # (9€, Kompositum -- "ladegerät" bereits vorhanden, aber nur als eigenes
+  # Wort geprueft, "aufladegerät" hat davor keine Wortgrenze, identisches
+  # Muster wie "aufsatz"/"Lötaufsatz"). Unbedingter (nicht kontextbewusster)
+  # Exclude wie bei "ladestation"/"dock" oben -- keine legitime
+  # "Controller inkl. Charging Station"-Bundle-Formulierung im Korpus
+  # gefunden, anders als beim echten Ladekabel. Blast Radius gemessen: 3
+  # Treffer, 0 Kollisionen.
+  - "aufladegerät"
+  - "charging station"
+  - "charger station"
   - "playstation" # verhindert Treffer mit ganzen Konsolen-Bundles
   - "konsole" # verhindert Treffer mit ganzen Konsolen-Bundles (auch Xbox/PS-Bundles, die "Konsole" im Titel nennen)
   # HINWEIS: "xbox" wurde hier bewusst NICHT (mehr) als Blanket-Exclude eingetragen.

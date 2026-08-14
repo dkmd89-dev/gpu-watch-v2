@@ -5,14 +5,15 @@
 > Stand: **2026-08-14**
 > Repository: `dkmd89-dev/gpu-watch-v2`
 > Branch: `main`
-> **Letzter Code-Commit (vor dieser Doku-Aktualisierung):** `a6e8df1` (fix:
-> Zubehör/Ersatzteil-vs-Gerät-Fehltreffer aus 251-Listing-Stichprobe schließen)
-> **HEAD (main, vor dieser Doku-Aktualisierung):** `3c9a678` (Merge PR #32)
+> **Letzter Code-Commit (vor dieser Doku-Aktualisierung):** `5a01516` (fix: Lade-Stationen/-Geräte-
+> Zubehör bei controller ausschließen)
+> **HEAD (main, vor dieser Doku-Aktualisierung):** `5fea3ec` (Merge PR #33)
 > Vorheriger dokumentierter Stand: `2745a95` (PR #29 + Folge-Sessions)
-> Vergleich `2745a95...a6e8df1`: PR #31 (251-Listing-Worksheet gelabelt + 3 Exclude-Fixes,
+> Vergleich `2745a95...5a01516`: PR #31 (251-Listing-Worksheet gelabelt + 3 Exclude-Fixes,
 > `c577207`) + PR #32 (Umlaut-Fingerprint-Fix + menschliches Labeling + Preishistorie-
-> Revalidierung v3, `3c9a678`) + `a6e8df1` (4 weitere Exclude-Fixes, Zubehör/Ersatzteil-vs-Gerät)
-> + freigegebene `lego_bundle`-Datenbereinigung (`data/price_history.jsonl`, kein Code-Commit)
+> Revalidierung v3, `3c9a678`) + PR #33 (4 weitere Exclude-Fixes, Zubehör/Ersatzteil-vs-Gerät,
+> `5fea3ec`) + `5a01516` (controller/ladekabel-Restlücke gelöst) + freigegebene
+> `lego_bundle`-Datenbereinigung (`data/price_history.jsonl`, kein Code-Commit)
 >
 > Diese Datei ersetzt `PROJEKTSTAND_KOMPLETT.md` (Datei mittlerweile aus dem Repository entfernt). Historische Phasenberichte bleiben als Detaildokumentation erhalten; widersprüchliche ältere Ist-Stand-Angaben gelten nicht mehr als aktuell.
 
@@ -22,7 +23,7 @@
 
 `gpu-watch-v2` ist ein modularer, YAML-gesteuerter **Hardware Deal Finder** für Second-Hand-Angebote. Das System kombiniert Scraper, kategoriebasiertes Matching, Hardware-Detektoren, Deal-Scoring, Marktpreis-/Resale-Statistik, Profit-/Flip-Bewertung, Duplicate Detection, Presence Tracking, Dashboard-KPIs und ntfy-Benachrichtigungen.
 
-Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und kontrollierter Weiterentwicklung**. Seit `d2effe7` wurden insbesondere Datenqualitäts-/Validierungslogik, Rule Analyzer/Coverage, Caching/Performance, neue Kategorien sowie ein umfangreicher False-Positive-Audit integriert. Seit 2026-08-14 ergänzt ein dediziertes, read-only **Ruleset-Qualitätssystem** (`tools/ruleset_quality/`, siehe Abschnitt 3.11) den bisherigen punktuellen Audit-Ansatz um reproduzierbare Regression-Benchmarks und Preishistorie-Simulationen. Im selben Tag (Abschnitt 3.12) wurde die 251-Listing-Stichprobe vollständig gelabelt, daraus resultierend 3 Exclude-Fixes umgesetzt (PR #31), der Umlaut-Fingerprint-Bug behoben und eine kontrollierte Preishistorie-Revalidierung v3 durchgeführt (PR #32) — mit dem wichtigen Befund, dass der Fix nicht rückwirkend auf bereits gespeicherte Daten wirkt. Direkt im Anschluss (Abschnitt 3.13) wurde Datenqualitätspunkt 14 (Zubehör/Ersatzteil-vs-Gerät) mit 4 weiteren gezielten Exclude-Fixes gelöst.
+Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und kontrollierter Weiterentwicklung**. Seit `d2effe7` wurden insbesondere Datenqualitäts-/Validierungslogik, Rule Analyzer/Coverage, Caching/Performance, neue Kategorien sowie ein umfangreicher False-Positive-Audit integriert. Seit 2026-08-14 ergänzt ein dediziertes, read-only **Ruleset-Qualitätssystem** (`tools/ruleset_quality/`, siehe Abschnitt 3.11) den bisherigen punktuellen Audit-Ansatz um reproduzierbare Regression-Benchmarks und Preishistorie-Simulationen. Im selben Tag (Abschnitt 3.12) wurde die 251-Listing-Stichprobe vollständig gelabelt, daraus resultierend 3 Exclude-Fixes umgesetzt (PR #31), der Umlaut-Fingerprint-Bug behoben und eine kontrollierte Preishistorie-Revalidierung v3 durchgeführt (PR #32) — mit dem wichtigen Befund, dass der Fix nicht rückwirkend auf bereits gespeicherte Daten wirkt. Direkt im Anschluss (Abschnitt 3.13) wurde Datenqualitätspunkt 14 (Zubehör/Ersatzteil-vs-Gerät) mit 4 weiteren gezielten Exclude-Fixes gelöst (PR #33), gefolgt von Datenqualitätspunkt 5 (Abschnitt 3.14, `controller`/`ladekabel`-Restlücke).
 
 ---
 
@@ -32,10 +33,10 @@ Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und ko
 
 ```text
 Branch: main
-Letzter Code-Commit (vor dieser Doku-Aktualisierung): a6e8df1
+Letzter Code-Commit (vor dieser Doku-Aktualisierung): 5a01516
 Vorheriger dokumentierter Stand: 2745a95 (PR #29 + Folge-Sessions)
 
-2745a95..a6e8df1:
+2745a95..5a01516:
   PR #31 (c577207) -- 251-Listing-Worksheet KI-gestützt gelabelt (217 TP/
                        21 FP/13 UNCLEAR) + 3 gezielte Exclude-Fixes:
                        exclude_global (defekt-Flexionsformen), handhelds
@@ -45,12 +46,15 @@ Vorheriger dokumentierter Stand: 2745a95 (PR #29 + Folge-Sessions)
                        menschlich verifiziertes Labeling (Listings 1-30
                        einzeln, 31-251 pauschal) + kontrollierte,
                        read-only Preishistorie-Revalidierung v3
-  a6e8df1           -- fix: Zubehör/Ersatzteil-vs-Gerät-Fehltreffer
+  PR #33 (5fea3ec)  -- fix: Zubehör/Ersatzteil-vs-Gerät-Fehltreffer
                        geschlossen (STATUS.md Nr. 14): controller
                        (Kompositum-Lücke "Lötaufsatz"), handhelds
                        (ssd/festplatte/headset/kopfhörer/in-ear),
                        netzteil (kabelset), konsolen_bundles
                        (kontextbewusster joy-con-Exclude)
+  5a01516           -- fix: controller/ladekabel-Restlücke geschlossen
+                       (STATUS.md Nr. 5): Lade-Stationen/-Geräte-Zubehör
+                       (nicht der ladekabel-Mechanismus selbst)
 ```
 
 Zusätzlich, außerhalb der Commit-Historie (freigegebene Datenänderung, kein Code-Commit):
@@ -59,22 +63,24 @@ gelöscht (siehe Abschnitt 3.12).
 
 ### Teststand
 
-In dieser Session tatsächlich lokal ausgeführt und verifiziert (nicht aus Commit-Historie übernommen):
-
 ```text
-pytest app/tests/ -> 1315 passed, 0 failed (623,91s)
+Zuletzt vollständig lokal ausgeführt und verifiziert (PR #33): 1315 passed, 0 failed (623,91s)
+
+Für den Punkt-5-Fix (5a01516, Einzelkategorie controller): 4 neue Tests +
+73 controller-bezogene Tests grün lokal verifiziert. Volle Suite dafür
+bewusst NICHT erneut automatisch ausgeführt (CLAUDE.md-Regel: nur nach
+expliziter Freigabe).
 
 rule_analyzer.py:
 355 Regeln, 19 Kategorien, 0 Findings
-Ruleset-Signatur (matcher.compute_ruleset_signature()): ee2a6eb114525b55
-  -- GEÄNDERT seit PR #31/#32 (98acd6152b61b8bb -> ee2a6eb114525b55), erwartbar:
-     der Punkt-14-Fix erweitert exclude_category in 3 Kategorien + einen neuen
-     exclude_category_unless_also_contains-Schlüssel in konsolen_bundles
+Ruleset-Signatur (matcher.compute_ruleset_signature()): 0d63c38b5dbf261c
+  -- GEÄNDERT seit PR #33 (ee2a6eb114525b55 -> 0d63c38b5dbf261c), erwartbar:
+     der Punkt-5-Fix erweitert exclude_category in controller.yaml
 ```
 
-Vorheriger dokumentierter Stand: 1309/1309 (PR #32). Die 6 neuen Tests:
-`test_zubehoer_ersatzteil_vs_geraet_fix.py` (Punkt-14-Fix, siehe Abschnitt 3.13) — kein Test
-wurde gelöscht oder abgeschwächt.
+Vorheriger dokumentierter Stand: 1315/1315 (PR #33). Die 4 neuen Tests:
+`test_controller_ladezubehoer_fix.py` (Punkt-5-Fix, siehe Abschnitt 3.14) — kein Test wurde
+gelöscht oder abgeschwächt.
 
 ---
 
@@ -446,6 +452,35 @@ blockiert — 0 Kollisionen.
 Tests grün, volle Suite 1315/1315 grün, `rule_analyzer.py` 0 Findings. Ruleset-Signatur geändert
 (`98acd6152b61b8bb` → `ee2a6eb114525b55`).
 
+### 3.14 `controller`/`ladekabel`-Restlücke gelöst (`5a01516`, Datenqualität Punkt 5)
+
+Direkte Fortsetzung von Abschnitt 3.13 — nächster, als Einzelschritt geplanter Datenqualitätspunkt
+(dokumentierte Phase-15-Restlücke, ursprüngliche Detaildokumentation in `document/PHASE15_*.md`
+nicht mehr im Repository vorhanden, daher frische empirische Analyse gegen `found.json` +
+`price_history.jsonl`).
+
+**Analysebefund:** der bestehende `exclude_category_unless_preceded_by`-Mechanismus für
+`ladekabel` selbst funktioniert korrekt — Standalone-Kabel-Angebote werden blockiert
+(`"USB-C Ladekabel für PS5 Controller 3m"` → kein Treffer), echte Bundle-Formulierungen bleiben
+erhalten (`"... inkl. Ladekabel"` → matcht weiterhin). Die tatsächliche, real bestätigte Lücke
+betraf einen **anderen** Zubehör-Typ — Lade-**Stationen/-Geräte** statt Kabel:
+
+| Titel | Preis | Ursache |
+|---|---|---|
+| "PS5 Controller USB Dual-Charger Station Neu in OVP" | 6,99€ | `"charger station"` fehlte als Exclude |
+| "PowerA Twin Charging Station für PS5 Controller" | 15€ | `"charging station"` fehlte als Exclude |
+| "5in1 Switch 1 Aufladegerät für 4 Joycons und 1 Pro Controller" | 9€ (historisch, `price_history.jsonl`) | Kompositum-Lücke — "ladegerät" existierte bereits als Exclude, aber nur als eigenes Wort geprüft (identisches Muster wie "Lötaufsatz", Abschnitt 3.13) |
+
+**Fix:** `exclude_category` in `controller.yaml` um `aufladegerät`/`charging station`/
+`charger station` ergänzt — unbedingt (wie bei den bereits vorhandenen `ladestation`/`dock`),
+nicht kontextbewusst wie bei `ladekabel`: keine legitime "Controller inkl. Charging
+Station"-Bundle-Formulierung im Korpus gefunden. Blast Radius: 3 Treffer, 0 Kollisionen
+(inkl. Sicherheitsnetz-Test, dass der bestehende `ladekabel`-Mechanismus unverändert bleibt).
+
+4 neue Regressionstests (`test_controller_ladezubehoer_fix.py`), 73 `controller`-Tests grün,
+`rule_analyzer.py` 0 Findings. Ruleset-Signatur geändert (`ee2a6eb114525b55` →
+`0d63c38b5dbf261c`).
+
 ---
 
 ## 4. Datenqualität
@@ -470,7 +505,7 @@ Der anschließende PR-#6-Audit adressiert bereits mehrere konkrete False Positiv
 
 - historische Alt-Kontamination in `price_history.jsonl`
 - 19 Regeln ohne Produktivdaten weiter beobachten
-- `RX 7600 XT`/`RX 7600`-Überlappung — weiterhin offen. `controller`-`ladekabel`-Exclude: **nächster geplanter Einzelschritt** (noch nicht bearbeitet)
+- `RX 7600 XT`/`RX 7600`-Überlappung — weiterhin offen. `controller`-`ladekabel`-Exclude: **erledigt** (Abschnitt 3.14) — Lücke betraf Lade-Stationen/-Geräte, nicht den Kabel-Mechanismus selbst
 - 9 Muster / 27 Titel aus dem Active-False-Positive-Audit (Abschnitt 3.9) bewusst zurückgestellt (P1/P2) — vollständige Liste: `docs/ACTIVE_FALSE_POSITIVE_AUDIT.md`
 - Zubehör/Ersatzteil-vs-Gerät-Fehlklassifikation: **erledigt** (Abschnitt 3.13) — 4 gezielte Exclude-Fixes
 - Spieltitel-ohne-Konsole (5 Fälle, jetzt auch in `retro_konsolen` bestätigt) — weiterhin offen
@@ -538,7 +573,7 @@ Folgende Punkte sind **nicht** durch die Konsolidierung als abgeschlossen zu bet
 3. Resale-Confidence (z.B. HIGH/MEDIUM/LOW) ist konzeptionell sinnvoll, aber noch nicht als vollständiges Produktfeature etabliert.
 4. Datenqualitätswarnungen für Kategorien, Regeln und Preisverteilungen sollten langfristig automatisiert werden.
 5. Cross-Platform-Duplicate-Identity ist weiter ausbaufähig.
-6. Die dokumentierten Phase-15-Restlücken (`rx_7600_xt`, `controller.yaml`/`ladekabel`) warten auf eine bewusst getrennte Regeländerung — `controller`/`ladekabel` ist der als Nächstes geplante Einzelschritt (Abschnitt 7).
+6. Die dokumentierten Phase-15-Restlücken: `controller.yaml`/`ladekabel` **erledigt** (Abschnitt 3.14); `rx_7600_xt` weiterhin offen, wartet auf eine bewusst getrennte Regeländerung.
 7. `konsolen_bundles`: "Spieltitel VOR Plattform ohne Bindestrich"-Restlücke (Abschnitt 3.8, z.B. "Donkey Kong Bananza Nintendo Switch 2 2025 OVP") — bewusst offen, kein kollisionsfreies Substring-Muster identifiziert.
 8. 9 Muster / 27 Titel aus dem Active-False-Positive-Audit (Abschnitt 3.9) bewusst zurückgestellt (P1/P2), nicht gefixt — vollständige Liste mit Einzelbegründung: `docs/ACTIVE_FALSE_POSITIVE_AUDIT.md`.
 9. Coverage-/False-Positive-Rate: 251-Listing-Stichprobe jetzt vollständig gelabelt (Abschnitt 3.12) — Precision 91,2%, aber nur 30 von 251 Listings unabhängig einzeln geprüft (Rest pauschal übernommen).
@@ -551,8 +586,7 @@ Folgende Punkte sind **nicht** durch die Konsolidierung als abgeschlossen zu bet
 ## 7. Empfohlene nächste Reihenfolge
 
 ```text
-1. controller/ladekabel-Exclude separat bewerten (Datenqualität Nr. 5,
-   Phase-15-Restlücke) -- nächster geplanter Einzelschritt
+1. RX 7600 XT / RX 7600-Überlappung (Datenqualität Nr. 4) -- noch keine Analyse
         ↓
 2. Scan-Performance messen
         ↓
@@ -562,6 +596,9 @@ Folgende Punkte sind **nicht** durch die Konsolidierung als abgeschlossen zu bet
         ↓
 5. erst danach neue Features/Kategorien priorisieren
 ```
+
+Stand 2026-08-14: `controller`/`ladekabel`-Exclude (vorherige P0) ist **abgeschlossen**
+(Abschnitt 3.14).
 
 Stand 2026-08-14: die vorherige P0 (Stichproben-Worksheet labeln + kontrollierte
 Preishistorie-Revalidierung + Orphan-Modell-Freigabe + Zubehör/Ersatzteil-vs-Gerät-
@@ -601,4 +638,4 @@ ABSCHLUSSBERICHT.md`, `FINALE_REVALIDIERUNG_ABSCHLUSSBERICHT.md`,
 `HUMAN_VERIFIED_LABELING_ABSCHLUSSBERICHT_2026-08-14.md`,
 `PREISHISTORIE_REVALIDIERUNG_V3_BERICHT_2026-08-14.md` (Abschnitt 3.12).
 
-Diese Dokumente liefern historische Details. Für den **aktuellen technischen Code-Stand** ist der Code-Commit `a6e8df1` maßgeblich; für die technische Projektreferenz ist diese Datei maßgeblich.
+Diese Dokumente liefern historische Details. Für den **aktuellen technischen Code-Stand** ist der Code-Commit `5a01516` maßgeblich; für die technische Projektreferenz ist diese Datei maßgeblich.

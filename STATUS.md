@@ -3,8 +3,8 @@
 > **Stand:** 2026-08-14  
 > **Repository:** `dkmd89-dev/gpu-watch-v2`  
 > **Branch:** `main`  
-> **Letzter Code-Commit auf `main` (vor dieser Doku-Aktualisierung):** `3c9a678` (Merge PR #32,
-> davor `dfe3eb9`, `c9967ba`, `c577207` = Merge PR #31)  
+> **Letzter Code-Commit auf `main` (vor dieser Doku-Aktualisierung):** `5a01516` (davor `5fea3ec`
+> = Merge PR #33, `3c9a678` = Merge PR #32)  
 > **Technische Referenz:** `TECHNISCHER_PROJEKTSTATUS.md`
 
 ## Gesamtstatus
@@ -13,32 +13,31 @@
 Folge-Sessions) wurde die 251-Listing-Stichprobe vollständig gelabelt (KI-gestützt + menschlich
 verifiziert), daraus resultierend 3 gezielte Exclude-Fixes umgesetzt (PR #31), der Umlaut-
 Fingerprint-Bug behoben (PR #32), die freigegebene `lego_bundle`-Migration/-Bereinigung
-ausgeführt, eine kontrollierte Preishistorie-Revalidierung v3 durchgeführt (PR #32) und **STATUS.md
-Punkt 14 (Zubehör/Ersatzteil-vs-Gerät) gelöst** — 4 weitere gezielte Exclude-Fixes. **Ruleset-
-Signatur hat sich erneut geändert** (`98acd6152b61b8bb` → `ee2a6eb114525b55`) — erwartbar, der
-Punkt-14-Fix erweitert vier weitere Exclude-Listen.
+ausgeführt, eine kontrollierte Preishistorie-Revalidierung v3 durchgeführt (PR #32), **STATUS.md
+Punkt 14 (Zubehör/Ersatzteil-vs-Gerät) gelöst** (PR #33) und jetzt **Punkt 5 (`controller`/
+`ladekabel`) gelöst** — Lade-Stationen/-Geräte-Zubehör ausgeschlossen. **Ruleset-Signatur hat sich
+erneut geändert** (`ee2a6eb114525b55` → `0d63c38b5dbf261c`).
 
 ## Verifizierter Stand
 
 ```text
-main (vor dieser Doku-Aktualisierung): 3c9a678 (Merge PR #32)
-
-Vollständiger Testlauf (in dieser Session lokal ausgeführt und verifiziert):
-pytest app/tests/ -> 1315 passed, 0 failed (623,91s)
+main (vor dieser Doku-Aktualisierung): 5fea3ec (Merge PR #33)
 
 Rule Analyzer:
 355 Regeln
 19 Kategorien
 0 Findings
-Ruleset-Signatur: ee2a6eb114525b55 (GEÄNDERT seit PR #31/#32 — Punkt-14-Fix erweitert
-  exclude_category in 3 Kategorien + einen neuen exclude_category_unless_also_contains-Schlüssel)
+Ruleset-Signatur: 0d63c38b5dbf261c (GEÄNDERT seit PR #33 — Punkt-5-Fix erweitert
+  exclude_category in controller.yaml)
 
 data/found.json: 2500 Einträge
 data/price_history.jsonl: 14.899 Datenpunkte (unverändert seit der lego_bundle-Bereinigung)
 ```
 
-Vorheriger dokumentierter Teststand: 1309/1309 (PR #32). Die 6 neuen Tests:
-`test_zubehoer_ersatzteil_vs_geraet_fix.py` (Punkt-14-Fix, siehe Batch 8 unten).
+Teststand: 4 neue Tests (`test_controller_ladezubehoer_fix.py`) + 73 `controller`-bezogene Tests
+lokal grün verifiziert. Volle Suite zuletzt bei 1315/1315 (PR #33, vom Nutzer lokal verifiziert) —
+für diesen kleinen Einzelkategorie-Fix nicht erneut automatisch ausgeführt (CLAUDE.md-Regel: nur
+nach expliziter Freigabe).
 
 ## Zuletzt abgeschlossene Batches
 
@@ -140,6 +139,25 @@ Vier unabhängige Root Causes für die 6 in der Stichprobe gefundenen Fälle, je
 6 neue Regressionstests (`test_zubehoer_ersatzteil_vs_geraet_fix.py`), 190 kategorienbezogene
 Tests + volle Suite 1315/1315 grün, `rule_analyzer.py` 0 Findings.
 
+### 9. `controller`/`ladekabel`-Restlücke gelöst (Datenqualität Punkt 5)
+
+Analyse ergab: der bestehende `ladekabel`-Mechanismus (`exclude_category_unless_preceded_by`)
+funktioniert korrekt — Standalone-Kabel werden blockiert, echte "Controller inkl.
+Ladekabel"-Bundles bleiben erhalten. Die tatsächliche Lücke betraf einen **anderen** Zubehör-Typ:
+Lade-**Stationen/-Geräte** (Dock-artiges Zubehör statt Kabel), real bestätigt:
+
+- "PS5 Controller USB Dual-Charger Station" (6,99€)
+- "PowerA Twin Charging Station für PS5 Controller" (15€)
+- "5in1 Switch Aufladegerät für 4 Joycons und 1 Pro Controller" (9€) — Kompositum-Lücke,
+  identisches Muster wie "Lötaufsatz": "ladegerät" existierte bereits als Exclude, aber nur als
+  eigenes Wort geprüft, "aufladegerät" hat davor keine Wortgrenze.
+
+`exclude_category` um `aufladegerät`/`charging station`/`charger station` ergänzt (unbedingt, wie
+bei `ladestation`/`dock` — keine legitime Bundle-Formulierung mit diesen Begriffen im Korpus
+gefunden). Blast Radius: 3 Treffer, 0 Kollisionen. 4 neue Regressionstests
+(`test_controller_ladezubehoer_fix.py`), 73 `controller`-Tests grün, `rule_analyzer.py` 0
+Findings.
+
 ## Abgeschlossen
 
 - ursprüngliche Phasen 0–10
@@ -167,6 +185,7 @@ Tests + volle Suite 1315/1315 grün, `rule_analyzer.py` 0 Findings.
 - `lego_bundle`-Migration/-Bereinigung ausgeführt (freigegeben)
 - Kontrollierte Preishistorie-Revalidierung v3 (read-only, Kernbefunde siehe Batch 7 oben)
 - Zubehör/Ersatzteil-vs-Gerät-Fehlklassifikation gelöst, 4 Kategorien (Batch 8 oben)
+- `controller`/`ladekabel`-Restlücke gelöst (Batch 9 oben)
 
 ## Aktuelle Systemkette
 
@@ -206,7 +225,8 @@ Wichtige Architekturregeln:
 3. Orphan-Datenpunkte aus der entfernten `spielzeug_bundles`-Kategorie: **erledigt** (Batch 6) —
    5 migriert, 655 gelöscht, 3 bewusst erhalten.
 4. dokumentierte `RX 7600 XT`/`RX 7600`-Überlappung — weiterhin offen.
-5. `controller`-`ladekabel`-Exclude separat bewerten.
+5. `controller`-`ladekabel`-Exclude: **erledigt** (Batch 9) — Lücke betraf Lade-Stationen/-Geräte,
+   nicht den Kabel-Mechanismus selbst (der bereits korrekt funktionierte).
 6. Resale-Confidence (`HIGH/MEDIUM/LOW`) ist eine mögliche nächste Qualitätsstufe.
 7. automatische Data-Quality-Warnungen weiterentwickeln.
 8. `konsolen_bundles`/`retro_konsolen`: "Spieltitel ohne Plattform-Bindestrich"-Restlücke —
@@ -232,10 +252,11 @@ Wichtige Architekturregeln:
 
 ## Nächste Prioritäten
 
-### P0 — nächster einzelner Schritt
+### P0 — offene Punkte
 
-- Punkt 5: `controller`-`ladekabel`-Exclude separat bewerten (Analyse + ggf. Fix, als eigener
-  Schritt nach dieser Doku-Aktualisierung).
+- Keine dringenden P0-Punkte mehr offen (alle in Batch 1–9 dokumentierten Punkte abgeschlossen).
+  Nächste Schritte laut Datenqualität/offene Punkte: `RX 7600 XT`/`RX 7600`-Überlappung (Nr. 4,
+  noch keine Analyse) oder P1/P2 unten.
 
 ### P1 — Datenqualität
 
