@@ -5,12 +5,14 @@
 > Stand: **2026-08-14**
 > Repository: `dkmd89-dev/gpu-watch-v2`
 > Branch: `main`
-> **Letzter Code-Commit:** `2745a95` (docs: README auf aktuellen Stand bringen)
-> **HEAD (main):** `2745a95`
-> Vorheriger dokumentierter Stand: `1f65553` (PR #25)
-> Vergleich `1f65553...2745a95`: PR #26–#28 (Cross-Category-Routing-Audit, 2 reale Fixes) + PR #29
-> (Ruleset-Qualitätssystem, `tools/ruleset_quality/`) + 1 direkter Folge-Commit (`b9081e3`,
-> finale read-only Revalidierung) + 2 reine Doku-Commits (`cb6787e`, `2745a95`)
+> **Letzter Code-Commit (vor dieser Doku-Aktualisierung):** `dfe3eb9` (feat(quality): menschlich
+> verifiziertes Labeling + Preishistorie-Revalidierung v3)
+> **HEAD (main, vor dieser Doku-Aktualisierung):** `dfe3eb9`
+> Vorheriger dokumentierter Stand: `2745a95` (PR #29 + Folge-Sessions)
+> Vergleich `2745a95...dfe3eb9`: PR #31 (251-Listing-Worksheet gelabelt + 3 Exclude-Fixes,
+> `c577207`) + `c9967ba` (Umlaut-Fingerprint-Fix) + `dfe3eb9` (menschliches Labeling +
+> Preishistorie-Revalidierung v3, read-only) + freigegebene `lego_bundle`-Datenbereinigung
+> (`data/price_history.jsonl`, kein Code-Commit)
 >
 > Diese Datei ersetzt `PROJEKTSTAND_KOMPLETT.md` (Datei mittlerweile aus dem Repository entfernt). Historische Phasenberichte bleiben als Detaildokumentation erhalten; widersprüchliche ältere Ist-Stand-Angaben gelten nicht mehr als aktuell.
 
@@ -20,7 +22,7 @@
 
 `gpu-watch-v2` ist ein modularer, YAML-gesteuerter **Hardware Deal Finder** für Second-Hand-Angebote. Das System kombiniert Scraper, kategoriebasiertes Matching, Hardware-Detektoren, Deal-Scoring, Marktpreis-/Resale-Statistik, Profit-/Flip-Bewertung, Duplicate Detection, Presence Tracking, Dashboard-KPIs und ntfy-Benachrichtigungen.
 
-Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und kontrollierter Weiterentwicklung**. Seit `d2effe7` wurden insbesondere Datenqualitäts-/Validierungslogik, Rule Analyzer/Coverage, Caching/Performance, neue Kategorien sowie ein umfangreicher False-Positive-Audit integriert. Seit 2026-08-14 ergänzt ein dediziertes, read-only **Ruleset-Qualitätssystem** (`tools/ruleset_quality/`, siehe Abschnitt 3.11) den bisherigen punktuellen Audit-Ansatz um reproduzierbare Regression-Benchmarks und Preishistorie-Simulationen.
+Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und kontrollierter Weiterentwicklung**. Seit `d2effe7` wurden insbesondere Datenqualitäts-/Validierungslogik, Rule Analyzer/Coverage, Caching/Performance, neue Kategorien sowie ein umfangreicher False-Positive-Audit integriert. Seit 2026-08-14 ergänzt ein dediziertes, read-only **Ruleset-Qualitätssystem** (`tools/ruleset_quality/`, siehe Abschnitt 3.11) den bisherigen punktuellen Audit-Ansatz um reproduzierbare Regression-Benchmarks und Preishistorie-Simulationen. Im selben Tag (Abschnitt 3.12) wurde die 251-Listing-Stichprobe vollständig gelabelt, daraus resultierend 3 Exclude-Fixes umgesetzt (PR #31), der Umlaut-Fingerprint-Bug behoben und eine kontrollierte Preishistorie-Revalidierung v3 durchgeführt — mit dem wichtigen Befund, dass der Fix nicht rückwirkend auf bereits gespeicherte Daten wirkt.
 
 ---
 
@@ -30,47 +32,45 @@ Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und ko
 
 ```text
 Branch: main
-Letzter Code-Commit: 2745a95 (docs: README auf aktuellen Stand bringen)
-Vorheriger dokumentierter Stand: 1f65553 (PR #25)
+Letzter Code-Commit (vor dieser Doku-Aktualisierung): dfe3eb9
+Vorheriger dokumentierter Stand: 2745a95 (PR #29 + Folge-Sessions)
 
-1f65553..2745a95:
-  PR #26 (e55d600) -- docs: STATUS.md/TECHNISCHER_PROJEKTSTATUS.md/README.md
-                       nach Abschluss des 19-Kategorien-Audits sync
-  PR #27 (bc0e1a4) -- fix(office_pc): Notebooks/Laptops ausschließen
-                       (Cross-Category Routing Audit)
-  PR #28 (2691da6) -- fix(macbook): "1024GB"-Speichergrößen-Schreibweise
-                       ergänzen (Cross-Category Routing Audit P2)
-  PR #29 (4311683) -- feat(quality): Ruleset-Qualitätssystem für
-                       reproduzierbare Regression-Benchmarks (Phase 19.1-19.5)
-  b9081e3           -- feat(quality): finale read-only Revalidierung vor
-                        Preishistorie-Update (direkter Commit auf main)
-  cb6787e, 2745a95  -- reine Doku-Commits (README für tools/ruleset_quality/)
+2745a95..dfe3eb9:
+  PR #31 (c577207) -- 251-Listing-Worksheet KI-gestützt gelabelt (217 TP/
+                       21 FP/13 UNCLEAR) + 3 gezielte Exclude-Fixes:
+                       exclude_global (defekt-Flexionsformen), handhelds
+                       (sd karten Plural), office_pc (dynabook/latitude)
+  c9967ba           -- fix: Umlaut-Fingerprint-Bug behoben
+                       (duplicate_detection.normalize_title(), STATUS.md
+                       Nr. 11) -- wirkt NUR auf künftig neue Daten
+  dfe3eb9           -- feat(quality): menschlich verifiziertes Labeling
+                       (Listings 1-30 einzeln, 31-251 pauschal) +
+                       kontrollierte, read-only Preishistorie-
+                       Revalidierung v3
 ```
 
-PR #26–#28 wurden zwischen 2026-08-11 und 2026-08-11 gemergt (Cross-Category-Routing-Audit, siehe
-Abschnitt 3.10). PR #29 sowie die read-only Folge-Session (`b9081e3`) entstanden am 2026-08-14
-(Ruleset-Qualitätssystem, siehe Abschnitt 3.11) — dazwischen liegen 3 Tage ohne dokumentierten
-Zwischenstand, in denen der Produktiv-Scanner weiterlief (`found.json` 2500 statt 2477 Einträge,
-`price_history.jsonl` 15554 statt 12365 Zeilen).
+Zusätzlich, außerhalb der Commit-Historie (freigegebene Datenänderung, kein Code-Commit):
+`lego_bundle`-Migration/-Bereinigung in `data/price_history.jsonl` — 5 Punkte migriert, 655
+gelöscht (siehe Abschnitt 3.12).
 
 ### Teststand
 
 In dieser Session tatsächlich lokal ausgeführt und verifiziert (nicht aus Commit-Historie übernommen):
 
 ```text
-pytest app/tests/ -> 1296 passed, 0 failed (671,17s)
+pytest app/tests/ -> 1309 passed, 0 failed
 
 rule_analyzer.py:
 355 Regeln, 19 Kategorien, 0 Findings
-Ruleset-Signatur (matcher.compute_ruleset_signature()): acd510eb61845cb5
-  -- identisch seit PR #28, d.h. seit PR #29 keine Regeländerung mehr
+Ruleset-Signatur (matcher.compute_ruleset_signature()): 98acd6152b61b8bb
+  -- GEÄNDERT seit PR #28/#29 (acd510eb61845cb5 -> 98acd6152b61b8bb), erwartbar:
+     PR #31 erweitert exclude_global und 2x exclude_category
 ```
 
-Vorheriger dokumentierter Stand: 1241/1241 (PR #25). Die 55 neuen Tests: PR #27/#28
-(Cross-Category-Fixes) + `app/tests/test_ruleset_quality_tooling.py` (20 Tests) +
-`app/tests/test_ruleset_quality_detailed_transition.py` (19 Tests) für das neue,
-read-only `tools/ruleset_quality/`-Package (siehe Abschnitt 3.11) — kein Test wurde
-gelöscht oder abgeschwächt.
+Vorheriger dokumentierter Stand: 1296/1296 (PR #29 + Folge-Sessions). Die 13 neuen Tests: 9 aus
+PR #31 (`test_office_pc_dynabook_latitude_fix.py`, `test_handhelds_sd_karten_plural_fix.py`,
+`test_matcher_defekt_flexionsform_fix.py`) + 4 aus dem Umlaut-Fix
+(`test_duplicate_detection_umlaut_fix.py`) — kein Test wurde gelöscht oder abgeschwächt.
 
 ---
 
@@ -303,16 +303,18 @@ decision_points_1_3.py / sampling_plan.py   Tiefenanalyse einzelner offener Punk
    zugunsten der semantisch richtigeren Kategorie auf.
 4. **Methoden-Fund (wichtig für alle künftigen Preishistorie-Analysen):**
    `duplicate_detection.normalize_title()` — Basis von `PricePoint.fingerprint` in
-   `price_history.jsonl` — ersetzt deutsche Umlaute (ä/ö/ü/ß) durch ein Leerzeichen statt einer
+   `price_history.jsonl` — ersetzte deutsche Umlaute (ä/ö/ü/ß) durch ein Leerzeichen statt einer
    Transliteration (`"Röhrenfernseher"` → `"r hrenfernseher"`). Jede Fingerprint-basierte
    `evaluate()`-Revalidierung — **einschließlich des bereits produktiven**
-   `app/rule_coverage.py::_is_still_valid()` — matcht dadurch nie gegen Umlaut-haltige
-   `match`/`require_all_of`-Begriffe (19 von 355 Regeln in 4 Kategorien betroffen: `handhelds`,
-   `konsolen_bundles`, `retro_konsolen`, `vintage_elektronik`). Nur dokumentiert, **nicht
-   behoben** (kein Code-Change im read-only-Auftrag). Empfehlung für künftige Arbeit: wo ein
-   echter Titel verfügbar ist (z. B. über den Ground-Truth-Label-Store oder `found.json`), diesen
-   statt des Fingerprints für `evaluate()`-Aufrufe verwenden (siehe `title_recovery.py` als
-   Referenzimplementierung).
+   `app/rule_coverage.py::_is_still_valid()` — konnte dadurch nie gegen Umlaut-haltige
+   `match`/`require_all_of`-Begriffe matchen (19 von 355 Regeln in 4 Kategorien betroffen:
+   `handhelds`, `konsolen_bundles`, `retro_konsolen`, `vintage_elektronik`).
+   **Update (Abschnitt 3.12, Commit `c9967ba`): gefixt, aber NICHT rückwirkend** — der Fix wirkt
+   nur auf ab jetzt neu geschriebene Zeilen, da `PricePoint` den Rohtitel nicht persistiert und
+   sich ein korrekter Fingerprint für bereits gespeicherte Zeilen daher nicht nachträglich
+   berechnen lässt. Für `retro_konsolen`/`vintage_elektronik` bleibt eine verlässliche
+   historische Revalidierung damit praktisch unmöglich (siehe Abschnitt 3.12, Preishistorie-
+   Revalidierung v3).
 5. Drei zuvor offene Preishistorie-Entscheidungspunkte geklärt (voller Bericht:
    `tools/ruleset_quality/generated/reports/OFFENE_ENTSCHEIDUNGEN_1_BIS_3_BERICHT.md`):
    - `roehrenfernseher` bleibt eigenständiges `price_history_model` — fachlich klar von
@@ -340,6 +342,83 @@ Keine `app/rules/*.yaml`-, `matcher.py`-, `data/found.json`-, `data/seen.json`- 
 `data/price_history.jsonl`-Änderung in diesem gesamten Arbeitsblock (rein additive, neue Dateien
 unter `tools/ruleset_quality/` + `app/tests/test_ruleset_quality_*.py`).
 
+### 3.12 Worksheet-Labeling, Exclude-Fixes, Umlaut-Fix, Datenbereinigung, Revalidierung v3 (2026-08-14, PR #31 + 3 direkte Commits)
+
+Direkte Fortsetzung von Abschnitt 3.11 — vom Stichprobenplan zur tatsächlichen Umsetzung.
+
+**1. KI-gestütztes Labeling (PR #31, `c577207`):** alle 251 Listings aus dem Worksheet bewertet
+(`tools/ruleset_quality/worksheet_diagnostics.py` + manuelle inhaltliche Prüfung je Titel/Preis/
+Regel-Diagnose) — **217 TRUE_POSITIVE / 21 FALSE_POSITIVE / 13 UNCLEAR**, Precision 91,2%.
+Explizit **keine** unabhängige menschliche Verifikation, als eigene Quelle
+`ai_assisted_labels_2026-08-14.json` abgelegt.
+
+**2. Drei gezielte Exclude-Fixes aus den FP-Ursachen (PR #31):**
+
+| Fix | Datei | Blast Radius (gemessen) |
+|---|---|---|
+| `defekte`/`defekter`/`defektes`/`defekten` ergänzt | `_global.yaml` (`exclude_global`) | 23 Punkte im Gesamtkorpus, 0 Negationsfälle |
+| `sd karten` (Plural) ergänzt | `handhelds.yaml` | 5 Punkte, 0 Kollisionen |
+| `dynabook`/`satellite pro`/`latitude` ergänzt | `office_pc.yaml` (`exclude_category`) | 13 Punkte, 0 Kollisionen |
+
+"tausch" bewusst **nicht** um "tausche" erweitert (Risiko: "Akku tauschen" u. ä. harmlose
+Wartungsformulierungen würden fälschlich ausgeschlossen). 9 neue Regressionstests. Zwei weitere
+identifizierte Muster (Zubehör/Ersatzteil-vs-Gerät, 6 Fälle; Spieltitel-ohne-Konsole, 5 Fälle,
+jetzt auch in `retro_konsolen` bestätigt) **bewusst nicht gefixt** — kein einfaches,
+generalisierbares Exclude-Muster identifiziert.
+
+**3. Menschlich verifiziertes Labeling (`dfe3eb9`):** dialogbasiert in Batches à 10. Listings
+1–30 einzeln gezeigt und explizit bestätigt (0 Abweichungen vom KI-Vorschlag). Listings 31–251
+auf ausdrücklichen Nutzerwunsch ("bestätigt alle batches") **pauschal** übernommen — im
+`review_modus`-Feld (`einzeln_bestaetigt`/`pauschal_bestaetigt`) je Eintrag nachvollziehbar
+unterschieden. Eigene Quelle `human_verified_labels_2026-08-14.json`, weder KI- noch
+Forensik-Quelle überschrieben.
+
+**4. Umlaut-Fingerprint-Fix (`c9967ba`):** siehe Abschnitt 3.11, Punkt 4 (Update). 4 neue Tests.
+
+**5. Freigegebene `lego_bundle`-Migration/-Bereinigung** (Datenänderung, kein Code-Commit): nach
+exaktem Dry-Run (Kandidatenzahlen vorab gegen die Freigabe geprüft) und expliziter Freigabe der 5
+Ziel-Titel/-Preise:
+
+```text
+Migriert:  5 Punkte (2x lego_bundle -> lego_ninjago_bundle, 3x -> lego_minifig_bundle,
+           nur das model-Feld geändert)
+Gelöscht:  655 Punkte (396x nicht rekonstruierbare lego_bundle, 210x playmobil_bundle,
+           49x spielzeug_bundle_sonstige -- beide strukturell ohne Nachfolgeregel)
+Erhalten:  3 rekonstruierbare, aber nicht eindeutig migrierbare lego_bundle-Punkte
+```
+
+`price_history.jsonl`: 15.554 → 14.899 Zeilen. Nachher-Validierung: valides JSONL, exakte
+Zählungen bestätigt, keine anderen Felder/Zeilen verändert.
+
+**6. Kontrollierte Preishistorie-Revalidierung v3** (`dfe3eb9`, vollständig read-only):
+Vollkorpus-Revalidierung aller 14.899 Punkte unter Nutzung des Umlaut-Fixes.
+
+- **15 nicht vom Umlaut-Bug betroffene Kategorien** (10.337 Punkte, verlässlich): 91,1%
+  unverändert, 4,5% kein Treffer, 4,4% Modell geändert, 0,1% Kategorie geändert — plausibel nach
+  über 30 gemergten Fix-PRs. Größte Einzelbewegung: `lego_ninjago_bundle` (60% Modellwechsel,
+  erklärt durch seither hinzugekommene granularere Lego-Sub-Modelle wie `lego_sw_clone`/
+  `lego_cmf`).
+- **4 zuvor betroffene Kategorien** (3.389 Punkte): "kein Treffer"-Rate 35,9% **nicht verlässlich
+  interpretierbar**. Für die vom Bug am stärksten betroffenen Kategorien wurde der rekonstruierbare
+  Anteil einzeln geprüft: `retro_konsolen` 1 von 714, `vintage_elektronik` 0 von 409,
+  `konsolen_bundles` 17 von 59, `handhelds` 7 von 34 — der weit überwiegende Rest bleibt
+  unbeurteilbar (Rohtitel nicht persistiert, keine Rekonstruktion möglich).
+- **Cross-Validierung gegen die menschlichen Labels** (282 abgeglichene Punkte) bestätigt den
+  PR-#31-Fix direkt auf den echten Daten: exakt die 4 gefixten Titel wechseln von
+  FALSE_POSITIVE-Match zu kein Treffer; die übrigen 10 von 14 auffindbaren FP-Fällen matchen
+  unverändert (bestätigt reale, weiterhin offene strukturelle Muster). Ein Einzelfund:
+  `normalize_title()` entfernt Satzzeichen ("M.2" → "m 2"), wodurch ein Fingerprint vereinzelt
+  andere Signalwörter als der echte Titel enthalten kann (1 beobachteter Fall:
+  `m2_ssd`→`sata_ssd`) — nur beobachtet, nicht verallgemeinert.
+
+**Keine Korrektur-Aktion an `price_history.jsonl` vorgeschlagen oder ausgeführt** — die Datenlage
+trägt für die 4 betroffenen Kategorien keine verlässliche Einzelfallentscheidung.
+
+Alle Berichte: `tools/ruleset_quality/generated/reports/WORKSHEET_LABELING_BERICHT_2026-08-14.md`,
+`HUMAN_VERIFIED_LABELING_ABSCHLUSSBERICHT_2026-08-14.md`,
+`PREISHISTORIE_REVALIDIERUNG_V3_BERICHT_2026-08-14.md`,
+`ENTSCHEIDUNGEN_TECHNISCHE_VORBEREITUNG_BERICHT.md`.
+
 ---
 
 ## 4. Datenqualität
@@ -356,21 +435,21 @@ Phase 15 dokumentierte:
 
 Der anschließende PR-#6-Audit adressiert bereits mehrere konkrete False Positives; der systematische Active-False-Positive-Audit (Abschnitt 3.9, PR #11–#25) hat diese Arbeit auf **alle 19 Kategorien** ausgeweitet und dabei 113 weitere reale Fehltreffer-Titel beseitigt (u.a. den mit 40 Titeln größten Einzelfund des Projekts in `vintage_elektronik`). Der Cross-Category-Routing-Audit (Abschnitt 3.10) hat zwei weitere Fehlrouting-Fixes ergänzt. Das neue Ruleset-Qualitätssystem (Abschnitt 3.11) liefert erstmals einen **reproduzierbaren** Regressionsvergleich statt punktueller Audits — Ergebnis: 93,1% TP-Stabilität, keine unbestätigten Regressionen.
 
-`price_history.jsonl` ist inzwischen auf **15.554 Datenpunkte** gewachsen (Stand 2026-08-14, per `read_price_points()` gezählt). Frisch gemessen (Abschnitt 3.11): **19** `price_history_model`-Gruppen ohne jeden Datenpunkt (vorheriger Wert "22" war veraltet), 3 Orphan-Modelle aus `spielzeug_bundles` mit weiterhin 663 historischen Punkten (unverändert, kein neuer Zufluss seit mind. 11 Tagen). Modelle mit auffällig wenigen validen Punkten nach simulierter Revalidierung (nur Beobachtung, keine Aktion): `roehrenfernseher` (96 Punkte, 96,2% weiterhin valide — nach Korrektur des Umlaut-Fingerprint-Problems, Abschnitt 3.11, Punkt 4), `rx_7600_xt` (12 → 4 valide), `gaming_laptop_rtx3060`/`rtx4060` (34 → 5 bzw. 20 → 5, neu erkannt).
+`price_history.jsonl` ist nach der freigegebenen `lego_bundle`-Bereinigung (Abschnitt 3.12) auf **14.899 Datenpunkte** (vorher 15.554, 655 gelöscht/5 migriert). **19** `price_history_model`-Gruppen ohne jeden Datenpunkt (unverändert seit Abschnitt 3.11). Die 3 Orphan-Modelle aus `spielzeug_bundles`: **erledigt** — 5 Punkte migriert, 655 gelöscht, 3 bewusst erhalten (Abschnitt 3.12, Punkt 5). Modelle mit auffällig wenigen validen Punkten nach simulierter Revalidierung (nur Beobachtung, keine Aktion): `roehrenfernseher` (96 Punkte, 96,2% weiterhin valide), `rx_7600_xt` (12 → 4 valide), `gaming_laptop_rtx3060`/`rtx4060` (34 → 5 bzw. 20 → 5).
 
-**Wichtige methodische Einschränkung neu dokumentiert:** die Fingerprint-basierte Revalidierung in `app/rule_coverage.py::_is_still_valid()` ist für Umlaut-haltige Match-Begriffe strukturell unzuverlässig (Abschnitt 3.11, Punkt 4) — ihre `false_positive_indicators`/`valid`-Zahlen sind für die betroffenen 19 Regeln (4 Kategorien) mit Vorsicht zu lesen, bis dies (separat) behoben wird.
+**Wichtige methodische Einschränkung (aktualisiert, Abschnitt 3.12):** der Umlaut-Fingerprint-Bug ist im Code behoben (`c9967ba`), aber **nicht rückwirkend** — `app/rule_coverage.py::_is_still_valid()` und jede fingerprint-basierte Revalidierung bleiben für **historische** Zeilen in `handhelds`/`konsolen_bundles`/`retro_konsolen`/`vintage_elektronik` strukturell unzuverlässig, da der Rohtitel nie persistiert wurde und sich nicht rekonstruieren lässt (Preishistorie-Revalidierung v3, Abschnitt 3.12, Punkt 6: für `retro_konsolen`/`vintage_elektronik` praktisch 0% der betroffenen Punkte beurteilbar). Ab jetzt neu geschriebene Zeilen sind korrekt.
 
 ### Offene Datenqualitätsfragen
 
 - historische Alt-Kontamination in `price_history.jsonl`
-- 19 Regeln ohne Produktivdaten weiter beobachten (frisch gemessen, siehe oben)
-- Orphan-Daten der entfernten `spielzeug_bundles`-Kategorie nicht ohne expliziten Auftrag löschen — Tiefenanalyse abgeschlossen (Abschnitt 3.11): `lego_bundle` teilmigrierbar, die anderen beiden strukturell ohne Nachfolger
-- `RX 7600 XT`/`RX 7600`-Überlappung und `controller`-`ladekabel`-Exclude als dokumentierte Restlücken aus Phase 15 — `RX 7600 XT`-Überlappung durch die Preishistorie-Simulation erneut bestätigt
+- 19 Regeln ohne Produktivdaten weiter beobachten
+- `RX 7600 XT`/`RX 7600`-Überlappung und `controller`-`ladekabel`-Exclude als dokumentierte Restlücken aus Phase 15 — weiterhin offen
 - 9 Muster / 27 Titel aus dem Active-False-Positive-Audit (Abschnitt 3.9) bewusst zurückgestellt (P1/P2) — vollständige Liste: `docs/ACTIVE_FALSE_POSITIVE_AUDIT.md`
-- Coverage-/False-Positive-Rate erneut messen — teilweise durch Abschnitt 3.11 adressiert (historischer Vergleich), aber Live-Korpus-Abdeckung selbst nur noch 0,6% (siehe Abschnitt 3.11, Punkt 1)
-- **Neu:** Umlaut-Fingerprint-Problem in `app/rule_coverage.py`/Preishistorie-Revalidierung (Abschnitt 3.11, Punkt 4) — nur dokumentiert, nicht behoben
-- **Neu:** Regel „Switch Pro Controller“ hat nur zwei statt drei Preisstufen (Abschnitt 3.11, Punkt 5) — nur dokumentiert, nicht behoben
-- **Neu:** Ground-Truth-Label-Abdeckung des Live-Korpus bei 0,6% — Stichproben-Worksheet für 251 Listings bereit, noch nicht gelabelt (Abschnitt 3.11, Punkt 6)
+- Zubehör/Ersatzteil-vs-Gerät-Fehlklassifikation (6 Fälle, Abschnitt 3.12, Punkt 2) — kein einfaches Exclude-Muster identifiziert
+- Spieltitel-ohne-Konsole (5 Fälle, jetzt auch in `retro_konsolen` bestätigt) — weiterhin offen
+- Umlaut-Fingerprint-Problem: **Code behoben, aber nicht rückwirkend** (Abschnitt 3.12, Punkt 4/6) — dauerhafte, dokumentierte Einschränkung für historische Daten in 4 Kategorien
+- Regel „Switch Pro Controller“ hat nur zwei statt drei Preisstufen — explizit auf Nutzerentscheidung **nicht** erweitert (keine belastbare Datenbasis)
+- `normalize_title()` entfernt Satzzeichen (z.B. "M.2" → "m 2"), 1 beobachteter Fehlklassifikationsfall (`m2_ssd`→`sata_ssd`) — nur beobachtet, nicht verallgemeinert
 
 ---
 
@@ -435,32 +514,30 @@ Folgende Punkte sind **nicht** durch die Konsolidierung als abgeschlossen zu bet
 6. Die dokumentierten Phase-15-Restlücken (`rx_7600_xt`, `controller.yaml`/`ladekabel`) warten auf eine bewusst getrennte Regeländerung.
 7. `konsolen_bundles`: "Spieltitel VOR Plattform ohne Bindestrich"-Restlücke (Abschnitt 3.8, z.B. "Donkey Kong Bananza Nintendo Switch 2 2025 OVP") — bewusst offen, kein kollisionsfreies Substring-Muster identifiziert.
 8. 9 Muster / 27 Titel aus dem Active-False-Positive-Audit (Abschnitt 3.9) bewusst zurückgestellt (P1/P2), nicht gefixt — vollständige Liste mit Einzelbegründung: `docs/ACTIVE_FALSE_POSITIVE_AUDIT.md`.
-9. Coverage-/False-Positive-Rate-Neumessung — durch Abschnitt 3.11 teilweise adressiert (historischer Regressionsvergleich), aber Live-Korpus-Ground-Truth-Abdeckung selbst weiterhin nicht belastbar (0,6%, Stichproben-Worksheet bereit, nicht gelabelt).
-10. Umlaut-Fingerprint-Problem in `app/rule_coverage.py::_is_still_valid()` (Abschnitt 3.11, Punkt 4) — real, reproduzierbar dokumentiert, absichtlich nicht behoben (außerhalb des read-only-Auftrags).
-11. Regel „Switch Pro Controller“ ohne dritte Preisstufe (Abschnitt 3.11, Punkt 5) — dokumentiert, nicht behoben.
-12. Freigabe-Entscheidung zu den 3 Orphan-Modellen aus `spielzeug_bundles` weiterhin ausstehend (Tiefenanalyse siehe Abschnitt 3.11, Punkt 5).
+9. Coverage-/False-Positive-Rate: 251-Listing-Stichprobe jetzt vollständig gelabelt (Abschnitt 3.12) — Precision 91,2%, aber nur 30 von 251 Listings unabhängig einzeln geprüft (Rest pauschal übernommen).
+10. Umlaut-Fingerprint-Problem in `app/rule_coverage.py::_is_still_valid()`: **Code-Fix umgesetzt** (Abschnitt 3.12, `c9967ba`), aber dauerhaft **nicht rückwirkend** für historische Daten in 4 Kategorien — bewusst keine weitere Aktion vorgesehen (Datenverlust nicht reparierbar).
+11. Regel „Switch Pro Controller“ ohne dritte Preisstufe — explizit auf Nutzerentscheidung nicht behoben (keine Datenbasis für eine Preisgrenze).
+12. Zubehör/Ersatzteil-vs-Gerät-Fehlklassifikation (Abschnitt 3.12, Punkt 2) — neu identifiziert, kein Fix-Ansatz gefunden.
 
 ---
 
 ## 7. Empfohlene nächste Reihenfolge
 
 ```text
-1. Stichproben-Worksheet labeln (251 Listings, tools/ruleset_quality/generated/
-   reports/sampling_worksheet_template.csv) -- zeitnah, Korpus rotiert schnell
+1. Scan-Performance messen
         ↓
-2. Kontrollierte Preishistorie-Revalidierung (separate Freigabe), unter Nutzung
-   der Umlaut-Fingerprint-Korrektur (echte Titel statt PricePoint.fingerprint)
+2. Resale-Confidence / weitere Datenqualität verbessern
         ↓
-3. Freigabe-Entscheidung zu den 3 Orphan-Modellen aus spielzeug_bundles
+3. Zubehör/Ersatzteil-vs-Gerät-Fehlklassifikation: Lösungsansatz suchen
+   (Abschnitt 3.12, Punkt 2 -- noch keine Idee)
         ↓
-4. Scan-Performance messen
+4. app.py nur bei konkretem Änderungsdruck weiter modularisieren
         ↓
-5. Resale-Confidence / weitere Datenqualität verbessern
-        ↓
-6. app.py nur bei konkretem Änderungsdruck weiter modularisieren
-        ↓
-7. erst danach neue Features/Kategorien priorisieren
+5. erst danach neue Features/Kategorien priorisieren
 ```
+
+Stand 2026-08-14: die vorherige P0 (Stichproben-Worksheet labeln + kontrollierte
+Preishistorie-Revalidierung + Orphan-Modell-Freigabe) ist **abgeschlossen** (Abschnitt 3.12).
 
 ### Harte Regeln für Folgearbeiten
 
@@ -491,6 +568,9 @@ Die folgenden Dokumente bleiben als Detail-/Arbeitsnachweise bestehen:
 
 Zusätzlich, für das Ruleset-Qualitätssystem: `tools/ruleset_quality/generated/reports/
 ABSCHLUSSBERICHT.md`, `FINALE_REVALIDIERUNG_ABSCHLUSSBERICHT.md`,
-`OFFENE_ENTSCHEIDUNGEN_1_BIS_3_BERICHT.md` (siehe Abschnitt 3.11).
+`OFFENE_ENTSCHEIDUNGEN_1_BIS_3_BERICHT.md` (Abschnitt 3.11),
+`ENTSCHEIDUNGEN_TECHNISCHE_VORBEREITUNG_BERICHT.md`, `WORKSHEET_LABELING_BERICHT_2026-08-14.md`,
+`HUMAN_VERIFIED_LABELING_ABSCHLUSSBERICHT_2026-08-14.md`,
+`PREISHISTORIE_REVALIDIERUNG_V3_BERICHT_2026-08-14.md` (Abschnitt 3.12).
 
-Diese Dokumente liefern historische Details. Für den **aktuellen technischen Code-Stand** ist der Code-Commit `2745a95` maßgeblich; für die technische Projektreferenz ist diese Datei maßgeblich.
+Diese Dokumente liefern historische Details. Für den **aktuellen technischen Code-Stand** ist der Code-Commit `dfe3eb9` maßgeblich; für die technische Projektreferenz ist diese Datei maßgeblich.
