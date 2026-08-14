@@ -2,16 +2,15 @@
 
 > **Single Source of Truth für den technischen Ist-Zustand.**
 >
-> Stand: **2026-08-11**
+> Stand: **2026-08-14**
 > Repository: `dkmd89-dev/gpu-watch-v2`
 > Branch: `main`
-> **Letzter Code-Commit:** `1f6555317152b453415e8f74f043a2bcdd758095` (PR #25, Merge-Commit)
-> **Commit:** `docs: kompletten 19-Kategorien-Ruleset-Audit abschließen (#25)`
-> **HEAD (main):** `1f6555317152b453415e8f74f043a2bcdd758095`
-> Ausgangspunkt dieser Konsolidierung: `d2effe7`
-> Vergleich zum vorherigen dokumentierten Stand (`ca4b35b`, PR #8): 17 gemergte PRs (#9–#25) — 15 mit Code-/Regeländerung (PR #10–#24), 3 reine Doku-Commits (#9, #21, #25)
->
-> PR #11–#25 (systematischer Active-False-Positive-Audit über alle 19 Kategorien, siehe Abschnitt 3.9) sind gemergt. Der technische Code-Stand von `main` ist damit `1f65553`.
+> **Letzter Code-Commit:** `2745a95` (docs: README auf aktuellen Stand bringen)
+> **HEAD (main):** `2745a95`
+> Vorheriger dokumentierter Stand: `1f65553` (PR #25)
+> Vergleich `1f65553...2745a95`: PR #26–#28 (Cross-Category-Routing-Audit, 2 reale Fixes) + PR #29
+> (Ruleset-Qualitätssystem, `tools/ruleset_quality/`) + 1 direkter Folge-Commit (`b9081e3`,
+> finale read-only Revalidierung) + 2 reine Doku-Commits (`cb6787e`, `2745a95`)
 >
 > Diese Datei ersetzt `PROJEKTSTAND_KOMPLETT.md` (Datei mittlerweile aus dem Repository entfernt). Historische Phasenberichte bleiben als Detaildokumentation erhalten; widersprüchliche ältere Ist-Stand-Angaben gelten nicht mehr als aktuell.
 
@@ -21,7 +20,7 @@
 
 `gpu-watch-v2` ist ein modularer, YAML-gesteuerter **Hardware Deal Finder** für Second-Hand-Angebote. Das System kombiniert Scraper, kategoriebasiertes Matching, Hardware-Detektoren, Deal-Scoring, Marktpreis-/Resale-Statistik, Profit-/Flip-Bewertung, Duplicate Detection, Presence Tracking, Dashboard-KPIs und ntfy-Benachrichtigungen.
 
-Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und kontrollierter Weiterentwicklung**. Seit `d2effe7` wurden insbesondere Datenqualitäts-/Validierungslogik, Rule Analyzer/Coverage, Caching/Performance, neue Kategorien sowie ein umfangreicher False-Positive-Audit integriert.
+Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und kontrollierter Weiterentwicklung**. Seit `d2effe7` wurden insbesondere Datenqualitäts-/Validierungslogik, Rule Analyzer/Coverage, Caching/Performance, neue Kategorien sowie ein umfangreicher False-Positive-Audit integriert. Seit 2026-08-14 ergänzt ein dediziertes, read-only **Ruleset-Qualitätssystem** (`tools/ruleset_quality/`, siehe Abschnitt 3.11) den bisherigen punktuellen Audit-Ansatz um reproduzierbare Regression-Benchmarks und Preishistorie-Simulationen.
 
 ---
 
@@ -31,37 +30,47 @@ Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und ko
 
 ```text
 Branch: main
-Letzter Code-Commit: 1f65553 (PR #25, Merge-Commit)
-Commit: docs: kompletten 19-Kategorien-Ruleset-Audit abschließen (#25)
-Datum: 2026-08-11
-Davor: 158f2ed (docs: kompletten 19-Kategorien-Ruleset-Audit abschließen)
-Vorheriger dokumentierter Stand: ca4b35b (PR #8)
-ca4b35b..1f65553: 17 gemergte PRs (#9-#25) -- #9/#21/#25 reine
-Doku-Commits, #10-#24 mit Code-/Regeländerung (#10 konsolen_bundles,
-#11 handhelds, #12 office_pc+retro_konsolen, #13 gpu+lego_minifiguren,
-#14 iphone, #15 monitor_curved, #16 vintage_elektronik, #17 netzteil,
-#18 notebook_resell, #19 ram, #20 sata_ssd, #22 controller, #23
-autoradio_opel_corsa, #24 gaming_pc+macbook)
+Letzter Code-Commit: 2745a95 (docs: README auf aktuellen Stand bringen)
+Vorheriger dokumentierter Stand: 1f65553 (PR #25)
+
+1f65553..2745a95:
+  PR #26 (e55d600) -- docs: STATUS.md/TECHNISCHER_PROJEKTSTATUS.md/README.md
+                       nach Abschluss des 19-Kategorien-Audits sync
+  PR #27 (bc0e1a4) -- fix(office_pc): Notebooks/Laptops ausschließen
+                       (Cross-Category Routing Audit)
+  PR #28 (2691da6) -- fix(macbook): "1024GB"-Speichergrößen-Schreibweise
+                       ergänzen (Cross-Category Routing Audit P2)
+  PR #29 (4311683) -- feat(quality): Ruleset-Qualitätssystem für
+                       reproduzierbare Regression-Benchmarks (Phase 19.1-19.5)
+  b9081e3           -- feat(quality): finale read-only Revalidierung vor
+                        Preishistorie-Update (direkter Commit auf main)
+  cb6787e, 2745a95  -- reine Doku-Commits (README für tools/ruleset_quality/)
 ```
 
-PR #6 wurde am 2026-08-09 gemergt, PR #8 am 2026-08-10. PR #11–#25 (systematischer Active-False-Positive-Audit über alle 19 Kategorien, siehe Abschnitt 3.9) wurden zwischen 2026-08-10 und 2026-08-11 gemergt, jeweils als eigener Feature-Branch → PR → Merge-Commit auf `main`.
+PR #26–#28 wurden zwischen 2026-08-11 und 2026-08-11 gemergt (Cross-Category-Routing-Audit, siehe
+Abschnitt 3.10). PR #29 sowie die read-only Folge-Session (`b9081e3`) entstanden am 2026-08-14
+(Ruleset-Qualitätssystem, siehe Abschnitt 3.11) — dazwischen liegen 3 Tage ohne dokumentierten
+Zwischenstand, in denen der Produktiv-Scanner weiterlief (`found.json` 2500 statt 2477 Einträge,
+`price_history.jsonl` 15554 statt 12365 Zeilen).
 
 ### Teststand
 
-In dieser Session tatsächlich lokal ausgeführt und verifiziert (kein Sandbox-Installationsproblem mehr, `pytest`/`flask`/`pyyaml` verfügbar):
+In dieser Session tatsächlich lokal ausgeführt und verifiziert (nicht aus Commit-Historie übernommen):
 
 ```text
-Zwischenstand (nach den ersten 12 der 19 Kategorien):
-pytest app/tests/ -> 1233 passed, 0 failed (620,33s)
+pytest app/tests/ -> 1296 passed, 0 failed (671,17s)
 
-Finaler Stand (nach Abschluss aller 19 Kategorien, PR #25):
-pytest app/tests/ -> 1241 passed, 0 failed (622,17s)
-
-rule_analyzer.py (nach jedem Einzel-Fix erneut verifiziert):
-355 Regeln, 19 Kategorien, 0 Findings -- durchgehend unverändert
+rule_analyzer.py:
+355 Regeln, 19 Kategorien, 0 Findings
+Ruleset-Signatur (matcher.compute_ruleset_signature()): acd510eb61845cb5
+  -- identisch seit PR #28, d.h. seit PR #29 keine Regeländerung mehr
 ```
 
-Vorheriger dokumentierter Stand (`3eed07f`, aus Commit-Message übernommen, nicht selbst reproduziert): 1175/1175. Die volle Suite wurde in diesem Durchlauf bewusst nicht nach jeder Einzelkategorie ausgeführt (Vorgabe des Nutzers), sondern nur an den beiden genannten Batch-Grenzen — nach jedem Einzel-Fix lief stattdessen ausschließlich der kategorienbezogene Testlauf (`pytest app/tests/ -k "<kategorie>"`).
+Vorheriger dokumentierter Stand: 1241/1241 (PR #25). Die 55 neuen Tests: PR #27/#28
+(Cross-Category-Fixes) + `app/tests/test_ruleset_quality_tooling.py` (20 Tests) +
+`app/tests/test_ruleset_quality_detailed_transition.py` (19 Tests) für das neue,
+read-only `tools/ruleset_quality/`-Package (siehe Abschnitt 3.11) — kein Test wurde
+gelöscht oder abgeschwächt.
 
 ---
 
@@ -232,6 +241,105 @@ Direkte methodische Fortsetzung von Abschnitt 3.7/3.8, jetzt aber **vollständig
 
 Testabdeckung: 14 neue Regressionstestdateien. Innerhalb dieses Audit-Durchlaufs (PR #11–#24, ab dem zu Beginn selbst verifizierten Stand 1197/1197 nach handhelds) wuchs die volle Suite auf **1241/1241** — 44 neue Tests. Der ältere Referenzwert 1175/1175 (`3eed07f`, vor PR #8/#10) ist nicht direkt vergleichbar, da die volle Suite zwischen `3eed07f` und dem Start dieses Durchlaufs nicht durchgehend lokal reproduziert wurde (siehe Abschnitt 3.8, Teststand-Hinweis dort). `rule_analyzer.py`: durchgehend 0 Findings, 355 Regeln, 19 Kategorien — unverändert über den gesamten Durchlauf.
 
+### 3.10 Cross-Category-Routing-Audit (abgeschlossen, PR #26–#28 gemergt)
+
+Direkte methodische Fortsetzung von Abschnitt 3.9, aber anderer Blickwinkel: nicht mehr "ist
+Kategorie X intern zu breit", sondern "landet ein realer Titel aktuell in der falschen Kategorie,
+obwohl eine andere vorhandene Kategorie besser passt". Korpus: `data/found.json`, 1817 Einträge /
+1760 eindeutige Titel (Stand des Audit-Laufs), jeder Titel frisch über `matcher.load_rules()` +
+`matcher.evaluate()` mit dem echten Preis ausgewertet (nicht `price=0.0`, identische Begründung
+wie Abschnitt 3.9).
+
+**Ergebnis:**
+
+1. **`office_pc`** (PR #27, `fc59d1d`): excludiert jetzt zusätzlich `laptop`/`notebook`/
+   `thinkpad`/`macbook`/`ideapad`/`alienware`/`lifebook`. 22 betroffene Titel danach sauber
+   `unmatched` (kein neues Fehlrouting in eine andere Kategorie), die verbleibenden 21
+   `office_pc`-Treffer sind ausnahmslos echte Desktop-/Tower-/Bundle-Angebote. Tests:
+   `test_office_pc_notebook_cross_category_fix.py` (9 neue Tests).
+2. **`macbook`** (PR #28, `b6f33e0`): `"1024GB"`-Speichergrößen-Schreibweise ergänzt (P2-Fund
+   desselben Audits, bare Zahl ohne Leerzeichen vor "GB" wurde nicht erkannt).
+
+Details, vollständige Titel-Listen und Root-Cause-Analyse: `docs/CROSS_CATEGORY_ROUTING_AUDIT.md`.
+Rule Analyzer nach beiden Fixes weiterhin 0 Findings, 355 Regeln, 19 Kategorien.
+
+### 3.11 Ruleset-Qualitätssystem (`tools/ruleset_quality/`, PR #29 + 2 read-only Folge-Sessions)
+
+Neues, dediziertes Package **außerhalb der Produktionskette** (kein Import durch `app.py`/
+`matcher.py`/`rule_analyzer.py`/`rule_coverage.py`) für reproduzierbare Regression-Benchmarks und
+Preishistorie-Simulationen. Nutzt ausschließlich bereits produktive Funktionen wieder
+(`matcher.evaluate()`, `matcher.compute_ruleset_signature()`, `category_validation.
+is_still_valid_category()`, `rule_analyzer.analyze_ruleset()`, `rule_coverage.
+compute_rule_coverage()`, `price_history.read_price_points()`) — **keine zweite Matching-/
+Regex-Engine**. Vollständige Architektur-/Datenfluss-Doku: `tools/ruleset_quality/README.md`.
+
+**Module** (Kurzübersicht, Details im README):
+
+```text
+label_store.py              Ground-Truth-Label-Store aus docs/DASHBOARD_MATCH_FORENSICS.json
+baseline.py / historical_baseline.py   found.json-Snapshot bzw. historischer Vor-Audit-Snapshot
+benchmark.py / detailed_transition.py  Regression-Benchmark inkl. Gate v2 (CRITICAL/HIGH/
+                                        MEDIUM/LOW-Matrix)
+category_report.py / quality_metrics.py  Precision/FP-Rate je Kategorie
+cross_category_routing.py    empirische Mehrfach-Kategorie-Analyse (kategoriegefilterte evaluate())
+price_history_revalidation(_v2).py     read-only Preishistorie-Simulation
+title_recovery.py            Fingerprint -> echter Titel (Korrektur-Baustein, siehe unten)
+decision_points_1_3.py / sampling_plan.py   Tiefenanalyse einzelner offener Punkte + Stichprobenplan
+```
+
+**Zentrale Befunde:**
+
+1. Die zuvor kursierenden Referenzzahlen ("2252 TP / 19 FP / 35 UNCLEAR") stammen nachweislich aus
+   `docs/DASHBOARD_MATCH_FORENSICS.json`, einem Snapshot von **vor** dem 19-Kategorien-Audit
+   (Commit `01afd5b`, 2026-08-10) — nicht aus dem aktuellen Korpus. Ground-Truth-Abdeckung des
+   Live-Korpus fällt sehr schnell: 19,2% (2026-08-11) → 0,6% (2026-08-14, 3 Tage später).
+2. Historischer Regressionsvergleich (Forensik-Snapshot gegen aktuelles Ruleset, über echten
+   Produktionspfad): 2096/2252 vormals bestätigte TRUE_POSITIVE (93,1%) bleiben exakt stabil. Die
+   91 "TP → kein Treffer"-Fälle sind bei Stichprobenprüfung fast durchweg bereits bekannte,
+   gewollte Fixes aus Abschnitt 3.9/3.10 (office_pc-ThinkPad-Exclude, gaming_pc-Laptop-Exclude,
+   vintage_elektronik-"Altes Foto"-Exclude) — keine neuen unentdeckten Regressionen.
+3. Cross-Category-Ambiguität (19 kategoriegefilterte `evaluate()`-Läufe je Listing, 2500 Listings):
+   nur 23 (0,9%) mit mehr als einer möglichen Kategorie, in jedem Fall löst First-Match-Wins
+   zugunsten der semantisch richtigeren Kategorie auf.
+4. **Methoden-Fund (wichtig für alle künftigen Preishistorie-Analysen):**
+   `duplicate_detection.normalize_title()` — Basis von `PricePoint.fingerprint` in
+   `price_history.jsonl` — ersetzt deutsche Umlaute (ä/ö/ü/ß) durch ein Leerzeichen statt einer
+   Transliteration (`"Röhrenfernseher"` → `"r hrenfernseher"`). Jede Fingerprint-basierte
+   `evaluate()`-Revalidierung — **einschließlich des bereits produktiven**
+   `app/rule_coverage.py::_is_still_valid()` — matcht dadurch nie gegen Umlaut-haltige
+   `match`/`require_all_of`-Begriffe (19 von 355 Regeln in 4 Kategorien betroffen: `handhelds`,
+   `konsolen_bundles`, `retro_konsolen`, `vintage_elektronik`). Nur dokumentiert, **nicht
+   behoben** (kein Code-Change im read-only-Auftrag). Empfehlung für künftige Arbeit: wo ein
+   echter Titel verfügbar ist (z. B. über den Ground-Truth-Label-Store oder `found.json`), diesen
+   statt des Fingerprints für `evaluate()`-Aufrufe verwenden (siehe `title_recovery.py` als
+   Referenzimplementierung).
+5. Drei zuvor offene Preishistorie-Entscheidungspunkte geklärt (voller Bericht:
+   `tools/ruleset_quality/generated/reports/OFFENE_ENTSCHEIDUNGEN_1_BIS_3_BERICHT.md`):
+   - `roehrenfernseher` bleibt eigenständiges `price_history_model` — fachlich klar von
+     `crt_profi_monitor` getrennt (Median 20€ vs. 99,50€), 96 Punkte, davon bei Neubewertung mit
+     echtem Titel 25/26 rekonstruierbare weiterhin valide (96,2%) — der ursprüngliche "3/96"-Alarm
+     war ein Artefakt des Umlaut-Fingerprint-Problems (Punkt 4).
+   - Die 3 Orphan-Modelle aus der entfernten Kategorie `spielzeug_bundles` (663 Punkte, seit
+     mind. 11 Tagen ohne neuen Zufluss): `lego_bundle` nur teilweise zu `lego_minifiguren`
+     migrierbar (nur Minifiguren-Anteil), `playmobil_bundle`/`spielzeug_bundle_sonstige`
+     strukturell verifiziert ohne jeden Nachfolger im aktuellen Regelwerk (kein
+     `"playmobil"`/`"spielzeug"`-Match-Begriff mehr vorhanden).
+   - Von 35 UNCLEAR-gelabelten Fällen (nicht 7, wie eine erste Fingerprint-basierte Analyse
+     zeigte) sind 14 verändert/matchen nicht mehr, keiner blockiert eine Revalidierung. Struktur-
+     befund: die Regel „Switch Pro Controller“ (`controller.yaml`) hat nur zwei Preisstufen
+     (bis 35 €) statt der sonst üblichen drei — Controller über 35 € werden aktuell nicht erfasst.
+6. Konkreter, geschichteter Stichprobenplan für eine frische Ground-Truth-Erhebung erzeugt: ein
+   251-Listing-Worksheet über alle 19 Kategorien
+   (`tools/ruleset_quality/generated/reports/sampling_worksheet_template.csv`), Preisstufen-
+   geschichtet, Verdict-Spalten bewusst leer — noch nicht gelabelt.
+
+Alle Berichte unter `tools/ruleset_quality/generated/reports/`: `ABSCHLUSSBERICHT.md` (Phase
+19.1–19.5), `FINALE_REVALIDIERUNG_ABSCHLUSSBERICHT.md`, `OFFENE_ENTSCHEIDUNGEN_1_BIS_3_BERICHT.md`.
+
+Keine `app/rules/*.yaml`-, `matcher.py`-, `data/found.json`-, `data/seen.json`- oder
+`data/price_history.jsonl`-Änderung in diesem gesamten Arbeitsblock (rein additive, neue Dateien
+unter `tools/ruleset_quality/` + `app/tests/test_ruleset_quality_*.py`).
+
 ---
 
 ## 4. Datenqualität
@@ -246,16 +354,23 @@ Phase 15 dokumentierte:
 - 3 Orphan-Modelle aus der nicht mehr vorhandenen Kategorie `spielzeug_bundles` mit zusammen 663 historischen Datenpunkten
 - eine damalige Gesamt-False-Positive-Rate von 17,2 % in der Coverage-Analyse; diese Zahl ist wegen Alt-/Neudatenvermischung ausdrücklich nur als Beobachtungswert zu verstehen
 
-Der anschließende PR-#6-Audit adressiert bereits mehrere konkrete False Positives; der systematische Active-False-Positive-Audit (Abschnitt 3.9, PR #11–#25) hat diese Arbeit auf **alle 19 Kategorien** ausgeweitet und dabei 113 weitere reale Fehltreffer-Titel beseitigt (u.a. den mit 40 Titeln größten Einzelfund des Projekts in `vintage_elektronik`). `price_history.jsonl` ist inzwischen auf 11.799 Datenpunkte gewachsen (Stand 2026-08-11, reine Zeilenzählung — keine erneute vollständige Coverage-/Model-Abdeckungsanalyse in dieser Session durchgeführt). Eine erneute Coverage-Messung mit überwiegend Post-Audit-Daten bleibt der nächste sinnvolle Schritt (siehe Abschnitt 7, P0).
+Der anschließende PR-#6-Audit adressiert bereits mehrere konkrete False Positives; der systematische Active-False-Positive-Audit (Abschnitt 3.9, PR #11–#25) hat diese Arbeit auf **alle 19 Kategorien** ausgeweitet und dabei 113 weitere reale Fehltreffer-Titel beseitigt (u.a. den mit 40 Titeln größten Einzelfund des Projekts in `vintage_elektronik`). Der Cross-Category-Routing-Audit (Abschnitt 3.10) hat zwei weitere Fehlrouting-Fixes ergänzt. Das neue Ruleset-Qualitätssystem (Abschnitt 3.11) liefert erstmals einen **reproduzierbaren** Regressionsvergleich statt punktueller Audits — Ergebnis: 93,1% TP-Stabilität, keine unbestätigten Regressionen.
+
+`price_history.jsonl` ist inzwischen auf **15.554 Datenpunkte** gewachsen (Stand 2026-08-14, per `read_price_points()` gezählt). Frisch gemessen (Abschnitt 3.11): **19** `price_history_model`-Gruppen ohne jeden Datenpunkt (vorheriger Wert "22" war veraltet), 3 Orphan-Modelle aus `spielzeug_bundles` mit weiterhin 663 historischen Punkten (unverändert, kein neuer Zufluss seit mind. 11 Tagen). Modelle mit auffällig wenigen validen Punkten nach simulierter Revalidierung (nur Beobachtung, keine Aktion): `roehrenfernseher` (96 Punkte, 96,2% weiterhin valide — nach Korrektur des Umlaut-Fingerprint-Problems, Abschnitt 3.11, Punkt 4), `rx_7600_xt` (12 → 4 valide), `gaming_laptop_rtx3060`/`rtx4060` (34 → 5 bzw. 20 → 5, neu erkannt).
+
+**Wichtige methodische Einschränkung neu dokumentiert:** die Fingerprint-basierte Revalidierung in `app/rule_coverage.py::_is_still_valid()` ist für Umlaut-haltige Match-Begriffe strukturell unzuverlässig (Abschnitt 3.11, Punkt 4) — ihre `false_positive_indicators`/`valid`-Zahlen sind für die betroffenen 19 Regeln (4 Kategorien) mit Vorsicht zu lesen, bis dies (separat) behoben wird.
 
 ### Offene Datenqualitätsfragen
 
 - historische Alt-Kontamination in `price_history.jsonl`
-- 22 Regeln ohne Produktivdaten weiter beobachten
-- Orphan-Daten der entfernten `spielzeug_bundles`-Kategorie nicht ohne expliziten Auftrag löschen
-- `RX 7600 XT`/`RX 7600`-Überlappung und `controller`-`ladekabel`-Exclude als dokumentierte Restlücken aus Phase 15
+- 19 Regeln ohne Produktivdaten weiter beobachten (frisch gemessen, siehe oben)
+- Orphan-Daten der entfernten `spielzeug_bundles`-Kategorie nicht ohne expliziten Auftrag löschen — Tiefenanalyse abgeschlossen (Abschnitt 3.11): `lego_bundle` teilmigrierbar, die anderen beiden strukturell ohne Nachfolger
+- `RX 7600 XT`/`RX 7600`-Überlappung und `controller`-`ladekabel`-Exclude als dokumentierte Restlücken aus Phase 15 — `RX 7600 XT`-Überlappung durch die Preishistorie-Simulation erneut bestätigt
 - 9 Muster / 27 Titel aus dem Active-False-Positive-Audit (Abschnitt 3.9) bewusst zurückgestellt (P1/P2) — vollständige Liste: `docs/ACTIVE_FALSE_POSITIVE_AUDIT.md`
-- Coverage-/False-Positive-Rate erneut messen, sobald überwiegend Post-Audit-Daten vorliegen (letzter Beobachtungswert 17,2 % gilt weiterhin als nicht belastbar, siehe oben)
+- Coverage-/False-Positive-Rate erneut messen — teilweise durch Abschnitt 3.11 adressiert (historischer Vergleich), aber Live-Korpus-Abdeckung selbst nur noch 0,6% (siehe Abschnitt 3.11, Punkt 1)
+- **Neu:** Umlaut-Fingerprint-Problem in `app/rule_coverage.py`/Preishistorie-Revalidierung (Abschnitt 3.11, Punkt 4) — nur dokumentiert, nicht behoben
+- **Neu:** Regel „Switch Pro Controller“ hat nur zwei statt drei Preisstufen (Abschnitt 3.11, Punkt 5) — nur dokumentiert, nicht behoben
+- **Neu:** Ground-Truth-Label-Abdeckung des Live-Korpus bei 0,6% — Stichproben-Worksheet für 251 Listings bereit, noch nicht gelabelt (Abschnitt 3.11, Punkt 6)
 
 ---
 
@@ -291,6 +406,9 @@ Deal Score
 Dashboard / API / Statistics
 ```
 
+Zusätzlich, außerhalb dieser Produktionskette (read-only, kein Import durch `app.py`):
+`tools/ruleset_quality/` — Regression-Benchmark/Qualitätssystem, siehe Abschnitt 3.11.
+
 ### Grundprinzipien
 
 - YAML ist Single Source of Truth für Kategorien und viele Matching-/Scoring-Regeln.
@@ -300,6 +418,8 @@ Dashboard / API / Statistics
 - Preisstatistik und Resale-Schätzung sind getrennt.
 - Notification-Gating bleibt von Preis-/Resale-Experimenten getrennt.
 - Änderungen werden bevorzugt klein und regressionsgetestet umgesetzt.
+- Diagnose-/Qualitäts-Tooling (`tools/ruleset_quality/`) importiert ausschließlich bereits
+  produktive Matching-Funktionen wieder — keine zweite Matching-/Regex-Engine.
 
 ---
 
@@ -315,24 +435,31 @@ Folgende Punkte sind **nicht** durch die Konsolidierung als abgeschlossen zu bet
 6. Die dokumentierten Phase-15-Restlücken (`rx_7600_xt`, `controller.yaml`/`ladekabel`) warten auf eine bewusst getrennte Regeländerung.
 7. `konsolen_bundles`: "Spieltitel VOR Plattform ohne Bindestrich"-Restlücke (Abschnitt 3.8, z.B. "Donkey Kong Bananza Nintendo Switch 2 2025 OVP") — bewusst offen, kein kollisionsfreies Substring-Muster identifiziert.
 8. 9 Muster / 27 Titel aus dem Active-False-Positive-Audit (Abschnitt 3.9) bewusst zurückgestellt (P1/P2), nicht gefixt — vollständige Liste mit Einzelbegründung: `docs/ACTIVE_FALSE_POSITIVE_AUDIT.md`.
-9. Coverage-/False-Positive-Rate-Neumessung nach dem Audit (Abschnitt 3.9) steht noch aus — der 17,2-%-Beobachtungswert aus Phase 15 bleibt bis dahin nicht belastbar.
+9. Coverage-/False-Positive-Rate-Neumessung — durch Abschnitt 3.11 teilweise adressiert (historischer Regressionsvergleich), aber Live-Korpus-Ground-Truth-Abdeckung selbst weiterhin nicht belastbar (0,6%, Stichproben-Worksheet bereit, nicht gelabelt).
+10. Umlaut-Fingerprint-Problem in `app/rule_coverage.py::_is_still_valid()` (Abschnitt 3.11, Punkt 4) — real, reproduzierbar dokumentiert, absichtlich nicht behoben (außerhalb des read-only-Auftrags).
+11. Regel „Switch Pro Controller“ ohne dritte Preisstufe (Abschnitt 3.11, Punkt 5) — dokumentiert, nicht behoben.
+12. Freigabe-Entscheidung zu den 3 Orphan-Modellen aus `spielzeug_bundles` weiterhin ausstehend (Tiefenanalyse siehe Abschnitt 3.11, Punkt 5).
 
 ---
 
 ## 7. Empfohlene nächste Reihenfolge
 
 ```text
-1. Dokumentation synchron halten
+1. Stichproben-Worksheet labeln (251 Listings, tools/ruleset_quality/generated/
+   reports/sampling_worksheet_template.csv) -- zeitnah, Korpus rotiert schnell
         ↓
-2. Scan-Performance messen
+2. Kontrollierte Preishistorie-Revalidierung (separate Freigabe), unter Nutzung
+   der Umlaut-Fingerprint-Korrektur (echte Titel statt PricePoint.fingerprint)
         ↓
-3. False-Positive-/Coverage-Audit erneut gegen neue Daten
+3. Freigabe-Entscheidung zu den 3 Orphan-Modellen aus spielzeug_bundles
         ↓
-4. Resale-Confidence / Datenqualität verbessern
+4. Scan-Performance messen
         ↓
-5. app.py nur bei konkretem Änderungsdruck weiter modularisieren
+5. Resale-Confidence / weitere Datenqualität verbessern
         ↓
-6. erst danach neue Features/Kategorien priorisieren
+6. app.py nur bei konkretem Änderungsdruck weiter modularisieren
+        ↓
+7. erst danach neue Features/Kategorien priorisieren
 ```
 
 ### Harte Regeln für Folgearbeiten
@@ -362,4 +489,8 @@ Die folgenden Dokumente bleiben als Detail-/Arbeitsnachweise bestehen:
 - `document/PRICE_CALIBRATION_REVIEW_V2.md`
 - `document/PRICE_CALIBRATION_APPLIED.md`
 
-Diese Dokumente liefern historische Details. Für den **aktuellen technischen Code-Stand** ist der Code-Commit `ca4b35b` maßgeblich; für die technische Projektreferenz ist diese Datei maßgeblich.
+Zusätzlich, für das Ruleset-Qualitätssystem: `tools/ruleset_quality/generated/reports/
+ABSCHLUSSBERICHT.md`, `FINALE_REVALIDIERUNG_ABSCHLUSSBERICHT.md`,
+`OFFENE_ENTSCHEIDUNGEN_1_BIS_3_BERICHT.md` (siehe Abschnitt 3.11).
+
+Diese Dokumente liefern historische Details. Für den **aktuellen technischen Code-Stand** ist der Code-Commit `2745a95` maßgeblich; für die technische Projektreferenz ist diese Datei maßgeblich.
