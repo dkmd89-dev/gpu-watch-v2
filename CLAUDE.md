@@ -61,16 +61,12 @@ Diese Regeln gelten für **jede** Aufgabe, unabhängig davon wie sie formuliert 
 1. Bestehenden Code zum betroffenen Bereich analysieren (nicht raten, tatsächlich lesen).
 2. Kurz erläutern: Warum ist die Änderung nötig? Welche Datei(en) sind betroffen?
 3. **Nur den aktuellen Schritt implementieren.** Nicht vorgreifen.
-4. Nach Abschluss: **gestuft testen**, nicht reflexartig immer die volle Suite:
+4.4. Nach Abschluss: **gestuft testen**, nicht reflexartig immer die volle Suite:
    - Bei Änderungen an einer Kategorie/YAML: zuerst
      `pytest app/tests/test_<kategorie>.py -v` (schnell, gibt sofortiges Feedback).
    - Danach: `pytest app/tests/ -k "<kategorie>" -v` (alle Tests mit Bezug zum Namen,
      fängt Seiteneffekte in verwandten Tests ab).
-   - **Volle Suite (`pytest app/tests/`) nur** vor Abschluss eines Batches/Schritts
-     mit Auswirkung über eine einzelne Kategorie hinaus (z.B. Matcher-, Scoring-,
-     Persistence-Änderungen) oder wenn explizit angefragt — nicht nach jeder
-     kleinen YAML-Anpassung. Im Zweifel: lieber einmal mehr die volle Suite als
-     einen unbemerkten Regressionsfehler riskieren, aber nicht als Standard-Reflex.
+   - **Volle Suite (`pytest app/tests/`) NIEMALS automatisch ausführen.** Sie darf **ausschließlich nach expliziter Freigabe durch den Nutzer** ausgeführt werden – egal aus welchem Grund, egal ob nach großen Refactorings, Batch-Abschlüssen oder sonstigen Änderungen.
    - 1142+ Tests müssen grün sein, bevor ein Schritt als abgeschlossen gilt.
 5. Output **immer** in diesem Schema:
    - Zusammenfassung
@@ -234,7 +230,7 @@ aus der Dokumentation übernehmen.
 
 1. `app/rule_analyzer.py` laufen lassen (read-only: unerreichbare Regeln,
    Duplikate, Exclude-Konflikte).
-2. Testsuite laufen lassen (`cd app && pytest tests/`).
+2. Testsuite zielgerichtet laufen lassen (z.B. kategorienspezifische Tests mit `pytest app/tests/test_<kategorie>.py`). Die volle Testsuite erst nach expliziter Freigabe durch den Nutzer ausführen.
 3. Änderung als YAML vornehmen, nicht als Python-Sonderfall — außer es
    handelt sich nachweislich um einen neuen Detector-Typ.
 
