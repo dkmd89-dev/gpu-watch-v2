@@ -101,6 +101,23 @@ SEEN_DELISTED_MAX_AGE_DAYS = int(os.environ.get("SEEN_DELISTED_MAX_AGE_DAYS", "3
 # aus app.py verschwunden, hier wiederhergestellt).
 SEEN_MAX_ITEMS = int(os.environ.get("SEEN_MAX_ITEMS", "50000"))
 
+# FIX (Persistence-Batching, Scan-Performance-Messung 2026-08-15,
+# docs/SCAN_PERFORMANCE_MESSUNG_2026-08-15.md): seen.json (bis 16,7 MB) und
+# found.json wurden bisher bei JEDEM einzelnen neu gesehenen bzw. neu
+# gematchten Angebot komplett neu geschrieben (atomar, siehe _save_json()
+# in persistence/json_store.py) -- Persistence korrelierte mit r=0,997 zur
+# Anzahl neuer Angebote je Scan und machte bis zu 267s (~15%) der
+# Gesamt-Scanzeit aus. Jetzt wird waehrend des Scans hoechstens alle
+# PERSIST_BATCH_INTERVAL_SECONDS tatsaechlich geschrieben (Zeitfenster statt
+# feste Anzahl, da die Trefferrate pro Scan stark schwankt, siehe Bericht).
+# Tradeoff: ein Absturz zwischen zwei Batches kann jetzt bis zu
+# PERSIST_BATCH_INTERVAL_SECONDS Sekunden an bereits als "seen" markierten,
+# aber noch nicht persistierten Angeboten verlieren (vorher: 0 Sekunden
+# Risikofenster) -- bewusst in Kauf genommen (siehe Scan-Performance-
+# Bericht), kein Verzicht auf Crash-Sicherheit an sich: der finale,
+# unbedingte Save am Scan-Ende bleibt unveraendert bestehen.
+PERSIST_BATCH_INTERVAL_SECONDS = float(os.environ.get("PERSIST_BATCH_INTERVAL_SECONDS", "5.0"))
+
 # Schritt B: Log-Rotation. Ohne Rotation wuchs gpu_watch.log unbegrenzt
 # (ein Long-Running-Container ohne Log-Limit ist ein bekanntes Betriebs-
 # risiko -- volle Disk faengt irgendwann den ganzen Container ein). Grenzen
@@ -548,6 +565,27 @@ def run_scan():
         with _status_lock:
             _scan_status["scan_progress_total"] = len(raw)
 
+        # Persistence-Batching (siehe PERSIST_BATCH_INTERVAL_SECONDS oben):
+        # EIN gemeinsamer Zeitstempel/Helper fuer beide bisherigen Sofort-
+        # Speicherstellen (seen.json bei neu gesehenen Angeboten, found.json
+        # bei neuen Treffern) -- schreibt beide Dateien gemeinsam, hoechstens
+        # einmal je Intervall, statt bei jedem einzelnen Ereignis. Muss
+        # innerhalb von "with _seen_lock:" aufgerufen werden (unveraendert
+        # gegenueber vorher), da sowohl `seen` als auch `found` gelesen
+        # werden.
+        _last_periodic_persist = time.perf_counter()
+
+        def _persist_seen_and_found_if_due():
+            nonlocal _last_periodic_persist, persistence_duration
+            now_perf = time.perf_counter()
+            if now_perf - _last_periodic_persist < PERSIST_BATCH_INTERVAL_SECONDS:
+                return
+            _persist_start = time.perf_counter()
+            _save_json(SEEN_FILE, seen)
+            _save_json(FOUND_FILE, found[:FOUND_MAX_ITEMS])
+            persistence_duration += time.perf_counter() - _persist_start
+            _last_periodic_persist = time.perf_counter()
+
         new_hits = 0
         # Baustein 6, Schritt 1: EIN Zeitstempel für den gesamten Scan-Lauf
         # (statt pro Item neu), analog zu "found_at" weiter unten -- ein
@@ -601,25 +639,26 @@ def run_scan():
                     # gemeinsam mit last_seen persistiert, kein
                     # zusaetzlicher I/O-Aufwand hier).
                 else:
-                    # Sofort persistieren statt erst am Scan-Ende: verhindert,
-                    # dass ein Crash mitten im Scan dazu führt, dass bereits
-                    # verarbeitete (und ggf. schon benachrichtigte) Angebote
-                    # beim nächsten Lauf erneut gematcht und doppelt verschickt
-                    # werden (siehe Phase-0-Analyse, Befund d). Für bereits
-                    # bekannte URLs (nur last_seen aktualisiert, oder ein
-                    # Re-Evaluierungs-Kandidat) wird NICHT sofort persistiert
-                    # -- das wäre bei tausenden bereits bekannten Angeboten
-                    # pro Scan ein spürbarer I/O-Mehraufwand für eine
-                    # unkritische Information; diese Updates werden gesammelt
-                    # am Scan-Ende geschrieben (siehe unten). Kein
-                    # Datenverlustrisiko: bei einem Crash bleibt last_seen/
-                    # last_evaluated_ruleset_hash für diese Einträge
-                    # lediglich auf dem Stand des vorherigen Scans --
-                    # first_seen (sicherheitsrelevant für Schritt 2) ist
-                    # davon nicht betroffen.
-                    _persist_start = time.perf_counter()
-                    _save_json(SEEN_FILE, seen)
-                    persistence_duration += time.perf_counter() - _persist_start
+                    # Periodisch statt bei JEDEM neu gesehenen Angebot
+                    # persistieren (PERSIST_BATCH_INTERVAL_SECONDS, siehe
+                    # Konstante oben): verhindert weiterhin, dass ein Crash
+                    # mitten im Scan bereits verarbeitete (und ggf. schon
+                    # benachrichtigte) Angebote beim nächsten Lauf erneut
+                    # matchen und doppelt verschicken laesst (siehe Phase-0-
+                    # Analyse, Befund d) -- das Risikofenster ist jetzt auf
+                    # PERSIST_BATCH_INTERVAL_SECONDS begrenzt statt 0. Für
+                    # bereits bekannte URLs (nur last_seen aktualisiert, oder
+                    # ein Re-Evaluierungs-Kandidat) wird weiterhin NICHT
+                    # periodisch persistiert -- das wäre bei tausenden
+                    # bereits bekannten Angeboten pro Scan ein spürbarer
+                    # I/O-Mehraufwand für eine unkritische Information; diese
+                    # Updates werden gesammelt am Scan-Ende geschrieben
+                    # (siehe unten). Kein zusätzliches Datenverlustrisiko:
+                    # bei einem Crash bleibt last_seen/last_evaluated_
+                    # ruleset_hash für diese Einträge lediglich auf dem Stand
+                    # des vorherigen Scans -- first_seen (sicherheitsrelevant
+                    # für Schritt 2) ist davon nicht betroffen.
+                    _persist_seen_and_found_if_due()
 
             # roadmap.md Phase 2: Matching- und Deal-Score-Zeit. Beide in
             # einem Wert, da evaluate() sie intern nicht getrennt berechnet
@@ -811,14 +850,14 @@ def run_scan():
 
                 with _seen_lock:
                     found.insert(0, entry)
-                    # Ebenfalls sofort persistieren (siehe seen.json oben): ohne
-                    # das würde ein Absturz nach dem seen-Save, aber vor dem
-                    # bisherigen Scan-Ende-Save, den Treffer endgültig verlieren
-                    # -- er gilt ja bereits als "seen" und würde beim nächsten
-                    # Lauf nicht erneut ausgewertet.
-                    _persist_start = time.perf_counter()
-                    _save_json(FOUND_FILE, found[:FOUND_MAX_ITEMS])
-                    persistence_duration += time.perf_counter() - _persist_start
+                    # Ebenfalls periodisch persistieren (siehe seen.json oben,
+                    # PERSIST_BATCH_INTERVAL_SECONDS): ohne das würde ein
+                    # Absturz zwischen zwei Batches, aber vor dem finalen
+                    # Scan-Ende-Save, den Treffer verlieren -- er gilt ja
+                    # bereits als "seen" und würde beim nächsten Lauf nicht
+                    # erneut ausgewertet. Risikofenster jetzt auf
+                    # PERSIST_BATCH_INTERVAL_SECONDS begrenzt statt 0.
+                    _persist_seen_and_found_if_due()
 
                 new_hits += 1
 
