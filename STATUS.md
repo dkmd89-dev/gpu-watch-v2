@@ -3,8 +3,8 @@
 > **Stand:** 2026-08-15  
 > **Repository:** `dkmd89-dev/gpu-watch-v2`  
 > **Branch:** `main`  
-> **Letzter Code-Commit auf `main` (vor dieser Doku-Aktualisierung):** `1ac95ef` (davor `c3b9443`
-> = Merge PR #34, `5fea3ec` = Merge PR #33)  
+> **Letzter Code-Commit auf `main` (vor dieser Doku-Aktualisierung):** `6bc0def` (davor `efb842e`
+> = Merge PR #35, `c3b9443` = Merge PR #34)  
 > **Technische Referenz:** `TECHNISCHER_PROJEKTSTATUS.md`
 
 ## Gesamtstatus
@@ -14,31 +14,36 @@ Folge-Sessions) wurde die 251-Listing-Stichprobe vollständig gelabelt, 3 geziel
 umgesetzt (PR #31), der Umlaut-Fingerprint-Bug behoben (PR #32), die freigegebene
 `lego_bundle`-Migration/-Bereinigung ausgeführt, eine kontrollierte Preishistorie-Revalidierung v3
 durchgeführt (PR #32), **STATUS.md Punkt 14 (Zubehör/Ersatzteil-vs-Gerät) gelöst** (PR #33),
-**Punkt 5 (`controller`/`ladekabel`) gelöst** (PR #34) und jetzt **Punkt 4 (`RX 7600 XT`/`RX 7600`)
-gelöst** — inklusive eines wichtigen Zusatzfundes: derselbe VRAM-Filter-Bug betraf strukturell 4
-weitere GPU-Modelle (`rtx_3060_ti`, `rtx_3070`, `rtx_4060`, `rtx_2080_ti`), ebenfalls mitgefixt.
-**Ruleset-Signatur hat sich erneut geändert** (`0d63c38b5dbf261c` → `133dcd1a9f614e7e`).
+**Punkt 5 (`controller`/`ladekabel`) gelöst** (PR #34), **Punkt 4 (`RX 7600 XT`/`RX 7600`)
+gelöst** inkl. min_vram_gb-Fix bei 4 weiteren GPU-Modellen (PR #35) und jetzt eine **echte
+End-to-End-Scan-Performance-Messung** durchgeführt und direkt der größte gefundene Hebel
+umgesetzt: **Scraping parallelisiert** (88,9% der Scan-Zeit, bisher seriell) inkl. Behebung eines
+bestehenden Robustheitsproblems (ein fehlschlagender Scraper riss bisher den kompletten Scan ab).
+**Ruleset-Signatur unverändert** (reine Python-Änderung, keine YAML berührt).
 
 ## Verifizierter Stand
 
 ```text
-main (vor dieser Doku-Aktualisierung): c3b9443 (Merge PR #34)
+main (vor dieser Doku-Aktualisierung): efb842e (Merge PR #35)
+
+Vollständiger Testlauf (vom Nutzer lokal ausgeführt und verifiziert):
+pytest app/tests/ -> 1332 passed, 0 failed (76,41s)
 
 Rule Analyzer:
 355 Regeln
 19 Kategorien
 0 Findings
-Ruleset-Signatur: 133dcd1a9f614e7e (GEÄNDERT seit PR #34 — Punkt-4-Fix ergänzt
-  min_vram_gb: 0 bei 5 GPU-Modellen/10 Regeln in gpu.yaml)
+Ruleset-Signatur: 133dcd1a9f614e7e (unverändert -- der Scraping-Parallelisierungs-Fix
+  ist reiner Python-Code, keine app/rules/*.yaml-Änderung)
 
 data/found.json: 2500 Einträge
 data/price_history.jsonl: 14.899 Datenpunkte (unverändert seit der lego_bundle-Bereinigung)
 ```
 
-Teststand: 10 neue Tests (`test_gpu_rx7600_vram_fix.py`, `test_gpu_low_vram_models_fix.py`) + 54
-`gpu`-bezogene Tests lokal grün verifiziert. Volle Suite zuletzt bei 1315/1315 (PR #33, vom Nutzer
-lokal verifiziert) — für diesen Einzelkategorie-Fix nicht erneut automatisch ausgeführt
-(CLAUDE.md-Regel: nur nach expliziter Freigabe).
+Vorheriger dokumentierter Teststand: 1315/1315 (PR #33). Die 17 neuen Tests seit PR #33: 4 aus
+PR #34 (`test_controller_ladezubehoer_fix.py`) + 10 aus PR #35 (`test_gpu_rx7600_vram_fix.py`,
+`test_gpu_low_vram_models_fix.py`) + 3 aus dem Scraping-Parallelisierungs-Fix
+(`test_app_parallel_scraping.py`, siehe Batch 11 unten) = 1315+4+10+3 = 1332.
 
 ## Zuletzt abgeschlossene Batches
 
@@ -185,6 +190,38 @@ unverändert wirksam (per Kollisions-Test verifiziert). 10 neue Regressionstests
 (`test_gpu_rx7600_vram_fix.py`, `test_gpu_low_vram_models_fix.py`), 54 `gpu`-Tests grün,
 `rule_analyzer.py` 0 Findings.
 
+### 11. Scan-Performance gemessen + Scraping parallelisiert
+
+Echte End-to-End-Scan-Messung anhand von 35 Produktiv-Scan-Läufen aus dem Log (`data/
+gpu_watch.log`, ~22h Zeitraum) — kein synthetischer Benchmark. Ergebnis:
+
+- Median-Gesamtdauer 28,5 Minuten pro Scan (bei konfiguriertem `SCAN_INTERVAL_MINUTES=10` —
+  faktisch ~3× langsamer als beabsichtigt).
+- **Scraping: 88,9%** der Gesamtzeit — lief seriell (drei Einzeldauern summierten sich exakt zur
+  Gesamtzeit).
+- **Persistence: 10,1%** (bis zu 267s) — korreliert nahezu perfekt (r=0,997) mit der Anzahl neuer
+  Treffer; Root Cause: atomares Neuschreiben der kompletten `found.json` bei jedem einzelnen
+  neuen Treffer (bewusste Crash-Sicherheit, kein Bug). **Nicht verändert** — Tradeoff (Crash-
+  Sicherheit vs. Geschwindigkeit) erfordert eine eigene Entscheidung.
+- Matching+Scoring/Price-Stats/Notification zusammen < 0,5% — unauffällig.
+
+**Größter Hebel direkt umgesetzt:** die drei Scraper-Quellen (eBay/Kleinanzeigen/Quoka) laufen
+jetzt über `concurrent.futures.ThreadPoolExecutor` parallel statt seriell — unabhängige
+HTTP-Ziele ohne geteilten Zustand (kein gemeinsames Session-Objekt, kein geteilter
+Rate-Limiter), rechnerisches Potenzial ~57% kürzere Gesamtdauer (28,5 → ~12,2 min). Zusätzlich
+ein bestehendes Robustheitsproblem behoben: es gab **kein** try/except um `plugin.search()` — ein
+Fehler in einer Quelle riss bisher den kompletten Scan ab und verwarf auch die Ergebnisse der
+anderen beiden, bereits erfolgreichen Quellen. Jetzt wird jede Quelle einzeln abgefangen.
+
+Fehlenden Quoka-Mock in `test_app_deal_cleanup.py` nachgetragen (bestehende Testlücke, direkt an
+diesem Codepfad hängend). 3 neue Tests (`test_app_parallel_scraping.py`, inkl. Timing-Nachweis
+echter Parallelität), volle Suite 1332/1332 grün (vom Nutzer lokal verifiziert). Ruleset
+unverändert (reine Python-Änderung). Berichte: `docs/SCAN_PERFORMANCE_MESSUNG_2026-08-15.md`.
+
+**Reale Wirkung auf die Produktiv-Scandauer noch nicht verifiziert** — die 57%-Schätzung ist
+rechnerisch (aus den 35 historischen Läufen abgeleitet), nicht durch einen tatsächlichen
+Nach-Fix-Scan bestätigt (erfordert Deployment: `docker compose up --build -d`).
+
 ## Abgeschlossen
 
 - ursprüngliche Phasen 0–10
@@ -215,6 +252,7 @@ unverändert wirksam (per Kollisions-Test verifiziert). 10 neue Regressionstests
 - `controller`/`ladekabel`-Restlücke gelöst (Batch 9 oben)
 - `RX 7600 XT`/`RX 7600`-Überlappung gelöst + min_vram_gb-Bug bei 4 weiteren GPU-Modellen
   (`rtx_3060_ti`/`rtx_3070`/`rtx_4060`/`rtx_2080_ti`) behoben (Batch 10 oben)
+- Echte End-to-End-Scan-Performance-Messung + Scraping parallelisiert (Batch 11 oben)
 
 ## Aktuelle Systemkette
 
@@ -285,12 +323,19 @@ Wichtige Architekturregeln:
 
 ### P0 — offene Punkte
 
-- Keine dringenden P0-Punkte mehr offen (alle in Batch 1–10 dokumentierten Punkte abgeschlossen,
-  Nr. 1–5 der Datenqualitätsliste sind jetzt vollständig erledigt). Nächste Schritte laut
-  Datenqualität/offene Punkte: Nr. 6 (Resale-Confidence) oder P1/P2 unten. Ein möglicher, bisher
-  nicht gemessener Verdacht: derselbe min_vram_gb-Musterbug (Batch 10) könnte theoretisch auch
-  außerhalb von `gpu` relevant sein, wo Kategorien VRAM-abhängige Modelle mit eigenem
-  `min_vram_gb` nutzen — bisher nicht geprüft, keine konkrete Evidenz, kein aktiver Punkt.
+- Keine dringenden P0-Punkte mehr offen (alle in Batch 1–11 dokumentierten Punkte abgeschlossen,
+  Nr. 1–5 der Datenqualitätsliste sind vollständig erledigt, Scan-Performance gemessen +
+  größter Hebel umgesetzt). Nächste Schritte laut Datenqualität/offene Punkte: Nr. 6
+  (Resale-Confidence) oder P1/P2 unten.
+- **Noch offen aus Batch 11:** die reale Wirkung der Scraping-Parallelisierung auf die
+  Produktiv-Scandauer ist noch nicht verifiziert (erfordert Deployment,
+  `docker compose up --build -d`, dann erneute Log-Auswertung).
+- **Noch offen aus Batch 11:** ob das Persistence-Batching (10,1% der Scan-Zeit) angegangen wird,
+  ist eine offene Design-Entscheidung (Crash-Sicherheit vs. Geschwindigkeit) — nicht automatisch
+  als nächster Schritt anzunehmen.
+- Ein möglicher, bisher nicht gemessener Verdacht: derselbe min_vram_gb-Musterbug (Batch 10)
+  könnte theoretisch auch außerhalb von `gpu` relevant sein — bisher nicht geprüft, kein aktiver
+  Punkt.
 
 ### P1 — Datenqualität
 
