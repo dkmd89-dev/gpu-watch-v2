@@ -7,15 +7,17 @@
 > Branch: `main`
 > **Letzter Code-Commit (vor dieser Doku-Aktualisierung):** `00a4053` (perf(scan):
 > Persistence-Batching für seen.json/found.json)
-> **HEAD (main, vor dieser Doku-Aktualisierung):** `a27e9d9` (Merge PR #36)
+> **HEAD (main, vor dieser Doku-Aktualisierung):** `374fc16` (Merge PR #37)
 > Vorheriger dokumentierter Stand: `2745a95` (PR #29 + Folge-Sessions)
 > Vergleich `2745a95...00a4053`: PR #31 (251-Listing-Worksheet gelabelt + 3 Exclude-Fixes,
 > `c577207`) + PR #32 (Umlaut-Fingerprint-Fix + menschliches Labeling + Preishistorie-
 > Revalidierung v3, `3c9a678`) + PR #33 (4 weitere Exclude-Fixes, Zubehör/Ersatzteil-vs-Gerät,
 > `5fea3ec`) + PR #34 (controller/ladekabel-Restlücke gelöst, `c3b9443`) + PR #35
 > (min_vram_gb-Bug bei 5 GPU-Modellen behoben, `efb842e`) + PR #36 (Scan-Performance-Messung +
-> Scraping parallelisiert, `a27e9d9`) + `00a4053` (Persistence-Batching) + freigegebene
-> `lego_bundle`-Datenbereinigung (`data/price_history.jsonl`, kein Code-Commit)
+> Scraping parallelisiert, `a27e9d9`) + PR #37 (Persistence-Batching, `374fc16`) + freigegebene
+> `lego_bundle`-Datenbereinigung (`data/price_history.jsonl`, kein Code-Commit) — **beide
+> Performance-Fixes am 2026-08-15 gegen echte Produktivdaten nach Deployment verifiziert**
+> (Abschnitt 3.18): Gesamtdauer -56,4%, Persistence -89%
 >
 > Diese Datei ersetzt `PROJEKTSTAND_KOMPLETT.md` (Datei mittlerweile aus dem Repository entfernt). Historische Phasenberichte bleiben als Detaildokumentation erhalten; widersprüchliche ältere Ist-Stand-Angaben gelten nicht mehr als aktuell.
 
@@ -617,6 +619,43 @@ Persistence-Zeit sollte von bis zu 267s (median 173,6s) auf wenige einzelne Batc
 plus den finalen Save sinken — Größenordnung Sekunden statt Minuten. Wie bei Abschnitt 3.16 ist
 die reale Wirkung erst nach Deployment und erneuter Log-Auswertung nachweisbar.
 
+### 3.18 Scraping-Parallelisierung + Persistence-Batching: reale Wirkung verifiziert
+
+Direkter Abschluss von Abschnitt 3.16/3.17. Erster echter Produktiv-Scan nach Deployment
+(`docker compose up --build -d`), vom Nutzer aus dem Log geteilt (2026-08-14 23:36:59 UTC+2):
+
+```text
+✅ Scan komplett: 304 Treffer (von 14206 geprüften Angeboten).
+📊 Scan-Metriken: Gesamtdauer=746.44s, Scraping={'ebay': 444.532, 'kleinanzeigen': 535.931,
+'quoka': 544.318}, gescrapt=14206, dedupliziert=9135, Matching+Scoring=166.51s,
+Price-Stats=0.27s, Persistence=19.10s, Notification=14.22s
+```
+
+**Scraping läuft nachweislich parallel:** die drei Einzeldauern summieren sich seriell auf
+1524,8s, aber Gesamtdauer minus allem anderen (Matching+PriceStats+Persistence+Notification =
+200,1s) ergibt eine tatsächliche Scraping-Wandzeit von nur 546,3s — praktisch identisch mit der
+langsamsten Einzelquelle (Quoka, 544,3s, nur ~2s Overhead über dem theoretischen Optimum).
+
+**Gesamtdauer: 746,44s (12,4 min) statt Median 1712s (28,5 min) — 56,4% schneller**, fast exakt
+die in Abschnitt 3.16 vorhergesagten ~57%. Bei konfiguriertem `SCAN_INTERVAL_MINUTES=10` ist die
+reale Kadenz jetzt nur noch ~1,24× statt ~2,85× langsamer als beabsichtigt.
+
+**Persistence: 19,10s statt Median 173,6s — 89% schneller**, trotz eines für diesen Scan
+ungewöhnlich hohen `dedupliziert=9135` (normaler Bereich über die 35 zuvor ausgewerteten Läufe:
+186–642).
+
+**Eingeordnete Auffälligkeit (kein neues Problem):** `Matching+Scoring=166,51s` liegt deutlich
+über dem historischen Median (~5,9s), korreliert aber plausibel mit dem stark erhöhten
+`dedupliziert`-Wert. Wahrscheinlich ein einmaliger Übergangseffekt: die im Laufe dieser Session
+mehrfach geänderte Ruleset-Signatur (`98acd...`→`ee2a6...`→`0d63c...`→`133dcd...`) lässt
+`needs_reevaluation()` für sehr viele bereits bekannte `seen.json`-Einträge auf einmal "True"
+zurückgeben (sie fallen zurück in die volle Matching-Schleife), zusätzlich zur direkt vorher im
+selben Log geloggten Bereinigung (7128 delistete Alt-Einträge entfernt). Beide Effekte erklären
+den erhöhten `dedupliziert`-Wert plausibel, ohne dass Matching+Scoring oder Persistence dabei
+ineffizienter geworden wären (beide skalieren erwartbar mit der Ereigniszahl). Empfehlung: einen
+der nächsten 1-2 Scans gegenchecken, sobald sich `dedupliziert` wieder im Normalbereich
+einpendelt, für eine "steady state"-Bestätigung.
+
 ---
 
 ## 4. Datenqualität
@@ -719,32 +758,34 @@ Folgende Punkte sind **nicht** durch die Konsolidierung als abgeschlossen zu bet
 13. min_vram_gb-Bug bei RX 7600 + 4 weiteren GPU-Modellen: **erledigt** (Abschnitt 3.15) — offene
     Beobachtung, ob derselbe Musterbug außerhalb von `gpu` relevant ist, nicht geprüft, kein
     aktiver Punkt.
-14. Scraping-Parallelisierung (Abschnitt 3.16) + Persistence-Batching (Abschnitt 3.17): beide
-    Code-Fixes umgesetzt, volle Suite grün, aber reale Wirkung auf die Produktiv-Scandauer für
-    **beide** **noch nicht verifiziert** (erfordert Deployment + erneute Log-Auswertung).
+14. Scraping-Parallelisierung (Abschnitt 3.16) + Persistence-Batching (Abschnitt 3.17): **erledigt
+    und verifiziert** (Abschnitt 3.18) — Gesamtdauer -56,4%, Persistence -89%, gegen einen echten
+    Produktiv-Scan nach Deployment gemessen. Offene, unkritische Beobachtung: einen der nächsten
+    1-2 Scans für eine "steady state"-Bestätigung gegenchecken (dieser erste Scan hatte einen
+    ungewöhnlich hohen `dedupliziert`-Wert durch die Ruleset-Signatur-Änderungen dieser Session).
 
 ---
 
 ## 7. Empfohlene nächste Reihenfolge
 
 ```text
-1. Reale Wirkung von Scraping-Parallelisierung + Persistence-Batching
-   verifizieren (Deployment + erneute Log-Auswertung) -- optional, kein
-   Blocker für Weiterarbeit
+1. Resale-Confidence / weitere Datenqualität verbessern
         ↓
-2. Resale-Confidence / weitere Datenqualität verbessern
+2. app.py nur bei konkretem Änderungsdruck weiter modularisieren
         ↓
-3. app.py nur bei konkretem Änderungsdruck weiter modularisieren
-        ↓
-4. erst danach neue Features/Kategorien priorisieren
+3. erst danach neue Features/Kategorien priorisieren
 ```
+
+(Reale Wirkung von Scraping-Parallelisierung + Persistence-Batching: erledigt und verifiziert,
+Abschnitt 3.18 -- war die vorherige Position 1 dieser Liste.)
 
 Stand 2026-08-15: Datenqualitätspunkte Nr. 1–5 (Coverage-Stichprobe, Regeln ohne Daten,
 Orphan-Modelle, RX-7600-Überlappung, controller/ladekabel) sind **alle abgeschlossen**
 (Abschnitt 3.12–3.15), ebenso die Scan-Performance-Messung + beide identifizierten Hebel
-(Abschnitt 3.16–3.17: Scraping-Parallelisierung + Persistence-Batching). Keine offene, konkret
-benannte P0 mehr — nächster Schritt nach freiem Ermessen aus P1/P2 oder einer neuen
-Nutzeranfrage.
+**inklusive Verifikation gegen echte Produktivdaten** (Abschnitt 3.16–3.18:
+Scraping-Parallelisierung + Persistence-Batching, -56,4% Gesamtdauer / -89% Persistence). Keine
+offene, konkret benannte P0 mehr — nächster Schritt nach freiem Ermessen aus P1/P2 oder einer
+neuen Nutzeranfrage.
 
 Stand 2026-08-14: die vorherige P0 (Stichproben-Worksheet labeln + kontrollierte
 Preishistorie-Revalidierung + Orphan-Modell-Freigabe + Zubehör/Ersatzteil-vs-Gerät-

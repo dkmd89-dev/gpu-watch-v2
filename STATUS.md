@@ -16,9 +16,12 @@ umgesetzt (PR #31), der Umlaut-Fingerprint-Bug behoben (PR #32), die freigegeben
 durchgeführt (PR #32), **STATUS.md Punkt 14 (Zubehör/Ersatzteil-vs-Gerät) gelöst** (PR #33),
 **Punkt 5 (`controller`/`ladekabel`) gelöst** (PR #34), **Punkt 4 (`RX 7600 XT`/`RX 7600`)
 gelöst** inkl. min_vram_gb-Fix bei 4 weiteren GPU-Modellen (PR #35), **Scraping parallelisiert**
-(PR #36) und jetzt **Persistence-Batching** umgesetzt — Folgeschritt der Scan-Performance-Messung:
-`seen.json` (16,7 MB, nicht nur `found.json`) wurde bisher bei jedem einzelnen neuen Angebot
-komplett neu geschrieben. **Ruleset-Signatur unverändert** (reine Python-Änderung).
+(PR #36) und **Persistence-Batching** umgesetzt (PR #37) — Folgeschritt der Scan-Performance-
+Messung: `seen.json` (16,7 MB, nicht nur `found.json`) wurde bisher bei jedem einzelnen neuen
+Angebot komplett neu geschrieben. **Ruleset-Signatur unverändert** (reine Python-Änderung).
+**Beide Fixes am 2026-08-15 gegen echte Produktivdaten nach Deployment verifiziert** (siehe
+Batch 13 unten): Gesamtdauer 746s statt Median 1712s (**-56,4%**), Persistence 19,1s statt
+Median 173,6s (**-89%**).
 
 ## Verifizierter Stand
 
@@ -246,8 +249,39 @@ statt (vorher: 1 Save je neuem Angebot), trotzdem sind am Scan-Ende alle Treffer
 gesehenen URLs korrekt persistiert — kein Datenverlust. Volle Suite **1334/1334 grün** (vom
 Nutzer lokal verifiziert, 76,51s). Ruleset unverändert.
 
-**Reale Wirkung auf die Produktiv-Scandauer noch nicht verifiziert** (wie bei Batch 11 — erfordert
-Deployment + erneute Log-Auswertung).
+**Reale Wirkung auf die Produktiv-Scandauer: siehe Batch 13 unten — inzwischen verifiziert.**
+
+### 13. Scraping-Parallelisierung + Persistence-Batching: reale Wirkung verifiziert
+
+Erster echter Produktiv-Scan nach Deployment (`docker compose up --build -d`), vom Nutzer aus dem
+Log geteilt:
+
+```text
+2026-08-14 23:36:59 INFO ✅ Scan komplett: 304 Treffer (von 14206 geprüften Angeboten).
+📊 Scan-Metriken: Gesamtdauer=746.44s, Scraping={'ebay': 444.532, 'kleinanzeigen': 535.931,
+'quoka': 544.318}, gescrapt=14206, dedupliziert=9135, Matching+Scoring=166.51s,
+Price-Stats=0.27s, Persistence=19.10s, Notification=14.22s
+```
+
+**Scraping läuft nachweislich parallel:** die drei Einzeldauern summieren sich seriell auf
+1524,8s, aber Gesamtdauer minus allem anderen (Matching+PriceStats+Persistence+Notification =
+200,1s) ergibt eine tatsächliche Scraping-Wandzeit von nur 546,3s — praktisch identisch mit der
+langsamsten Einzelquelle (Quoka, 544,3s, nur ~2s Overhead).
+
+**Gesamtdauer: 746,44s (12,4 min) statt Median 1712s (28,5 min) — 56,4% schneller**, fast exakt
+die vorhergesagten ~57%. Bei konfiguriertem 10-Minuten-Intervall ist die reale Kadenz jetzt nur
+noch ~1,24× statt ~2,85× langsamer als beabsichtigt.
+
+**Persistence: 19,10s statt Median 173,6s — 89% schneller**, trotz eines für diesen Scan
+ungewöhnlich hohen `dedupliziert=9135` (normal: 186–642).
+
+**Eingeordnete Auffälligkeit (kein neues Problem):** `Matching+Scoring=166,51s` liegt deutlich
+über dem historischen Median (~5,9s), korreliert aber plausibel mit dem ungewöhnlich hohen
+`dedupliziert`-Wert (9135 statt normal <650) — vermutlich ein einmaliger Übergangseffekt: die
+mehrfach geänderte Ruleset-Signatur aus den heutigen Fixes lässt `needs_reevaluation()` für sehr
+viele bereits bekannte `seen.json`-Einträge auf einmal "True" zurückgeben, zusätzlich zur direkt
+vorher geloggten Bereinigung (7128 delistete Alt-Einträge entfernt). Empfehlung: einen der
+nächsten 1-2 Scans gegenchecken, sobald sich `dedupliziert` wieder im Normalbereich einpendelt.
 
 ## Abgeschlossen
 
@@ -281,6 +315,7 @@ Deployment + erneute Log-Auswertung).
   (`rtx_3060_ti`/`rtx_3070`/`rtx_4060`/`rtx_2080_ti`) behoben (Batch 10 oben)
 - Echte End-to-End-Scan-Performance-Messung + Scraping parallelisiert (Batch 11 oben)
 - Persistence-Batching für seen.json/found.json (Batch 12 oben)
+- Reale Wirkung beider Performance-Fixes gegen Produktivdaten verifiziert (Batch 13 oben)
 
 ## Aktuelle Systemkette
 
@@ -351,13 +386,13 @@ Wichtige Architekturregeln:
 
 ### P0 — offene Punkte
 
-- Keine dringenden P0-Punkte mehr offen (alle in Batch 1–12 dokumentierten Punkte abgeschlossen,
-  Nr. 1–5 der Datenqualitätsliste sind vollständig erledigt, Scan-Performance gemessen + beide
-  identifizierten Hebel umgesetzt). Nächste Schritte laut Datenqualität/offene Punkte: Nr. 6
-  (Resale-Confidence) oder P1/P2 unten.
-- **Noch offen aus Batch 11/12:** die reale Wirkung der Scraping-Parallelisierung UND des
-  Persistence-Batchings auf die Produktiv-Scandauer ist noch nicht verifiziert (erfordert
-  Deployment, `docker compose up --build -d`, dann erneute Log-Auswertung).
+- Keine offenen P0-Punkte (alle in Batch 1–13 dokumentierten Punkte abgeschlossen und verifiziert,
+  Nr. 1–5 der Datenqualitätsliste sind vollständig erledigt, Scan-Performance gemessen, beide
+  identifizierten Hebel umgesetzt UND gegen echte Produktivdaten verifiziert — siehe Batch 13).
+  Nächste Schritte laut Datenqualität/offene Punkte: Nr. 6 (Resale-Confidence) oder P1/P2 unten.
+- Beobachtung aus Batch 13 (kein Blocker): einen der nächsten 1-2 Scans gegenchecken, sobald sich
+  `dedupliziert` wieder im Normalbereich (<650) einpendelt, für eine "steady state"-Bestätigung
+  der Matching+Scoring-/Persistence-Werte.
 - Ein möglicher, bisher nicht gemessener Verdacht: derselbe min_vram_gb-Musterbug (Batch 10)
   könnte theoretisch auch außerhalb von `gpu` relevant sein — bisher nicht geprüft, kein aktiver
   Punkt.
