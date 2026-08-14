@@ -41,6 +41,7 @@ VALID_VERDICTS = {"TRUE_POSITIVE", "FALSE_POSITIVE", "UNCLEAR"}
 class Label:
     url: str
     verdict: str  # TRUE_POSITIVE | FALSE_POSITIVE | UNCLEAR
+    title: str | None
     category: str | None
     rule_label: str | None
     price_history_model: str | None
@@ -71,6 +72,7 @@ def parse_forensics(path: Path = FORENSICS_SOURCE) -> dict[str, Label]:
         labels[url] = Label(
             url=url,
             verdict=verdict,
+            title=entry.get("title"),
             category=entry.get("category"),
             rule_label=entry.get("stored_rule_label"),
             price_history_model=entry.get("price_history_model"),

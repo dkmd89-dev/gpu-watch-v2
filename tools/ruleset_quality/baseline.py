@@ -72,6 +72,10 @@ def freeze_baseline(baseline_id: str | None = None) -> dict:
             "price": price,
             "stored_category": stored_category,
             "stored_rule_label": stored_rule,
+            # found.json speichert kein price_history_model (verifiziert:
+            # Feld fehlt in jedem Eintrag) -- explizit NOT_AVAILABLE statt
+            # eines erfundenen Werts, siehe Auftrag Abschnitt 4.
+            "stored_price_history_model": "NOT_AVAILABLE",
             "matched_category": result.category if result else None,
             "matched_rule_label": result.rule_label if result else None,
             "visible": visible,

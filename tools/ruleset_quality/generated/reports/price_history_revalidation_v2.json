@@ -1,0 +1,3964 @@
+{
+  "meta": {
+    "hinweis": "Read-only Simulation, data/price_history.jsonl unveraendert. Fingerprint-Kreuzreferenz nutzt dieselbe normalize_title()-Funktion wie die Produktion (duplicate_detection.py) -- keine neue Normalisierungslogik.",
+    "anzahl_historische_punkte": 15554,
+    "anzahl_modelle_gesamt": 125,
+    "anzahl_modelle_mit_schwellen_warnung": 9
+  },
+  "modelle": [
+    {
+      "price_history_model": "autoradio_corsa_d_android",
+      "altes_sample_count": 71,
+      "neues_sample_count": 70,
+      "delta": -1,
+      "alte_stats": {
+        "n": 71,
+        "median": 129.99,
+        "min": 40.0,
+        "max": 179.99
+      },
+      "neue_stats": {
+        "n": 70,
+        "median": 132.49,
+        "min": 40.0,
+        "max": 179.99
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "controller_ps5_drift",
+      "altes_sample_count": 10,
+      "neues_sample_count": 9,
+      "delta": -1,
+      "alte_stats": {
+        "n": 10,
+        "median": 20.0,
+        "min": 1.0,
+        "max": 20.0
+      },
+      "neue_stats": {
+        "n": 9,
+        "median": 20.0,
+        "min": 1.0,
+        "max": 20.0
+      },
+      "schwellen_warnungen": [
+        "unterschreitet 10 Samples nach Revalidierung (10 -> 9)"
+      ]
+    },
+    {
+      "price_history_model": "controller_ps5_dualsense",
+      "altes_sample_count": 82,
+      "neues_sample_count": 79,
+      "delta": -3,
+      "alte_stats": {
+        "n": 82,
+        "median": 25.0,
+        "min": 1.0,
+        "max": 35.0
+      },
+      "neue_stats": {
+        "n": 79,
+        "median": 29.0,
+        "min": 1.0,
+        "max": 95.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "controller_switch_pro",
+      "altes_sample_count": 99,
+      "neues_sample_count": 104,
+      "delta": 5,
+      "alte_stats": {
+        "n": 99,
+        "median": 27.0,
+        "min": 5.0,
+        "max": 35.0
+      },
+      "neue_stats": {
+        "n": 104,
+        "median": 28.49,
+        "min": 5.0,
+        "max": 130.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "controller_xbox_drift",
+      "altes_sample_count": 10,
+      "neues_sample_count": 12,
+      "delta": 2,
+      "alte_stats": {
+        "n": 10,
+        "median": 13.0,
+        "min": 10.0,
+        "max": 18.0
+      },
+      "neue_stats": {
+        "n": 12,
+        "median": 14.5,
+        "min": 10.0,
+        "max": 35.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "controller_xbox_series",
+      "altes_sample_count": 88,
+      "neues_sample_count": 86,
+      "delta": -2,
+      "alte_stats": {
+        "n": 88,
+        "median": 24.99,
+        "min": 1.0,
+        "max": 30.0
+      },
+      "neue_stats": {
+        "n": 86,
+        "median": 25.0,
+        "min": 5.0,
+        "max": 80.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "cpu_bundle_i5_12400f_b660",
+      "altes_sample_count": 0,
+      "neues_sample_count": 6,
+      "delta": 6,
+      "alte_stats": null,
+      "neue_stats": {
+        "n": 6,
+        "median": 279.0,
+        "min": 250.0,
+        "max": 300.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "cpu_bundle_ryzen3600_b450",
+      "altes_sample_count": 2,
+      "neues_sample_count": 14,
+      "delta": 12,
+      "alte_stats": {
+        "n": 2,
+        "median": 65.0,
+        "min": 60.0,
+        "max": 70.0
+      },
+      "neue_stats": {
+        "n": 14,
+        "median": 209.0,
+        "min": 60.0,
+        "max": 300.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "cpu_bundle_ryzen5600_b550",
+      "altes_sample_count": 4,
+      "neues_sample_count": 14,
+      "delta": 10,
+      "alte_stats": {
+        "n": 4,
+        "median": 187.0,
+        "min": 119.0,
+        "max": 199.0
+      },
+      "neue_stats": {
+        "n": 14,
+        "median": 259.5,
+        "min": 119.0,
+        "max": 300.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "crt_profi_monitor",
+      "altes_sample_count": 86,
+      "neues_sample_count": 38,
+      "delta": -48,
+      "alte_stats": {
+        "n": 86,
+        "median": 99.5,
+        "min": 1.0,
+        "max": 250.0
+      },
+      "neue_stats": {
+        "n": 38,
+        "median": 139.5,
+        "min": 10.0,
+        "max": 250.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "gaming_laptop_rtx3060",
+      "altes_sample_count": 34,
+      "neues_sample_count": 5,
+      "delta": -29,
+      "alte_stats": {
+        "n": 34,
+        "median": 299.99,
+        "min": 140.0,
+        "max": 470.0
+      },
+      "neue_stats": {
+        "n": 5,
+        "median": 450.0,
+        "min": 400.0,
+        "max": 450.0
+      },
+      "schwellen_warnungen": [
+        "unterschreitet 10 Samples nach Revalidierung (34 -> 5)"
+      ]
+    },
+    {
+      "price_history_model": "gaming_laptop_rtx4060",
+      "altes_sample_count": 20,
+      "neues_sample_count": 5,
+      "delta": -15,
+      "alte_stats": {
+        "n": 20,
+        "median": 389.0,
+        "min": 0.0,
+        "max": 550.0
+      },
+      "neue_stats": {
+        "n": 5,
+        "median": 450.0,
+        "min": 1.0,
+        "max": 550.0
+      },
+      "schwellen_warnungen": [
+        "unterschreitet 10 Samples nach Revalidierung (20 -> 5)"
+      ]
+    },
+    {
+      "price_history_model": "gaming_pc",
+      "altes_sample_count": 639,
+      "neues_sample_count": 212,
+      "delta": -427,
+      "alte_stats": {
+        "n": 639,
+        "median": 400.0,
+        "min": 1.0,
+        "max": 750.0
+      },
+      "neue_stats": {
+        "n": 212,
+        "median": 350.0,
+        "min": 1.0,
+        "max": 450.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "handheld_nintendo_3ds",
+      "altes_sample_count": 37,
+      "neues_sample_count": 31,
+      "delta": -6,
+      "alte_stats": {
+        "n": 37,
+        "median": 41.9,
+        "min": 1.0,
+        "max": 95.0
+      },
+      "neue_stats": {
+        "n": 31,
+        "median": 50.0,
+        "min": 1.0,
+        "max": 95.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "handheld_pc_preator",
+      "altes_sample_count": 31,
+      "neues_sample_count": 20,
+      "delta": -11,
+      "alte_stats": {
+        "n": 31,
+        "median": 200.0,
+        "min": 2.79,
+        "max": 330.0
+      },
+      "neue_stats": {
+        "n": 20,
+        "median": 239.32,
+        "min": 5.0,
+        "max": 330.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "handheld_ps_vita",
+      "altes_sample_count": 9,
+      "neues_sample_count": 3,
+      "delta": -6,
+      "alte_stats": {
+        "n": 9,
+        "median": 39.0,
+        "min": 21.0,
+        "max": 85.0
+      },
+      "neue_stats": {
+        "n": 3,
+        "median": 49.95,
+        "min": 39.9,
+        "max": 85.0
+      },
+      "schwellen_warnungen": [
+        "unterschreitet 5 Samples nach Revalidierung (9 -> 3)"
+      ]
+    },
+    {
+      "price_history_model": "handheld_steam_deck",
+      "altes_sample_count": 21,
+      "neues_sample_count": 13,
+      "delta": -8,
+      "alte_stats": {
+        "n": 21,
+        "median": 80.0,
+        "min": 10.0,
+        "max": 229.0
+      },
+      "neue_stats": {
+        "n": 13,
+        "median": 139.0,
+        "min": 10.0,
+        "max": 229.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_11_128gb",
+      "altes_sample_count": 470,
+      "neues_sample_count": 470,
+      "delta": 0,
+      "alte_stats": {
+        "n": 470,
+        "median": 109.5,
+        "min": 1.0,
+        "max": 130.0
+      },
+      "neue_stats": {
+        "n": 470,
+        "median": 109.5,
+        "min": 1.0,
+        "max": 130.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_11_pro_128gb",
+      "altes_sample_count": 149,
+      "neues_sample_count": 149,
+      "delta": 0,
+      "alte_stats": {
+        "n": 149,
+        "median": 130.0,
+        "min": 52.0,
+        "max": 160.0
+      },
+      "neue_stats": {
+        "n": 149,
+        "median": 130.0,
+        "min": 52.0,
+        "max": 160.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_11_pro_512gb",
+      "altes_sample_count": 14,
+      "neues_sample_count": 14,
+      "delta": 0,
+      "alte_stats": {
+        "n": 14,
+        "median": 195.0,
+        "min": 105.0,
+        "max": 250.0
+      },
+      "neue_stats": {
+        "n": 14,
+        "median": 195.0,
+        "min": 105.0,
+        "max": 250.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_11_pro_max_128gb",
+      "altes_sample_count": 59,
+      "neues_sample_count": 60,
+      "delta": 1,
+      "alte_stats": {
+        "n": 59,
+        "median": 150.0,
+        "min": 15.0,
+        "max": 180.0
+      },
+      "neue_stats": {
+        "n": 60,
+        "median": 152.5,
+        "min": 15.0,
+        "max": 278.99
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_11_pro_max_512gb",
+      "altes_sample_count": 7,
+      "neues_sample_count": 6,
+      "delta": -1,
+      "alte_stats": {
+        "n": 7,
+        "median": 230.0,
+        "min": 100.0,
+        "max": 278.99
+      },
+      "neue_stats": {
+        "n": 6,
+        "median": 220.0,
+        "min": 100.0,
+        "max": 260.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_12_128gb",
+      "altes_sample_count": 318,
+      "neues_sample_count": 318,
+      "delta": 0,
+      "alte_stats": {
+        "n": 318,
+        "median": 140.0,
+        "min": 1.0,
+        "max": 160.0
+      },
+      "neue_stats": {
+        "n": 318,
+        "median": 140.0,
+        "min": 1.0,
+        "max": 160.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_12_mini_128gb",
+      "altes_sample_count": 129,
+      "neues_sample_count": 129,
+      "delta": 0,
+      "alte_stats": {
+        "n": 129,
+        "median": 120.0,
+        "min": 35.0,
+        "max": 140.0
+      },
+      "neue_stats": {
+        "n": 129,
+        "median": 120.0,
+        "min": 35.0,
+        "max": 140.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_12_pro_128gb",
+      "altes_sample_count": 78,
+      "neues_sample_count": 78,
+      "delta": 0,
+      "alte_stats": {
+        "n": 78,
+        "median": 160.0,
+        "min": 60.0,
+        "max": 190.0
+      },
+      "neue_stats": {
+        "n": 78,
+        "median": 160.0,
+        "min": 60.0,
+        "max": 190.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_12_pro_512gb",
+      "altes_sample_count": 14,
+      "neues_sample_count": 14,
+      "delta": 0,
+      "alte_stats": {
+        "n": 14,
+        "median": 235.5,
+        "min": 150.0,
+        "max": 290.0
+      },
+      "neue_stats": {
+        "n": 14,
+        "median": 235.5,
+        "min": 150.0,
+        "max": 290.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_12_pro_max_128gb",
+      "altes_sample_count": 60,
+      "neues_sample_count": 60,
+      "delta": 0,
+      "alte_stats": {
+        "n": 60,
+        "median": 200.0,
+        "min": 70.0,
+        "max": 220.0
+      },
+      "neue_stats": {
+        "n": 60,
+        "median": 200.0,
+        "min": 70.0,
+        "max": 220.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_12_pro_max_512gb",
+      "altes_sample_count": 10,
+      "neues_sample_count": 10,
+      "delta": 0,
+      "alte_stats": {
+        "n": 10,
+        "median": 275.0,
+        "min": 200.0,
+        "max": 320.0
+      },
+      "neue_stats": {
+        "n": 10,
+        "median": 275.0,
+        "min": 200.0,
+        "max": 320.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_13_128gb",
+      "altes_sample_count": 354,
+      "neues_sample_count": 354,
+      "delta": 0,
+      "alte_stats": {
+        "n": 354,
+        "median": 195.0,
+        "min": 1.0,
+        "max": 220.0
+      },
+      "neue_stats": {
+        "n": 354,
+        "median": 195.0,
+        "min": 1.0,
+        "max": 220.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_13_512gb",
+      "altes_sample_count": 3,
+      "neues_sample_count": 3,
+      "delta": 0,
+      "alte_stats": {
+        "n": 3,
+        "median": 240.0,
+        "min": 220.0,
+        "max": 275.0
+      },
+      "neue_stats": {
+        "n": 3,
+        "median": 240.0,
+        "min": 220.0,
+        "max": 275.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_13_mini_128gb",
+      "altes_sample_count": 57,
+      "neues_sample_count": 59,
+      "delta": 2,
+      "alte_stats": {
+        "n": 57,
+        "median": 160.0,
+        "min": 49.0,
+        "max": 190.0
+      },
+      "neue_stats": {
+        "n": 59,
+        "median": 160.0,
+        "min": 49.0,
+        "max": 207.9
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_13_mini_512gb",
+      "altes_sample_count": 2,
+      "neues_sample_count": 0,
+      "delta": -2,
+      "alte_stats": {
+        "n": 2,
+        "median": 202.95,
+        "min": 198.0,
+        "max": 207.9
+      },
+      "neue_stats": null,
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_13_pro_128gb",
+      "altes_sample_count": 126,
+      "neues_sample_count": 126,
+      "delta": 0,
+      "alte_stats": {
+        "n": 126,
+        "median": 250.0,
+        "min": 15.0,
+        "max": 280.0
+      },
+      "neue_stats": {
+        "n": 126,
+        "median": 250.0,
+        "min": 15.0,
+        "max": 280.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_13_pro_512gb",
+      "altes_sample_count": 13,
+      "neues_sample_count": 13,
+      "delta": 0,
+      "alte_stats": {
+        "n": 13,
+        "median": 335.0,
+        "min": 255.0,
+        "max": 370.0
+      },
+      "neue_stats": {
+        "n": 13,
+        "median": 335.0,
+        "min": 255.0,
+        "max": 370.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_13_pro_max_128gb",
+      "altes_sample_count": 75,
+      "neues_sample_count": 75,
+      "delta": 0,
+      "alte_stats": {
+        "n": 75,
+        "median": 280.0,
+        "min": 150.0,
+        "max": 320.0
+      },
+      "neue_stats": {
+        "n": 75,
+        "median": 280.0,
+        "min": 150.0,
+        "max": 320.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_13_pro_max_512gb",
+      "altes_sample_count": 13,
+      "neues_sample_count": 13,
+      "delta": 0,
+      "alte_stats": {
+        "n": 13,
+        "median": 350.0,
+        "min": 150.0,
+        "max": 400.0
+      },
+      "neue_stats": {
+        "n": 13,
+        "median": 350.0,
+        "min": 150.0,
+        "max": 400.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_14_128gb",
+      "altes_sample_count": 237,
+      "neues_sample_count": 238,
+      "delta": 1,
+      "alte_stats": {
+        "n": 237,
+        "median": 250.0,
+        "min": 1.0,
+        "max": 280.0
+      },
+      "neue_stats": {
+        "n": 238,
+        "median": 250.0,
+        "min": 1.0,
+        "max": 301.5
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_14_512gb",
+      "altes_sample_count": 6,
+      "neues_sample_count": 5,
+      "delta": -1,
+      "alte_stats": {
+        "n": 6,
+        "median": 324.98,
+        "min": 250.0,
+        "max": 350.0
+      },
+      "neue_stats": {
+        "n": 5,
+        "median": 329.95,
+        "min": 250.0,
+        "max": 350.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_14_plus_128gb",
+      "altes_sample_count": 46,
+      "neues_sample_count": 46,
+      "delta": 0,
+      "alte_stats": {
+        "n": 46,
+        "median": 270.43,
+        "min": 100.0,
+        "max": 300.0
+      },
+      "neue_stats": {
+        "n": 46,
+        "median": 270.43,
+        "min": 100.0,
+        "max": 300.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_14_pro_128gb",
+      "altes_sample_count": 202,
+      "neues_sample_count": 202,
+      "delta": 0,
+      "alte_stats": {
+        "n": 202,
+        "median": 330.0,
+        "min": 1.0,
+        "max": 380.0
+      },
+      "neue_stats": {
+        "n": 202,
+        "median": 330.0,
+        "min": 1.0,
+        "max": 380.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_14_pro_512gb",
+      "altes_sample_count": 9,
+      "neues_sample_count": 9,
+      "delta": 0,
+      "alte_stats": {
+        "n": 9,
+        "median": 430.0,
+        "min": 250.0,
+        "max": 450.0
+      },
+      "neue_stats": {
+        "n": 9,
+        "median": 430.0,
+        "min": 250.0,
+        "max": 450.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_14_pro_max_128gb",
+      "altes_sample_count": 129,
+      "neues_sample_count": 129,
+      "delta": 0,
+      "alte_stats": {
+        "n": 129,
+        "median": 370.0,
+        "min": 1.0,
+        "max": 420.0
+      },
+      "neue_stats": {
+        "n": 129,
+        "median": 370.0,
+        "min": 1.0,
+        "max": 420.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_14_pro_max_512gb",
+      "altes_sample_count": 20,
+      "neues_sample_count": 20,
+      "delta": 0,
+      "alte_stats": {
+        "n": 20,
+        "median": 435.0,
+        "min": 1.0,
+        "max": 500.0
+      },
+      "neue_stats": {
+        "n": 20,
+        "median": 435.0,
+        "min": 1.0,
+        "max": 500.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_15_128gb",
+      "altes_sample_count": 260,
+      "neues_sample_count": 260,
+      "delta": 0,
+      "alte_stats": {
+        "n": 260,
+        "median": 350.0,
+        "min": 1.0,
+        "max": 380.0
+      },
+      "neue_stats": {
+        "n": 260,
+        "median": 350.0,
+        "min": 1.0,
+        "max": 380.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_15_512gb",
+      "altes_sample_count": 1,
+      "neues_sample_count": 1,
+      "delta": 0,
+      "alte_stats": {
+        "n": 1,
+        "median": 320.0,
+        "min": 320.0,
+        "max": 320.0
+      },
+      "neue_stats": {
+        "n": 1,
+        "median": 320.0,
+        "min": 320.0,
+        "max": 320.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_15_plus_128gb",
+      "altes_sample_count": 37,
+      "neues_sample_count": 37,
+      "delta": 0,
+      "alte_stats": {
+        "n": 37,
+        "median": 370.0,
+        "min": 1.0,
+        "max": 400.0
+      },
+      "neue_stats": {
+        "n": 37,
+        "median": 370.0,
+        "min": 1.0,
+        "max": 400.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_15_plus_512gb",
+      "altes_sample_count": 1,
+      "neues_sample_count": 1,
+      "delta": 0,
+      "alte_stats": {
+        "n": 1,
+        "median": 450.0,
+        "min": 450.0,
+        "max": 450.0
+      },
+      "neue_stats": {
+        "n": 1,
+        "median": 450.0,
+        "min": 450.0,
+        "max": 450.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_15_pro_128gb",
+      "altes_sample_count": 197,
+      "neues_sample_count": 197,
+      "delta": 0,
+      "alte_stats": {
+        "n": 197,
+        "median": 420.0,
+        "min": 1.0,
+        "max": 480.0
+      },
+      "neue_stats": {
+        "n": 197,
+        "median": 420.0,
+        "min": 1.0,
+        "max": 480.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_15_pro_512gb",
+      "altes_sample_count": 9,
+      "neues_sample_count": 9,
+      "delta": 0,
+      "alte_stats": {
+        "n": 9,
+        "median": 500.0,
+        "min": 379.0,
+        "max": 560.0
+      },
+      "neue_stats": {
+        "n": 9,
+        "median": 500.0,
+        "min": 379.0,
+        "max": 560.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_15_pro_max_128gb",
+      "altes_sample_count": 119,
+      "neues_sample_count": 119,
+      "delta": 0,
+      "alte_stats": {
+        "n": 119,
+        "median": 500.0,
+        "min": 1.0,
+        "max": 550.0
+      },
+      "neue_stats": {
+        "n": 119,
+        "median": 500.0,
+        "min": 1.0,
+        "max": 550.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_15_pro_max_512gb",
+      "altes_sample_count": 27,
+      "neues_sample_count": 27,
+      "delta": 0,
+      "alte_stats": {
+        "n": 27,
+        "median": 540.0,
+        "min": 1.0,
+        "max": 650.0
+      },
+      "neue_stats": {
+        "n": 27,
+        "median": 540.0,
+        "min": 1.0,
+        "max": 650.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_16_128gb",
+      "altes_sample_count": 104,
+      "neues_sample_count": 104,
+      "delta": 0,
+      "alte_stats": {
+        "n": 104,
+        "median": 450.0,
+        "min": 1.0,
+        "max": 500.0
+      },
+      "neue_stats": {
+        "n": 104,
+        "median": 450.0,
+        "min": 1.0,
+        "max": 500.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_16_512gb",
+      "altes_sample_count": 1,
+      "neues_sample_count": 1,
+      "delta": 0,
+      "alte_stats": {
+        "n": 1,
+        "median": 570.0,
+        "min": 570.0,
+        "max": 570.0
+      },
+      "neue_stats": {
+        "n": 1,
+        "median": 570.0,
+        "min": 570.0,
+        "max": 570.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_16_plus_128gb",
+      "altes_sample_count": 5,
+      "neues_sample_count": 5,
+      "delta": 0,
+      "alte_stats": {
+        "n": 5,
+        "median": 500.0,
+        "min": 380.0,
+        "max": 530.0
+      },
+      "neue_stats": {
+        "n": 5,
+        "median": 500.0,
+        "min": 380.0,
+        "max": 530.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_16_pro_128gb",
+      "altes_sample_count": 151,
+      "neues_sample_count": 151,
+      "delta": 0,
+      "alte_stats": {
+        "n": 151,
+        "median": 600.0,
+        "min": 1.0,
+        "max": 650.0
+      },
+      "neue_stats": {
+        "n": 151,
+        "median": 600.0,
+        "min": 1.0,
+        "max": 650.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_16_pro_512gb",
+      "altes_sample_count": 2,
+      "neues_sample_count": 2,
+      "delta": 0,
+      "alte_stats": {
+        "n": 2,
+        "median": 734.5,
+        "min": 719.0,
+        "max": 750.0
+      },
+      "neue_stats": {
+        "n": 2,
+        "median": 734.5,
+        "min": 719.0,
+        "max": 750.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_16_pro_max_128gb",
+      "altes_sample_count": 115,
+      "neues_sample_count": 115,
+      "delta": 0,
+      "alte_stats": {
+        "n": 115,
+        "median": 680.0,
+        "min": 1.0,
+        "max": 750.0
+      },
+      "neue_stats": {
+        "n": 115,
+        "median": 680.0,
+        "min": 1.0,
+        "max": 750.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "iphone_16_pro_max_512gb",
+      "altes_sample_count": 31,
+      "neues_sample_count": 31,
+      "delta": 0,
+      "alte_stats": {
+        "n": 31,
+        "median": 800.0,
+        "min": 0.0,
+        "max": 850.0
+      },
+      "neue_stats": {
+        "n": 31,
+        "median": 800.0,
+        "min": 0.0,
+        "max": 850.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "konsole_bastler_bundle",
+      "altes_sample_count": 18,
+      "neues_sample_count": 13,
+      "delta": -5,
+      "alte_stats": {
+        "n": 18,
+        "median": 20.0,
+        "min": 1.0,
+        "max": 35.0
+      },
+      "neue_stats": {
+        "n": 13,
+        "median": 25.0,
+        "min": 1.0,
+        "max": 55.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "konsole_ps4_bundle",
+      "altes_sample_count": 410,
+      "neues_sample_count": 389,
+      "delta": -21,
+      "alte_stats": {
+        "n": 410,
+        "median": 90.0,
+        "min": 1.0,
+        "max": 110.0
+      },
+      "neue_stats": {
+        "n": 389,
+        "median": 90.0,
+        "min": 1.0,
+        "max": 110.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "konsole_switch_lite",
+      "altes_sample_count": 72,
+      "neues_sample_count": 65,
+      "delta": -7,
+      "alte_stats": {
+        "n": 72,
+        "median": 80.0,
+        "min": 4.0,
+        "max": 95.0
+      },
+      "neue_stats": {
+        "n": 65,
+        "median": 80.0,
+        "min": 4.0,
+        "max": 95.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "konsole_switch_standard",
+      "altes_sample_count": 220,
+      "neues_sample_count": 202,
+      "delta": -18,
+      "alte_stats": {
+        "n": 220,
+        "median": 79.5,
+        "min": 6.49,
+        "max": 150.0
+      },
+      "neue_stats": {
+        "n": 202,
+        "median": 80.0,
+        "min": 6.49,
+        "max": 150.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "konsole_xbox_one",
+      "altes_sample_count": 54,
+      "neues_sample_count": 51,
+      "delta": -3,
+      "alte_stats": {
+        "n": 54,
+        "median": 71.75,
+        "min": 9.95,
+        "max": 90.0
+      },
+      "neue_stats": {
+        "n": 51,
+        "median": 71.0,
+        "min": 9.95,
+        "max": 90.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "lego_bundle",
+      "altes_sample_count": 404,
+      "neues_sample_count": 0,
+      "delta": -404,
+      "alte_stats": {
+        "n": 404,
+        "median": 35.0,
+        "min": 1.0,
+        "max": 150.0
+      },
+      "neue_stats": null,
+      "schwellen_warnungen": [
+        "unterschreitet 3 Samples nach Revalidierung (404 -> 0)",
+        "unterschreitet 5 Samples nach Revalidierung (404 -> 0)",
+        "unterschreitet 10 Samples nach Revalidierung (404 -> 0)"
+      ]
+    },
+    {
+      "price_history_model": "lego_cmf",
+      "altes_sample_count": 232,
+      "neues_sample_count": 267,
+      "delta": 35,
+      "alte_stats": {
+        "n": 232,
+        "median": 6.64,
+        "min": 1.0,
+        "max": 23.9
+      },
+      "neue_stats": {
+        "n": 267,
+        "median": 7.35,
+        "min": 1.0,
+        "max": 50.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "lego_collector_generic",
+      "altes_sample_count": 16,
+      "neues_sample_count": 12,
+      "delta": -4,
+      "alte_stats": {
+        "n": 16,
+        "median": 23.45,
+        "min": 9.0,
+        "max": 35.0
+      },
+      "neue_stats": {
+        "n": 12,
+        "median": 14.5,
+        "min": 9.0,
+        "max": 35.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "lego_fantasy_rare",
+      "altes_sample_count": 1,
+      "neues_sample_count": 0,
+      "delta": -1,
+      "alte_stats": {
+        "n": 1,
+        "median": 50.0,
+        "min": 50.0,
+        "max": 50.0
+      },
+      "neue_stats": null,
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "lego_minifig_bundle",
+      "altes_sample_count": 368,
+      "neues_sample_count": 835,
+      "delta": 467,
+      "alte_stats": {
+        "n": 368,
+        "median": 29.97,
+        "min": 1.0,
+        "max": 60.0
+      },
+      "neue_stats": {
+        "n": 835,
+        "median": 30.0,
+        "min": 1.0,
+        "max": 150.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "lego_ninjago_bundle",
+      "altes_sample_count": 596,
+      "neues_sample_count": 198,
+      "delta": -398,
+      "alte_stats": {
+        "n": 596,
+        "median": 30.0,
+        "min": 1.0,
+        "max": 70.0
+      },
+      "neue_stats": {
+        "n": 198,
+        "median": 29.99,
+        "min": 1.0,
+        "max": 70.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "lego_ninjago_rare",
+      "altes_sample_count": 20,
+      "neues_sample_count": 51,
+      "delta": 31,
+      "alte_stats": {
+        "n": 20,
+        "median": 8.5,
+        "min": 3.0,
+        "max": 29.99
+      },
+      "neue_stats": {
+        "n": 51,
+        "median": 5.99,
+        "min": 2.5,
+        "max": 45.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "lego_promo",
+      "altes_sample_count": 23,
+      "neues_sample_count": 49,
+      "delta": 26,
+      "alte_stats": {
+        "n": 23,
+        "median": 15.45,
+        "min": 1.5,
+        "max": 45.0
+      },
+      "neue_stats": {
+        "n": 49,
+        "median": 9.9,
+        "min": 1.5,
+        "max": 49.99
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "lego_retro_rare",
+      "altes_sample_count": 7,
+      "neues_sample_count": 7,
+      "delta": 0,
+      "alte_stats": {
+        "n": 7,
+        "median": 12.0,
+        "min": 9.9,
+        "max": 29.0
+      },
+      "neue_stats": {
+        "n": 7,
+        "median": 12.0,
+        "min": 7.0,
+        "max": 29.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "lego_sw_clone",
+      "altes_sample_count": 720,
+      "neues_sample_count": 686,
+      "delta": -34,
+      "alte_stats": {
+        "n": 720,
+        "median": 14.0,
+        "min": 1.0,
+        "max": 50.0
+      },
+      "neue_stats": {
+        "n": 686,
+        "median": 13.1,
+        "min": 1.0,
+        "max": 69.99
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "lego_sw_rare",
+      "altes_sample_count": 110,
+      "neues_sample_count": 20,
+      "delta": -90,
+      "alte_stats": {
+        "n": 110,
+        "median": 8.95,
+        "min": 2.49,
+        "max": 50.0
+      },
+      "neue_stats": {
+        "n": 20,
+        "median": 20.92,
+        "min": 2.99,
+        "max": 49.99
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "m2_ssd_1tb",
+      "altes_sample_count": 7,
+      "neues_sample_count": 6,
+      "delta": -1,
+      "alte_stats": {
+        "n": 7,
+        "median": 20.0,
+        "min": 1.0,
+        "max": 40.0
+      },
+      "neue_stats": {
+        "n": 6,
+        "median": 60.0,
+        "min": 14.0,
+        "max": 320.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "macbook_air_intel_1tb",
+      "altes_sample_count": 3,
+      "neues_sample_count": 3,
+      "delta": 0,
+      "alte_stats": {
+        "n": 3,
+        "median": 320.0,
+        "min": 250.0,
+        "max": 380.0
+      },
+      "neue_stats": {
+        "n": 3,
+        "median": 320.0,
+        "min": 250.0,
+        "max": 380.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "macbook_air_intel_512gb",
+      "altes_sample_count": 37,
+      "neues_sample_count": 37,
+      "delta": 0,
+      "alte_stats": {
+        "n": 37,
+        "median": 150.0,
+        "min": 1.0,
+        "max": 250.0
+      },
+      "neue_stats": {
+        "n": 37,
+        "median": 150.0,
+        "min": 1.0,
+        "max": 250.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "macbook_air_m1_1tb",
+      "altes_sample_count": 5,
+      "neues_sample_count": 5,
+      "delta": 0,
+      "alte_stats": {
+        "n": 5,
+        "median": 550.0,
+        "min": 490.0,
+        "max": 580.0
+      },
+      "neue_stats": {
+        "n": 5,
+        "median": 550.0,
+        "min": 490.0,
+        "max": 580.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "macbook_air_m1_512gb",
+      "altes_sample_count": 88,
+      "neues_sample_count": 88,
+      "delta": 0,
+      "alte_stats": {
+        "n": 88,
+        "median": 380.0,
+        "min": 159.0,
+        "max": 450.0
+      },
+      "neue_stats": {
+        "n": 88,
+        "median": 380.0,
+        "min": 159.0,
+        "max": 450.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "macbook_air_m2_1tb",
+      "altes_sample_count": 1,
+      "neues_sample_count": 1,
+      "delta": 0,
+      "alte_stats": {
+        "n": 1,
+        "median": 700.0,
+        "min": 700.0,
+        "max": 700.0
+      },
+      "neue_stats": {
+        "n": 1,
+        "median": 700.0,
+        "min": 700.0,
+        "max": 700.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "macbook_air_m2_512gb",
+      "altes_sample_count": 15,
+      "neues_sample_count": 15,
+      "delta": 0,
+      "alte_stats": {
+        "n": 15,
+        "median": 499.0,
+        "min": 14.0,
+        "max": 550.0
+      },
+      "neue_stats": {
+        "n": 15,
+        "median": 499.0,
+        "min": 14.0,
+        "max": 550.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "macbook_air_m3_1tb",
+      "altes_sample_count": 1,
+      "neues_sample_count": 1,
+      "delta": 0,
+      "alte_stats": {
+        "n": 1,
+        "median": 800.0,
+        "min": 800.0,
+        "max": 800.0
+      },
+      "neue_stats": {
+        "n": 1,
+        "median": 800.0,
+        "min": 800.0,
+        "max": 800.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "macbook_air_m3_512gb",
+      "altes_sample_count": 12,
+      "neues_sample_count": 12,
+      "delta": 0,
+      "alte_stats": {
+        "n": 12,
+        "median": 614.38,
+        "min": 450.0,
+        "max": 650.0
+      },
+      "neue_stats": {
+        "n": 12,
+        "median": 614.38,
+        "min": 450.0,
+        "max": 650.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "macbook_air_m4_512gb",
+      "altes_sample_count": 30,
+      "neues_sample_count": 30,
+      "delta": 0,
+      "alte_stats": {
+        "n": 30,
+        "median": 724.5,
+        "min": 350.0,
+        "max": 750.0
+      },
+      "neue_stats": {
+        "n": 30,
+        "median": 724.5,
+        "min": 350.0,
+        "max": 750.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "macbook_pro_intel_1tb",
+      "altes_sample_count": 69,
+      "neues_sample_count": 72,
+      "delta": 3,
+      "alte_stats": {
+        "n": 69,
+        "median": 430.0,
+        "min": 120.0,
+        "max": 550.0
+      },
+      "neue_stats": {
+        "n": 72,
+        "median": 420.0,
+        "min": 120.0,
+        "max": 550.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "macbook_pro_intel_512gb",
+      "altes_sample_count": 232,
+      "neues_sample_count": 232,
+      "delta": 0,
+      "alte_stats": {
+        "n": 232,
+        "median": 250.0,
+        "min": 50.0,
+        "max": 400.0
+      },
+      "neue_stats": {
+        "n": 232,
+        "median": 250.0,
+        "min": 50.0,
+        "max": 400.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "macbook_pro_m1_1tb",
+      "altes_sample_count": 25,
+      "neues_sample_count": 25,
+      "delta": 0,
+      "alte_stats": {
+        "n": 25,
+        "median": 649.0,
+        "min": 1.0,
+        "max": 750.0
+      },
+      "neue_stats": {
+        "n": 25,
+        "median": 649.0,
+        "min": 1.0,
+        "max": 750.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "macbook_pro_m1_512gb",
+      "altes_sample_count": 55,
+      "neues_sample_count": 55,
+      "delta": 0,
+      "alte_stats": {
+        "n": 55,
+        "median": 500.0,
+        "min": 80.0,
+        "max": 600.0
+      },
+      "neue_stats": {
+        "n": 55,
+        "median": 500.0,
+        "min": 80.0,
+        "max": 600.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "macbook_pro_m2_1tb",
+      "altes_sample_count": 1,
+      "neues_sample_count": 1,
+      "delta": 0,
+      "alte_stats": {
+        "n": 1,
+        "median": 899.0,
+        "min": 899.0,
+        "max": 899.0
+      },
+      "neue_stats": {
+        "n": 1,
+        "median": 899.0,
+        "min": 899.0,
+        "max": 899.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "macbook_pro_m2_512gb",
+      "altes_sample_count": 22,
+      "neues_sample_count": 22,
+      "delta": 0,
+      "alte_stats": {
+        "n": 22,
+        "median": 649.0,
+        "min": 400.0,
+        "max": 750.0
+      },
+      "neue_stats": {
+        "n": 22,
+        "median": 649.0,
+        "min": 400.0,
+        "max": 750.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "macbook_pro_m3_1tb",
+      "altes_sample_count": 1,
+      "neues_sample_count": 1,
+      "delta": 0,
+      "alte_stats": {
+        "n": 1,
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "neue_stats": {
+        "n": 1,
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "macbook_pro_m3_512gb",
+      "altes_sample_count": 4,
+      "neues_sample_count": 4,
+      "delta": 0,
+      "alte_stats": {
+        "n": 4,
+        "median": 825.0,
+        "min": 549.0,
+        "max": 870.0
+      },
+      "neue_stats": {
+        "n": 4,
+        "median": 825.0,
+        "min": 549.0,
+        "max": 870.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "macbook_pro_m4_1tb",
+      "altes_sample_count": 2,
+      "neues_sample_count": 2,
+      "delta": 0,
+      "alte_stats": {
+        "n": 2,
+        "median": 1045.0,
+        "min": 900.0,
+        "max": 1190.0
+      },
+      "neue_stats": {
+        "n": 2,
+        "median": 1045.0,
+        "min": 900.0,
+        "max": 1190.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "macbook_pro_m4_512gb",
+      "altes_sample_count": 7,
+      "neues_sample_count": 7,
+      "delta": 0,
+      "alte_stats": {
+        "n": 7,
+        "median": 1100.0,
+        "min": 0.0,
+        "max": 1100.0
+      },
+      "neue_stats": {
+        "n": 7,
+        "median": 1100.0,
+        "min": 0.0,
+        "max": 1100.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "monitor_curved",
+      "altes_sample_count": 1066,
+      "neues_sample_count": 1058,
+      "delta": -8,
+      "alte_stats": {
+        "n": 1066,
+        "median": 90.0,
+        "min": 1.0,
+        "max": 180.0
+      },
+      "neue_stats": {
+        "n": 1058,
+        "median": 90.0,
+        "min": 1.0,
+        "max": 180.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "netzteil_550w",
+      "altes_sample_count": 173,
+      "neues_sample_count": 125,
+      "delta": -48,
+      "alte_stats": {
+        "n": 173,
+        "median": 22.0,
+        "min": 5.0,
+        "max": 40.0
+      },
+      "neue_stats": {
+        "n": 125,
+        "median": 20.0,
+        "min": 5.0,
+        "max": 280.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "netzteil_650w",
+      "altes_sample_count": 123,
+      "neues_sample_count": 89,
+      "delta": -34,
+      "alte_stats": {
+        "n": 123,
+        "median": 30.0,
+        "min": 10.0,
+        "max": 50.0
+      },
+      "neue_stats": {
+        "n": 89,
+        "median": 30.0,
+        "min": 10.0,
+        "max": 250.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "netzteil_750w_plus",
+      "altes_sample_count": 195,
+      "neues_sample_count": 145,
+      "delta": -50,
+      "alte_stats": {
+        "n": 195,
+        "median": 42.99,
+        "min": 1.0,
+        "max": 65.0
+      },
+      "neue_stats": {
+        "n": 145,
+        "median": 40.0,
+        "min": 1.0,
+        "max": 50.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "nintendo_retro_konsole",
+      "altes_sample_count": 770,
+      "neues_sample_count": 393,
+      "delta": -377,
+      "alte_stats": {
+        "n": 770,
+        "median": 50.0,
+        "min": 1.0,
+        "max": 100.0
+      },
+      "neue_stats": {
+        "n": 393,
+        "median": 65.0,
+        "min": 1.0,
+        "max": 105.99
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "office_pc",
+      "altes_sample_count": 353,
+      "neues_sample_count": 178,
+      "delta": -175,
+      "alte_stats": {
+        "n": 353,
+        "median": 225.0,
+        "min": 1.0,
+        "max": 336.6
+      },
+      "neue_stats": {
+        "n": 178,
+        "median": 200.0,
+        "min": 1.0,
+        "max": 330.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "playmobil_bundle",
+      "altes_sample_count": 210,
+      "neues_sample_count": 0,
+      "delta": -210,
+      "alte_stats": {
+        "n": 210,
+        "median": 29.16,
+        "min": 1.0,
+        "max": 100.0
+      },
+      "neue_stats": null,
+      "schwellen_warnungen": [
+        "unterschreitet 3 Samples nach Revalidierung (210 -> 0)",
+        "unterschreitet 5 Samples nach Revalidierung (210 -> 0)",
+        "unterschreitet 10 Samples nach Revalidierung (210 -> 0)"
+      ]
+    },
+    {
+      "price_history_model": "ram_ddr4_16gb",
+      "altes_sample_count": 243,
+      "neues_sample_count": 219,
+      "delta": -24,
+      "alte_stats": {
+        "n": 243,
+        "median": 45.0,
+        "min": 15.0,
+        "max": 55.0
+      },
+      "neue_stats": {
+        "n": 219,
+        "median": 49.9,
+        "min": 15.0,
+        "max": 245.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "ram_ddr4_32gb",
+      "altes_sample_count": 95,
+      "neues_sample_count": 55,
+      "delta": -40,
+      "alte_stats": {
+        "n": 95,
+        "median": 89.0,
+        "min": 40.0,
+        "max": 110.0
+      },
+      "neue_stats": {
+        "n": 55,
+        "median": 99.0,
+        "min": 40.0,
+        "max": 110.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "ram_ddr4_8gb",
+      "altes_sample_count": 106,
+      "neues_sample_count": 174,
+      "delta": 68,
+      "alte_stats": {
+        "n": 106,
+        "median": 19.99,
+        "min": 1.0,
+        "max": 22.0
+      },
+      "neue_stats": {
+        "n": 174,
+        "median": 20.17,
+        "min": 1.0,
+        "max": 219.99
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "retro_konvolut",
+      "altes_sample_count": 40,
+      "neues_sample_count": 17,
+      "delta": -23,
+      "alte_stats": {
+        "n": 40,
+        "median": 89.97,
+        "min": 1.0,
+        "max": 135.0
+      },
+      "neue_stats": {
+        "n": 17,
+        "median": 80.0,
+        "min": 20.0,
+        "max": 110.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "roehrenfernseher",
+      "altes_sample_count": 96,
+      "neues_sample_count": 3,
+      "delta": -93,
+      "alte_stats": {
+        "n": 96,
+        "median": 20.0,
+        "min": 1.0,
+        "max": 45.0
+      },
+      "neue_stats": {
+        "n": 3,
+        "median": 10.0,
+        "min": 10.0,
+        "max": 29.0
+      },
+      "schwellen_warnungen": [
+        "unterschreitet 5 Samples nach Revalidierung (96 -> 3)",
+        "unterschreitet 10 Samples nach Revalidierung (96 -> 3)"
+      ]
+    },
+    {
+      "price_history_model": "rtx_2080_ti",
+      "altes_sample_count": 60,
+      "neues_sample_count": 27,
+      "delta": -33,
+      "alte_stats": {
+        "n": 60,
+        "median": 200.0,
+        "min": 1.0,
+        "max": 270.0
+      },
+      "neue_stats": {
+        "n": 27,
+        "median": 200.0,
+        "min": 1.0,
+        "max": 269.95
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "rtx_3060_12gb",
+      "altes_sample_count": 327,
+      "neues_sample_count": 179,
+      "delta": -148,
+      "alte_stats": {
+        "n": 327,
+        "median": 240.0,
+        "min": 1.0,
+        "max": 280.0
+      },
+      "neue_stats": {
+        "n": 179,
+        "median": 240.0,
+        "min": 1.0,
+        "max": 389.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "rtx_3060_ti",
+      "altes_sample_count": 110,
+      "neues_sample_count": 65,
+      "delta": -45,
+      "alte_stats": {
+        "n": 110,
+        "median": 224.5,
+        "min": 24.99,
+        "max": 280.0
+      },
+      "neue_stats": {
+        "n": 65,
+        "median": 220.0,
+        "min": 25.95,
+        "max": 350.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "rtx_3070",
+      "altes_sample_count": 149,
+      "neues_sample_count": 80,
+      "delta": -69,
+      "alte_stats": {
+        "n": 149,
+        "median": 250.0,
+        "min": 50.0,
+        "max": 310.0
+      },
+      "neue_stats": {
+        "n": 80,
+        "median": 250.0,
+        "min": 50.0,
+        "max": 310.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "rtx_4060",
+      "altes_sample_count": 29,
+      "neues_sample_count": 19,
+      "delta": -10,
+      "alte_stats": {
+        "n": 29,
+        "median": 239.0,
+        "min": 80.0,
+        "max": 280.0
+      },
+      "neue_stats": {
+        "n": 19,
+        "median": 250.0,
+        "min": 80.0,
+        "max": 550.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "rx_6700_xt",
+      "altes_sample_count": 114,
+      "neues_sample_count": 58,
+      "delta": -56,
+      "alte_stats": {
+        "n": 114,
+        "median": 250.0,
+        "min": 24.99,
+        "max": 300.0
+      },
+      "neue_stats": {
+        "n": 58,
+        "median": 250.0,
+        "min": 24.99,
+        "max": 300.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "rx_6750_xt",
+      "altes_sample_count": 37,
+      "neues_sample_count": 23,
+      "delta": -14,
+      "alte_stats": {
+        "n": 37,
+        "median": 278.49,
+        "min": 210.0,
+        "max": 310.0
+      },
+      "neue_stats": {
+        "n": 23,
+        "median": 279.0,
+        "min": 210.0,
+        "max": 310.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "rx_6800",
+      "altes_sample_count": 42,
+      "neues_sample_count": 20,
+      "delta": -22,
+      "alte_stats": {
+        "n": 42,
+        "median": 310.0,
+        "min": 105.0,
+        "max": 350.0
+      },
+      "neue_stats": {
+        "n": 20,
+        "median": 305.0,
+        "min": 105.0,
+        "max": 350.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "rx_7600",
+      "altes_sample_count": 1,
+      "neues_sample_count": 3,
+      "delta": 2,
+      "alte_stats": {
+        "n": 1,
+        "median": 205.0,
+        "min": 205.0,
+        "max": 205.0
+      },
+      "neue_stats": {
+        "n": 3,
+        "median": 205.0,
+        "min": 180.0,
+        "max": 220.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "rx_7600_xt",
+      "altes_sample_count": 12,
+      "neues_sample_count": 4,
+      "delta": -8,
+      "alte_stats": {
+        "n": 12,
+        "median": 200.0,
+        "min": 155.29,
+        "max": 230.0
+      },
+      "neue_stats": {
+        "n": 4,
+        "median": 200.0,
+        "min": 180.0,
+        "max": 230.0
+      },
+      "schwellen_warnungen": [
+        "unterschreitet 5 Samples nach Revalidierung (12 -> 4)",
+        "unterschreitet 10 Samples nach Revalidierung (12 -> 4)"
+      ]
+    },
+    {
+      "price_history_model": "sata_ssd_128gb",
+      "altes_sample_count": 74,
+      "neues_sample_count": 45,
+      "delta": -29,
+      "alte_stats": {
+        "n": 74,
+        "median": 15.0,
+        "min": 1.4,
+        "max": 25.0
+      },
+      "neue_stats": {
+        "n": 45,
+        "median": 14.0,
+        "min": 7.0,
+        "max": 17.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "sata_ssd_1tb",
+      "altes_sample_count": 125,
+      "neues_sample_count": 89,
+      "delta": -36,
+      "alte_stats": {
+        "n": 125,
+        "median": 75.9,
+        "min": 1.0,
+        "max": 110.0
+      },
+      "neue_stats": {
+        "n": 89,
+        "median": 73.0,
+        "min": 1.0,
+        "max": 89.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "sata_ssd_250gb",
+      "altes_sample_count": 189,
+      "neues_sample_count": 163,
+      "delta": -26,
+      "alte_stats": {
+        "n": 189,
+        "median": 24.99,
+        "min": 10.0,
+        "max": 45.0
+      },
+      "neue_stats": {
+        "n": 163,
+        "median": 22.0,
+        "min": 10.0,
+        "max": 260.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "sata_ssd_2tb",
+      "altes_sample_count": 76,
+      "neues_sample_count": 21,
+      "delta": -55,
+      "alte_stats": {
+        "n": 76,
+        "median": 150.0,
+        "min": 15.0,
+        "max": 200.0
+      },
+      "neue_stats": {
+        "n": 21,
+        "median": 144.0,
+        "min": 15.0,
+        "max": 150.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "sata_ssd_500gb",
+      "altes_sample_count": 194,
+      "neues_sample_count": 192,
+      "delta": -2,
+      "alte_stats": {
+        "n": 194,
+        "median": 44.0,
+        "min": 1.0,
+        "max": 55.99
+      },
+      "neue_stats": {
+        "n": 192,
+        "median": 44.5,
+        "min": 1.0,
+        "max": 339.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "sony_retro_konsole",
+      "altes_sample_count": 905,
+      "neues_sample_count": 591,
+      "delta": -314,
+      "alte_stats": {
+        "n": 905,
+        "median": 49.0,
+        "min": 1.0,
+        "max": 90.0
+      },
+      "neue_stats": {
+        "n": 591,
+        "median": 55.55,
+        "min": 1.0,
+        "max": 135.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "spielzeug_bundle_sonstige",
+      "altes_sample_count": 49,
+      "neues_sample_count": 0,
+      "delta": -49,
+      "alte_stats": {
+        "n": 49,
+        "median": 20.0,
+        "min": 2.5,
+        "max": 90.0
+      },
+      "neue_stats": null,
+      "schwellen_warnungen": [
+        "unterschreitet 3 Samples nach Revalidierung (49 -> 0)",
+        "unterschreitet 5 Samples nach Revalidierung (49 -> 0)",
+        "unterschreitet 10 Samples nach Revalidierung (49 -> 0)"
+      ]
+    },
+    {
+      "price_history_model": "thinkpad_modern",
+      "altes_sample_count": 180,
+      "neues_sample_count": 155,
+      "delta": -25,
+      "alte_stats": {
+        "n": 180,
+        "median": 188.5,
+        "min": 7.0,
+        "max": 240.0
+      },
+      "neue_stats": {
+        "n": 155,
+        "median": 199.9,
+        "min": 99.99,
+        "max": 329.0
+      },
+      "schwellen_warnungen": []
+    },
+    {
+      "price_history_model": "vintage_hifi_verstaerker",
+      "altes_sample_count": 620,
+      "neues_sample_count": 352,
+      "delta": -268,
+      "alte_stats": {
+        "n": 620,
+        "median": 99.0,
+        "min": 1.0,
+        "max": 200.0
+      },
+      "neue_stats": {
+        "n": 352,
+        "median": 99.0,
+        "min": 1.0,
+        "max": 200.0
+      },
+      "schwellen_warnungen": []
+    }
+  ],
+  "kleine_samples_warnungen": [
+    {
+      "price_history_model": "controller_ps5_drift",
+      "altes_sample_count": 10,
+      "neues_sample_count": 9,
+      "delta": -1,
+      "alte_stats": {
+        "n": 10,
+        "median": 20.0,
+        "min": 1.0,
+        "max": 20.0
+      },
+      "neue_stats": {
+        "n": 9,
+        "median": 20.0,
+        "min": 1.0,
+        "max": 20.0
+      },
+      "schwellen_warnungen": [
+        "unterschreitet 10 Samples nach Revalidierung (10 -> 9)"
+      ]
+    },
+    {
+      "price_history_model": "gaming_laptop_rtx3060",
+      "altes_sample_count": 34,
+      "neues_sample_count": 5,
+      "delta": -29,
+      "alte_stats": {
+        "n": 34,
+        "median": 299.99,
+        "min": 140.0,
+        "max": 470.0
+      },
+      "neue_stats": {
+        "n": 5,
+        "median": 450.0,
+        "min": 400.0,
+        "max": 450.0
+      },
+      "schwellen_warnungen": [
+        "unterschreitet 10 Samples nach Revalidierung (34 -> 5)"
+      ]
+    },
+    {
+      "price_history_model": "gaming_laptop_rtx4060",
+      "altes_sample_count": 20,
+      "neues_sample_count": 5,
+      "delta": -15,
+      "alte_stats": {
+        "n": 20,
+        "median": 389.0,
+        "min": 0.0,
+        "max": 550.0
+      },
+      "neue_stats": {
+        "n": 5,
+        "median": 450.0,
+        "min": 1.0,
+        "max": 550.0
+      },
+      "schwellen_warnungen": [
+        "unterschreitet 10 Samples nach Revalidierung (20 -> 5)"
+      ]
+    },
+    {
+      "price_history_model": "handheld_ps_vita",
+      "altes_sample_count": 9,
+      "neues_sample_count": 3,
+      "delta": -6,
+      "alte_stats": {
+        "n": 9,
+        "median": 39.0,
+        "min": 21.0,
+        "max": 85.0
+      },
+      "neue_stats": {
+        "n": 3,
+        "median": 49.95,
+        "min": 39.9,
+        "max": 85.0
+      },
+      "schwellen_warnungen": [
+        "unterschreitet 5 Samples nach Revalidierung (9 -> 3)"
+      ]
+    },
+    {
+      "price_history_model": "lego_bundle",
+      "altes_sample_count": 404,
+      "neues_sample_count": 0,
+      "delta": -404,
+      "alte_stats": {
+        "n": 404,
+        "median": 35.0,
+        "min": 1.0,
+        "max": 150.0
+      },
+      "neue_stats": null,
+      "schwellen_warnungen": [
+        "unterschreitet 3 Samples nach Revalidierung (404 -> 0)",
+        "unterschreitet 5 Samples nach Revalidierung (404 -> 0)",
+        "unterschreitet 10 Samples nach Revalidierung (404 -> 0)"
+      ]
+    },
+    {
+      "price_history_model": "playmobil_bundle",
+      "altes_sample_count": 210,
+      "neues_sample_count": 0,
+      "delta": -210,
+      "alte_stats": {
+        "n": 210,
+        "median": 29.16,
+        "min": 1.0,
+        "max": 100.0
+      },
+      "neue_stats": null,
+      "schwellen_warnungen": [
+        "unterschreitet 3 Samples nach Revalidierung (210 -> 0)",
+        "unterschreitet 5 Samples nach Revalidierung (210 -> 0)",
+        "unterschreitet 10 Samples nach Revalidierung (210 -> 0)"
+      ]
+    },
+    {
+      "price_history_model": "roehrenfernseher",
+      "altes_sample_count": 96,
+      "neues_sample_count": 3,
+      "delta": -93,
+      "alte_stats": {
+        "n": 96,
+        "median": 20.0,
+        "min": 1.0,
+        "max": 45.0
+      },
+      "neue_stats": {
+        "n": 3,
+        "median": 10.0,
+        "min": 10.0,
+        "max": 29.0
+      },
+      "schwellen_warnungen": [
+        "unterschreitet 5 Samples nach Revalidierung (96 -> 3)",
+        "unterschreitet 10 Samples nach Revalidierung (96 -> 3)"
+      ]
+    },
+    {
+      "price_history_model": "rx_7600_xt",
+      "altes_sample_count": 12,
+      "neues_sample_count": 4,
+      "delta": -8,
+      "alte_stats": {
+        "n": 12,
+        "median": 200.0,
+        "min": 155.29,
+        "max": 230.0
+      },
+      "neue_stats": {
+        "n": 4,
+        "median": 200.0,
+        "min": 180.0,
+        "max": 230.0
+      },
+      "schwellen_warnungen": [
+        "unterschreitet 5 Samples nach Revalidierung (12 -> 4)",
+        "unterschreitet 10 Samples nach Revalidierung (12 -> 4)"
+      ]
+    },
+    {
+      "price_history_model": "spielzeug_bundle_sonstige",
+      "altes_sample_count": 49,
+      "neues_sample_count": 0,
+      "delta": -49,
+      "alte_stats": {
+        "n": 49,
+        "median": 20.0,
+        "min": 2.5,
+        "max": 90.0
+      },
+      "neue_stats": null,
+      "schwellen_warnungen": [
+        "unterschreitet 3 Samples nach Revalidierung (49 -> 0)",
+        "unterschreitet 5 Samples nach Revalidierung (49 -> 0)",
+        "unterschreitet 10 Samples nach Revalidierung (49 -> 0)"
+      ]
+    }
+  ],
+  "kritisch_true_positive_mit_model_wechsel": [
+    {
+      "fingerprint": "lego star wars minifiguren konvolut",
+      "price": 75.0,
+      "date": "2026-08-03T12:54:28.118011+00:00",
+      "altes_model": "lego_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "spielzeug_bundles",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars figuren konvolut",
+      "price": 95.0,
+      "date": "2026-08-03T13:18:11.518079+00:00",
+      "altes_model": "lego_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "spielzeug_bundles",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego minifiguren konvolut",
+      "price": 59.0,
+      "date": "2026-08-03T15:09:56.432342+00:00",
+      "altes_model": "lego_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "spielzeug_bundles",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars general grievous starfighter 8095 mit minifiguren konvolut",
+      "price": 60.0,
+      "date": "2026-08-03T15:33:18.193469+00:00",
+      "altes_model": "lego_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "spielzeug_bundles",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego minifiguren konvolut",
+      "price": 40.0,
+      "date": "2026-08-03T16:44:29.196016+00:00",
+      "altes_model": "lego_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "spielzeug_bundles",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego ninjago minifiguren sammlung",
+      "price": 1.0,
+      "date": "2026-08-03T18:19:05.140350+00:00",
+      "altes_model": "lego_bundle",
+      "neues_model": "lego_ninjago_bundle",
+      "alte_kategorie": "spielzeug_bundles",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego minifiguren konvolut",
+      "price": 60.0,
+      "date": "2026-08-03T18:48:45.429858+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars minifiguren sammlung",
+      "price": 40.0,
+      "date": "2026-08-03T18:48:45.860184+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "dc marvel lego figuren sammlung konvolut super heroes",
+      "price": 21.5,
+      "date": "2026-08-03T18:48:46.030618+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego ninjago minifigur jay item 891615 limited edition ovp 2016",
+      "price": 5.99,
+      "date": "2026-08-03T18:48:47.933181+00:00",
+      "altes_model": "lego_sw_rare",
+      "neues_model": "lego_ninjago_rare",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego minifiguren konvolut mit zubeh r teilen inkl schl sselanh nger figur",
+      "price": 25.0,
+      "date": "2026-08-03T18:48:56.719327+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego ccxp cologne 2019 exclusive minifigur very limited edition",
+      "price": 20.0,
+      "date": "2026-08-03T18:49:07.602761+00:00",
+      "altes_model": "lego_sw_rare",
+      "neues_model": "lego_cmf",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego minifiguren konvolut",
+      "price": 15.0,
+      "date": "2026-08-03T18:49:08.193539+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego minifiguren konvolut verschiedene minifiguren aus sammlung",
+      "price": 15.0,
+      "date": "2026-08-03T21:39:13.012229+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars general grievous starfighter 8095 mit minifiguren konvolut",
+      "price": 60.0,
+      "date": "2026-08-03T21:39:30.472817+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego minifiguren konvolut",
+      "price": 35.0,
+      "date": "2026-08-03T21:40:45.523397+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego ninjago minifigur scooter limited edition ovp mini figur",
+      "price": 3.0,
+      "date": "2026-08-04T07:40:13.691533+00:00",
+      "altes_model": "lego_sw_rare",
+      "neues_model": "lego_ninjago_rare",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego konvolut minifiguren sammler inselbewohner soldat uvm pferd moc",
+      "price": 23.0,
+      "date": "2026-08-04T11:31:34.723286+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars minifiguren konvolut",
+      "price": 50.0,
+      "date": "2026-08-04T14:06:22.959664+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego spiderman ritter dungeons dragons disney figuren konvolut",
+      "price": 1.0,
+      "date": "2026-08-04T16:41:06.683738+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars figuren konvolut",
+      "price": 14.5,
+      "date": "2026-08-04T17:58:37.297216+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars figuren konvolut",
+      "price": 45.0,
+      "date": "2026-08-04T18:24:52.651742+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars figuren konvolut",
+      "price": 22.0,
+      "date": "2026-08-04T18:50:44.486168+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars minifiguren sammlung",
+      "price": 1.0,
+      "date": "2026-08-04T19:42:41.654529+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego ninjago minifigur jay item 891615 limited edition ovp 2016",
+      "price": 3.9,
+      "date": "2026-08-04T20:08:41.804724+00:00",
+      "altes_model": "lego_sw_rare",
+      "neues_model": "lego_ninjago_rare",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego minifiguren konvolut",
+      "price": 20.0,
+      "date": "2026-08-04T23:46:00.114668+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego minifiguren konvolut 21 figuren viel zubeh r tiere",
+      "price": 34.99,
+      "date": "2026-08-05T07:28:07.125322+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego minifiguren konvolut",
+      "price": 40.0,
+      "date": "2026-08-05T07:28:07.928080+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars figuren konvolut",
+      "price": 40.0,
+      "date": "2026-08-05T12:44:37.956181+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars figuren konvolut",
+      "price": 70.0,
+      "date": "2026-08-05T13:38:01.316621+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego posten homemaker gro kopf figur figuren k pfe mit arme 70er jahre 685px",
+      "price": 39.9,
+      "date": "2026-08-05T17:41:16.284670+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars figuren konvolut",
+      "price": 35.0,
+      "date": "2026-08-05T18:10:43.938900+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars figuren konvolut",
+      "price": 30.0,
+      "date": "2026-08-05T19:24:04.685009+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars minifiguren konvolut",
+      "price": 30.0,
+      "date": "2026-08-05T19:24:04.753340+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego minifiguren k pfe gesichter 100 st ck konvolut sammlung 4",
+      "price": 22.0,
+      "date": "2026-08-06T07:49:52.353593+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego minifiguren k pfe gesichter 100 st ck konvolut sammlung 3",
+      "price": 22.0,
+      "date": "2026-08-06T07:49:52.710993+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego minifiguren k pfe gesichter 100 st ck konvolut sammlung 1",
+      "price": 22.0,
+      "date": "2026-08-06T07:49:53.135957+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars sammlung minifiguren",
+      "price": 12.0,
+      "date": "2026-08-06T08:57:19.124465+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars figuren konvolut",
+      "price": 1.0,
+      "date": "2026-08-06T13:27:26.278644+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego minifiguren konvolut",
+      "price": 30.0,
+      "date": "2026-08-06T15:44:23.591686+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars minifiguren konvolut",
+      "price": 32.0,
+      "date": "2026-08-06T20:47:10.999833+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars figuren konvolut",
+      "price": 24.0,
+      "date": "2026-08-07T07:53:02.598989+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego castle ritter figuren minifiguren konvolut sammlung maiden",
+      "price": 68.0,
+      "date": "2026-08-07T15:56:30.863548+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego minifiguren konvolut",
+      "price": 50.0,
+      "date": "2026-08-07T17:17:06.392245+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars figuren konvolut",
+      "price": 60.0,
+      "date": "2026-08-07T19:57:24.940830+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars figuren konvolut",
+      "price": 20.0,
+      "date": "2026-08-07T19:57:24.995987+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lenovo ideapad 5 15are05 amd ryzen 5 4600u 250gb ssd 16gb ram",
+      "price": 260.0,
+      "date": "2026-08-07T22:25:48.094466+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "sata_ssd_250gb",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "sata_ssd"
+    },
+    {
+      "fingerprint": "lenovo ideapad gaming 3 15imh05 i5 10300h gtx 1650 8gb ram 512gb ssd",
+      "price": 339.0,
+      "date": "2026-08-08T07:52:39.012630+00:00",
+      "altes_model": "gaming_pc",
+      "neues_model": "sata_ssd_500gb",
+      "alte_kategorie": "gaming_pc",
+      "neue_kategorie": "sata_ssd"
+    },
+    {
+      "fingerprint": "lego star wars minifiguren konvolut mit zubeh r blaster lando jubil umsedition",
+      "price": 1.0,
+      "date": "2026-08-08T07:52:41.785129+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego minifiguren k pfe gesichter 100 st ck konvolut sammlung 4",
+      "price": 17.0,
+      "date": "2026-08-08T07:52:42.187659+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego minifiguren k pfe gesichter 100 st ck konvolut sammlung 1",
+      "price": 17.0,
+      "date": "2026-08-08T07:52:42.601138+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars figuren sammlung konvolut figur auswahl",
+      "price": 44.0,
+      "date": "2026-08-08T07:52:43.037925+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego batman 211901 minifigur limited edition polybag ovp",
+      "price": 5.75,
+      "date": "2026-08-08T07:52:43.124500+00:00",
+      "altes_model": "lego_sw_rare",
+      "neues_model": "lego_promo",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego minifiguren k pfe gesichter 100 st ck konvolut sammlung 3",
+      "price": 17.0,
+      "date": "2026-08-08T07:52:43.937386+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "fujitsu lifebook u7510 i5 10310u 2 20 ghz 16gb ddr4 512gb nvme win 11 pro",
+      "price": 245.0,
+      "date": "2026-08-08T07:52:45.850516+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "ram_ddr4_16gb",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "ram"
+    },
+    {
+      "fingerprint": "pc bundle asus strix b450 f gaming amd ryzen 5 3600 16gb ddr4 corsair ram",
+      "price": 299.0,
+      "date": "2026-08-08T07:52:46.274511+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "cpu_bundle_ryzen3600_b450",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "cpu_mainboard_bundle"
+    },
+    {
+      "fingerprint": "pc aufr stkit bundle amd ryzen 5 3600 bis 32gb ddr4 mit asrock a520m hdv",
+      "price": 179.0,
+      "date": "2026-08-08T07:52:46.704247+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "cpu_bundle_ryzen3600_b450",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "cpu_mainboard_bundle"
+    },
+    {
+      "fingerprint": "pc aufr stkit bundle amd ryzen 5 3600 bis 32gb ddr4 mit gigabyte a520m k v2",
+      "price": 189.0,
+      "date": "2026-08-08T07:52:46.790122+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "cpu_bundle_ryzen3600_b450",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "cpu_mainboard_bundle"
+    },
+    {
+      "fingerprint": "pc aufr stkit bundle amd ryzen 5 3600 bis 32gb ddr4 mit asrock b550 pro4",
+      "price": 219.0,
+      "date": "2026-08-08T07:52:46.876385+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "cpu_bundle_ryzen3600_b450",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "cpu_mainboard_bundle"
+    },
+    {
+      "fingerprint": "pc aufr stkit bundle amd ryzen 5 3600 bis 32gb ddr4 mit asrock b550m hdv",
+      "price": 199.0,
+      "date": "2026-08-08T07:52:46.963160+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "cpu_bundle_ryzen3600_b450",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "cpu_mainboard_bundle"
+    },
+    {
+      "fingerprint": "pc aufr stkit bundle amd ryzen 5 5600x bis 32gb ddr4 mit asrock b550 pro4",
+      "price": 299.0,
+      "date": "2026-08-08T07:52:47.224857+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "cpu_bundle_ryzen5600_b550",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "cpu_mainboard_bundle"
+    },
+    {
+      "fingerprint": "pc aufr stkit bundle amd ryzen 5 5600x bis 32gb ddr4 mit gigabyte b550m k",
+      "price": 289.0,
+      "date": "2026-08-08T07:52:47.826025+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "cpu_bundle_ryzen5600_b550",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "cpu_mainboard_bundle"
+    },
+    {
+      "fingerprint": "pc aufr stkit bundle amd ryzen 5 5600x bis 32gb ddr4 mit gigabyte a520m k v2",
+      "price": 269.0,
+      "date": "2026-08-08T07:52:48.044402+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "cpu_bundle_ryzen5600_b550",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "cpu_mainboard_bundle"
+    },
+    {
+      "fingerprint": "pc aufr stkit bundle amd ryzen 5 5600x bis 32gb ddr4 mit asrock a520m hdv",
+      "price": 259.0,
+      "date": "2026-08-08T07:52:48.134224+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "cpu_bundle_ryzen5600_b550",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "cpu_mainboard_bundle"
+    },
+    {
+      "fingerprint": "lenovo thinkpad t14 gen 1 core i5 10310u 1 7ghz 16gb ram 512gb m 2",
+      "price": 259.0,
+      "date": "2026-08-08T07:52:48.222233+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "thinkpad_modern",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "notebook_resell"
+    },
+    {
+      "fingerprint": "lenovo thinkpad t14 gen1 i5 10310u 16gb ram 256gb ssd 14 fhd win 11 pro mwst",
+      "price": 299.99,
+      "date": "2026-08-08T07:52:48.300239+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "thinkpad_modern",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "notebook_resell"
+    },
+    {
+      "fingerprint": "laptop 2 in 1 lenovo thinkpad x13 yoga gen 1 i7 10510u 16gb ram ssd 512gb win 11",
+      "price": 270.0,
+      "date": "2026-08-08T07:52:49.760600+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "thinkpad_modern",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "notebook_resell"
+    },
+    {
+      "fingerprint": "lenovo thinkpad x13 yoga gen 1 i5 10310u 16gb ram 512gb ssd touch windows 11",
+      "price": 297.5,
+      "date": "2026-08-08T07:52:49.843836+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "thinkpad_modern",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "notebook_resell"
+    },
+    {
+      "fingerprint": "lenovo thinkpad x13 gen 1 13 3 intel i5 10310u 1 70ghz 16gb ram 256gb ssd touch",
+      "price": 249.0,
+      "date": "2026-08-08T07:52:49.927189+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "thinkpad_modern",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "notebook_resell"
+    },
+    {
+      "fingerprint": "notebook lenovo thinkpad x13 yoga gen 1 intel core i5 10310u 4x 1 7ghz 16gb ram",
+      "price": 274.0,
+      "date": "2026-08-08T07:52:50.009516+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "thinkpad_modern",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "notebook_resell"
+    },
+    {
+      "fingerprint": "laptop lenovo thinkpad x390 yoga 13 3 fhd 256gb ssd i7 8565u 16gb ram qwertz",
+      "price": 280.0,
+      "date": "2026-08-08T07:52:50.090821+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "thinkpad_modern",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "notebook_resell"
+    },
+    {
+      "fingerprint": "lenovo thinkpad x390 yoga 13 3 i7 8665u 16 gb ram 256 gb ssd",
+      "price": 314.0,
+      "date": "2026-08-08T07:52:50.173535+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "thinkpad_modern",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "notebook_resell"
+    },
+    {
+      "fingerprint": "lenovo thinkpad x390 13 3 i5 8365u 8 gb ram 512 gb ssd",
+      "price": 293.0,
+      "date": "2026-08-08T07:52:50.256019+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "thinkpad_modern",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "notebook_resell"
+    },
+    {
+      "fingerprint": "pc aufr stkit bundle intel core i5 12400f bis 64gb ddr4 mit msi pro h610m e",
+      "price": 269.0,
+      "date": "2026-08-08T07:52:50.331867+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "cpu_bundle_i5_12400f_b660",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "cpu_mainboard_bundle"
+    },
+    {
+      "fingerprint": "pc aufr stkit bundle intel core i5 12400f bis 64gb ddr4 mit msi pro b760m p",
+      "price": 299.0,
+      "date": "2026-08-08T07:52:50.407779+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "cpu_bundle_i5_12400f_b660",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "cpu_mainboard_bundle"
+    },
+    {
+      "fingerprint": "pc aufr stkit bundle intel core i5 12400f bis 64gb ddr4 mit asrock h610m hdv",
+      "price": 269.0,
+      "date": "2026-08-08T07:52:50.569204+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "cpu_bundle_i5_12400f_b660",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "cpu_mainboard_bundle"
+    },
+    {
+      "fingerprint": "pc aufr stkit bundle intel core i5 12400f bis 64gb ddr4 mit gigabyte b760m h",
+      "price": 289.0,
+      "date": "2026-08-08T07:52:50.651501+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "cpu_bundle_i5_12400f_b660",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "cpu_mainboard_bundle"
+    },
+    {
+      "fingerprint": "lego auch technik konvolut 3kg viele teile figuren reifen",
+      "price": 40.0,
+      "date": "2026-08-08T08:27:39.614128+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "am4 bundle ryzen 5 3600x 16gb ddr4 256gb ssd",
+      "price": 225.0,
+      "date": "2026-08-08T08:27:41.410994+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "cpu_bundle_ryzen3600_b450",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "cpu_mainboard_bundle"
+    },
+    {
+      "fingerprint": "lego duplo konvolut flugzeug hubschrauber figuren steine",
+      "price": 39.0,
+      "date": "2026-08-08T09:08:26.244547+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "gro es lego duplo konvolut mit steinen platten und figuren",
+      "price": 45.0,
+      "date": "2026-08-08T09:08:26.327350+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars set 75194 mit minifiguren konvolut",
+      "price": 8.0,
+      "date": "2026-08-08T09:08:26.408488+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego minifiguren sammlung und zubeh r",
+      "price": 30.0,
+      "date": "2026-08-08T09:08:26.815098+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego bausteine konvolut minifiguren sondersteine fenster usw ca 480 g",
+      "price": 4.99,
+      "date": "2026-08-08T09:40:07.507995+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego nexo knights 271720 limited edition figur macy",
+      "price": 3.0,
+      "date": "2026-08-08T09:40:07.915316+00:00",
+      "altes_model": "lego_sw_rare",
+      "neues_model": "lego_promo",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego duplo gro es konvolut mit figuren tieren zubeh r",
+      "price": 50.0,
+      "date": "2026-08-08T09:40:08.419803+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego city ca 50 minifiguren konvolut plus zubeh r polizei etc",
+      "price": 45.0,
+      "date": "2026-08-08T09:40:08.511103+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars set 75224 mit minifiguren und anleitung konvolut",
+      "price": 7.0,
+      "date": "2026-08-08T09:40:08.600665+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars set 75194 mit minifiguren und anleitung konvolut",
+      "price": 7.0,
+      "date": "2026-08-08T09:40:09.014097+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "amd radeon msi rx 7600 mech 2x classic 8g oc ovp",
+      "price": 180.0,
+      "date": "2026-08-08T10:22:43.461026+00:00",
+      "altes_model": "rx_7600_xt",
+      "neues_model": "rx_7600",
+      "alte_kategorie": "gpu",
+      "neue_kategorie": "gpu"
+    },
+    {
+      "fingerprint": "lego fabuland figuren konvolut",
+      "price": 12.0,
+      "date": "2026-08-08T10:22:46.602990+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars sammlung minifiguren",
+      "price": 11.0,
+      "date": "2026-08-08T10:22:47.006503+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego konvolut 14 piraten ritter konvolut 9 figuren waffen",
+      "price": 40.0,
+      "date": "2026-08-08T10:54:23.828793+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "gro e lego minecraft figuren sammlung konvolut minifiguren tiere",
+      "price": 1.0,
+      "date": "2026-08-08T10:54:23.910528+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego figuren konvolut teilweise 1980 90er jahre rat selten",
+      "price": 1.0,
+      "date": "2026-08-08T10:54:24.341317+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego konvolut sammlung minifiguren minecraft inkl waffen",
+      "price": 19.0,
+      "date": "2026-08-08T11:26:12.574632+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego konvolut sammlung minifiguren weltall space alien astronauten",
+      "price": 19.0,
+      "date": "2026-08-08T11:26:12.743917+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego jurassic world minifigur owen propellerboot limited edition 30 teile",
+      "price": 8.9,
+      "date": "2026-08-08T11:26:12.835642+00:00",
+      "altes_model": "lego_sw_rare",
+      "neues_model": "lego_promo",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars assasin droid figuren konvolut bounty hunter 8015",
+      "price": 15.0,
+      "date": "2026-08-08T11:26:13.591032+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "gro e lego duplo steine sammlung mit fahrzeugen und figuren",
+      "price": 30.0,
+      "date": "2026-08-08T11:26:14.397731+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "original lego primo konvolut figuren tiere bausteine autos",
+      "price": 50.0,
+      "date": "2026-08-08T11:26:14.493502+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego minifiguren sammlung verschiedene serien ovp",
+      "price": 6.0,
+      "date": "2026-08-08T11:26:14.591635+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "g skill 16 gb ram 2x 8 gb ddr4",
+      "price": 50.0,
+      "date": "2026-08-08T21:27:37.819985+00:00",
+      "altes_model": "ram_ddr4_16gb",
+      "neues_model": "ram_ddr4_8gb",
+      "alte_kategorie": "ram",
+      "neue_kategorie": "ram"
+    },
+    {
+      "fingerprint": "samsung arbeitsspeicher ddr4 2x 16gb 32gb 2666mhz pc ram",
+      "price": 80.0,
+      "date": "2026-08-08T21:27:38.056580+00:00",
+      "altes_model": "ram_ddr4_32gb",
+      "neues_model": "ram_ddr4_16gb",
+      "alte_kategorie": "ram",
+      "neue_kategorie": "ram"
+    },
+    {
+      "fingerprint": "16gb ddr4 ram crucial 2 8gb",
+      "price": 50.0,
+      "date": "2026-08-08T21:27:38.299486+00:00",
+      "altes_model": "ram_ddr4_16gb",
+      "neues_model": "ram_ddr4_8gb",
+      "alte_kategorie": "ram",
+      "neue_kategorie": "ram"
+    },
+    {
+      "fingerprint": "lego star wars figuren konvolut",
+      "price": 33.0,
+      "date": "2026-08-08T21:27:44.204679+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego vintge classic space minifiguren konvolut 13 figuren",
+      "price": 48.0,
+      "date": "2026-08-08T21:27:44.371049+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "gro e lego sammlung ca 6 7 kg mit figuren und fahrzeugen",
+      "price": 60.0,
+      "date": "2026-08-08T21:27:44.531914+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars city konvolut minifiguren viele teile",
+      "price": 49.0,
+      "date": "2026-08-08T21:27:44.615508+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars minifiguren konvolut",
+      "price": 67.0,
+      "date": "2026-08-08T21:27:44.699295+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars minifiguren konvolut",
+      "price": 38.0,
+      "date": "2026-08-08T21:27:44.782532+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars minifiguren konvolut",
+      "price": 35.0,
+      "date": "2026-08-08T21:27:44.866355+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego formula 1 minifiguren sammlung",
+      "price": 50.0,
+      "date": "2026-08-08T21:27:45.030875+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego star wars minifiguren figuren 17 st ck set sammlung konvolut",
+      "price": 50.0,
+      "date": "2026-08-08T21:27:45.910917+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "amd ryzen 5 5600 msi b350 gaming pro 32 gb ddr4 3200 bundle",
+      "price": 299.0,
+      "date": "2026-08-08T21:27:49.276588+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "cpu_bundle_ryzen5600_b550",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "cpu_mainboard_bundle"
+    },
+    {
+      "fingerprint": "bundle ryzen 5 5600 asrock b550m pro se 16gb ddr4",
+      "price": 260.0,
+      "date": "2026-08-08T21:27:49.771298+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "cpu_bundle_ryzen5600_b550",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "cpu_mainboard_bundle"
+    },
+    {
+      "fingerprint": "lego mario figuren konvolut",
+      "price": 50.0,
+      "date": "2026-08-08T21:53:09.261489+00:00",
+      "altes_model": "lego_ninjago_bundle",
+      "neues_model": "lego_minifig_bundle",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "lego ccxp cologne 2019 exclusive minifigur very limited edition",
+      "price": 50.0,
+      "date": "2026-08-08T22:53:43.303331+00:00",
+      "altes_model": "lego_sw_rare",
+      "neues_model": "lego_cmf",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "xbox one controller titanfall edition defekt zubeh r",
+      "price": 35.0,
+      "date": "2026-08-09T02:55:51.083543+00:00",
+      "altes_model": "konsole_bastler_bundle",
+      "neues_model": "controller_xbox_drift",
+      "alte_kategorie": "konsolen_bundles",
+      "neue_kategorie": "controller"
+    },
+    {
+      "fingerprint": "lenovo thinkpad l14 gen 1 14 16 32 gb ram 512 gb ssd i5 10210u notebook laptop mwst garantie office schule uni microsoft office paket",
+      "price": 329.0,
+      "date": "2026-08-09T06:34:16.521775+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "thinkpad_modern",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "notebook_resell"
+    },
+    {
+      "fingerprint": "2x nanya nt8ga64d88cx3f jr ddr4 ram 8gb kit 16gb",
+      "price": 40.0,
+      "date": "2026-08-09T08:39:16.856702+00:00",
+      "altes_model": "ram_ddr4_16gb",
+      "neues_model": "ram_ddr4_8gb",
+      "alte_kategorie": "ram",
+      "neue_kategorie": "ram"
+    },
+    {
+      "fingerprint": "2x 16 gb ddr4 ram 32 gb gesamt pc4 2400",
+      "price": 89.0,
+      "date": "2026-08-09T08:39:17.039682+00:00",
+      "altes_model": "ram_ddr4_32gb",
+      "neues_model": "ram_ddr4_16gb",
+      "alte_kategorie": "ram",
+      "neue_kategorie": "ram"
+    },
+    {
+      "fingerprint": "nintendo switch pro controller mit ovp",
+      "price": 45.0,
+      "date": "2026-08-09T08:39:45.279869+00:00",
+      "altes_model": "konsole_switch_standard",
+      "neues_model": "controller_switch_pro",
+      "alte_kategorie": "konsolen_bundles",
+      "neue_kategorie": "controller"
+    },
+    {
+      "fingerprint": "pc aufr stkit bundle amd ryzen 5 3600 bis 32gb ddr4 mit biostar b550mhp",
+      "price": 199.0,
+      "date": "2026-08-09T08:40:29.073973+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "cpu_bundle_ryzen3600_b450",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "cpu_mainboard_bundle"
+    },
+    {
+      "fingerprint": "kingston fury beast 16 gb ddr4 3200 mhz 2x 8 gb",
+      "price": 50.0,
+      "date": "2026-08-09T09:21:03.086285+00:00",
+      "altes_model": "ram_ddr4_16gb",
+      "neues_model": "ram_ddr4_8gb",
+      "alte_kategorie": "ram",
+      "neue_kategorie": "ram"
+    },
+    {
+      "fingerprint": "g skill ripjaws v 32gb ddr4 ram 2x 16gb",
+      "price": 75.0,
+      "date": "2026-08-09T10:36:00.651822+00:00",
+      "altes_model": "ram_ddr4_32gb",
+      "neues_model": "ram_ddr4_16gb",
+      "alte_kategorie": "ram",
+      "neue_kategorie": "ram"
+    },
+    {
+      "fingerprint": "ddr4 speicher 32gb 4 x 8gb",
+      "price": 70.0,
+      "date": "2026-08-09T10:36:00.741183+00:00",
+      "altes_model": "ram_ddr4_32gb",
+      "neues_model": "ram_ddr4_8gb",
+      "alte_kategorie": "ram",
+      "neue_kategorie": "ram"
+    },
+    {
+      "fingerprint": "ram riegel 2x 8gb ddr 4 2666mhz",
+      "price": 50.0,
+      "date": "2026-08-09T10:36:00.829517+00:00",
+      "altes_model": "ram_ddr4_16gb",
+      "neues_model": "ram_ddr4_8gb",
+      "alte_kategorie": "ram",
+      "neue_kategorie": "ram"
+    },
+    {
+      "fingerprint": "arbeitsspeicher ram ddr4 2133 mhz pc4 17000 288 pin 4gb 8gb 16gb",
+      "price": 35.0,
+      "date": "2026-08-09T11:55:08.870553+00:00",
+      "altes_model": "ram_ddr4_16gb",
+      "neues_model": "ram_ddr4_8gb",
+      "alte_kategorie": "ram",
+      "neue_kategorie": "ram"
+    },
+    {
+      "fingerprint": "g skill ripjaws v 8gb 2x8gb ddr4 3466 dimm ram cl16 18 18 38",
+      "price": 55.0,
+      "date": "2026-08-09T13:14:29.280054+00:00",
+      "altes_model": "ram_ddr4_16gb",
+      "neues_model": "ram_ddr4_8gb",
+      "alte_kategorie": "ram",
+      "neue_kategorie": "ram"
+    },
+    {
+      "fingerprint": "2x 16gb kingspec ddr4 ram 2666mhz arbeitsspeicher",
+      "price": 100.0,
+      "date": "2026-08-09T15:11:52.127318+00:00",
+      "altes_model": "ram_ddr4_32gb",
+      "neues_model": "ram_ddr4_16gb",
+      "alte_kategorie": "ram",
+      "neue_kategorie": "ram"
+    },
+    {
+      "fingerprint": "16gb gesamtkapazit t 2x 8gb module typ ddr4",
+      "price": 25.0,
+      "date": "2026-08-09T15:11:52.265055+00:00",
+      "altes_model": "ram_ddr4_16gb",
+      "neues_model": "ram_ddr4_8gb",
+      "alte_kategorie": "ram",
+      "neue_kategorie": "ram"
+    },
+    {
+      "fingerprint": "2x 16gb qiyida ddr4 ram 3200mhz arbeitsspeicher",
+      "price": 110.0,
+      "date": "2026-08-09T15:11:52.676863+00:00",
+      "altes_model": "ram_ddr4_32gb",
+      "neues_model": "ram_ddr4_16gb",
+      "alte_kategorie": "ram",
+      "neue_kategorie": "ram"
+    },
+    {
+      "fingerprint": "2x 8gb crucial ballistix sport ddr4 ram",
+      "price": 50.0,
+      "date": "2026-08-09T15:51:17.635935+00:00",
+      "altes_model": "ram_ddr4_16gb",
+      "neues_model": "ram_ddr4_8gb",
+      "alte_kategorie": "ram",
+      "neue_kategorie": "ram"
+    },
+    {
+      "fingerprint": "microsoft xbox series x s und xbox one controller defekt stickdrift",
+      "price": 19.0,
+      "date": "2026-08-09T15:51:19.972741+00:00",
+      "altes_model": "konsole_bastler_bundle",
+      "neues_model": "controller_xbox_drift",
+      "alte_kategorie": "konsolen_bundles",
+      "neue_kategorie": "controller"
+    },
+    {
+      "fingerprint": "sony playstation konvolut ps2 slim pink psone konsole controller boot ok",
+      "price": 110.0,
+      "date": "2026-08-09T15:51:26.410973+00:00",
+      "altes_model": "retro_konvolut",
+      "neues_model": "sony_retro_konsole",
+      "alte_kategorie": "retro_konsolen",
+      "neue_kategorie": "retro_konsolen"
+    },
+    {
+      "fingerprint": "crucial 16gb ddr4 2x 8gb pc4 2400",
+      "price": 39.0,
+      "date": "2026-08-09T16:30:46.514925+00:00",
+      "altes_model": "ram_ddr4_16gb",
+      "neues_model": "ram_ddr4_8gb",
+      "alte_kategorie": "ram",
+      "neue_kategorie": "ram"
+    },
+    {
+      "fingerprint": "crucial 32gb ddr4 2x 16gb pc4 2400",
+      "price": 85.0,
+      "date": "2026-08-09T16:30:46.604849+00:00",
+      "altes_model": "ram_ddr4_32gb",
+      "neues_model": "ram_ddr4_16gb",
+      "alte_kategorie": "ram",
+      "neue_kategorie": "ram"
+    },
+    {
+      "fingerprint": "samsung 16gb ddr4 2x 8gb pc4 2133p",
+      "price": 39.0,
+      "date": "2026-08-09T16:30:46.693956+00:00",
+      "altes_model": "ram_ddr4_16gb",
+      "neues_model": "ram_ddr4_8gb",
+      "alte_kategorie": "ram",
+      "neue_kategorie": "ram"
+    },
+    {
+      "fingerprint": "2x 8gb timetec ddr4 ram 16gb ram",
+      "price": 38.0,
+      "date": "2026-08-09T17:10:13.362910+00:00",
+      "altes_model": "ram_ddr4_16gb",
+      "neues_model": "ram_ddr4_8gb",
+      "alte_kategorie": "ram",
+      "neue_kategorie": "ram"
+    },
+    {
+      "fingerprint": "2x 16gb crucial ddr4 ram module f r deinen pc",
+      "price": 80.0,
+      "date": "2026-08-09T17:49:25.658161+00:00",
+      "altes_model": "ram_ddr4_32gb",
+      "neues_model": "ram_ddr4_16gb",
+      "alte_kategorie": "ram",
+      "neue_kategorie": "ram"
+    },
+    {
+      "fingerprint": "laptop lenovo thinkpad t14 gen1 core i7 10510u ddr4 24gb ssd 512",
+      "price": 300.0,
+      "date": "2026-08-09T17:49:34.842020+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "thinkpad_modern",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "notebook_resell"
+    },
+    {
+      "fingerprint": "16gb kit 2x 8gb micron ddr4 ram 1rx8 pc4 2666v ua2 11 desktop speicher",
+      "price": 50.0,
+      "date": "2026-08-09T19:10:12.659755+00:00",
+      "altes_model": "ram_ddr4_16gb",
+      "neues_model": "ram_ddr4_8gb",
+      "alte_kategorie": "ram",
+      "neue_kategorie": "ram"
+    },
+    {
+      "fingerprint": "pc aufr stkit bundle amd ryzen 5 5600 bis 32gb ddr4 mit asrock a520m hdv",
+      "price": 239.0,
+      "date": "2026-08-09T19:10:19.082746+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "cpu_bundle_ryzen5600_b550",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "cpu_mainboard_bundle"
+    },
+    {
+      "fingerprint": "lenovo ideapad 5 ryzen 7 4700u 16gb ram 500gb ssd",
+      "price": 180.0,
+      "date": "2026-08-09T19:10:19.281096+00:00",
+      "altes_model": "office_pc",
+      "neues_model": "sata_ssd_500gb",
+      "alte_kategorie": "office_pc",
+      "neue_kategorie": "sata_ssd"
+    },
+    {
+      "fingerprint": "nacon revolution unlimited pro ps5 ps4 pc controller",
+      "price": 95.0,
+      "date": "2026-08-09T19:49:57.134594+00:00",
+      "altes_model": "konsole_ps4_bundle",
+      "neues_model": "controller_ps5_dualsense",
+      "alte_kategorie": "konsolen_bundles",
+      "neue_kategorie": "controller"
+    },
+    {
+      "fingerprint": "lego pirates captain roger red beard pi055 minifigur sammler gebraucht flaage",
+      "price": 11.49,
+      "date": "2026-08-09T20:40:35.656667+00:00",
+      "altes_model": "lego_retro_rare",
+      "neues_model": "lego_cmf",
+      "alte_kategorie": "lego_minifiguren",
+      "neue_kategorie": "lego_minifiguren"
+    },
+    {
+      "fingerprint": "original nintendo switch pro controller 2 st ck vorhanden ovp",
+      "price": 39.0,
+      "date": "2026-08-10T14:06:30.415633+00:00",
+      "altes_model": "konsole_switch_standard",
+      "neues_model": "controller_switch_pro",
+      "alte_kategorie": "konsolen_bundles",
+      "neue_kategorie": "controller"
+    }
+  ],
+  "kritisch_unclear_mit_model_wechsel": [
+    {
+      "fingerprint": "nintendo switch 2 pro controller nswitch 2 ovp",
+      "price": 79.99,
+      "date": "2026-08-09T08:39:42.610889+00:00",
+      "altes_model": "konsole_switch_standard",
+      "neues_model": "controller_switch_pro",
+      "alte_kategorie": "konsolen_bundles",
+      "neue_kategorie": "controller"
+    },
+    {
+      "fingerprint": "nintendo switch pro controller original ovp",
+      "price": 39.99,
+      "date": "2026-08-09T08:39:43.174360+00:00",
+      "altes_model": "konsole_switch_standard",
+      "neues_model": "controller_switch_pro",
+      "alte_kategorie": "konsolen_bundles",
+      "neue_kategorie": "controller"
+    },
+    {
+      "fingerprint": "ovp nintendo switch pro controller monster hunter rise sunbreak edition",
+      "price": 75.0,
+      "date": "2026-08-09T08:39:43.582429+00:00",
+      "altes_model": "konsole_switch_standard",
+      "neues_model": "controller_switch_pro",
+      "alte_kategorie": "konsolen_bundles",
+      "neue_kategorie": "controller"
+    },
+    {
+      "fingerprint": "nintendo switch pro controller in ovp",
+      "price": 50.0,
+      "date": "2026-08-09T09:56:30.703998+00:00",
+      "altes_model": "konsole_switch_standard",
+      "neues_model": "controller_switch_pro",
+      "alte_kategorie": "konsolen_bundles",
+      "neue_kategorie": "controller"
+    },
+    {
+      "fingerprint": "nintendo switch pro controller schwarz mit ovp kaum genutzt",
+      "price": 39.0,
+      "date": "2026-08-09T13:14:32.530409+00:00",
+      "altes_model": "konsole_switch_standard",
+      "neues_model": "controller_switch_pro",
+      "alte_kategorie": "konsolen_bundles",
+      "neue_kategorie": "controller"
+    },
+    {
+      "fingerprint": "2x nintendo switch 2 pro controller ovp",
+      "price": 130.0,
+      "date": "2026-08-09T15:11:53.989269+00:00",
+      "altes_model": "konsole_switch_standard",
+      "neues_model": "controller_switch_pro",
+      "alte_kategorie": "konsolen_bundles",
+      "neue_kategorie": "controller"
+    },
+    {
+      "fingerprint": "xbox one s 1 tb 1 controller wei ovp",
+      "price": 80.0,
+      "date": "2026-08-09T15:51:20.062144+00:00",
+      "altes_model": "konsole_xbox_one",
+      "neues_model": "controller_xbox_series",
+      "alte_kategorie": "konsolen_bundles",
+      "neue_kategorie": "controller"
+    }
+  ]
+}

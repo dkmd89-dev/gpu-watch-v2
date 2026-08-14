@@ -73,6 +73,7 @@ def build_historical_baseline(write: bool = True) -> dict:
             "price": e.get("price", 0.0) or 0.0,
             "stored_category": stored_category,
             "stored_rule_label": stored_rule,
+            "stored_price_history_model": e.get("price_history_model") or "NOT_AVAILABLE",
             "matched_category": e.get("matched_category"),
             "matched_rule_label": e.get("matched_rule_label"),
             "visible": True,  # forensics enthaelt nur "sichtbare Treffer"
