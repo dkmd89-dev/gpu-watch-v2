@@ -1,6 +1,5 @@
 # Sensible Daten / API-Keys
 .env
-CLAUDE.md
 
 # Python Cache & Artefakte
 __pycache__/
