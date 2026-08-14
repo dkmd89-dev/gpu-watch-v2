@@ -234,16 +234,25 @@ rules:
   # ============================================================
   # RTX 3060 Ti
   # ============================================================
+  # FIX (Datenqualität Nr. 4, Folgeschritt zum RX-7600-VRAM-Fix 2026-08-15):
+  # min_vram_gb explizit auf 0 -- ohne eigenen Wert fiel die Regel auf den
+  # globalen Default (min_vram_gb: 12) zurück, die RTX 3060 Ti hat aber nur
+  # 8GB VRAM. matcher.py::_vram_gb() erkennt "8GB" im Titel, nicht "8G" --
+  # jedes Angebot mit "8GB"-Schreibweise wurde faelschlich verworfen (real
+  # verifiziert, 110 historische + 12 aktuelle price_history-Punkte
+  # betroffen). match-Begriffe bereits eindeutig modellspezifisch, kein
+  # Risiko einer falschen Karte durch den fehlenden VRAM-Filter.
   - label: "RTX 3060 Ti ★ Top-Deal"
-    match: 
+    match:
       - "3060 ti"
       - "3060ti"
       - "rtx 3060 ti"
     price_history_model: "rtx_3060_ti"
-    exclude: 
+    exclude:
       - "3070"
       - "3080"
       - "4060"
+    min_vram_gb: 0
     max_price: 220
     deal_rating: "Top-Deal"
     negotiation_tolerance_pct: 15.0
@@ -251,32 +260,38 @@ rules:
     negotiation_score_component: "hardware_qualitaet"
 
   - label: "RTX 3060 Ti"
-    match: 
+    match:
       - "3060 ti"
       - "3060ti"
       - "rtx 3060 ti"
     price_history_model: "rtx_3060_ti"
-    exclude: 
+    exclude:
       - "3070"
       - "3080"
       - "4060"
+    min_vram_gb: 0
     max_price: 280
     deal_rating: "Guter Preis"
 
   # ============================================================
   # RTX 3070
   # ============================================================
+  # FIX (Datenqualität Nr. 4, Folgeschritt 2026-08-15): min_vram_gb: 0,
+  # identische Begründung wie bei RTX 3060 Ti oben -- RTX 3070 hat nur
+  # 8GB VRAM, real verifiziert (149 historische + 16 aktuelle Punkte
+  # betroffen).
   - label: "RTX 3070 ★ Top-Deal"
-    match: 
+    match:
       - "rtx 3070"
       - "3070 8g"
       - "3070-8g"
     price_history_model: "rtx_3070"
-    exclude: 
+    exclude:
       - "3070 ti"
       - "3070ti"
       - "3080"
       - "3090"
+    min_vram_gb: 0
     max_price: 250
     deal_rating: "Top-Deal"
     negotiation_tolerance_pct: 15.0
@@ -284,16 +299,17 @@ rules:
     negotiation_score_component: "hardware_qualitaet"
 
   - label: "RTX 3070"
-    match: 
+    match:
       - "rtx 3070"
       - "3070 8g"
       - "3070-8g"
     price_history_model: "rtx_3070"
-    exclude: 
+    exclude:
       - "3070 ti"
       - "3070ti"
       - "3080"
       - "3090"
+    min_vram_gb: 0
     max_price: 310
     deal_rating: "Guter Preis"
 
@@ -392,15 +408,19 @@ rules:
   # ============================================================
   # RTX 4060
   # ============================================================
+  # FIX (Datenqualität Nr. 4, Folgeschritt 2026-08-15): min_vram_gb: 0,
+  # identische Begründung -- RTX 4060 hat nur 8GB VRAM, real verifiziert
+  # (29 historische + 4 aktuelle Punkte betroffen).
   - label: "RTX 4060 ★ Top-Deal"
-    match: 
+    match:
       - "rtx 4060"
       - "4060 8g"
     price_history_model: "rtx_4060"
-    exclude: 
+    exclude:
       - "4060 ti"
       - "4070"
       - "4080"
+    min_vram_gb: 0
     max_price: 240
     deal_rating: "Top-Deal"
     negotiation_tolerance_pct: 15.0
@@ -408,14 +428,15 @@ rules:
     negotiation_score_component: "hardware_qualitaet"
 
   - label: "RTX 4060"
-    match: 
+    match:
       - "rtx 4060"
       - "4060 8g"
     price_history_model: "rtx_4060"
-    exclude: 
+    exclude:
       - "4060 ti"
       - "4070"
       - "4080"
+    min_vram_gb: 0
     max_price: 290
     deal_rating: "Guter Preis"
 
@@ -463,15 +484,27 @@ rules:
   # ============================================================
   # RX 7600 (8GB)
   # ============================================================
+  # FIX (Datenqualität Nr. 4, Ruleset-Qualitätssystem-Folgeschritt
+  # 2026-08-15): min_vram_gb explizit auf 0 gesetzt. Ohne eigenen Wert
+  # fiel die Regel auf den globalen Default (_global.yaml, min_vram_gb: 12)
+  # zurück -- die RX 7600 hat aber nur 8GB VRAM. matcher.py::_vram_gb()
+  # erkennt "8GB" im Titel (Regex "(\d{1,2})\s*gb"), NICHT aber "8G" --
+  # jedes Angebot, das die (weit häufigere) Schreibweise "8GB" statt "8G"
+  # nutzte, wurde dadurch fälschlich verworfen (vram=8 < min_vram=12),
+  # real bestätigt ("... RX 7600 MECH 2X CLASSIC 8GB OC" matchte nicht,
+  # identischer Titel mit "8G" matchte). match-Begriffe sind bereits
+  # eindeutig modellspezifisch ("rx 7600"/"7600 8g"), kein Risiko einer
+  # falschen Karte durch den fehlenden VRAM-Filter.
   - label: "RX 7600 ★ Top-Deal"
-    match: 
+    match:
       - "rx 7600"
       - "7600 8g"
     price_history_model: "rx_7600"
-    exclude: 
+    exclude:
       - "7600 xt"
       - "7700"
       - "7800"
+    min_vram_gb: 0
     max_price: 160
     deal_rating: "Top-Deal"
     negotiation_tolerance_pct: 15.0
@@ -479,30 +512,36 @@ rules:
     negotiation_score_component: "hardware_qualitaet"
 
   - label: "RX 7600"
-    match: 
+    match:
       - "rx 7600"
       - "7600 8g"
     price_history_model: "rx_7600"
-    exclude: 
+    exclude:
       - "7600 xt"
       - "7700"
       - "7800"
+    min_vram_gb: 0
     max_price: 210
     deal_rating: "Guter Preis"
 
   # ============================================================
   # RTX 2080 Ti
   # ============================================================
+  # FIX (Datenqualität Nr. 4, Folgeschritt 2026-08-15): min_vram_gb: 0,
+  # identische Begründung -- RTX 2080 Ti hat 11GB VRAM (knapp unter dem
+  # globalen 12GB-Default), real verifiziert (60 historische + 3 aktuelle
+  # Punkte betroffen).
   - label: "RTX 2080 Ti ★ Top-Deal"
-    match: 
+    match:
       - "2080 ti"
       - "2080ti"
       - "rtx 2080"
     price_history_model: "rtx_2080_ti"
-    exclude: 
+    exclude:
       - "2080 super"
       - "2070"
       - "2060"
+    min_vram_gb: 0
     max_price: 220
     deal_rating: "Top-Deal"
     negotiation_tolerance_pct: 15.0
@@ -510,14 +549,15 @@ rules:
     negotiation_score_component: "hardware_qualitaet"
 
   - label: "RTX 2080 Ti"
-    match: 
+    match:
       - "2080 ti"
       - "2080ti"
       - "rtx 2080"
     price_history_model: "rtx_2080_ti"
-    exclude: 
+    exclude:
       - "2080 super"
       - "2070"
       - "2060"
+    min_vram_gb: 0
     max_price: 270
     deal_rating: "Guter Preis"

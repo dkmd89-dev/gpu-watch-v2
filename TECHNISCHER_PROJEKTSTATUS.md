@@ -2,18 +2,19 @@
 
 > **Single Source of Truth für den technischen Ist-Zustand.**
 >
-> Stand: **2026-08-14**
+> Stand: **2026-08-15**
 > Repository: `dkmd89-dev/gpu-watch-v2`
 > Branch: `main`
-> **Letzter Code-Commit (vor dieser Doku-Aktualisierung):** `5a01516` (fix: Lade-Stationen/-Geräte-
-> Zubehör bei controller ausschließen)
-> **HEAD (main, vor dieser Doku-Aktualisierung):** `5fea3ec` (Merge PR #33)
+> **Letzter Code-Commit (vor dieser Doku-Aktualisierung):** `1ac95ef` (fix: min_vram_gb-Bug bei
+> RX 7600 + 4 weiteren GPU-Modellen behoben)
+> **HEAD (main, vor dieser Doku-Aktualisierung):** `c3b9443` (Merge PR #34)
 > Vorheriger dokumentierter Stand: `2745a95` (PR #29 + Folge-Sessions)
-> Vergleich `2745a95...5a01516`: PR #31 (251-Listing-Worksheet gelabelt + 3 Exclude-Fixes,
+> Vergleich `2745a95...1ac95ef`: PR #31 (251-Listing-Worksheet gelabelt + 3 Exclude-Fixes,
 > `c577207`) + PR #32 (Umlaut-Fingerprint-Fix + menschliches Labeling + Preishistorie-
 > Revalidierung v3, `3c9a678`) + PR #33 (4 weitere Exclude-Fixes, Zubehör/Ersatzteil-vs-Gerät,
-> `5fea3ec`) + `5a01516` (controller/ladekabel-Restlücke gelöst) + freigegebene
-> `lego_bundle`-Datenbereinigung (`data/price_history.jsonl`, kein Code-Commit)
+> `5fea3ec`) + PR #34 (controller/ladekabel-Restlücke gelöst, `c3b9443`) + `1ac95ef`
+> (min_vram_gb-Bug bei 5 GPU-Modellen behoben) + freigegebene `lego_bundle`-Datenbereinigung
+> (`data/price_history.jsonl`, kein Code-Commit)
 >
 > Diese Datei ersetzt `PROJEKTSTAND_KOMPLETT.md` (Datei mittlerweile aus dem Repository entfernt). Historische Phasenberichte bleiben als Detaildokumentation erhalten; widersprüchliche ältere Ist-Stand-Angaben gelten nicht mehr als aktuell.
 
@@ -23,7 +24,7 @@
 
 `gpu-watch-v2` ist ein modularer, YAML-gesteuerter **Hardware Deal Finder** für Second-Hand-Angebote. Das System kombiniert Scraper, kategoriebasiertes Matching, Hardware-Detektoren, Deal-Scoring, Marktpreis-/Resale-Statistik, Profit-/Flip-Bewertung, Duplicate Detection, Presence Tracking, Dashboard-KPIs und ntfy-Benachrichtigungen.
 
-Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und kontrollierter Weiterentwicklung**. Seit `d2effe7` wurden insbesondere Datenqualitäts-/Validierungslogik, Rule Analyzer/Coverage, Caching/Performance, neue Kategorien sowie ein umfangreicher False-Positive-Audit integriert. Seit 2026-08-14 ergänzt ein dediziertes, read-only **Ruleset-Qualitätssystem** (`tools/ruleset_quality/`, siehe Abschnitt 3.11) den bisherigen punktuellen Audit-Ansatz um reproduzierbare Regression-Benchmarks und Preishistorie-Simulationen. Im selben Tag (Abschnitt 3.12) wurde die 251-Listing-Stichprobe vollständig gelabelt, daraus resultierend 3 Exclude-Fixes umgesetzt (PR #31), der Umlaut-Fingerprint-Bug behoben und eine kontrollierte Preishistorie-Revalidierung v3 durchgeführt (PR #32) — mit dem wichtigen Befund, dass der Fix nicht rückwirkend auf bereits gespeicherte Daten wirkt. Direkt im Anschluss (Abschnitt 3.13) wurde Datenqualitätspunkt 14 (Zubehör/Ersatzteil-vs-Gerät) mit 4 weiteren gezielten Exclude-Fixes gelöst (PR #33), gefolgt von Datenqualitätspunkt 5 (Abschnitt 3.14, `controller`/`ladekabel`-Restlücke).
+Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und kontrollierter Weiterentwicklung**. Seit `d2effe7` wurden insbesondere Datenqualitäts-/Validierungslogik, Rule Analyzer/Coverage, Caching/Performance, neue Kategorien sowie ein umfangreicher False-Positive-Audit integriert. Seit 2026-08-14 ergänzt ein dediziertes, read-only **Ruleset-Qualitätssystem** (`tools/ruleset_quality/`, siehe Abschnitt 3.11) den bisherigen punktuellen Audit-Ansatz um reproduzierbare Regression-Benchmarks und Preishistorie-Simulationen. Im selben Tag (Abschnitt 3.12) wurde die 251-Listing-Stichprobe vollständig gelabelt, daraus resultierend 3 Exclude-Fixes umgesetzt (PR #31), der Umlaut-Fingerprint-Bug behoben und eine kontrollierte Preishistorie-Revalidierung v3 durchgeführt (PR #32) — mit dem wichtigen Befund, dass der Fix nicht rückwirkend auf bereits gespeicherte Daten wirkt. Direkt im Anschluss wurde Datenqualitätspunkt 14 (Abschnitt 3.13, Zubehör/Ersatzteil-vs-Gerät) mit 4 weiteren gezielten Exclude-Fixes gelöst (PR #33), gefolgt von Datenqualitätspunkt 5 (Abschnitt 3.14, `controller`/`ladekabel`-Restlücke, PR #34) und Datenqualitätspunkt 4 (Abschnitt 3.15, `RX 7600 XT`/`RX 7600`-Überlappung) — Letzteres deckte einen strukturellen min_vram_gb-Bug auf, der zusätzlich 4 weitere GPU-Modelle betraf und direkt mitgefixt wurde.
 
 ---
 
@@ -33,10 +34,10 @@ Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und ko
 
 ```text
 Branch: main
-Letzter Code-Commit (vor dieser Doku-Aktualisierung): 5a01516
+Letzter Code-Commit (vor dieser Doku-Aktualisierung): 1ac95ef
 Vorheriger dokumentierter Stand: 2745a95 (PR #29 + Folge-Sessions)
 
-2745a95..5a01516:
+2745a95..1ac95ef:
   PR #31 (c577207) -- 251-Listing-Worksheet KI-gestützt gelabelt (217 TP/
                        21 FP/13 UNCLEAR) + 3 gezielte Exclude-Fixes:
                        exclude_global (defekt-Flexionsformen), handhelds
@@ -52,9 +53,11 @@ Vorheriger dokumentierter Stand: 2745a95 (PR #29 + Folge-Sessions)
                        (ssd/festplatte/headset/kopfhörer/in-ear),
                        netzteil (kabelset), konsolen_bundles
                        (kontextbewusster joy-con-Exclude)
-  5a01516           -- fix: controller/ladekabel-Restlücke geschlossen
+  PR #34 (c3b9443)  -- fix: controller/ladekabel-Restlücke geschlossen
                        (STATUS.md Nr. 5): Lade-Stationen/-Geräte-Zubehör
                        (nicht der ladekabel-Mechanismus selbst)
+  1ac95ef           -- fix: min_vram_gb-Bug bei RX 7600 + 4 weiteren
+                       GPU-Modellen behoben (STATUS.md Nr. 4)
 ```
 
 Zusätzlich, außerhalb der Commit-Historie (freigegebene Datenänderung, kein Code-Commit):
@@ -66,16 +69,16 @@ gelöscht (siehe Abschnitt 3.12).
 ```text
 Zuletzt vollständig lokal ausgeführt und verifiziert (PR #33): 1315 passed, 0 failed (623,91s)
 
-Für den Punkt-5-Fix (5a01516, Einzelkategorie controller): 4 neue Tests +
-73 controller-bezogene Tests grün lokal verifiziert. Volle Suite dafür
-bewusst NICHT erneut automatisch ausgeführt (CLAUDE.md-Regel: nur nach
-expliziter Freigabe).
+Für den Punkt-4-Fix (1ac95ef, Einzelkategorie gpu): 10 neue Tests +
+54 gpu-bezogene Tests grün lokal verifiziert. Volle Suite dafür bewusst
+NICHT erneut automatisch ausgeführt (CLAUDE.md-Regel: nur nach expliziter
+Freigabe).
 
 rule_analyzer.py:
 355 Regeln, 19 Kategorien, 0 Findings
-Ruleset-Signatur (matcher.compute_ruleset_signature()): 0d63c38b5dbf261c
-  -- GEÄNDERT seit PR #33 (ee2a6eb114525b55 -> 0d63c38b5dbf261c), erwartbar:
-     der Punkt-5-Fix erweitert exclude_category in controller.yaml
+Ruleset-Signatur (matcher.compute_ruleset_signature()): 133dcd1a9f614e7e
+  -- GEÄNDERT seit PR #34 (0d63c38b5dbf261c -> 133dcd1a9f614e7e), erwartbar:
+     der Punkt-4-Fix ergänzt min_vram_gb: 0 bei 5 GPU-Modellen/10 Regeln
 ```
 
 Vorheriger dokumentierter Stand: 1315/1315 (PR #33). Die 4 neuen Tests:
@@ -481,6 +484,48 @@ Station"-Bundle-Formulierung im Korpus gefunden. Blast Radius: 3 Treffer, 0 Koll
 `rule_analyzer.py` 0 Findings. Ruleset-Signatur geändert (`ee2a6eb114525b55` →
 `0d63c38b5dbf261c`).
 
+### 3.15 `RX 7600 XT`/`RX 7600`-Überlappung gelöst + min_vram_gb-Bug bei 4 weiteren GPU-Modellen (`1ac95ef`, Datenqualität Punkt 4)
+
+Direkte Fortsetzung von Abschnitt 3.14. Die ursprünglich dokumentierte Match-Präzedenz-
+Überlappung ("rx 7600" fälschlich als match-Begriff der XT-Regel, sodass jede echte Nicht-XT-
+Karte als `rx_7600_xt` gespeichert wurde) war bereits vor dieser Session gefixt — siehe
+Code-Kommentar bei der Regel "RX 7600 XT" in `gpu.yaml`. Frische Analyse gegen `found.json` +
+`price_history.jsonl` zeigte aber weiterhin eine extrem dünne `rx_7600`-Datenlage (nur 1 Punkt).
+
+**Root Cause (neu identifiziert):** die beiden `RX 7600`-Regeln (8GB-Karte) hatten kein eigenes
+`min_vram_gb` und fielen daher auf den globalen Default zurück (`_global.yaml`,
+`min_vram_gb: 12`). `matcher.py::_vram_gb()` (Regex `(\d{1,2})\s*gb`) erkennt "8GB" im Titel,
+nicht aber "8G" — jedes Angebot mit der (weit häufigeren) Schreibweise "8GB" wurde durch den
+VRAM-Check fälschlich verworfen (`vram=8 < min_vram=12`). Real verifiziert: identischer Titel,
+nur "8G"→"8GB" geändert, Match verschwindet vollständig
+(`"... RX 7600 MECH 2X CLASSIC 8GB OC"` kein Treffer, `"... 8G OC"` matcht).
+
+**Wichtiger Zusatzfund, direkt mitgefixt:** derselbe strukturelle Bug betraf 4 weitere
+GPU-Modelle ohne eigenes `min_vram_gb`, deren reale VRAM-Größe unter dem globalen 12GB-Default
+liegt (real mit demselben "XG"→"XGB"-Test verifiziert):
+
+| Modell | VRAM | Historische Punkte (`price_history.jsonl`) | Aktuell im Live-Korpus (`found.json`) |
+|---|---|---|---|
+| `rtx_3070` | 8GB | 149 | 16 |
+| `rtx_3060_ti` | 8GB | 110 | 12 |
+| `rtx_2080_ti` | 11GB | 60 | 3 |
+| `rtx_4060` | 8GB | 29 | 4 |
+
+**Fix:** `min_vram_gb: 0` explizit bei allen 5 Modellen (10 Regeln: je Top-Deal/Guter-Preis-Stufe)
+in `gpu.yaml` ergänzt. Kein Kollisionsrisiko, da alle match-Begriffe bereits eindeutig
+modellspezifisch sind (z.B. `"3060 ti"`/`"rtx 3060 ti"`) — die bestehenden Excludes (RTX 3070 Ti,
+RTX 4060 Ti, RTX 2080 Super, jeweils selbst < 12GB VRAM) bleiben unverändert wirksam, per
+dediziertem Kollisions-Test verifiziert (`test_benachbarte_modelle_bleiben_ueber_exclude_getrennt`).
+
+10 neue Regressionstests (`test_gpu_rx7600_vram_fix.py`, `test_gpu_low_vram_models_fix.py`), 54
+`gpu`-Tests grün, `rule_analyzer.py` 0 Findings. Ruleset-Signatur geändert
+(`0d63c38b5dbf261c` → `133dcd1a9f614e7e`).
+
+**Offene Beobachtung (kein aktiver Punkt, keine Evidenz gesammelt):** derselbe min_vram_gb-
+Musterbug könnte theoretisch auch außerhalb von `gpu` relevant sein, falls andere Kategorien
+VRAM-abhängige Modelle ohne eigenes `min_vram_gb` definieren — nicht geprüft, nur als Hinweis für
+künftige Arbeit festgehalten.
+
 ---
 
 ## 4. Datenqualität
@@ -505,7 +550,7 @@ Der anschließende PR-#6-Audit adressiert bereits mehrere konkrete False Positiv
 
 - historische Alt-Kontamination in `price_history.jsonl`
 - 19 Regeln ohne Produktivdaten weiter beobachten
-- `RX 7600 XT`/`RX 7600`-Überlappung — weiterhin offen. `controller`-`ladekabel`-Exclude: **erledigt** (Abschnitt 3.14) — Lücke betraf Lade-Stationen/-Geräte, nicht den Kabel-Mechanismus selbst
+- `RX 7600 XT`/`RX 7600`-Überlappung: **erledigt** (Abschnitt 3.15) — eigentliche Ursache war ein min_vram_gb-Bug, nicht die längst gefixte Match-Präzedenz; 4 weitere GPU-Modelle mit demselben Bug mitgefixt. `controller`-`ladekabel`-Exclude: **erledigt** (Abschnitt 3.14) — Lücke betraf Lade-Stationen/-Geräte, nicht den Kabel-Mechanismus selbst
 - 9 Muster / 27 Titel aus dem Active-False-Positive-Audit (Abschnitt 3.9) bewusst zurückgestellt (P1/P2) — vollständige Liste: `docs/ACTIVE_FALSE_POSITIVE_AUDIT.md`
 - Zubehör/Ersatzteil-vs-Gerät-Fehlklassifikation: **erledigt** (Abschnitt 3.13) — 4 gezielte Exclude-Fixes
 - Spieltitel-ohne-Konsole (5 Fälle, jetzt auch in `retro_konsolen` bestätigt) — weiterhin offen
@@ -573,32 +618,35 @@ Folgende Punkte sind **nicht** durch die Konsolidierung als abgeschlossen zu bet
 3. Resale-Confidence (z.B. HIGH/MEDIUM/LOW) ist konzeptionell sinnvoll, aber noch nicht als vollständiges Produktfeature etabliert.
 4. Datenqualitätswarnungen für Kategorien, Regeln und Preisverteilungen sollten langfristig automatisiert werden.
 5. Cross-Platform-Duplicate-Identity ist weiter ausbaufähig.
-6. Die dokumentierten Phase-15-Restlücken: `controller.yaml`/`ladekabel` **erledigt** (Abschnitt 3.14); `rx_7600_xt` weiterhin offen, wartet auf eine bewusst getrennte Regeländerung.
+6. Die dokumentierten Phase-15-Restlücken: `controller.yaml`/`ladekabel` **erledigt** (Abschnitt 3.14); `rx_7600`/`rx_7600_xt` **erledigt** (Abschnitt 3.15).
 7. `konsolen_bundles`: "Spieltitel VOR Plattform ohne Bindestrich"-Restlücke (Abschnitt 3.8, z.B. "Donkey Kong Bananza Nintendo Switch 2 2025 OVP") — bewusst offen, kein kollisionsfreies Substring-Muster identifiziert.
 8. 9 Muster / 27 Titel aus dem Active-False-Positive-Audit (Abschnitt 3.9) bewusst zurückgestellt (P1/P2), nicht gefixt — vollständige Liste mit Einzelbegründung: `docs/ACTIVE_FALSE_POSITIVE_AUDIT.md`.
 9. Coverage-/False-Positive-Rate: 251-Listing-Stichprobe jetzt vollständig gelabelt (Abschnitt 3.12) — Precision 91,2%, aber nur 30 von 251 Listings unabhängig einzeln geprüft (Rest pauschal übernommen).
 10. Umlaut-Fingerprint-Problem in `app/rule_coverage.py::_is_still_valid()`: **Code-Fix umgesetzt** (Abschnitt 3.12, `c9967ba`), aber dauerhaft **nicht rückwirkend** für historische Daten in 4 Kategorien — bewusst keine weitere Aktion vorgesehen (Datenverlust nicht reparierbar).
 11. Regel „Switch Pro Controller“ ohne dritte Preisstufe — explizit auf Nutzerentscheidung nicht behoben (keine Datenbasis für eine Preisgrenze).
 12. Zubehör/Ersatzteil-vs-Gerät-Fehlklassifikation: **erledigt** (Abschnitt 3.13).
+13. min_vram_gb-Bug bei RX 7600 + 4 weiteren GPU-Modellen: **erledigt** (Abschnitt 3.15) — offene
+    Beobachtung, ob derselbe Musterbug außerhalb von `gpu` relevant ist, nicht geprüft, kein
+    aktiver Punkt.
 
 ---
 
 ## 7. Empfohlene nächste Reihenfolge
 
 ```text
-1. RX 7600 XT / RX 7600-Überlappung (Datenqualität Nr. 4) -- noch keine Analyse
+1. Scan-Performance messen
         ↓
-2. Scan-Performance messen
+2. Resale-Confidence / weitere Datenqualität verbessern
         ↓
-3. Resale-Confidence / weitere Datenqualität verbessern
+3. app.py nur bei konkretem Änderungsdruck weiter modularisieren
         ↓
-4. app.py nur bei konkretem Änderungsdruck weiter modularisieren
-        ↓
-5. erst danach neue Features/Kategorien priorisieren
+4. erst danach neue Features/Kategorien priorisieren
 ```
 
-Stand 2026-08-14: `controller`/`ladekabel`-Exclude (vorherige P0) ist **abgeschlossen**
-(Abschnitt 3.14).
+Stand 2026-08-15: Datenqualitätspunkte Nr. 1–5 (Coverage-Stichprobe, Regeln ohne Daten,
+Orphan-Modelle, RX-7600-Überlappung, controller/ladekabel) sind **alle abgeschlossen**
+(Abschnitt 3.12–3.15). Keine offene, konkret benannte P0 mehr — nächster Schritt nach freiem
+Ermessen aus P1/P2 oder einer neuen Nutzeranfrage.
 
 Stand 2026-08-14: die vorherige P0 (Stichproben-Worksheet labeln + kontrollierte
 Preishistorie-Revalidierung + Orphan-Modell-Freigabe + Zubehör/Ersatzteil-vs-Gerät-
@@ -638,4 +686,4 @@ ABSCHLUSSBERICHT.md`, `FINALE_REVALIDIERUNG_ABSCHLUSSBERICHT.md`,
 `HUMAN_VERIFIED_LABELING_ABSCHLUSSBERICHT_2026-08-14.md`,
 `PREISHISTORIE_REVALIDIERUNG_V3_BERICHT_2026-08-14.md` (Abschnitt 3.12).
 
-Diese Dokumente liefern historische Details. Für den **aktuellen technischen Code-Stand** ist der Code-Commit `5a01516` maßgeblich; für die technische Projektreferenz ist diese Datei maßgeblich.
+Diese Dokumente liefern historische Details. Für den **aktuellen technischen Code-Stand** ist der Code-Commit `1ac95ef` maßgeblich; für die technische Projektreferenz ist diese Datei maßgeblich.
