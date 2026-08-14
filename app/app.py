@@ -3,6 +3,7 @@ import time
 import logging
 import logging.handlers
 import threading
+import concurrent.futures
 from pathlib import Path
 from datetime import datetime, timedelta, timezone
 
@@ -490,17 +491,59 @@ def run_scan():
         # Codeaenderung an app.py automatisch mitgescannt.
         raw = []
         scraper_plugins = discover_scrapers()
-        for scraper_name, plugin in scraper_plugins.items():
-            # roadmap.md Phase 2: Scraping-Zeit je Quelle. Einzeln pro
-            # Plugin gemessen (nicht nur gesamt), damit eine einzelne
-            # langsame Quelle sichtbar wird statt in der Summe unterzugehen.
+
+        def _run_one_scraper(scraper_name, plugin):
+            # FIX (Scan-Performance-Messung 2026-08-15, docs/SCAN_PERFORMANCE_
+            # MESSUNG_2026-08-15.md): vorher gab es HIER keinerlei try/except --
+            # ein Fehler in EINER Quelle riss den gesamten Scan in den aeusseren
+            # except-Block von run_scan() (siehe Funktionsende), die anderen
+            # beiden bereits erfolgreichen/laufenden Quellen wurden verworfen.
+            # Jetzt lokal abgefangen: eine fehlschlagende Quelle liefert leere
+            # Ergebnisse statt den kompletten Scan abzubrechen -- identisches
+            # Prinzip wie bereits in scrapers/registry.py::discover_scrapers()
+            # ("ein fehlerhaftes Plugin darf nicht alle anderen Quellen
+            # lahmlegen"), hier erstmals auch fuer den search()-Aufruf selbst
+            # durchgesetzt.
             _scrape_start = time.perf_counter()
-            raw += plugin.search(
-                search_terms, defaults["location_plz"], defaults["radius_km"], global_max_price,
-            )
-            scrape_duration_by_source[scraper_name] = round(
-                time.perf_counter() - _scrape_start, 3
-            )
+            try:
+                results = plugin.search(
+                    search_terms, defaults["location_plz"], defaults["radius_km"], global_max_price,
+                )
+            except Exception:
+                log.exception(
+                    "Scraper '%s' fehlgeschlagen -- übersprungen, andere "
+                    "Quellen laufen unabhängig weiter.", scraper_name,
+                )
+                results = []
+            return scraper_name, results, round(time.perf_counter() - _scrape_start, 3)
+
+        # FIX (Scan-Performance-Messung 2026-08-15): Scraping macht 88,9% der
+        # Gesamt-Scandauer aus, lief aber rein seriell (Summe der drei
+        # Einzeldauern ergab exakt die Gesamtzeit). Die drei Quellen sind
+        # unabhaengige HTTP-Ziele ohne geteilten Zustand (kein gemeinsames
+        # requests.Session-Objekt, kein geteilter Rate-Limiter/Circuit-
+        # Breaker -- jeweils lokale Funktionsvariablen, siehe scrapers/*.py),
+        # daher unproblematisch parallelisierbar. Ein Rate-Limit-Konflikt
+        # koennte nur INNERHALB einer Quelle durch Parallelisierung
+        # entstehen, nicht zwischen den drei unterschiedlichen Domains.
+        # ThreadPoolExecutor statt asyncio: alle drei Scraper nutzen
+        # synchrones `requests`, kein Umbau auf async noetig -- I/O-gebunden,
+        # der GIL wird waehrend echter Netzwerk-Wartezeit freigegeben.
+        # Ergebnisse werden bewusst NUR im Hauptthread in `raw` gemergt
+        # (kein gleichzeitiges Schreiben aus mehreren Threads); das
+        # bestehende Scraper-Plugin-Protocol (scrapers/base.py) bleibt
+        # unveraendert, es aendert sich nur WIE app.py die Plugins aufruft.
+        with concurrent.futures.ThreadPoolExecutor(
+            max_workers=max(len(scraper_plugins), 1)
+        ) as executor:
+            futures = [
+                executor.submit(_run_one_scraper, scraper_name, plugin)
+                for scraper_name, plugin in scraper_plugins.items()
+            ]
+            for future in futures:
+                scraper_name, results, duration = future.result()
+                raw += results
+                scrape_duration_by_source[scraper_name] = duration
 
         with _status_lock:
             _scan_status["scan_progress_total"] = len(raw)

@@ -5,15 +5,16 @@
 > Stand: **2026-08-15**
 > Repository: `dkmd89-dev/gpu-watch-v2`
 > Branch: `main`
-> **Letzter Code-Commit (vor dieser Doku-Aktualisierung):** `1ac95ef` (fix: min_vram_gb-Bug bei
-> RX 7600 + 4 weiteren GPU-Modellen behoben)
-> **HEAD (main, vor dieser Doku-Aktualisierung):** `c3b9443` (Merge PR #34)
+> **Letzter Code-Commit (vor dieser Doku-Aktualisierung):** `6bc0def` (perf(scan): Scraping
+> parallelisieren + Fehler-Isolation)
+> **HEAD (main, vor dieser Doku-Aktualisierung):** `efb842e` (Merge PR #35)
 > Vorheriger dokumentierter Stand: `2745a95` (PR #29 + Folge-Sessions)
-> Vergleich `2745a95...1ac95ef`: PR #31 (251-Listing-Worksheet gelabelt + 3 Exclude-Fixes,
+> Vergleich `2745a95...6bc0def`: PR #31 (251-Listing-Worksheet gelabelt + 3 Exclude-Fixes,
 > `c577207`) + PR #32 (Umlaut-Fingerprint-Fix + menschliches Labeling + Preishistorie-
 > Revalidierung v3, `3c9a678`) + PR #33 (4 weitere Exclude-Fixes, Zubehör/Ersatzteil-vs-Gerät,
-> `5fea3ec`) + PR #34 (controller/ladekabel-Restlücke gelöst, `c3b9443`) + `1ac95ef`
-> (min_vram_gb-Bug bei 5 GPU-Modellen behoben) + freigegebene `lego_bundle`-Datenbereinigung
+> `5fea3ec`) + PR #34 (controller/ladekabel-Restlücke gelöst, `c3b9443`) + PR #35
+> (min_vram_gb-Bug bei 5 GPU-Modellen behoben, `efb842e`) + `6bc0def` (Scan-Performance-Messung +
+> Scraping parallelisiert) + freigegebene `lego_bundle`-Datenbereinigung
 > (`data/price_history.jsonl`, kein Code-Commit)
 >
 > Diese Datei ersetzt `PROJEKTSTAND_KOMPLETT.md` (Datei mittlerweile aus dem Repository entfernt). Historische Phasenberichte bleiben als Detaildokumentation erhalten; widersprüchliche ältere Ist-Stand-Angaben gelten nicht mehr als aktuell.
@@ -24,7 +25,7 @@
 
 `gpu-watch-v2` ist ein modularer, YAML-gesteuerter **Hardware Deal Finder** für Second-Hand-Angebote. Das System kombiniert Scraper, kategoriebasiertes Matching, Hardware-Detektoren, Deal-Scoring, Marktpreis-/Resale-Statistik, Profit-/Flip-Bewertung, Duplicate Detection, Presence Tracking, Dashboard-KPIs und ntfy-Benachrichtigungen.
 
-Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und kontrollierter Weiterentwicklung**. Seit `d2effe7` wurden insbesondere Datenqualitäts-/Validierungslogik, Rule Analyzer/Coverage, Caching/Performance, neue Kategorien sowie ein umfangreicher False-Positive-Audit integriert. Seit 2026-08-14 ergänzt ein dediziertes, read-only **Ruleset-Qualitätssystem** (`tools/ruleset_quality/`, siehe Abschnitt 3.11) den bisherigen punktuellen Audit-Ansatz um reproduzierbare Regression-Benchmarks und Preishistorie-Simulationen. Im selben Tag (Abschnitt 3.12) wurde die 251-Listing-Stichprobe vollständig gelabelt, daraus resultierend 3 Exclude-Fixes umgesetzt (PR #31), der Umlaut-Fingerprint-Bug behoben und eine kontrollierte Preishistorie-Revalidierung v3 durchgeführt (PR #32) — mit dem wichtigen Befund, dass der Fix nicht rückwirkend auf bereits gespeicherte Daten wirkt. Direkt im Anschluss wurde Datenqualitätspunkt 14 (Abschnitt 3.13, Zubehör/Ersatzteil-vs-Gerät) mit 4 weiteren gezielten Exclude-Fixes gelöst (PR #33), gefolgt von Datenqualitätspunkt 5 (Abschnitt 3.14, `controller`/`ladekabel`-Restlücke, PR #34) und Datenqualitätspunkt 4 (Abschnitt 3.15, `RX 7600 XT`/`RX 7600`-Überlappung) — Letzteres deckte einen strukturellen min_vram_gb-Bug auf, der zusätzlich 4 weitere GPU-Modelle betraf und direkt mitgefixt wurde.
+Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und kontrollierter Weiterentwicklung**. Seit `d2effe7` wurden insbesondere Datenqualitäts-/Validierungslogik, Rule Analyzer/Coverage, Caching/Performance, neue Kategorien sowie ein umfangreicher False-Positive-Audit integriert. Seit 2026-08-14 ergänzt ein dediziertes, read-only **Ruleset-Qualitätssystem** (`tools/ruleset_quality/`, siehe Abschnitt 3.11) den bisherigen punktuellen Audit-Ansatz um reproduzierbare Regression-Benchmarks und Preishistorie-Simulationen. Im selben Tag (Abschnitt 3.12) wurde die 251-Listing-Stichprobe vollständig gelabelt, daraus resultierend 3 Exclude-Fixes umgesetzt (PR #31), der Umlaut-Fingerprint-Bug behoben und eine kontrollierte Preishistorie-Revalidierung v3 durchgeführt (PR #32) — mit dem wichtigen Befund, dass der Fix nicht rückwirkend auf bereits gespeicherte Daten wirkt. Direkt im Anschluss wurde Datenqualitätspunkt 14 (Abschnitt 3.13, Zubehör/Ersatzteil-vs-Gerät) mit 4 weiteren gezielten Exclude-Fixes gelöst (PR #33), gefolgt von Datenqualitätspunkt 5 (Abschnitt 3.14, `controller`/`ladekabel`-Restlücke, PR #34) und Datenqualitätspunkt 4 (Abschnitt 3.15, `RX 7600 XT`/`RX 7600`-Überlappung, PR #35) — Letzteres deckte einen strukturellen min_vram_gb-Bug auf, der zusätzlich 4 weitere GPU-Modelle betraf. Am 2026-08-15 (Abschnitt 3.16) wurde erstmals eine echte End-to-End-Scan-Performance-Messung anhand von 35 Produktiv-Scan-Läufen durchgeführt und der größte gefundene Hebel (Scraping macht 88,9% der Scanzeit aus, lief seriell) direkt umgesetzt: die drei Scraper-Quellen laufen jetzt parallel.
 
 ---
 
@@ -34,10 +35,10 @@ Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und ko
 
 ```text
 Branch: main
-Letzter Code-Commit (vor dieser Doku-Aktualisierung): 1ac95ef
+Letzter Code-Commit (vor dieser Doku-Aktualisierung): 6bc0def
 Vorheriger dokumentierter Stand: 2745a95 (PR #29 + Folge-Sessions)
 
-2745a95..1ac95ef:
+2745a95..6bc0def:
   PR #31 (c577207) -- 251-Listing-Worksheet KI-gestützt gelabelt (217 TP/
                        21 FP/13 UNCLEAR) + 3 gezielte Exclude-Fixes:
                        exclude_global (defekt-Flexionsformen), handhelds
@@ -56,8 +57,10 @@ Vorheriger dokumentierter Stand: 2745a95 (PR #29 + Folge-Sessions)
   PR #34 (c3b9443)  -- fix: controller/ladekabel-Restlücke geschlossen
                        (STATUS.md Nr. 5): Lade-Stationen/-Geräte-Zubehör
                        (nicht der ladekabel-Mechanismus selbst)
-  1ac95ef           -- fix: min_vram_gb-Bug bei RX 7600 + 4 weiteren
+  PR #35 (efb842e)  -- fix: min_vram_gb-Bug bei RX 7600 + 4 weiteren
                        GPU-Modellen behoben (STATUS.md Nr. 4)
+  6bc0def           -- perf(scan): Scraping parallelisiert (88,9% der
+                       Scan-Zeit) + Fehler-Isolation je Scraper-Quelle
 ```
 
 Zusätzlich, außerhalb der Commit-Historie (freigegebene Datenänderung, kein Code-Commit):
@@ -67,23 +70,20 @@ gelöscht (siehe Abschnitt 3.12).
 ### Teststand
 
 ```text
-Zuletzt vollständig lokal ausgeführt und verifiziert (PR #33): 1315 passed, 0 failed (623,91s)
-
-Für den Punkt-4-Fix (1ac95ef, Einzelkategorie gpu): 10 neue Tests +
-54 gpu-bezogene Tests grün lokal verifiziert. Volle Suite dafür bewusst
-NICHT erneut automatisch ausgeführt (CLAUDE.md-Regel: nur nach expliziter
-Freigabe).
+Zuletzt vollständig lokal ausgeführt und verifiziert (vom Nutzer, nach 6bc0def):
+pytest app/tests/ -> 1332 passed, 0 failed (76,41s)
 
 rule_analyzer.py:
 355 Regeln, 19 Kategorien, 0 Findings
 Ruleset-Signatur (matcher.compute_ruleset_signature()): 133dcd1a9f614e7e
-  -- GEÄNDERT seit PR #34 (0d63c38b5dbf261c -> 133dcd1a9f614e7e), erwartbar:
-     der Punkt-4-Fix ergänzt min_vram_gb: 0 bei 5 GPU-Modellen/10 Regeln
+  -- UNVERÄNDERT seit PR #35 (6bc0def ist reiner Python-Code, keine
+     app/rules/*.yaml-Änderung)
 ```
 
-Vorheriger dokumentierter Stand: 1315/1315 (PR #33). Die 4 neuen Tests:
-`test_controller_ladezubehoer_fix.py` (Punkt-5-Fix, siehe Abschnitt 3.14) — kein Test wurde
-gelöscht oder abgeschwächt.
+Vorheriger dokumentierter Stand: 1315/1315 (PR #33). Die 17 neuen Tests: 4 aus PR #34
+(`test_controller_ladezubehoer_fix.py`) + 10 aus PR #35 (`test_gpu_rx7600_vram_fix.py`,
+`test_gpu_low_vram_models_fix.py`) + 3 aus `6bc0def` (`test_app_parallel_scraping.py`, siehe
+Abschnitt 3.16) = 1315+4+10+3 = 1332 — kein Test wurde gelöscht oder abgeschwächt.
 
 ---
 
@@ -526,6 +526,60 @@ Musterbug könnte theoretisch auch außerhalb von `gpu` relevant sein, falls and
 VRAM-abhängige Modelle ohne eigenes `min_vram_gb` definieren — nicht geprüft, nur als Hinweis für
 künftige Arbeit festgehalten.
 
+### 3.16 Scan-Performance gemessen + Scraping parallelisiert (`6bc0def`)
+
+Erste echte End-to-End-Scan-Performance-Messung (vorher offener Punkt seit Phase 15, siehe
+Abschnitt 6). Methodik: Auswertung von **35 bereits im Produktivlog vorhandenen Scan-Läufen**
+(`data/gpu_watch.log`, `app.py::run_scan()` protokolliert bereits seit Längerem eine
+`📊 Scan-Metriken`-Zeile je Lauf mit Dauer je Phase) — kein synthetischer Benchmark, keine neue
+Messung ausgelöst. Voller Bericht: `docs/SCAN_PERFORMANCE_MESSUNG_2026-08-15.md`.
+
+**Ergebnis (Median über 35 Läufe):**
+
+| Phase | Anteil | Auffälligkeit |
+|---|---|---|
+| Scraping (eBay+Kleinanzeigen+Quoka) | 88,9% | lief seriell, Einzeldauern summierten sich exakt zur Gesamtzeit |
+| Persistence | 10,1% (bis 267s) | korreliert r=0,997 mit Anzahl neuer Treffer — atomares Neuschreiben der kompletten `found.json` bei JEDEM einzelnen Treffer (bewusste Crash-Sicherheit, `_save_json()` nutzt Temp-Datei+fsync+os.replace) |
+| Matching+Scoring, Price-Stats, Notification | < 0,5% | unauffällig |
+
+Gesamtdauer median 28,5 Minuten bei konfiguriertem `SCAN_INTERVAL_MINUTES=10` — die reale
+Scan-Kadenz lag damit bei ~28-31 statt der beabsichtigten 10 Minuten.
+
+**Größter Hebel direkt umgesetzt:** die drei Scraper-Plugins (discover_scrapers()) liefen bisher
+in einer einfachen `for`-Schleife seriell. Da es unabhängige HTTP-Ziele ohne geteilten Zustand
+sind (kein gemeinsames `requests.Session`-Objekt, kein geteilter Rate-Limiter/Circuit-Breaker —
+jeweils lokale Funktionsvariablen, verifiziert in allen drei `scrapers/*.py`-Modulen), wurde die
+Schleife durch `concurrent.futures.ThreadPoolExecutor` (ein Worker je entdecktem Plugin) ersetzt.
+Ergebnisse werden weiterhin ausschließlich im Hauptthread in `raw` gemergt (kein gleichzeitiges
+Schreiben aus mehreren Threads), das Scraper-Plugin-Protocol (`scrapers/base.py`) bleibt
+unverändert — es ändert sich nur, WIE `app.py` die Plugins aufruft.
+
+**Zusätzlich behobenes Robustheitsproblem:** vorher gab es **kein** `try/except` um
+`plugin.search()` — ein Fehler in einer Quelle riss den kompletten Scan in den äußeren
+`except`-Block von `run_scan()`, wodurch auch die Ergebnisse der anderen beiden, bereits
+erfolgreichen Quellen verworfen wurden. Jetzt wird jede Quelle einzeln abgefangen (identisches
+Prinzip wie bereits in `scrapers/registry.py::discover_scrapers()` für die Plugin-Discovery
+selbst: "ein fehlerhaftes Plugin darf nicht alle anderen Quellen lahmlegen").
+
+**Bewusst nicht verändert:** die Persistence-Phase (10,1%, Crash-Sicherheits-Tradeoff) — ein
+Batching würde die Crash-Sicherheits-Garantie abschwächen (mehr potenziell verlorene Treffer bei
+einem Absturz zwischen zwei Batches) und ist eine eigene Design-Entscheidung, kein reiner
+Performance-Fix.
+
+Fehlenden Quoka-Mock in `app/tests/test_app_deal_cleanup.py` nachgetragen (bestehende
+Testlücke — der Test rief `run_scan()` auf, ohne alle drei Scraper zu mocken, direkt an diesem
+Codepfad hängend). 3 neue Regressionstests (`test_app_parallel_scraping.py`): Merge aller drei
+Quellen, Fehler-Isolation (eine simulierte `RuntimeError` blockiert die anderen Quellen nicht
+mehr), und ein Timing-Nachweis echter Parallelität (3× 0,15s-Sleep liefen in < 0,4s statt seriell
+≥ 0,45s). Volle Suite **vom Nutzer lokal ausgeführt und verifiziert: 1332/1332 grün (76,41s)**.
+Ruleset-Signatur unverändert (reiner Python-Code, keine `app/rules/*.yaml`-Änderung).
+
+**Rechnerisches Potenzial (aus den 35 historischen Läufen abgeleitet, NICHT durch einen
+tatsächlichen Nach-Fix-Scan verifiziert):** Scraping-Zeit sinkt von der Summe aller drei Quellen
+(median 1522,3s) auf die langsamste Einzelquelle (Kleinanzeigen, median 548,2s) — rechnerisch
+**~57% kürzere Gesamtdauer** (28,5 → ~12,2 Minuten). Die reale Wirkung ist erst nach Deployment
+(`docker compose up --build -d`) und einer erneuten Log-Auswertung nachweisbar.
+
 ---
 
 ## 4. Datenqualität
@@ -614,7 +668,7 @@ Zusätzlich, außerhalb dieser Produktionskette (read-only, kein Import durch `a
 Folgende Punkte sind **nicht** durch die Konsolidierung als abgeschlossen zu betrachten:
 
 1. `app.py` ist trotz bereits erfolgter Reduktion weiterhin ein Kandidat für kontrollierte Modularisierung.
-2. Scan-Performance sollte mit echten End-to-End-Scanmetriken gemessen werden, bevor weitere Optimierungen erfolgen.
+2. Scan-Performance: **gemessen** (Abschnitt 3.16) und größter Hebel (serielles Scraping) **direkt behoben**. Reale Wirkung auf die Produktiv-Scandauer noch nicht verifiziert (Deployment ausstehend). Persistence-Phase (10,1%) bewusst nicht verändert -- offene Design-Entscheidung (Crash-Sicherheit vs. Geschwindigkeit).
 3. Resale-Confidence (z.B. HIGH/MEDIUM/LOW) ist konzeptionell sinnvoll, aber noch nicht als vollständiges Produktfeature etabliert.
 4. Datenqualitätswarnungen für Kategorien, Regeln und Preisverteilungen sollten langfristig automatisiert werden.
 5. Cross-Platform-Duplicate-Identity ist weiter ausbaufähig.
@@ -628,13 +682,17 @@ Folgende Punkte sind **nicht** durch die Konsolidierung als abgeschlossen zu bet
 13. min_vram_gb-Bug bei RX 7600 + 4 weiteren GPU-Modellen: **erledigt** (Abschnitt 3.15) — offene
     Beobachtung, ob derselbe Musterbug außerhalb von `gpu` relevant ist, nicht geprüft, kein
     aktiver Punkt.
+14. Scraping-Parallelisierung (Abschnitt 3.16): Code-Fix umgesetzt, volle Suite grün, aber reale
+    Wirkung auf die Produktiv-Scandauer **noch nicht verifiziert** (erfordert Deployment + erneute
+    Log-Auswertung). Persistence-Phase (10,1% der Scanzeit) bewusst nicht angefasst.
 
 ---
 
 ## 7. Empfohlene nächste Reihenfolge
 
 ```text
-1. Scan-Performance messen
+1. Reale Wirkung der Scraping-Parallelisierung verifizieren (Deployment +
+   erneute Log-Auswertung) -- optional, kein Blocker für Weiterarbeit
         ↓
 2. Resale-Confidence / weitere Datenqualität verbessern
         ↓
@@ -645,8 +703,9 @@ Folgende Punkte sind **nicht** durch die Konsolidierung als abgeschlossen zu bet
 
 Stand 2026-08-15: Datenqualitätspunkte Nr. 1–5 (Coverage-Stichprobe, Regeln ohne Daten,
 Orphan-Modelle, RX-7600-Überlappung, controller/ladekabel) sind **alle abgeschlossen**
-(Abschnitt 3.12–3.15). Keine offene, konkret benannte P0 mehr — nächster Schritt nach freiem
-Ermessen aus P1/P2 oder einer neuen Nutzeranfrage.
+(Abschnitt 3.12–3.15), ebenso die Scan-Performance-Messung + größter Hebel (Abschnitt 3.16).
+Keine offene, konkret benannte P0 mehr — nächster Schritt nach freiem Ermessen aus P1/P2 oder
+einer neuen Nutzeranfrage.
 
 Stand 2026-08-14: die vorherige P0 (Stichproben-Worksheet labeln + kontrollierte
 Preishistorie-Revalidierung + Orphan-Modell-Freigabe + Zubehör/Ersatzteil-vs-Gerät-
@@ -686,4 +745,4 @@ ABSCHLUSSBERICHT.md`, `FINALE_REVALIDIERUNG_ABSCHLUSSBERICHT.md`,
 `HUMAN_VERIFIED_LABELING_ABSCHLUSSBERICHT_2026-08-14.md`,
 `PREISHISTORIE_REVALIDIERUNG_V3_BERICHT_2026-08-14.md` (Abschnitt 3.12).
 
-Diese Dokumente liefern historische Details. Für den **aktuellen technischen Code-Stand** ist der Code-Commit `1ac95ef` maßgeblich; für die technische Projektreferenz ist diese Datei maßgeblich.
+Diese Dokumente liefern historische Details. Für den **aktuellen technischen Code-Stand** ist der Code-Commit `6bc0def` maßgeblich; für die technische Projektreferenz ist diese Datei maßgeblich. Zusätzlich: `docs/SCAN_PERFORMANCE_MESSUNG_2026-08-15.md` (Abschnitt 3.16).
