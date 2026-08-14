@@ -1,0 +1,5498 @@
+{
+  "gesamt": {
+    "gesamt_punkte": 14899,
+    "gesamt_verteilung": {
+      "OHNE_FINGERPRINT": 1173,
+      "UNVERAENDERT": 11581,
+      "KEIN_TREFFER": 1677,
+      "KATEGORIE_GEAENDERT": 17,
+      "MODELL_GEAENDERT": 451
+    },
+    "je_modell": {
+      "netzteil_650w": {
+        "gesamt": 87,
+        "unveraendert": 87,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "sata_ssd_2tb": {
+        "gesamt": 26,
+        "unveraendert": 21,
+        "unveraendert_pct": 80.8,
+        "kein_treffer": 5,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "dell emc 071k37 1 92tb ssd samsung sm883 sata 6gbps 2 5 mit tray",
+            "price": 125.0,
+            "alte_kategorie": "sata_ssd",
+            "altes_model": "sata_ssd_2tb",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "sandisk extreme pro portable ssd 2 tb usb c",
+            "price": 150.0,
+            "alte_kategorie": "sata_ssd",
+            "altes_model": "sata_ssd_2tb",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "sandisk extreme portable ssd 2 tb",
+            "price": 150.0,
+            "alte_kategorie": "sata_ssd",
+            "altes_model": "sata_ssd_2tb",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "sandisk extreme portable ssd 2tb externe ssd usb c schwarz orange",
+            "price": 111.78,
+            "alte_kategorie": "sata_ssd",
+            "altes_model": "sata_ssd_2tb",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "hpe ssd 1 92tb sata",
+            "price": 150.0,
+            "alte_kategorie": "sata_ssd",
+            "altes_model": "sata_ssd_2tb",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "sata_ssd_1tb": {
+        "gesamt": 92,
+        "unveraendert": 90,
+        "unveraendert_pct": 97.8,
+        "kein_treffer": 1,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 1,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "sandisk portable ssd 1 tb speicher",
+            "price": 65.0,
+            "alte_kategorie": "sata_ssd",
+            "altes_model": "sata_ssd_1tb",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "pc ddr4 2x8gb ram und 1tb ssd radeon rx580 8gb ryzen 5 1600",
+            "price": 1.0,
+            "alte_kategorie": "sata_ssd",
+            "altes_model": "sata_ssd_1tb",
+            "neue_kategorie": "ram",
+            "neues_model": "ram_ddr4_8gb",
+            "state": "KATEGORIE_GEAENDERT"
+          }
+        ]
+      },
+      "gaming_pc": {
+        "gesamt": 225,
+        "unveraendert": 212,
+        "unveraendert_pct": 94.2,
+        "kein_treffer": 13,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "dell g7 17 gaming laptop i5 9300h rtx 2060 8gb ram tauscheps5",
+            "price": 450.0,
+            "alte_kategorie": "gaming_pc",
+            "altes_model": "gaming_pc",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "gigabyte g5 md 15 6 gaming notebook i5 11400h 2 70ghz rtx 3050ti 16gb ram 512gb",
+            "price": 419.99,
+            "alte_kategorie": "gaming_pc",
+            "altes_model": "gaming_pc",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "msi gf65 thin i7 9750h rtx 2060 16gb ram ssd gaming laptop",
+            "price": 365.0,
+            "alte_kategorie": "gaming_pc",
+            "altes_model": "gaming_pc",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "bundle mainboard b760 cpu i5 13400f l fter ram 16gb extra rtx 3060 ti",
+            "price": 315.0,
+            "alte_kategorie": "gaming_pc",
+            "altes_model": "gaming_pc",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "mainboard set h310m d2p i5 9500 gtx 1050ti nwme 16gb ddr4",
+            "price": 120.0,
+            "alte_kategorie": "gaming_pc",
+            "altes_model": "gaming_pc",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "rtx_3060_12gb": {
+        "gesamt": 168,
+        "unveraendert": 168,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "netzteil_550w": {
+        "gesamt": 126,
+        "unveraendert": 123,
+        "unveraendert_pct": 97.6,
+        "kein_treffer": 3,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "chieftec aps 550s max 550w netzteil power supply active pfc",
+            "price": 39.95,
+            "alte_kategorie": "netzteil",
+            "altes_model": "netzteil_550w",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "600w bluetooth mini verst rker hifi power audio stereo bass amplifier usb mp3 fm",
+            "price": 25.99,
+            "alte_kategorie": "netzteil",
+            "altes_model": "netzteil_550w",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "600w verst rker stereo amplifier hifi digital bluetooth fm usb vollverst rker",
+            "price": 21.99,
+            "alte_kategorie": "netzteil",
+            "altes_model": "netzteil_550w",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "rtx_3070": {
+        "gesamt": 83,
+        "unveraendert": 80,
+        "unveraendert_pct": 96.4,
+        "kein_treffer": 3,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "asus tuf gaming geforce rtx 3070 8 gb gddr6 grafikkarte",
+            "price": 295.0,
+            "alte_kategorie": "gpu",
+            "altes_model": "rtx_3070",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "asus tuf gaming geforce rtx 3070 8 gb gddr6 grafikkarte",
+            "price": 240.0,
+            "alte_kategorie": "gpu",
+            "altes_model": "rtx_3070",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "asus tuf gaming geforce rtx 3070 8 gb gddr6 grafikkarte",
+            "price": 120.0,
+            "alte_kategorie": "gpu",
+            "altes_model": "rtx_3070",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "monitor_curved": {
+        "gesamt": 1066,
+        "unveraendert": 959,
+        "unveraendert_pct": 90.0,
+        "kein_treffer": 107,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "aoc cq27g2u bk 27 zoll qhd curved gaming monitor 144 hz mit ovp",
+            "price": 140.0,
+            "alte_kategorie": "monitor_curved",
+            "altes_model": "monitor_curved",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "aoc c27g2ze 27 zoll gaming monitor 240hz fullhd curved ovp",
+            "price": 140.0,
+            "alte_kategorie": "monitor_curved",
+            "altes_model": "monitor_curved",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "aoc gaming 27 zoll curved monitor va full hd 240 hz 0 5 ms freesync",
+            "price": 159.99,
+            "alte_kategorie": "monitor_curved",
+            "altes_model": "monitor_curved",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "aoc c32g2ze bk 32 31 5 zoll curved gaming monitor 2x hdmi dp 0 5ms 240hz",
+            "price": 165.0,
+            "alte_kategorie": "monitor_curved",
+            "altes_model": "monitor_curved",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "aoc c32g1 32g1 curved gaming monitor 144hz",
+            "price": 140.0,
+            "alte_kategorie": "monitor_curved",
+            "altes_model": "monitor_curved",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "netzteil_750w_plus": {
+        "gesamt": 151,
+        "unveraendert": 145,
+        "unveraendert_pct": 96.0,
+        "kein_treffer": 6,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "1000w verst rker stereo amplifier hifi digital bluetooth fm usb vollverst rker",
+            "price": 22.59,
+            "alte_kategorie": "netzteil",
+            "altes_model": "netzteil_750w_plus",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "1000w verst rker stereo amplifier hifi digital bluetooth fm usb vollverst rker",
+            "price": 26.55,
+            "alte_kategorie": "netzteil",
+            "altes_model": "netzteil_750w_plus",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "800w verst rker stereo amplifier hifi digital bluetooth fm usb vollverst rker",
+            "price": 29.99,
+            "alte_kategorie": "netzteil",
+            "altes_model": "netzteil_750w_plus",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "1000w verst rker stereo amplifier hifi digital bluetooth fm usb vollverst rker",
+            "price": 28.99,
+            "alte_kategorie": "netzteil",
+            "altes_model": "netzteil_750w_plus",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "stereo amplifier 1000w verst rker hifi digital bluetooth fm usb vollverst rker",
+            "price": 28.99,
+            "alte_kategorie": "netzteil",
+            "altes_model": "netzteil_750w_plus",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "sata_ssd_128gb": {
+        "gesamt": 45,
+        "unveraendert": 45,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "sata_ssd_250gb": {
+        "gesamt": 162,
+        "unveraendert": 162,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "office_pc": {
+        "gesamt": 275,
+        "unveraendert": 195,
+        "unveraendert_pct": 70.9,
+        "kein_treffer": 75,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 5,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "apple macbook pro a2159 2019 13 i5 8257u 8gb ram 128gb ssd touch bar silber",
+            "price": 219.99,
+            "alte_kategorie": "office_pc",
+            "altes_model": "office_pc",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "hp zbook firefly 14 g7 14 laptop i5 10310u 1tb 512gb 256gb 128gb ssd 16gb 8gb ddr4 ram wlan bluetooth win 11 pro notebook office schneller mit f r zoll 15 17 500 250",
+            "price": 260.0,
+            "alte_kategorie": "office_pc",
+            "altes_model": "office_pc",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "hp probook 440 g7 14 laptop i5 10210u 1tb 512gb 256gb ssd 16gb ddr4 ram wlan bluetooth windows 11 notebook office schneller mit f r gebrauchter zoll 15 8 128 250 500",
+            "price": 285.0,
+            "alte_kategorie": "office_pc",
+            "altes_model": "office_pc",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "lenovo thinkpad t14 g1 14 laptop i5 10310u 1tb 512gb 256gb ssd 16gb ddr4 ram wlan bluetooth windows 11 pro laptop homeoffice f r gebrauchter generation gen zoll 8 13 17",
+            "price": 260.0,
+            "alte_kategorie": "office_pc",
+            "altes_model": "office_pc",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "dell latitude 5310 13 3 laptop i5 10310u 1tb 512gb 256gb ssd 16gb ddr4 ram wlan bluetooth windows 11 pro notebook office homeoffice schneller mit f r gebrauchter zoll 15",
+            "price": 200.0,
+            "alte_kategorie": "office_pc",
+            "altes_model": "office_pc",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "rtx_2080_ti": {
+        "gesamt": 27,
+        "unveraendert": 27,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "sata_ssd_500gb": {
+        "gesamt": 194,
+        "unveraendert": 190,
+        "unveraendert_pct": 97.9,
+        "kein_treffer": 4,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "seagate expansion ssd 500gb portable external solid state drive for pc and mac",
+            "price": 54.95,
+            "alte_kategorie": "sata_ssd",
+            "altes_model": "sata_ssd_500gb",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "reisetasche f r sandisk extreme pro sandisk extreme portable external ssd 500 gb",
+            "price": 14.99,
+            "alte_kategorie": "sata_ssd",
+            "altes_model": "sata_ssd_500gb",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "crucial ct500mx500ssd1 ssd 500 1 gb",
+            "price": 10.0,
+            "alte_kategorie": "sata_ssd",
+            "altes_model": "sata_ssd_500gb",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "sandisk extreme 500 portable ssd 500 gb",
+            "price": 49.0,
+            "alte_kategorie": "sata_ssd",
+            "altes_model": "sata_ssd_500gb",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "rx_6700_xt": {
+        "gesamt": 58,
+        "unveraendert": 58,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "nintendo_retro_konsole": {
+        "gesamt": 770,
+        "unveraendert": 392,
+        "unveraendert_pct": 50.9,
+        "kein_treffer": 374,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 4,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "nintendo gamecube schwarz dol 001 eur funktioniert mit 3 controller",
+            "price": 53.99,
+            "alte_kategorie": "retro_konsolen",
+            "altes_model": "nintendo_retro_konsole",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "nintendo gamecube spiel pok mon colosseum ohne h lle nur cd mit memory card",
+            "price": 49.99,
+            "alte_kategorie": "retro_konsolen",
+            "altes_model": "nintendo_retro_konsole",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "nintendo gamecube silber dol 001 eur funktioniert",
+            "price": 55.0,
+            "alte_kategorie": "retro_konsolen",
+            "altes_model": "nintendo_retro_konsole",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "nintendo pok mon colosseum gamecube pal inkl handbuch memory card",
+            "price": 80.0,
+            "alte_kategorie": "retro_konsolen",
+            "altes_model": "nintendo_retro_konsole",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "zelda wind waker nintendo gamecube ovp mit anleitung",
+            "price": 46.99,
+            "alte_kategorie": "retro_konsolen",
+            "altes_model": "nintendo_retro_konsole",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "retro_konvolut": {
+        "gesamt": 40,
+        "unveraendert": 21,
+        "unveraendert_pct": 52.5,
+        "kein_treffer": 19,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "playstation 1 spiele 40 stk konvolut verschiedene zust nde",
+            "price": 115.0,
+            "alte_kategorie": "retro_konsolen",
+            "altes_model": "retro_konvolut",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "nintendo gameboy konvolut 16 spiele",
+            "price": 89.95,
+            "alte_kategorie": "retro_konsolen",
+            "altes_model": "retro_konvolut",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "ps2 konvolut 13 spiele die meisten komplett aktzeptabel bis gebraucht",
+            "price": 122.99,
+            "alte_kategorie": "retro_konsolen",
+            "altes_model": "retro_konvolut",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "playstation 3 konsole konvolut 31 spiele sammlung",
+            "price": 110.0,
+            "alte_kategorie": "retro_konsolen",
+            "altes_model": "retro_konvolut",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "nintendo nes konvolut spiele sammlung entertainment system konvolut mario",
+            "price": 64.99,
+            "alte_kategorie": "retro_konsolen",
+            "altes_model": "retro_konvolut",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "sony_retro_konsole": {
+        "gesamt": 905,
+        "unveraendert": 584,
+        "unveraendert_pct": 64.5,
+        "kein_treffer": 321,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "12 playstation 2 ps2 spiele konvolut retro getestet",
+            "price": 44.95,
+            "alte_kategorie": "retro_konsolen",
+            "altes_model": "sony_retro_konsole",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "ps2 spielesammlung konvolut",
+            "price": 75.0,
+            "alte_kategorie": "retro_konsolen",
+            "altes_model": "sony_retro_konsole",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "playstation 2 konvolut 30 spiele",
+            "price": 89.95,
+            "alte_kategorie": "retro_konsolen",
+            "altes_model": "sony_retro_konsole",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "12 playstation 2 ps2 spiele konvolut retro getestet",
+            "price": 34.95,
+            "alte_kategorie": "retro_konsolen",
+            "altes_model": "sony_retro_konsole",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "12 playstation 2 ps2 spiele konvolut retro getestet",
+            "price": 39.95,
+            "alte_kategorie": "retro_konsolen",
+            "altes_model": "sony_retro_konsole",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "lego_bundle": {
+        "gesamt": 3,
+        "unveraendert": 0,
+        "unveraendert_pct": 0.0,
+        "kein_treffer": 3,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": true,
+          "10": true
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "lego figuren sammlung",
+            "price": 75.0,
+            "alte_kategorie": "spielzeug_bundles",
+            "altes_model": "lego_bundle",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "lego star wars minifiguren konvolut",
+            "price": 75.0,
+            "alte_kategorie": "spielzeug_bundles",
+            "altes_model": "lego_bundle",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "lego star wars figuren konvolut",
+            "price": 95.0,
+            "alte_kategorie": "spielzeug_bundles",
+            "altes_model": "lego_bundle",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "roehrenfernseher": {
+        "gesamt": 96,
+        "unveraendert": 3,
+        "unveraendert_pct": 3.1,
+        "kein_treffer": 93,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "vintage mini fernseher budmann tragbarer r hrenfernseher crt rot",
+            "price": 15.0,
+            "alte_kategorie": "vintage_elektronik",
+            "altes_model": "roehrenfernseher",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "original daewoo r 49c10 fernbedienung tv crt r hrenfernseher remote",
+            "price": 8.99,
+            "alte_kategorie": "vintage_elektronik",
+            "altes_model": "roehrenfernseher",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "17 21 meliconi 42 55 cm tv fernseher r hrenfernseher wandhalterung silber a21",
+            "price": 9.99,
+            "alte_kategorie": "vintage_elektronik",
+            "altes_model": "roehrenfernseher",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "telefunken netzschalter f r r hrenfernseher 18mm lochabstand",
+            "price": 4.98,
+            "alte_kategorie": "vintage_elektronik",
+            "altes_model": "roehrenfernseher",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "r hrenfernseher radio tonbandger t wohnung altes foto",
+            "price": 8.9,
+            "alte_kategorie": "vintage_elektronik",
+            "altes_model": "roehrenfernseher",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "crt_profi_monitor": {
+        "gesamt": 86,
+        "unveraendert": 38,
+        "unveraendert_pct": 44.2,
+        "kein_treffer": 48,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "sony bvm pvm monitor einbauset f r 9 monitore",
+            "price": 69.0,
+            "alte_kategorie": "vintage_elektronik",
+            "altes_model": "crt_profi_monitor",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "sony bvm 1310 bvm 1410 bi mounted c board a 1135 360 a vom h ndler",
+            "price": 149.0,
+            "alte_kategorie": "vintage_elektronik",
+            "altes_model": "crt_profi_monitor",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "sony analog board a 1135 826 a for sony bvm 20f1e monitor bvm rgb broadcast pvm",
+            "price": 249.0,
+            "alte_kategorie": "vintage_elektronik",
+            "altes_model": "crt_profi_monitor",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "sony bvm 1910 bvm 1912 hr trinitron crt monitor mounted circuit board",
+            "price": 129.0,
+            "alte_kategorie": "vintage_elektronik",
+            "altes_model": "crt_profi_monitor",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "sony pvm 1444qm bvm 1315 bvm 1415 kv 14md1 crt monitor transformer assy flyback",
+            "price": 199.0,
+            "alte_kategorie": "vintage_elektronik",
+            "altes_model": "crt_profi_monitor",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "vintage_hifi_verstaerker": {
+        "gesamt": 620,
+        "unveraendert": 352,
+        "unveraendert_pct": 56.8,
+        "kein_treffer": 268,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "onkyo a 9211 verst rker",
+            "price": 49.0,
+            "alte_kategorie": "vintage_elektronik",
+            "altes_model": "vintage_hifi_verstaerker",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "yamaha ax 590 verst rker made in malaysia voll funktionsf hig getestet",
+            "price": 175.0,
+            "alte_kategorie": "vintage_elektronik",
+            "altes_model": "vintage_hifi_verstaerker",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "stereo verst rker pioneer a 445 made in japan",
+            "price": 95.0,
+            "alte_kategorie": "vintage_elektronik",
+            "altes_model": "vintage_hifi_verstaerker",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "onkyo a 922 vollverst rker integrated amplifier",
+            "price": 195.0,
+            "alte_kategorie": "vintage_elektronik",
+            "altes_model": "vintage_hifi_verstaerker",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "aiyima t5 hifi r hrenverst rker mm phono 2x160w schwarz",
+            "price": 101.24,
+            "alte_kategorie": "vintage_elektronik",
+            "altes_model": "vintage_hifi_verstaerker",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "iphone_11_128gb": {
+        "gesamt": 470,
+        "unveraendert": 468,
+        "unveraendert_pct": 99.6,
+        "kein_treffer": 2,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "iphone 11 128gb schwarz defektes face id",
+            "price": 120.0,
+            "alte_kategorie": "iphone",
+            "altes_model": "iphone_11_128gb",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "iphone 11 128 gb schwarz defektes display",
+            "price": 100.0,
+            "alte_kategorie": "iphone",
+            "altes_model": "iphone_11_128gb",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "iphone_11_pro_128gb": {
+        "gesamt": 149,
+        "unveraendert": 149,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_11_pro_max_512gb": {
+        "gesamt": 7,
+        "unveraendert": 7,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": true
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_12_mini_128gb": {
+        "gesamt": 129,
+        "unveraendert": 129,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_12_128gb": {
+        "gesamt": 318,
+        "unveraendert": 317,
+        "unveraendert_pct": 99.7,
+        "kein_treffer": 1,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "defektes apple iphone 12 256gb",
+            "price": 155.0,
+            "alte_kategorie": "iphone",
+            "altes_model": "iphone_12_128gb",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "iphone_12_pro_128gb": {
+        "gesamt": 78,
+        "unveraendert": 78,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_12_pro_512gb": {
+        "gesamt": 14,
+        "unveraendert": 14,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_13_pro_128gb": {
+        "gesamt": 126,
+        "unveraendert": 126,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_13_128gb": {
+        "gesamt": 354,
+        "unveraendert": 353,
+        "unveraendert_pct": 99.7,
+        "kein_treffer": 1,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "iphone 13 128gb wei defekte r ckseite bastlerger t",
+            "price": 100.0,
+            "alte_kategorie": "iphone",
+            "altes_model": "iphone_13_128gb",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "iphone_13_pro_max_128gb": {
+        "gesamt": 75,
+        "unveraendert": 74,
+        "unveraendert_pct": 98.7,
+        "kein_treffer": 1,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "iphone 13 pro max 256gb neuer akku defekte",
+            "price": 295.0,
+            "alte_kategorie": "iphone",
+            "altes_model": "iphone_13_pro_max_128gb",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "iphone_13_mini_128gb": {
+        "gesamt": 57,
+        "unveraendert": 57,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_13_512gb": {
+        "gesamt": 3,
+        "unveraendert": 3,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": true,
+          "10": true
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_13_pro_512gb": {
+        "gesamt": 13,
+        "unveraendert": 13,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_14_128gb": {
+        "gesamt": 237,
+        "unveraendert": 237,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_14_plus_128gb": {
+        "gesamt": 46,
+        "unveraendert": 46,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_14_512gb": {
+        "gesamt": 6,
+        "unveraendert": 6,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": true
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_14_pro_max_128gb": {
+        "gesamt": 129,
+        "unveraendert": 129,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_15_128gb": {
+        "gesamt": 260,
+        "unveraendert": 260,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_15_pro_128gb": {
+        "gesamt": 197,
+        "unveraendert": 196,
+        "unveraendert_pct": 99.5,
+        "kein_treffer": 1,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "iphone 15 pro 128 gb blue titanium defektes r ckglas 450",
+            "price": 450.0,
+            "alte_kategorie": "iphone",
+            "altes_model": "iphone_15_pro_128gb",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "iphone_16_128gb": {
+        "gesamt": 104,
+        "unveraendert": 103,
+        "unveraendert_pct": 99.0,
+        "kein_treffer": 1,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "iphone 16 128 gb defekte ladebuchse ansonsten funktionsf hig",
+            "price": 440.0,
+            "alte_kategorie": "iphone",
+            "altes_model": "iphone_16_128gb",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "iphone_16_pro_max_128gb": {
+        "gesamt": 115,
+        "unveraendert": 115,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_12_pro_max_128gb": {
+        "gesamt": 60,
+        "unveraendert": 60,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_13_pro_max_512gb": {
+        "gesamt": 13,
+        "unveraendert": 13,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_14_pro_128gb": {
+        "gesamt": 202,
+        "unveraendert": 201,
+        "unveraendert_pct": 99.5,
+        "kein_treffer": 1,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "iphone 14 pro in deep purple 128gb defekte r ckseite",
+            "price": 275.0,
+            "alte_kategorie": "iphone",
+            "altes_model": "iphone_14_pro_128gb",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "iphone_15_pro_max_128gb": {
+        "gesamt": 119,
+        "unveraendert": 119,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_15_pro_max_512gb": {
+        "gesamt": 27,
+        "unveraendert": 27,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "macbook_air_intel_512gb": {
+        "gesamt": 37,
+        "unveraendert": 37,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "macbook_air_m1_512gb": {
+        "gesamt": 88,
+        "unveraendert": 88,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "macbook_air_m3_512gb": {
+        "gesamt": 12,
+        "unveraendert": 12,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "macbook_pro_m1_512gb": {
+        "gesamt": 55,
+        "unveraendert": 55,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "macbook_pro_intel_512gb": {
+        "gesamt": 232,
+        "unveraendert": 232,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "macbook_pro_intel_1tb": {
+        "gesamt": 69,
+        "unveraendert": 69,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "macbook_air_m2_512gb": {
+        "gesamt": 15,
+        "unveraendert": 15,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "lego_ninjago_bundle": {
+        "gesamt": 598,
+        "unveraendert": 191,
+        "unveraendert_pct": 31.9,
+        "kein_treffer": 44,
+        "modell_geaendert": 361,
+        "kategorie_geaendert": 2,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "lego ninjago 8 besondere minifiguren sammlung k6",
+            "price": 13.0,
+            "alte_kategorie": "spielzeug_bundles",
+            "altes_model": "lego_ninjago_bundle",
+            "neue_kategorie": "lego_minifiguren",
+            "neues_model": "lego_ninjago_bundle",
+            "state": "KATEGORIE_GEAENDERT"
+          },
+          {
+            "fingerprint": "lego ninjago minifiguren sammlung",
+            "price": 1.0,
+            "alte_kategorie": "spielzeug_bundles",
+            "altes_model": "lego_ninjago_bundle",
+            "neue_kategorie": "lego_minifiguren",
+            "neues_model": "lego_ninjago_bundle",
+            "state": "KATEGORIE_GEAENDERT"
+          },
+          {
+            "fingerprint": "lego minifiguren cmf sammlung nur bpz ab serie 1",
+            "price": 29.0,
+            "alte_kategorie": "lego_minifiguren",
+            "altes_model": "lego_ninjago_bundle",
+            "neue_kategorie": "lego_minifiguren",
+            "neues_model": "lego_minifig_bundle",
+            "state": "MODELL_GEAENDERT"
+          },
+          {
+            "fingerprint": "lego minifiguren konvolut figuren cmf minecraft simpsons",
+            "price": 70.0,
+            "alte_kategorie": "lego_minifiguren",
+            "altes_model": "lego_ninjago_bundle",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "lego cmf figuren konvolut 16 figuren",
+            "price": 60.0,
+            "alte_kategorie": "lego_minifiguren",
+            "altes_model": "lego_ninjago_bundle",
+            "neue_kategorie": "lego_minifiguren",
+            "neues_model": "lego_minifig_bundle",
+            "state": "MODELL_GEAENDERT"
+          }
+        ]
+      },
+      "macbook_pro_m4_512gb": {
+        "gesamt": 7,
+        "unveraendert": 7,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": true
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_16_pro_max_512gb": {
+        "gesamt": 31,
+        "unveraendert": 31,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "rx_6750_xt": {
+        "gesamt": 23,
+        "unveraendert": 23,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_15_plus_128gb": {
+        "gesamt": 37,
+        "unveraendert": 36,
+        "unveraendert_pct": 97.3,
+        "kein_treffer": 1,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "iphone 15 plus 128gb defektes backcover sonst einwandfrei",
+            "price": 320.0,
+            "alte_kategorie": "iphone",
+            "altes_model": "iphone_15_plus_128gb",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "macbook_air_m4_512gb": {
+        "gesamt": 30,
+        "unveraendert": 30,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_15_pro_512gb": {
+        "gesamt": 9,
+        "unveraendert": 9,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": true
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_16_pro_128gb": {
+        "gesamt": 151,
+        "unveraendert": 151,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_14_pro_512gb": {
+        "gesamt": 9,
+        "unveraendert": 9,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": true
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_11_pro_max_128gb": {
+        "gesamt": 59,
+        "unveraendert": 59,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_12_pro_max_512gb": {
+        "gesamt": 10,
+        "unveraendert": 10,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "rtx_3060_ti": {
+        "gesamt": 63,
+        "unveraendert": 63,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "lego_minifig_bundle": {
+        "gesamt": 371,
+        "unveraendert": 366,
+        "unveraendert_pct": 98.7,
+        "kein_treffer": 2,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 3,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "lego minifiguren konvolut",
+            "price": 59.0,
+            "alte_kategorie": "spielzeug_bundles",
+            "altes_model": "lego_minifig_bundle",
+            "neue_kategorie": "lego_minifiguren",
+            "neues_model": "lego_minifig_bundle",
+            "state": "KATEGORIE_GEAENDERT"
+          },
+          {
+            "fingerprint": "lego star wars general grievous starfighter 8095 mit minifiguren konvolut",
+            "price": 60.0,
+            "alte_kategorie": "spielzeug_bundles",
+            "altes_model": "lego_minifig_bundle",
+            "neue_kategorie": "lego_minifiguren",
+            "neues_model": "lego_minifig_bundle",
+            "state": "KATEGORIE_GEAENDERT"
+          },
+          {
+            "fingerprint": "lego minifiguren konvolut",
+            "price": 40.0,
+            "alte_kategorie": "spielzeug_bundles",
+            "altes_model": "lego_minifig_bundle",
+            "neue_kategorie": "lego_minifiguren",
+            "neues_model": "lego_minifig_bundle",
+            "state": "KATEGORIE_GEAENDERT"
+          },
+          {
+            "fingerprint": "gro es lego ninjagoset konvolut ohne figuren",
+            "price": 45.0,
+            "alte_kategorie": "lego_minifiguren",
+            "altes_model": "lego_minifig_bundle",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "lego konvolut ca 3 5 kg ohne figuren elves friends",
+            "price": 39.0,
+            "alte_kategorie": "lego_minifiguren",
+            "altes_model": "lego_minifig_bundle",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "macbook_pro_m1_1tb": {
+        "gesamt": 25,
+        "unveraendert": 25,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "macbook_air_intel_1tb": {
+        "gesamt": 3,
+        "unveraendert": 3,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": true,
+          "10": true
+        },
+        "beispiele_veraendert": []
+      },
+      "macbook_pro_m2_512gb": {
+        "gesamt": 22,
+        "unveraendert": 22,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "lego_cmf": {
+        "gesamt": 232,
+        "unveraendert": 195,
+        "unveraendert_pct": 84.1,
+        "kein_treffer": 37,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "lego cmf serie 13 goblin col13 5 minifigur komplett kobold schwert",
+            "price": 13.0,
+            "alte_kategorie": "lego_minifiguren",
+            "altes_model": "lego_cmf",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "lego cmf series 6 bandit col085 vollst ndig",
+            "price": 12.0,
+            "alte_kategorie": "lego_minifiguren",
+            "altes_model": "lego_cmf",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "lego minifiguren serie 19 71025 galaktischer kopfgeldj ger bounty hunter cmf",
+            "price": 14.99,
+            "alte_kategorie": "lego_minifiguren",
+            "altes_model": "lego_cmf",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "lego cmf serie 24 orc 71037 col24 7 col418 komplett anleitung",
+            "price": 17.99,
+            "alte_kategorie": "lego_minifiguren",
+            "altes_model": "lego_cmf",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "lego cmf series 22 space creature minifigur col396",
+            "price": 16.99,
+            "alte_kategorie": "lego_minifiguren",
+            "altes_model": "lego_cmf",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "lego_sw_clone": {
+        "gesamt": 720,
+        "unveraendert": 682,
+        "unveraendert_pct": 94.7,
+        "kein_treffer": 38,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "lego minifigur sw0223 clone trooper phase 1 aus 8014 clone walker battle",
+            "price": 22.0,
+            "alte_kategorie": "lego_minifiguren",
+            "altes_model": "lego_sw_clone",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "lego minifigur clone arc trooper fives 501st legion phase 2 sw1329",
+            "price": 14.99,
+            "alte_kategorie": "lego_minifiguren",
+            "altes_model": "lego_sw_clone",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "lego sw minifigur sw1329 clone arc trooper fives 501st legion aus set 75387",
+            "price": 17.04,
+            "alte_kategorie": "lego_minifiguren",
+            "altes_model": "lego_sw_clone",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "lego starwars clone airborne trooper 212th batallion minifigur sw0523",
+            "price": 18.99,
+            "alte_kategorie": "lego_minifiguren",
+            "altes_model": "lego_sw_clone",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "5 st ck lego 187th clone trooper commander aus 75342 ovp eol",
+            "price": 44.0,
+            "alte_kategorie": "lego_minifiguren",
+            "altes_model": "lego_sw_clone",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "lego_sw_rare": {
+        "gesamt": 110,
+        "unveraendert": 20,
+        "unveraendert_pct": 18.2,
+        "kein_treffer": 2,
+        "modell_geaendert": 88,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "original lego batman torso 7779 minifigur k rper dc super heroes selten zus",
+            "price": 44.99,
+            "alte_kategorie": "lego_minifiguren",
+            "altes_model": "lego_sw_rare",
+            "neue_kategorie": "lego_minifiguren",
+            "neues_model": "lego_superhero_rare",
+            "state": "MODELL_GEAENDERT"
+          },
+          {
+            "fingerprint": "1 exclusive lego store minifigur ihrer wahl",
+            "price": 6.99,
+            "alte_kategorie": "lego_minifiguren",
+            "altes_model": "lego_sw_rare",
+            "neue_kategorie": "lego_minifiguren",
+            "neues_model": "lego_cmf",
+            "state": "MODELL_GEAENDERT"
+          },
+          {
+            "fingerprint": "lego spider man sh1053 cyborg exclusive minifigur super heroes spider verse",
+            "price": 22.0,
+            "alte_kategorie": "lego_minifiguren",
+            "altes_model": "lego_sw_rare",
+            "neue_kategorie": "lego_minifiguren",
+            "neues_model": "lego_promo",
+            "state": "MODELL_GEAENDERT"
+          },
+          {
+            "fingerprint": "lego new york exclusive torso oberk rper city nyc minifigur",
+            "price": 3.0,
+            "alte_kategorie": "lego_minifiguren",
+            "altes_model": "lego_sw_rare",
+            "neue_kategorie": "lego_minifiguren",
+            "neues_model": "lego_cmf",
+            "state": "MODELL_GEAENDERT"
+          },
+          {
+            "fingerprint": "lego 5006065 black brick friday 2019 exclusive minifigur minifigure misb",
+            "price": 40.0,
+            "alte_kategorie": "lego_minifiguren",
+            "altes_model": "lego_sw_rare",
+            "neue_kategorie": "lego_minifiguren",
+            "neues_model": "lego_promo",
+            "state": "MODELL_GEAENDERT"
+          }
+        ]
+      },
+      "lego_promo": {
+        "gesamt": 23,
+        "unveraendert": 23,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "lego_retro_rare": {
+        "gesamt": 7,
+        "unveraendert": 7,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": true
+        },
+        "beispiele_veraendert": []
+      },
+      "lego_ninjago_rare": {
+        "gesamt": 20,
+        "unveraendert": 15,
+        "unveraendert_pct": 75.0,
+        "kein_treffer": 4,
+        "modell_geaendert": 1,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "lego mini figur brieftr ger und teile post alt",
+            "price": 7.0,
+            "alte_kategorie": "lego_minifiguren",
+            "altes_model": "lego_ninjago_rare",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "lego minifiguren alt preis pro figur",
+            "price": 3.0,
+            "alte_kategorie": "lego_minifiguren",
+            "altes_model": "lego_ninjago_rare",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "lego 2550c01 2xaffe alt braun figur minifigur pirat pirates aus 6285 6278 6270",
+            "price": 7.0,
+            "alte_kategorie": "lego_minifiguren",
+            "altes_model": "lego_ninjago_rare",
+            "neue_kategorie": "lego_minifiguren",
+            "neues_model": "lego_retro_rare",
+            "state": "MODELL_GEAENDERT"
+          },
+          {
+            "fingerprint": "lego duplo set 2331 figur b r 1990er alt",
+            "price": 10.0,
+            "alte_kategorie": "lego_minifiguren",
+            "altes_model": "lego_ninjago_rare",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "lego star wars figur luke skywalker alt old umhang sw0887 minifigur",
+            "price": 15.95,
+            "alte_kategorie": "lego_minifiguren",
+            "altes_model": "lego_ninjago_rare",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "rtx_4060": {
+        "gesamt": 17,
+        "unveraendert": 17,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "rx_6800": {
+        "gesamt": 20,
+        "unveraendert": 20,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_13_mini_512gb": {
+        "gesamt": 2,
+        "unveraendert": 2,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": true,
+          "5": true,
+          "10": true
+        },
+        "beispiele_veraendert": []
+      },
+      "macbook_air_m1_1tb": {
+        "gesamt": 5,
+        "unveraendert": 5,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": true
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_16_512gb": {
+        "gesamt": 1,
+        "unveraendert": 1,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": true,
+          "5": true,
+          "10": true
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_14_pro_max_512gb": {
+        "gesamt": 20,
+        "unveraendert": 20,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_11_pro_512gb": {
+        "gesamt": 14,
+        "unveraendert": 14,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "macbook_pro_m3_512gb": {
+        "gesamt": 4,
+        "unveraendert": 4,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": true,
+          "10": true
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_16_pro_512gb": {
+        "gesamt": 2,
+        "unveraendert": 2,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": true,
+          "5": true,
+          "10": true
+        },
+        "beispiele_veraendert": []
+      },
+      "lego_collector_generic": {
+        "gesamt": 16,
+        "unveraendert": 16,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_15_plus_512gb": {
+        "gesamt": 1,
+        "unveraendert": 1,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": true,
+          "5": true,
+          "10": true
+        },
+        "beispiele_veraendert": []
+      },
+      "macbook_pro_m4_1tb": {
+        "gesamt": 2,
+        "unveraendert": 2,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": true,
+          "5": true,
+          "10": true
+        },
+        "beispiele_veraendert": []
+      },
+      "iphone_16_plus_128gb": {
+        "gesamt": 5,
+        "unveraendert": 5,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": true
+        },
+        "beispiele_veraendert": []
+      },
+      "rx_7600_xt": {
+        "gesamt": 6,
+        "unveraendert": 4,
+        "unveraendert_pct": 66.7,
+        "kein_treffer": 1,
+        "modell_geaendert": 1,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": true
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "amd radeon msi rx 7600 mech 2x classic 8g oc ovp",
+            "price": 180.0,
+            "alte_kategorie": "gpu",
+            "altes_model": "rx_7600_xt",
+            "neue_kategorie": "gpu",
+            "neues_model": "rx_7600",
+            "state": "MODELL_GEAENDERT"
+          },
+          {
+            "fingerprint": "xfx radeon rx 7600",
+            "price": 220.0,
+            "alte_kategorie": "gpu",
+            "altes_model": "rx_7600_xt",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "ram_ddr4_8gb": {
+        "gesamt": 106,
+        "unveraendert": 105,
+        "unveraendert_pct": 99.1,
+        "kein_treffer": 1,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "samsung 8gb ddr4 ram riegel f r laptops",
+            "price": 20.0,
+            "alte_kategorie": "ram",
+            "altes_model": "ram_ddr4_8gb",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "thinkpad_modern": {
+        "gesamt": 180,
+        "unveraendert": 139,
+        "unveraendert_pct": 77.2,
+        "kein_treffer": 41,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "lenovo thinkpad t490 20n3 notebook laptop",
+            "price": 100.0,
+            "alte_kategorie": "notebook_resell",
+            "altes_model": "thinkpad_modern",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "lenovo thinkpad l14 gen 1 ryzen 5",
+            "price": 165.0,
+            "alte_kategorie": "notebook_resell",
+            "altes_model": "thinkpad_modern",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "lenovo thinkpad t14 gen3 21ah geh use unterseite case",
+            "price": 45.0,
+            "alte_kategorie": "notebook_resell",
+            "altes_model": "thinkpad_modern",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "lenovo thinkpad t490 poweron button einschaltknopf",
+            "price": 7.0,
+            "alte_kategorie": "notebook_resell",
+            "altes_model": "thinkpad_modern",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "lenovo thinkpad t490 lautsprecher speaker pk23000r9v0",
+            "price": 8.0,
+            "alte_kategorie": "notebook_resell",
+            "altes_model": "thinkpad_modern",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "ram_ddr4_16gb": {
+        "gesamt": 243,
+        "unveraendert": 242,
+        "unveraendert_pct": 99.6,
+        "kein_treffer": 1,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "16gb sk hynix ddr4 so dimm",
+            "price": 33.33,
+            "alte_kategorie": "ram",
+            "altes_model": "ram_ddr4_16gb",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "ram_ddr4_32gb": {
+        "gesamt": 95,
+        "unveraendert": 95,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "gaming_laptop_rtx3060": {
+        "gesamt": 34,
+        "unveraendert": 5,
+        "unveraendert_pct": 14.7,
+        "kein_treffer": 29,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "grafikkarte gigabyte geforce rtx 3060 gaming oc lhr 12gb gddr6 nvidia dlss rt",
+            "price": 349.0,
+            "alte_kategorie": "notebook_resell",
+            "altes_model": "gaming_laptop_rtx3060",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "msi geforce rtx 3060 gaming z trio 12g 12gb gddr6 grafikkarte gpu",
+            "price": 314.99,
+            "alte_kategorie": "notebook_resell",
+            "altes_model": "gaming_laptop_rtx3060",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "gigabyte geforce rtx 3060 vision oc gaming 12gb gddr6 grafikkarte gpu nvidia",
+            "price": 299.99,
+            "alte_kategorie": "notebook_resell",
+            "altes_model": "gaming_laptop_rtx3060",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "asus rtx 3060 tuf gaming 12gb grafikkarte mit ovp",
+            "price": 290.0,
+            "alte_kategorie": "notebook_resell",
+            "altes_model": "gaming_laptop_rtx3060",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "gaming pc rtx 3060 ryzen 5 16 gb ram 1tb ssd",
+            "price": 469.0,
+            "alte_kategorie": "notebook_resell",
+            "altes_model": "gaming_laptop_rtx3060",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "macbook_air_m3_1tb": {
+        "gesamt": 1,
+        "unveraendert": 1,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": true,
+          "5": true,
+          "10": true
+        },
+        "beispiele_veraendert": []
+      },
+      "gaming_laptop_rtx4060": {
+        "gesamt": 20,
+        "unveraendert": 5,
+        "unveraendert_pct": 25.0,
+        "kein_treffer": 15,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "asus tuf gaming a15 rtx 4060",
+            "price": 550.0,
+            "alte_kategorie": "notebook_resell",
+            "altes_model": "gaming_laptop_rtx4060",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "zotac gaming geforce rtx 4060 spider man edition oc 8gb gddr6",
+            "price": 0.0,
+            "alte_kategorie": "notebook_resell",
+            "altes_model": "gaming_laptop_rtx4060",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "gigabyte nvidia geforce rtx 4060 gaming oc graphics card 8gb gddr6 128 bit",
+            "price": 299.0,
+            "alte_kategorie": "notebook_resell",
+            "altes_model": "gaming_laptop_rtx4060",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "msi rtx 4060 ti gaming x slim white 16gb free delivery",
+            "price": 460.0,
+            "alte_kategorie": "notebook_resell",
+            "altes_model": "gaming_laptop_rtx4060",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "zotac geforce rtx 4060 ti 8gb gaming power f r fhd wqhd",
+            "price": 320.0,
+            "alte_kategorie": "notebook_resell",
+            "altes_model": "gaming_laptop_rtx4060",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "cpu_bundle_ryzen5600_b550": {
+        "gesamt": 4,
+        "unveraendert": 4,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": true,
+          "10": true
+        },
+        "beispiele_veraendert": []
+      },
+      "autoradio_corsa_d_android": {
+        "gesamt": 71,
+        "unveraendert": 70,
+        "unveraendert_pct": 98.6,
+        "kein_treffer": 1,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "opel corsa d radio multimedia cp player 13357124",
+            "price": 80.5,
+            "alte_kategorie": "autoradio_opel_corsa",
+            "altes_model": "autoradio_corsa_d_android",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "controller_switch_pro": {
+        "gesamt": 99,
+        "unveraendert": 96,
+        "unveraendert_pct": 97.0,
+        "kein_treffer": 3,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "tmr sticks nintendo switch 1 pro controller schwarz ovp ladekabel",
+            "price": 29.99,
+            "alte_kategorie": "controller",
+            "altes_model": "controller_switch_pro",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "voyee drahtloser switch pro controller rgb led 10 std akku one key pairing",
+            "price": 25.0,
+            "alte_kategorie": "controller",
+            "altes_model": "controller_switch_pro",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "nintendo switch pro controller schwarz grau kabellos ohne ladekabel",
+            "price": 20.0,
+            "alte_kategorie": "controller",
+            "altes_model": "controller_switch_pro",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "controller_ps5_dualsense": {
+        "gesamt": 82,
+        "unveraendert": 76,
+        "unveraendert_pct": 92.7,
+        "kein_treffer": 6,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "2x ersatz analog sticks f r ps5 controller dualsense schwarz blitzversand",
+            "price": 2.95,
+            "alte_kategorie": "controller",
+            "altes_model": "controller_ps5_dualsense",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "back shell sony dualsense wireless controller wei oder blau",
+            "price": 15.0,
+            "alte_kategorie": "controller",
+            "altes_model": "controller_ps5_dualsense",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "ps5 xbox scuf controller reparatur stickdrift tmr hall",
+            "price": 15.0,
+            "alte_kategorie": "controller",
+            "altes_model": "controller_ps5_dualsense",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "ps5 wandhalterung f r ps5 controller mit controller halter kopfh rer aufh nger",
+            "price": 23.99,
+            "alte_kategorie": "controller",
+            "altes_model": "controller_ps5_dualsense",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "ps5 xbox x controller halter fight faust design",
+            "price": 35.0,
+            "alte_kategorie": "controller",
+            "altes_model": "controller_ps5_dualsense",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "m2_ssd_1tb": {
+        "gesamt": 7,
+        "unveraendert": 3,
+        "unveraendert_pct": 42.9,
+        "kein_treffer": 3,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 1,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": true
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "adata swordfish 1tb m 2 2280 ssd speicher",
+            "price": 20.0,
+            "alte_kategorie": "m2_ssd",
+            "altes_model": "m2_ssd_1tb",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "portable m 2 ssd 1tb usb c speicher",
+            "price": 20.0,
+            "alte_kategorie": "m2_ssd",
+            "altes_model": "m2_ssd_1tb",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "hp mini tower g1i core ultra 7 265 64 gb ddr5 1tb m 2 ssd usw",
+            "price": 1.0,
+            "alte_kategorie": "m2_ssd",
+            "altes_model": "m2_ssd_1tb",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "msi gaming m 2 ssd 1 tb mit intel ssd inside sticker",
+            "price": 30.0,
+            "alte_kategorie": "m2_ssd",
+            "altes_model": "m2_ssd_1tb",
+            "neue_kategorie": "sata_ssd",
+            "neues_model": "sata_ssd_1tb",
+            "state": "KATEGORIE_GEAENDERT"
+          }
+        ]
+      },
+      "konsole_switch_standard": {
+        "gesamt": 220,
+        "unveraendert": 198,
+        "unveraendert_pct": 90.0,
+        "kein_treffer": 22,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "nintendo switch 2 konsole 7 spiele pro controller",
+            "price": 150.0,
+            "alte_kategorie": "konsolen_bundles",
+            "altes_model": "konsole_switch_standard",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "nintendo switch riesige spieleauswahl in ovp mario kart minecraft luigi uvm",
+            "price": 73.9,
+            "alte_kategorie": "konsolen_bundles",
+            "altes_model": "konsole_switch_standard",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "nintendo switch pro controller f r nintendo switch konsole schwarz mit ovp",
+            "price": 60.0,
+            "alte_kategorie": "konsolen_bundles",
+            "altes_model": "konsole_switch_standard",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "nintendo switch pro controller f r nintendo switch konsole",
+            "price": 20.0,
+            "alte_kategorie": "konsolen_bundles",
+            "altes_model": "konsole_switch_standard",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "nintendo switch 2 pro controller nswitch 2 ovp",
+            "price": 79.99,
+            "alte_kategorie": "konsolen_bundles",
+            "altes_model": "konsole_switch_standard",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "konsole_ps4_bundle": {
+        "gesamt": 410,
+        "unveraendert": 388,
+        "unveraendert_pct": 94.6,
+        "kein_treffer": 22,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "ps4 1tb kabel 4 ps4 controller",
+            "price": 100.0,
+            "alte_kategorie": "konsolen_bundles",
+            "altes_model": "konsole_ps4_bundle",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "tony hawk s pro skater 1 2 f r ps4",
+            "price": 20.0,
+            "alte_kategorie": "konsolen_bundles",
+            "altes_model": "konsole_ps4_bundle",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "gaming headset nacon ps4 rig 500 pro",
+            "price": 30.0,
+            "alte_kategorie": "konsolen_bundles",
+            "altes_model": "konsole_ps4_bundle",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "wireless controller f r ps4 slim pro pc rgb touchpad spinnennetz schwarz",
+            "price": 15.0,
+            "alte_kategorie": "konsolen_bundles",
+            "altes_model": "konsole_ps4_bundle",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "sony ps4 konsole 500gb 1tb 2tb slim pro controller playstation 4",
+            "price": 109.95,
+            "alte_kategorie": "konsolen_bundles",
+            "altes_model": "konsole_ps4_bundle",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "konsole_switch_lite": {
+        "gesamt": 72,
+        "unveraendert": 65,
+        "unveraendert_pct": 90.3,
+        "kein_treffer": 7,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "nintendo switch lite touchscreen schwarz versand aus deutschland",
+            "price": 26.09,
+            "alte_kategorie": "konsolen_bundles",
+            "altes_model": "konsole_switch_lite",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "nintendo switch lite lcd qualit tskontrolle versand aus deutschland",
+            "price": 41.84,
+            "alte_kategorie": "konsolen_bundles",
+            "altes_model": "konsole_switch_lite",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "nintendo switch lite touchscreen t rkis versand aus deutschland",
+            "price": 26.09,
+            "alte_kategorie": "konsolen_bundles",
+            "altes_model": "konsole_switch_lite",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "nintendo switch lite touchscreen t rkis set versand aus deutschland",
+            "price": 31.34,
+            "alte_kategorie": "konsolen_bundles",
+            "altes_model": "konsole_switch_lite",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "nintendo switch lite touchscreen grau versand aus deutschland",
+            "price": 26.09,
+            "alte_kategorie": "konsolen_bundles",
+            "altes_model": "konsole_switch_lite",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "konsole_xbox_one": {
+        "gesamt": 54,
+        "unveraendert": 51,
+        "unveraendert_pct": 94.4,
+        "kein_treffer": 3,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "xbox one s",
+            "price": 50.0,
+            "alte_kategorie": "konsolen_bundles",
+            "altes_model": "konsole_xbox_one",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "xbox one s",
+            "price": 90.0,
+            "alte_kategorie": "konsolen_bundles",
+            "altes_model": "konsole_xbox_one",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "xbox one x 1tb konsole defekter hdmi anschluss",
+            "price": 60.0,
+            "alte_kategorie": "konsolen_bundles",
+            "altes_model": "konsole_xbox_one",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "konsole_bastler_bundle": {
+        "gesamt": 18,
+        "unveraendert": 13,
+        "unveraendert_pct": 72.2,
+        "kein_treffer": 5,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "sony playstation 4 dualshock controller defekt verschiedene farben ps4",
+            "price": 14.99,
+            "alte_kategorie": "konsolen_bundles",
+            "altes_model": "konsole_bastler_bundle",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "ps4 wireless controller leicht defekt stickdrift",
+            "price": 15.0,
+            "alte_kategorie": "konsolen_bundles",
+            "altes_model": "konsole_bastler_bundle",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "1 x sony ps4 dualshock 4 schwarz wireless controller defekt verbindet sich nicht",
+            "price": 5.0,
+            "alte_kategorie": "konsolen_bundles",
+            "altes_model": "konsole_bastler_bundle",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "microsoft xbox series x s und xbox one controller defekt stickdrift",
+            "price": 19.0,
+            "alte_kategorie": "konsolen_bundles",
+            "altes_model": "konsole_bastler_bundle",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "playstation 4 controller defekt",
+            "price": 5.0,
+            "alte_kategorie": "konsolen_bundles",
+            "altes_model": "konsole_bastler_bundle",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "handheld_pc_preator": {
+        "gesamt": 31,
+        "unveraendert": 19,
+        "unveraendert_pct": 61.3,
+        "kein_treffer": 11,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 1,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "jsaux slim reisetasche f r lenovo legion go go s go 2 hartschalenbeutel schla",
+            "price": 41.48,
+            "alte_kategorie": "handhelds",
+            "altes_model": "handheld_pc_preator",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "lenovo legion go s mainboard handheld reparatur repair",
+            "price": 229.0,
+            "alte_kategorie": "handhelds",
+            "altes_model": "handheld_pc_preator",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "lenovo legion go controller rechts",
+            "price": 65.0,
+            "alte_kategorie": "handhelds",
+            "altes_model": "handheld_pc_preator",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "lenovo legion go gaming mainboard handheld reparatur repair",
+            "price": 229.0,
+            "alte_kategorie": "handhelds",
+            "altes_model": "handheld_pc_preator",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "tmr joysticks rog ally x von handhelddiy",
+            "price": 30.0,
+            "alte_kategorie": "handhelds",
+            "altes_model": "handheld_pc_preator",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "handheld_ps_vita": {
+        "gesamt": 9,
+        "unveraendert": 3,
+        "unveraendert_pct": 33.3,
+        "kein_treffer": 6,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": true
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "tokyo twilight ghost hunters ps vita",
+            "price": 39.0,
+            "alte_kategorie": "handhelds",
+            "altes_model": "handheld_ps_vita",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "world of final fantasy ps vita original",
+            "price": 25.0,
+            "alte_kategorie": "handhelds",
+            "altes_model": "handheld_ps_vita",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "ps vita mit ladeger t",
+            "price": 70.0,
+            "alte_kategorie": "handhelds",
+            "altes_model": "handheld_ps_vita",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "gravity rush sony ps vita spiel",
+            "price": 39.0,
+            "alte_kategorie": "handhelds",
+            "altes_model": "handheld_ps_vita",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "ps vita j stars victory vs",
+            "price": 30.0,
+            "alte_kategorie": "handhelds",
+            "altes_model": "handheld_ps_vita",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "handheld_nintendo_3ds": {
+        "gesamt": 37,
+        "unveraendert": 28,
+        "unveraendert_pct": 75.7,
+        "kein_treffer": 9,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "nintendo 3ds new 3ds touchpen stylus ersatzstift eingabe stift xl schwarz",
+            "price": 3.99,
+            "alte_kategorie": "handhelds",
+            "altes_model": "handheld_nintendo_3ds",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "nintendo new 3ds ll motherboard red cpu 10 oem for parts not working",
+            "price": 50.0,
+            "alte_kategorie": "handhelds",
+            "altes_model": "handheld_nintendo_3ds",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "nintendo ds 2ds 3ds wii u touchpen stylus ersatzstift touch new xl lite ndsl",
+            "price": 3.99,
+            "alte_kategorie": "handhelds",
+            "altes_model": "handheld_nintendo_3ds",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "originalverpackung nintendo new 2ds xl pokeball edition leere box mit inlay",
+            "price": 85.0,
+            "alte_kategorie": "handhelds",
+            "altes_model": "handheld_nintendo_3ds",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "new nintendo 3ds xl mainboard black screen of dead",
+            "price": 30.0,
+            "alte_kategorie": "handhelds",
+            "altes_model": "handheld_nintendo_3ds",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "controller_xbox_series": {
+        "gesamt": 88,
+        "unveraendert": 85,
+        "unveraendert_pct": 96.6,
+        "kein_treffer": 3,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "controller akku f r xbox one xbox series x s 2 3600mwh akku f r xbox one x s",
+            "price": 17.99,
+            "alte_kategorie": "controller",
+            "altes_model": "controller_xbox_series",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "microsoft xbox controller akku pad xbox one series schneller versand",
+            "price": 14.9,
+            "alte_kategorie": "controller",
+            "altes_model": "controller_xbox_series",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "xbox series s 1tb 2 controller bitte beschreibung lesen",
+            "price": 1.0,
+            "alte_kategorie": "controller",
+            "altes_model": "controller_xbox_series",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "controller_xbox_drift": {
+        "gesamt": 10,
+        "unveraendert": 10,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": []
+      },
+      "handheld_steam_deck": {
+        "gesamt": 21,
+        "unveraendert": 13,
+        "unveraendert_pct": 61.9,
+        "kein_treffer": 8,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "original valve steam deck dockingstation ohne zubeh r",
+            "price": 79.0,
+            "alte_kategorie": "handhelds",
+            "altes_model": "handheld_steam_deck",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "original valve steam deck docking station",
+            "price": 119.99,
+            "alte_kategorie": "handhelds",
+            "altes_model": "handheld_steam_deck",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "viture usb c an brille ladeadapter laden und spielen f r switch steam deck",
+            "price": 49.0,
+            "alte_kategorie": "handhelds",
+            "altes_model": "handheld_steam_deck",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "steam deck dockingstation f r steam deck oled rog ally legion go 6 in 1 usb",
+            "price": 43.99,
+            "alte_kategorie": "handhelds",
+            "altes_model": "handheld_steam_deck",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          },
+          {
+            "fingerprint": "steam deck skin faceplate schutz klebefolie design vinyl aufkleber skins oled",
+            "price": 19.95,
+            "alte_kategorie": "handhelds",
+            "altes_model": "handheld_steam_deck",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "controller_ps5_drift": {
+        "gesamt": 10,
+        "unveraendert": 9,
+        "unveraendert_pct": 90.0,
+        "kein_treffer": 1,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": false,
+          "5": false,
+          "10": false
+        },
+        "beispiele_veraendert": [
+          {
+            "fingerprint": "ps5 controller reparatur stick drift tmr hall sticks",
+            "price": 13.0,
+            "alte_kategorie": "controller",
+            "altes_model": "controller_ps5_drift",
+            "neue_kategorie": null,
+            "neues_model": null,
+            "state": "KEIN_TREFFER"
+          }
+        ]
+      },
+      "iphone_15_512gb": {
+        "gesamt": 1,
+        "unveraendert": 1,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": true,
+          "5": true,
+          "10": true
+        },
+        "beispiele_veraendert": []
+      },
+      "macbook_pro_m2_1tb": {
+        "gesamt": 1,
+        "unveraendert": 1,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": true,
+          "5": true,
+          "10": true
+        },
+        "beispiele_veraendert": []
+      },
+      "rx_7600": {
+        "gesamt": 1,
+        "unveraendert": 1,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": true,
+          "5": true,
+          "10": true
+        },
+        "beispiele_veraendert": []
+      },
+      "cpu_bundle_ryzen3600_b450": {
+        "gesamt": 2,
+        "unveraendert": 2,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": true,
+          "5": true,
+          "10": true
+        },
+        "beispiele_veraendert": []
+      },
+      "macbook_pro_m3_1tb": {
+        "gesamt": 1,
+        "unveraendert": 1,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": true,
+          "5": true,
+          "10": true
+        },
+        "beispiele_veraendert": []
+      },
+      "lego_fantasy_rare": {
+        "gesamt": 1,
+        "unveraendert": 1,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": true,
+          "5": true,
+          "10": true
+        },
+        "beispiele_veraendert": []
+      },
+      "macbook_air_m2_1tb": {
+        "gesamt": 1,
+        "unveraendert": 1,
+        "unveraendert_pct": 100.0,
+        "kein_treffer": 0,
+        "modell_geaendert": 0,
+        "kategorie_geaendert": 0,
+        "kleine_stichprobe_warnung": {
+          "3": true,
+          "5": true,
+          "10": true
+        },
+        "beispiele_veraendert": []
+      }
+    }
+  },
+  "residual_artefakt_analyse_betroffene_kategorien": {
+    "handhelds": {
+      "punkte_gesamt": 98,
+      "kein_treffer_per_fingerprint": 34,
+      "davon_titel_rekonstruierbar": 7,
+      "davon_residuales_fingerprint_artefakt": 0,
+      "davon_echte_aenderung_bei_titel": 7,
+      "davon_nicht_beurteilbar": 27,
+      "hinweis": "Nur der rekonstruierbare Anteil ist beurteilbar -- die 'kein_treffer'-Gesamtzahl dieser Kategorie im Hauptbericht ist NICHT direkt als Datenqualitaetsproblem interpretierbar, solange der weit ueberwiegende Rest unbeurteilbar bleibt."
+    },
+    "konsolen_bundles": {
+      "punkte_gesamt": 774,
+      "kein_treffer_per_fingerprint": 59,
+      "davon_titel_rekonstruierbar": 17,
+      "davon_residuales_fingerprint_artefakt": 6,
+      "davon_echte_aenderung_bei_titel": 11,
+      "davon_nicht_beurteilbar": 42,
+      "hinweis": "Nur der rekonstruierbare Anteil ist beurteilbar -- die 'kein_treffer'-Gesamtzahl dieser Kategorie im Hauptbericht ist NICHT direkt als Datenqualitaetsproblem interpretierbar, solange der weit ueberwiegende Rest unbeurteilbar bleibt."
+    },
+    "retro_konsolen": {
+      "punkte_gesamt": 1715,
+      "kein_treffer_per_fingerprint": 714,
+      "davon_titel_rekonstruierbar": 1,
+      "davon_residuales_fingerprint_artefakt": 0,
+      "davon_echte_aenderung_bei_titel": 1,
+      "davon_nicht_beurteilbar": 713,
+      "hinweis": "Nur der rekonstruierbare Anteil ist beurteilbar -- die 'kein_treffer'-Gesamtzahl dieser Kategorie im Hauptbericht ist NICHT direkt als Datenqualitaetsproblem interpretierbar, solange der weit ueberwiegende Rest unbeurteilbar bleibt."
+    },
+    "vintage_elektronik": {
+      "punkte_gesamt": 802,
+      "kein_treffer_per_fingerprint": 409,
+      "davon_titel_rekonstruierbar": 0,
+      "davon_residuales_fingerprint_artefakt": 0,
+      "davon_echte_aenderung_bei_titel": 0,
+      "davon_nicht_beurteilbar": 409,
+      "hinweis": "Nur der rekonstruierbare Anteil ist beurteilbar -- die 'kein_treffer'-Gesamtzahl dieser Kategorie im Hauptbericht ist NICHT direkt als Datenqualitaetsproblem interpretierbar, solange der weit ueberwiegende Rest unbeurteilbar bleibt."
+    }
+  },
+  "cross_validierung_human_labels": {
+    "abgeglichene_punkte": 282,
+    "hinweis": "282 von 14899 price_history.jsonl-Punkten haben einen Fingerprint, der exakt einem der 251 Sample-Titel entspricht (Ueberschneidung ist klein, da die Stichprobe aus dem AKTUELLEN found.json gezogen wurde, price_history.jsonl aber den gesamten Scan-Zeitraum abdeckt).",
+    "konfusionsmatrix": {
+      "TRUE_POSITIVE": {
+        "KEIN_TREFFER": 1,
+        "UNVERAENDERT": 251,
+        "MODELL_GEAENDERT": 4,
+        "KATEGORIE_GEAENDERT": 1
+      },
+      "FALSE_POSITIVE": {
+        "UNVERAENDERT": 10,
+        "KEIN_TREFFER": 4
+      },
+      "UNCLEAR": {
+        "UNVERAENDERT": 11
+      }
+    },
+    "details": [
+      {
+        "title": "LEGO Figuren Sammlung",
+        "price": 75.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "KEIN_TREFFER"
+      },
+      {
+        "title": "Apple MacBook Air 13.3 Zoll (128GB SSD, Intel Core i5 5. Gen., 1,40GHz, 4GB RAM)",
+        "price": 100.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Macbook Air M1 256gb",
+        "price": 350.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "iPhone 16 128GB",
+        "price": 500.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "iPhone 13 128gb",
+        "price": 130.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Apple MacBook Pro 13 Zoll (256GB SSD, Intel Core i5 7. Gen, 2,3GHz, 8GB) ",
+        "price": 200.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "iPhone 13 128gb",
+        "price": 200.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "MEDION 27 Zoll curved PC Monitor MD 21473",
+        "price": 100.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "LEGO Figuren Sammlung",
+        "price": 12.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "MODELL_GEAENDERT"
+      },
+      {
+        "title": "LEGO Figuren Sammlung",
+        "price": 36.54,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "MODELL_GEAENDERT"
+      },
+      {
+        "title": "LC-Power LC6550GP2 V2.2 ATX12V Netzteil 550W PFC SATA Schwarz",
+        "price": 13.85,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Thermaltake ToughPower 750W (W0116) ATX Netzteil 750 Watt",
+        "price": 36.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Thermaltake Toughpower GF1 750W PC Netzteil",
+        "price": 30.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "iPhone 13 128gb",
+        "price": 220.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "PS2 Konsole mit  Spiele",
+        "price": 15.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "iPhone 13 128gb",
+        "price": 140.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "XFX Speedster SWFT319 Radeon RX 6800 16GB GDDR6 – Gaming Grafikkarte",
+        "price": 300.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "iPhone 13 128gb",
+        "price": 180.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "LEGO Figuren Sammlung",
+        "price": 59.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "MODELL_GEAENDERT"
+      },
+      {
+        "title": "iPhone 16 128GB",
+        "price": 299.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "iPhone 13 schwarz 128 GB",
+        "price": 170.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "iPhone 16 128GB",
+        "price": 450.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "iPhone 13 128gb",
+        "price": 70.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "iPhone 13 128gb",
+        "price": 1.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Sony PlayStation 2 Konsole mit Controller und 2 Spielen",
+        "price": 50.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Macbook Air M1 256gb",
+        "price": 380.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Apple iPhone 11, 64GB, Schwarz",
+        "price": 100.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Gawfolk 27 Zoll Curved Gaming Monitor FHD 1920x1080 180Hz 1ms HDMI/DP VESA",
+        "price": 120.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "iPhone 13 128gb",
+        "price": 160.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "MSI RTX 3060Ti Gaming X Trio Grafikkarte",
+        "price": 210.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "LEGO Figuren Sammlung",
+        "price": 25.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "MODELL_GEAENDERT"
+      },
+      {
+        "title": "iPhone 13 128gb",
+        "price": 150.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "DELL PC | Win 11 | Intel i5 8500 | 8GB DDR4 | 256GB SSD | 1TB HDD NVIDIA GT 1030",
+        "price": 189.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Apple MacBook Air M1 256GB 8 GB Gold",
+        "price": 370.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "32GB Kingston ValueRAM 4x 8GB DDR4-2400 PC-19200 Arbeitsspeicher (KVR24N17S8/8)",
+        "price": 70.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Lenovo ThinkPad X390 | 13,3\" | i5-8265U | 8 GB RAM | 256 GB SSD",
+        "price": 188.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "KingFast SSD 256GB SATA 2,5“ Intern Festplatte",
+        "price": 19.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Nintendo Switch Lite",
+        "price": 85.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Nintendo Switch Lite",
+        "price": 45.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Xbox One Controller Original einwandfrei, gereinigt,",
+        "price": 20.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "einzeln_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "PS5 Controller Chroma Indigo-Look",
+        "price": 35.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "einzeln_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Nintendo Switch Pro Controller - Schwarz",
+        "price": 29.99,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "einzeln_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Nintendo Switch Pro Controller - Schwarz",
+        "price": 25.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "einzeln_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "ORIGINAL NINTENDO SWITCH - PRO CONTROLLER  / GAMEPAD (HAC-013)  Switch 2 kompat.",
+        "price": 32.95,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "einzeln_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Nintendo Switch Lite",
+        "price": 80.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Nintendo Switch Lite",
+        "price": 95.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Nintendo GameCube schwarz + Controller + Kabel #3",
+        "price": 89.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Nintendo Switch Pro Controller - Schwarz",
+        "price": 35.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "einzeln_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Nintendo Switch Konsole mit Joy-Con - Neon-Rot/Neon-Blau/Grau",
+        "price": 99.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "MacBook Pro M2 13\" | 16 GB RAM | 86 % Akku |256GB SSD",
+        "price": 610.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Apple iPhone 11, 64GB, Schwarz",
+        "price": 125.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "PlayStation 4 Slim",
+        "price": 100.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Apple iPhone 11, 64GB, Schwarz",
+        "price": 110.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Apple IPhone 14 Pro 128GB Space Black  Festpreis",
+        "price": 250.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Nintendo Switch Pro Controller - Schwarz",
+        "price": 27.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "einzeln_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "DINO CRISIS 2 (PlayStation 1 PS1 PSX) KOMPLETT",
+        "price": 30.0,
+        "human_verdict": "FALSE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Apple MacBook Pro 15 Zoll 2019 | i7 | 16 GB RAM / 256 GB SSD",
+        "price": 295.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Dell Precision 3450 I7 11700 16GB DDR4 Office PC",
+        "price": 300.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Nintendo Switch Lite",
+        "price": 60.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Nintendo Switch Lite",
+        "price": 90.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "iPhone 16 128GB",
+        "price": 280.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Lenovo ThinkPad X390 | 13,3\" | i5-8265U | 8 GB RAM | 256 GB SSD",
+        "price": 169.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "PlayStation 4 Slim",
+        "price": 80.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Tausche/Gaming:Core i5 9400F 16Gb DDR4 750Gb GTX 1070 8Gb Win 11",
+        "price": 250.0,
+        "human_verdict": "UNCLEAR",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Apple MacBook Pro 16“ M1 PRO 10C CPU 16C GPU 512 GB SSD 16 GB R",
+        "price": 579.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Gaming PC- Ryzen 5 3400G/16GB DDR4/400GB SSD/ GTX 1650",
+        "price": 240.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "PlayStation 4 Slim",
+        "price": 90.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Nintendo Switch Lite",
+        "price": 75.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "PlayStation 4 Slim",
+        "price": 85.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Nintendo Switch Konsole mit Joy-Con - Neon-Rot/Neon-Blau/Grau",
+        "price": 146.66,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "iPhone 13 128gb",
+        "price": 120.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "PC i5-8400 | GTX 1660 6GB | 16GB RAM | 1TB SSD + 1TB HDD",
+        "price": 349.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "2x 16GB 2Rx8 PC4 - 2666v - SE1 - 11 Samsung DDR4 SDRAM",
+        "price": 100.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "LEGO Figuren Sammlung",
+        "price": 40.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Apple MacBook Pro 16“ M1 PRO 10C CPU 16C GPU 512 GB SSD 16 GB R",
+        "price": 549.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Nintendo Switch Lite Konsole",
+        "price": 95.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "LEGO Minifigur Serie 10 – Baseballspieler (col157)",
+        "price": 10.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "iPhone 16 128GB",
+        "price": 380.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Nintendo Switch Lite",
+        "price": 70.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "PS2-Slim Konsole",
+        "price": 25.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Original Microsoft Xbox ONE Controller - Weiss - #Gut Lesen#!",
+        "price": 26.95,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "einzeln_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "ASUS ROG Ally Z1 Extreme RC71L-NH001W",
+        "price": 250.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Geforce RTX 3060",
+        "price": 210.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "PlayStation 4 Slim Konsole mit 2 Controllern und 2 Spielen",
+        "price": 100.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "XFX Radeon RX 6750 XT QICK 319 12GB",
+        "price": 300.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Gaming Laptop | RTX 4060 | Ryzen 7 8845HS | 144Hz |",
+        "price": 450.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "⚡️Medion Erazer P15805 | 15,6\" |  i5-9300H | NVIDIA GTX 1660 Ti | 16 GB RAM | 512 GB M.2 SSD | Akku 90 %",
+        "price": 419.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "einzeln_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "MEDION 27 Zoll curved PC Monitor MD 21473",
+        "price": 90.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "LEGO Polizei Minifiguren + 3 Hunde + Accessories Lot",
+        "price": 55.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Sony PlayStation 2 Konsole (PS2) mit Mod-Chip",
+        "price": 80.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "MSI GeForce RTX 3060 Ti Ventus 2X OC Edition",
+        "price": 200.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "2x8GB G.Skill Aegis DDR4-3200 DIMM CL16 Dual Kit",
+        "price": 55.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Be Quiet Netzteil S9-600W",
+        "price": 25.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Gaming PC Intel Core i5-8400, 16GB DDR4 RAM, GTX 1060 6GB, Win 11",
+        "price": 169.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Gaming PC Intel i5-8400, 16GB DDR4 RAM, GTX 1060 6GB, Win 11, SSD",
+        "price": 219.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Apple MacBook Air 13,3\", Intel® Core™ i5, 1,8 GHz, 128 GB SSD, 1440 x 900 Pixel",
+        "price": 129.99,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Apple MacBook Air 13“,Intel Core I7,256 GB",
+        "price": 185.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "MSI GeForce RTX 3070 Gaming Z Trio 8G LHR – Grafikkarte, guter Zu",
+        "price": 300.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Samsung 860 EVO Sata SSD 1TB",
+        "price": 60.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "SanDisk SSD 1TB",
+        "price": 80.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Viathan SSD 1TB",
+        "price": 80.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Defekte Asus ROG Ally Z1 Extreme 1TB",
+        "price": 200.0,
+        "human_verdict": "FALSE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "KEIN_TREFFER"
+      },
+      {
+        "title": "Gaming PC- Ryzen 5 3400G/16GB DDR4/400GB SSD/ GTX 1650",
+        "price": 200.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Apple iPhone 11, 64GB, Schwarz",
+        "price": 90.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "ASUS TUF GAMING A620M-PLUS AM5 + AMD Ryzen 7 8700G + 32GB RAM",
+        "price": 250.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Apple iPhone 11 Pro gebraucht 512 GB",
+        "price": 190.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Dell OptiPlex 3070 | i5-9500 | 16GB RAM | 512GB SSD + 1TB HDD | P",
+        "price": 175.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Festplatte-SSD-256 GB-ADATA",
+        "price": 28.0,
+        "human_verdict": "UNCLEAR",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Lenovo ThinkPad T14 Gen 1 14\" FHD i5-10310U 16GB 512GB SSD Win 10 Pro Laptop GUT",
+        "price": 225.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Dell G15 Gaming Laptop | Intel Core i7-10400 | RTX 3060 | 15,6",
+        "price": 450.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Apple iPhone 16 Pro / 256GB / Gut erhalten",
+        "price": 649.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Sony PlayStation 4 pro inkl. 2 Spiele",
+        "price": 85.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "I5-9600K, GTX 1650 Super, 16GB DDR4, 750 GB SSD, Gaming PC Win11",
+        "price": 429.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Gaming PC Intel Core i5 10400F RTX 2060 16GB RAM",
+        "price": 390.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "einzeln_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "LEGO® Star Wars - Clone ARC Trooper Hammer, Rancor SW0377 - Minifigur Set 9488",
+        "price": 24.99,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "LEGO Figuren Sammlung",
+        "price": 36.54,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Cooler Master MWE 750 V2 750W 80 Plus Bronze EU 230V PC-Netzteil",
+        "price": 31.51,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Thermaltake Toughpower GF1 750W PC Netzteil",
+        "price": 40.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Nintendo Switch Lite",
+        "price": 65.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Android Radio Opel Corsa D",
+        "price": 100.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "einzeln_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Gaming PC Ryzen 5 2600 | 16GB DDR4 | 256GB SSD | GTX 1070 8GB",
+        "price": 300.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Nintendo GameCube Super Mario Sunshine – komplett mit Anleitung",
+        "price": 45.0,
+        "human_verdict": "UNCLEAR",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Roter Xbox One Controller - Top Zustand",
+        "price": 20.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "einzeln_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "iPhone 14 Pro Max 512 GB Silber NEUER AKKU",
+        "price": 390.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "PlayStation 4 Pro – gebraucht, guter Zustand",
+        "price": 1.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Sony PlayStation 2 Konsole mit Controller und 2 Spielen",
+        "price": 90.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Cooler Master 700W Netzteil MPE-7001-ACABW 80 Plus",
+        "price": 20.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "MSI Optix G24C – 24” Curved Gaming Monitor 144 Hz, 1 ms, Full HD",
+        "price": 60.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Lenovo ThinkPad T14 Gen 2 i5-1145G7 16GB 256GB 14\" FHD Win11 StoreDeal #35",
+        "price": 219.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "16 GB DDR4-2400 DIMM Desktop RAM Bundle",
+        "price": 22.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "GTX1070 Gaming PC - Ryzen 5 2400G, 16GB Ddr4 Ram",
+        "price": 265.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Apple iPhone 15 128GB Pink 6,1\" 48MP A16 Bionic 5G Modell A3090",
+        "price": 350.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Asus Radeon RX 6700 XT Grafikkarte",
+        "price": 299.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "16 GB (2x 8 GB) DDR4-2666 PC4",
+        "price": 34.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Dell Wyse 5070 ThinClient HomeServer J5005 8GB DDR4 32GB Win 10",
+        "price": 67.0,
+        "human_verdict": "FALSE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "iPhone 14 - 128 GB in Hinmelblau, guter gebrauchter Zustand",
+        "price": 200.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Apple MacBook Pro 12\" Intel i5 16 GB RAM, 128 GB von 2015",
+        "price": 150.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Samsung S27D364GAU 27 Zoll Curved Gaming Monitor Full HD",
+        "price": 80.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Thermaltake ToughPower 750W (W0116) ATX Netzteil 750 Watt",
+        "price": 22.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Samsung 2x 8GB DDR4 2400mhz Arbeitsspeicher 16GB",
+        "price": 40.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Lenovo ThinkPad X390 Yoga 13,3 Zoll i5-8265U 8GB RAM 128GB SSD FHD WWAN W11 Pro",
+        "price": 169.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "LEGO Star Wars Commander Gree Minifigur Phase 2",
+        "price": 35.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Macbook Air M1 256gb",
+        "price": 450.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "S.C.A.R.S. PS1 / PlayStation 1 – PAL – komplett mit Anleitung",
+        "price": 12.0,
+        "human_verdict": "FALSE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Vintage HiFi Konvolut T+A, Onkyo, Harman Kardon, Sony",
+        "price": 100.0,
+        "human_verdict": "UNCLEAR",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Micron 1100 512GB SSD 2,5” SATA III",
+        "price": 40.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "MSI B550-A Pro Gaming Mainboard  + AMD Ryzen 5 3600",
+        "price": 70.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "einzeln_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Xbox One Controller",
+        "price": 22.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "einzeln_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Lenovo Thinkpad T14 Gen 1 Type 20S1 16GB RAM / 512 GB",
+        "price": 190.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Apple iPhone 11, 64GB, Schwarz",
+        "price": 85.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Crucial BX500 1TB SSD,",
+        "price": 60.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Crucial DDR4 2133mhz 2x8GB 16GB Arbeitsspeicher",
+        "price": 30.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "MSI Gaming M.2 SSD 1 TB mit Intel SSD Inside Sticker",
+        "price": 30.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "KATEGORIE_GEAENDERT"
+      },
+      {
+        "title": "MSI 27 Zoll Curved Gaming Monitor Full HD",
+        "price": 110.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "MSI Optix G24C6 Curved Gaming Monitor 24 Zoll 165Hz",
+        "price": 110.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Original Xbox Controller (Xbox series x)",
+        "price": 30.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "einzeln_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Fikwot M.2 2230 SSD PCIe Gen4 Interne SSD 1TB 2TB Festplatte For Steam Deck ASUS",
+        "price": 149.99,
+        "human_verdict": "FALSE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Nintendo 3DS XL mit Spiele!ABHOLUNG!",
+        "price": 90.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Apple MacBook Air 13.3 Zoll (128GB SSD, Intel Core i5 5. Gen., 1,40GHz, 4GB RAM)",
+        "price": 65.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Nintendo Gamecube Konsole + Spiel Herr der Ringe * DOL-001",
+        "price": 70.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Nintendo Switch Pro Controller Mario Kart Peach Design",
+        "price": 35.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "einzeln_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "MacBook Pro M1 13\" (256GB, 8GB) 🔋78%",
+        "price": 399.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Msi curved Monitor 27 Zoll",
+        "price": 120.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "PC Dell 7060 MT | I5-8500 | 8GB DDR4 | 256GB SSD M.2 | WIN11 pro",
+        "price": 289.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "GIGABYTE P850GM 850 W ATX PC-Netzteil vollmodular 80 PLUS Gold",
+        "price": 33.81,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Xbox One Controller",
+        "price": 30.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "einzeln_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "LEGO® Star Wars - Clone ARC Trooper Hammer, Rancor SW0377 - Minifigur Set 9488",
+        "price": 35.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Nintendo DS Classic Konsole Blau Metallic Blue FAT Handheld (ohne Kabel) - GUT ✅",
+        "price": 44.99,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "SK Hynix 8GB DDR4 RAM 2400T MHz",
+        "price": 17.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Lenovo ThinkPad X13 Gen1 i5-10310U 16GB 512GB 4G LTE Webcam USB-C HDMI WIN11",
+        "price": 169.9,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Lenovo ThinkPad X13 Gen1 i5-10310U 16GB 512GB 4G LTE Webcam USB-C HDMI WIN11",
+        "price": 139.9,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Lenovo Thinkpad T14 Gen 1 Type 20S0 16GB RAM / 512 GB",
+        "price": 150.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "PlayStation 4 Slim",
+        "price": 55.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "PC AMD Ryzen 5 3400G GA A520M KV2 16GB DDR4 3200MHz 256GB SSD M.2",
+        "price": 222.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Gigabyte NVIDIA GeForce RTX 3060 12GB VISION",
+        "price": 280.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "PS5 Controller spinnt",
+        "price": 15.0,
+        "human_verdict": "FALSE_POSITIVE",
+        "review_modus": "einzeln_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Lenovo ThinkPad X13 Gen1 i5-10310U 16GB 512GB 4G LTE Webcam USB-C HDMI WIN11",
+        "price": 159.9,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Pokemon Alpha Saphir + Nintendo 3Ds XL",
+        "price": 80.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "iPhone 13 schwarz 128 GB",
+        "price": 100.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Original LEGO Clone Trooper NUR KOPF -Star Wars- 8018 7675 8128 8098 8014 7959",
+        "price": 5.5,
+        "human_verdict": "FALSE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "AOC c24g1 24\" Gaming Monitor Curved 144Hz",
+        "price": 40.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "PC INTEL I5 9600K 32GB RAM DDR4 512GB SSD GT 710 WINDOWS 11",
+        "price": 299.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "MSI GeForce RTX 3070 | GRAFIKKARTE",
+        "price": 290.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "ADATA S510 SSD 120GB SATA III 2,5 Zoll Festplatte Zustand 100%",
+        "price": 15.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Crucial Micron 32GB DDR4 1x16GB 2933MHz MTA18ASF2G72PDZ-2G9E1TI (1920)",
+        "price": 44.9,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Nintendo Switch Lite (Koralle)",
+        "price": 90.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "NINTENDO 3DS XL SCHWARZ MIT  SPEICHERKARTE",
+        "price": 95.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "M2 SSD 250 GB",
+        "price": 30.0,
+        "human_verdict": "UNCLEAR",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Original Xbox Series X/S Wireless Controller",
+        "price": 20.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "einzeln_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Nintendo 3DS XL mit Spielen !ABHOLUNG!",
+        "price": 90.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Asus Prime X470 Pro/Ryzen 5 2600X/24GB DDR4 RAM/RTX2080 8GB",
+        "price": 400.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "einzeln_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "iPhone 15 Rosa • 128GB • Top Zustand",
+        "price": 360.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "AOC Curved Monitor 31,5\" QHD 144Hz IPS LED DP/HDMI schwarz/rot",
+        "price": 90.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Ryzen 7 3700x, 32gb DDR4 3200Mhz Ram, B350M- Pro VDH Bundle",
+        "price": 250.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Nintendo DS Lite Handheld Konsole Silber",
+        "price": 50.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "MSI GeForce RTX 3070 | GRAFIKKARTE",
+        "price": 250.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "LEGO DUPLO Konvolut mit Figuren und Sonderteilen",
+        "price": 10.0,
+        "human_verdict": "FALSE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Terra 31 5 Curved Monitor (Modell 3280W) Top Zustand",
+        "price": 60.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "AOC Curved Monitor 31,5\" QHD 144Hz IPS LED DP/HDMI schwarz/rot",
+        "price": 100.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "dell Z930P-00 Netzteil 930W 7001049-y000",
+        "price": 20.0,
+        "human_verdict": "UNCLEAR",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "PlayStation 4 Slim",
+        "price": 110.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "iPhone 13 128gb",
+        "price": 99.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Lego Star Wars - 501st Clone Trooper Pilot (sw0439)",
+        "price": 25.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Lenovo Thinkpad Laptop x390 Yoga Touch i5/8GB/256GB NVMe/Win11",
+        "price": 239.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Sony PlayStation 1 Konsole (PS1) Klassiker",
+        "price": 50.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Samsung 860 EVO 500GB SSD SATA 2,5 Zoll MZ-76E500 getestet gesund",
+        "price": 39.99,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "pc i7 11700f GTX 1060 6GB 16GB DDR4 3000mhz 256GB Nvme M.2 SSD",
+        "price": 270.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Apple iPhone 16 Pro 128GB Titan Schwarz 93%",
+        "price": 525.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "LEGO Star Wars Minifigur Clone BARC Trooper (sw0524)",
+        "price": 20.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "MacBook Pro 13,3 Zoll (256GB SSD, Intel  i5 2,3 GHz) Clamshell",
+        "price": 50.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Apple MacBook Pro 13\" (2018) | i7 | 16GB RAM | 1TB SSD | Top Zust",
+        "price": 350.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Lego Star Wars Clone Trooper Trans Satin Green Prototyp",
+        "price": 50.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "MacBook Pro 13\" M1 (16GB RAM / 256GB SSD) – Excellent Condition!",
+        "price": 550.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "FORESEE M.2 SATA SSD 128 GB - FSGLMMC-128GH",
+        "price": 15.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "PS5 DualSense Controller in Pink - Neuwertig",
+        "price": 30.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "einzeln_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Verkaufe ein iPhone 13 mit 128 Gb 200€",
+        "price": 200.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "iPhone 16 128GB",
+        "price": 320.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "LEGO Harry Potter – 9 Minifiguren – Konvolut – Sammler",
+        "price": 22.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "MacBook Air M1 2020 16GB/256GB Space Grau - sehr guter Zustand",
+        "price": 420.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Asus rtx 3060",
+        "price": 180.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Cooler Master RP-550-PCAP ATX12V Netzteil 550 W Passive PFC 20+4/4+4 SATA",
+        "price": 15.89,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Redundantes 2U Netzteil DPS-750PB 750W AC-078A",
+        "price": 35.0,
+        "human_verdict": "UNCLEAR",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Mariokart World - Nintendo Switch 2 - NEU & OVP",
+        "price": 50.0,
+        "human_verdict": "FALSE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Sony PlayStation 4 500GB Spielkonsole Schwarz CUH 1004A mit Controller 3x Spiele",
+        "price": 99.99,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "PS4 pro +2 Controller + Fernsehr",
+        "price": 100.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "PlayStation 4 Slim",
+        "price": 50.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "PC i5-8400 | GTX 1660 6GB | 16GB RAM | 1TB SSD + 1TB HDD",
+        "price": 300.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "SAMSUNG C27F390FHU LED Curved 27 Zoll Full-HD Monitor",
+        "price": 105.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Nintendo Switch Pro Controller - Schwarz",
+        "price": 20.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "einzeln_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Gaming PC Ryzen 5 3600 RX 5500 XT 8GB RAM RGB ohne HDD SSD",
+        "price": 350.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "einzeln_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "LEGO® Star Wars - Clone ARC Trooper Hammer, Rancor SW0377 - Minifigur Set 9488",
+        "price": 21.95,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Yamaha RX-V565 AV-Receiver",
+        "price": 50.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "PS2 Slim mit defekten Laser",
+        "price": 15.0,
+        "human_verdict": "FALSE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "KEIN_TREFFER"
+      },
+      {
+        "title": "Corsair Vengeance LPX 16GB DDR4-2400 // Neupreis jetzt ca.140€ /",
+        "price": 45.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Lego Figuren Konvolut Sammlung Marvel , DC , Ninjago , Dimensions",
+        "price": 35.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Corsair CX750M Computer ATX Netzteil 750W",
+        "price": 49.99,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "FUJITSU P758 BUDGET GAMING PC i5 9400F 16GB DDR4 256GB SSD + 500GB HDD GTX1050",
+        "price": 199.99,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Playstation 2 PS2 Slim Konsole 1 Controller 2 Spiele Memorycard",
+        "price": 85.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Nintendo DS und 3DS Spiele (AUSWAHL) Module - Sammlung Konvolut - 2DS DSi XL",
+        "price": 39.0,
+        "human_verdict": "FALSE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Fujitsu Esprimo Q958  i5-9500T 16GB RAM 256GB M.2 SSD DVD-RW WLAN BT W11 Pro",
+        "price": 199.9,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Lenovo ThinkPad T14 Gen 1 i5-10310U 16GB Touch ohne SSD Netzteil #V105",
+        "price": 149.0,
+        "human_verdict": "UNCLEAR",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Lenovo ThinkPad T490 i5-8365U 16GB RAM 14\" ohne SSD ohne Netzteil#V103",
+        "price": 149.0,
+        "human_verdict": "UNCLEAR",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Yamaha RX-E810 Stereo Receiver schwarz / gewartet 1 Jahr Garantie [2]",
+        "price": 169.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Yamaha AV Receiver RX-V 1065",
+        "price": 130.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Nintendo Switch Lite",
+        "price": 50.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Apple MacBook Pro 15 Zoll 2019 | i7 | 16 GB RAM / 256 GB SSD",
+        "price": 280.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "16GB (2x8) SK DDR 4 PC Speicher RAM DDR4 Arbeitsspeicher",
+        "price": 36.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "SW - Original Nintendo Switch Joy-Con 2er-Set Grau",
+        "price": 50.0,
+        "human_verdict": "FALSE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "ASUS ROG Ally Z1 Extreme 16GB / 512GB neuwertig",
+        "price": 300.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "DELL PC | Win 11 | Intel i5 8500 | 8GB DDR4 | 256GB SSD | 1TB HDD NVIDIA GT 1030",
+        "price": 179.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Dynabook Satellite Pro Intel Core 15,6\" i5-8250U 1.6Ghz 8GB RAM",
+        "price": 115.0,
+        "human_verdict": "FALSE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "KEIN_TREFFER"
+      },
+      {
+        "title": "Geforce RTX 3060 12GB Vram 150 bei heutiger Abholung!",
+        "price": 230.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Scuf Reflex FPS PS5 Controller Originalverpackung",
+        "price": 5.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "einzeln_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Lenovo Thinkpad T14 Gen 1 Type 20S1 16GB RAM / 512 GB",
+        "price": 170.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Techsolo 730W ATX Netzteil TP-730 Rev.B",
+        "price": 10.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "MSI G27CQ4 27“ 1440p 165hz Curved Monitor",
+        "price": 75.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "G.Skill Ripjaws V 32GB RAM DDR4 Arbeitsspeicher 4x8GB",
+        "price": 99.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Microsoft Xbox Series X/S Wireless Controller Stellar Shift-Stick",
+        "price": 19.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "einzeln_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "PlayStation 4 Slim",
+        "price": 60.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "24\" 144hz  AOC curved Monitor",
+        "price": 80.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Terra PC | Intel Core i5-10400, 16GB Ram, NVIDIA GeForce GT 730",
+        "price": 180.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "iPhone 13 128gb",
+        "price": 170.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Dell 3070 - Core i5 9500 - 8GB DDR4 - 256 GB NVMe - WIN11 pro",
+        "price": 119.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Dell OptiPlex 5070 Micro - i5-9500T / 8 GB RAM / 256 GB NVMe SSD",
+        "price": 189.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "2TB SSD Crucial BX500  2,5\" Interne SSD SATA 6Gb/s, guter Zustand",
+        "price": 124.34,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Apple MacBook Air M1 256GB 8 GB Gold",
+        "price": 350.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Lenovo PC IdeaCentre 510-15ICB - i5-8400 - 8GB RAM - 250GB SSD - Windows 11",
+        "price": 179.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Elgato SteamDeck+",
+        "price": 139.0,
+        "human_verdict": "UNCLEAR",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Lenovo ThinkPad T490 - I5-8365U (1,6 GHz) - 8 GB RAM - 256 GB SSD - Windows 11",
+        "price": 239.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "RTX 3070 Suprim X",
+        "price": 300.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "enermax cyberbron iii 750w",
+        "price": 45.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "MPC-Power 650W PC Netzteil",
+        "price": 30.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "4x 8GB (32GB) SK Hynix DDR4 2133MHz HMA41GU6AFR8N",
+        "price": 80.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Nintendo Switch Spiele Bundle",
+        "price": 25.0,
+        "human_verdict": "UNCLEAR",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Gaming Pc Ryzen 5 5500/ 16gb ddr4 ram 3200mhz/ b450 Mobo/Gtx 1650",
+        "price": 350.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "einzeln_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "LEGO Figuren Sammlung",
+        "price": 49.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "LEGO Figuren Sammlung",
+        "price": 28.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "LEGO NINJAGO Original Figuren Konvolut – sehr guter Zustand",
+        "price": 45.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Dell Latitude 7300 - i7-8665U - 16GB RAM - 500GB SSD - 13,3\" FHD - Windows 11",
+        "price": 179.99,
+        "human_verdict": "FALSE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "KEIN_TREFFER"
+      },
+      {
+        "title": "AORUS GeForce RTX 3060 Ti Elite 8G -- OVP",
+        "price": 200.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "Asus Nvidia RTX 3070",
+        "price": 240.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      },
+      {
+        "title": "PS2-Slim Konsole",
+        "price": 20.0,
+        "human_verdict": "TRUE_POSITIVE",
+        "review_modus": "pauschal_bestaetigt",
+        "fingerprint_state": "UNVERAENDERT"
+      }
+    ]
+  }
+}

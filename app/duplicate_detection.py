@@ -49,7 +49,7 @@ _TITLE_STOPWORDS = frozenset({
     "zustand",
 })
 
-_NON_ALNUM_RE = re.compile(r"[^a-z0-9 ]+")
+_NON_ALNUM_RE = re.compile(r"[^a-z0-9äöüß ]+")
 _MULTI_SPACE_RE = re.compile(r"\s+")
 
 
@@ -92,6 +92,29 @@ def normalize_title(title: str) -> str:
     das gespeicherte Fingerprint-Format in price_history.jsonl durch
     diese Verbesserung NICHT aendert (keine Migration bestehender
     Zeilen noetig).
+
+    FIX (STATUS.md Datenqualitaet Nr. 11, Ruleset-Qualitaetssystem):
+    deutsche Umlaute (ä/ö/ü/ß) werden NICHT mehr entfernt/durch ein
+    Leerzeichen ersetzt -- sie sind Teil der erlaubten Zeichenklasse.
+    Vorher wurde z.B. "Röhrenfernseher" zu "r hrenfernseher", wodurch
+    JEDE fingerprint-basierte matcher.evaluate()-Revalidierung (u.a.
+    app/rule_coverage.py::_is_still_valid()) nie mehr gegen Umlaut-
+    haltige match/require_all_of-Begriffe (z.B. "röhrenfernseher",
+    "verstärker") matchen konnte -- unabhaengig davon, ob der Titel
+    inhaltlich passen wuerde (19 von 355 Regeln in 4 Kategorien
+    betroffen: handhelds, konsolen_bundles, retro_konsolen,
+    vintage_elektronik). matcher.evaluate() selbst wendet nur title.lower()
+    an, verändert Umlaute also nie -- der Fingerprint muss daher exakt in
+    diesem Format vorliegen, damit ein Re-Match ueberhaupt moeglich ist.
+    Rueckwaertskompatibel fuer die produktive Duplicate-/Cross-Posting-
+    Erkennung: find_duplicate() vergleicht in app.py ausschliesslich
+    Fingerprints INNERHALB desselben Scan-Laufs (price_points_this_scan),
+    nie gegen historisch in price_history.jsonl gespeicherte Fingerprints
+    -- die Formataenderung hat daher keine Kontinuitaets-Auswirkung auf
+    bereits geschriebene Zeilen. Bereits VOR diesem Fix geschriebene
+    price_history.jsonl-Zeilen mit Umlaut-Titeln behalten ihr altes,
+    fehlerhaftes Fingerprint-Format (keine rueckwirkende Migration) --
+    nur ab jetzt neu geschriebene Zeilen sind korrekt.
     """
     lowered = title.lower()
     cleaned = _NON_ALNUM_RE.sub(" ", lowered)
