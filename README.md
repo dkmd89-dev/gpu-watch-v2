@@ -1,7 +1,7 @@
 # GPU Watch v2
 
-Ein selbst gehosteter Deal-Scanner für Kleinanzeigen (und eBay), der
-gebrauchte Hardware- und Elektronik-Angebote automatisch erkennt,
+Ein selbst gehosteter Deal-Scanner für Kleinanzeigen, eBay und Quoka,
+der gebrauchte Hardware- und Elektronik-Angebote automatisch erkennt,
 bewertet und bei guten Preisen per Push-Benachrichtigung meldet.
 
 Ursprünglich für GPU-Angebote gebaut, mittlerweile auf 19 Kategorien
@@ -11,7 +11,7 @@ bis zu iPhones und MacBooks.
 ## Funktionsweise
 
 1. **Scan** — durchsucht periodisch konfigurierte Quellen
-   (Kleinanzeigen, eBay) nach neuen Angeboten.
+   (Kleinanzeigen, eBay, Quoka) nach neuen Angeboten.
 2. **Matching** — gleicht jeden Angebotstitel gegen ein YAML-basiertes
    Regelwerk (`app/rules/*.yaml`) ab: Kategorie, Preisgrenzen,
    Ausschlussbegriffe. Bei Treffer wird das Angebot einer konkreten
@@ -90,6 +90,11 @@ Vor jeder Regeländerung empfiehlt sich ein Lauf des read-only
 Diagnose-Moduls `app/rule_analyzer.py` (prüft u.a. auf unerreichbare
 Regeln, Duplikate und Exclude-Konflikte) sowie die Testsuite.
 
+Für das Ruleset-Qualitätstooling (Benchmark-, Coverage- und
+Cross-Category-Analysen, ebenfalls read-only und kein Bestandteil der
+Produktionskette) siehe
+[`tools/ruleset_quality/README.md`](tools/ruleset_quality/README.md).
+
 Alle 19 Kategorien wurden im Rahmen eines systematischen
 Active-False-Positive-Audits einmal vollständig gegen den echten
 Produktivkorpus geprüft (113 real bestätigte Fehltreffer über 14
@@ -113,7 +118,7 @@ das echte, produktive Regelwerk unter `app/rules/`.
 app/
 ├── app.py                 # Flask-Einstiegspunkt, Scan-Loop, Persistenz-Orchestrierung
 ├── matcher.py              # Kern-Matching-Logik gegen die YAML-Regeln
-├── scrapers/                # Kleinanzeigen-/eBay-Scraper
+├── scrapers/                # Kleinanzeigen-/eBay-/Quoka-Scraper
 ├── rules/                   # Ein YAML pro Kategorie
 ├── scoring/                  # Deal-Score-, Profit-/Flip-Berechnung
 ├── categories/detectors/     # Kategorie-spezifische Ausstattungs-Erkennung
