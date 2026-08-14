@@ -5,14 +5,14 @@
 > Stand: **2026-08-14**
 > Repository: `dkmd89-dev/gpu-watch-v2`
 > Branch: `main`
-> **Letzter Code-Commit (vor dieser Doku-Aktualisierung):** `dfe3eb9` (feat(quality): menschlich
-> verifiziertes Labeling + Preishistorie-Revalidierung v3)
-> **HEAD (main, vor dieser Doku-Aktualisierung):** `dfe3eb9`
+> **Letzter Code-Commit (vor dieser Doku-Aktualisierung):** `a6e8df1` (fix:
+> Zubehör/Ersatzteil-vs-Gerät-Fehltreffer aus 251-Listing-Stichprobe schließen)
+> **HEAD (main, vor dieser Doku-Aktualisierung):** `3c9a678` (Merge PR #32)
 > Vorheriger dokumentierter Stand: `2745a95` (PR #29 + Folge-Sessions)
-> Vergleich `2745a95...dfe3eb9`: PR #31 (251-Listing-Worksheet gelabelt + 3 Exclude-Fixes,
-> `c577207`) + `c9967ba` (Umlaut-Fingerprint-Fix) + `dfe3eb9` (menschliches Labeling +
-> Preishistorie-Revalidierung v3, read-only) + freigegebene `lego_bundle`-Datenbereinigung
-> (`data/price_history.jsonl`, kein Code-Commit)
+> Vergleich `2745a95...a6e8df1`: PR #31 (251-Listing-Worksheet gelabelt + 3 Exclude-Fixes,
+> `c577207`) + PR #32 (Umlaut-Fingerprint-Fix + menschliches Labeling + Preishistorie-
+> Revalidierung v3, `3c9a678`) + `a6e8df1` (4 weitere Exclude-Fixes, Zubehör/Ersatzteil-vs-Gerät)
+> + freigegebene `lego_bundle`-Datenbereinigung (`data/price_history.jsonl`, kein Code-Commit)
 >
 > Diese Datei ersetzt `PROJEKTSTAND_KOMPLETT.md` (Datei mittlerweile aus dem Repository entfernt). Historische Phasenberichte bleiben als Detaildokumentation erhalten; widersprüchliche ältere Ist-Stand-Angaben gelten nicht mehr als aktuell.
 
@@ -22,7 +22,7 @@
 
 `gpu-watch-v2` ist ein modularer, YAML-gesteuerter **Hardware Deal Finder** für Second-Hand-Angebote. Das System kombiniert Scraper, kategoriebasiertes Matching, Hardware-Detektoren, Deal-Scoring, Marktpreis-/Resale-Statistik, Profit-/Flip-Bewertung, Duplicate Detection, Presence Tracking, Dashboard-KPIs und ntfy-Benachrichtigungen.
 
-Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und kontrollierter Weiterentwicklung**. Seit `d2effe7` wurden insbesondere Datenqualitäts-/Validierungslogik, Rule Analyzer/Coverage, Caching/Performance, neue Kategorien sowie ein umfangreicher False-Positive-Audit integriert. Seit 2026-08-14 ergänzt ein dediziertes, read-only **Ruleset-Qualitätssystem** (`tools/ruleset_quality/`, siehe Abschnitt 3.11) den bisherigen punktuellen Audit-Ansatz um reproduzierbare Regression-Benchmarks und Preishistorie-Simulationen. Im selben Tag (Abschnitt 3.12) wurde die 251-Listing-Stichprobe vollständig gelabelt, daraus resultierend 3 Exclude-Fixes umgesetzt (PR #31), der Umlaut-Fingerprint-Bug behoben und eine kontrollierte Preishistorie-Revalidierung v3 durchgeführt — mit dem wichtigen Befund, dass der Fix nicht rückwirkend auf bereits gespeicherte Daten wirkt.
+Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und kontrollierter Weiterentwicklung**. Seit `d2effe7` wurden insbesondere Datenqualitäts-/Validierungslogik, Rule Analyzer/Coverage, Caching/Performance, neue Kategorien sowie ein umfangreicher False-Positive-Audit integriert. Seit 2026-08-14 ergänzt ein dediziertes, read-only **Ruleset-Qualitätssystem** (`tools/ruleset_quality/`, siehe Abschnitt 3.11) den bisherigen punktuellen Audit-Ansatz um reproduzierbare Regression-Benchmarks und Preishistorie-Simulationen. Im selben Tag (Abschnitt 3.12) wurde die 251-Listing-Stichprobe vollständig gelabelt, daraus resultierend 3 Exclude-Fixes umgesetzt (PR #31), der Umlaut-Fingerprint-Bug behoben und eine kontrollierte Preishistorie-Revalidierung v3 durchgeführt (PR #32) — mit dem wichtigen Befund, dass der Fix nicht rückwirkend auf bereits gespeicherte Daten wirkt. Direkt im Anschluss (Abschnitt 3.13) wurde Datenqualitätspunkt 14 (Zubehör/Ersatzteil-vs-Gerät) mit 4 weiteren gezielten Exclude-Fixes gelöst.
 
 ---
 
@@ -32,21 +32,25 @@ Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und ko
 
 ```text
 Branch: main
-Letzter Code-Commit (vor dieser Doku-Aktualisierung): dfe3eb9
+Letzter Code-Commit (vor dieser Doku-Aktualisierung): a6e8df1
 Vorheriger dokumentierter Stand: 2745a95 (PR #29 + Folge-Sessions)
 
-2745a95..dfe3eb9:
+2745a95..a6e8df1:
   PR #31 (c577207) -- 251-Listing-Worksheet KI-gestützt gelabelt (217 TP/
                        21 FP/13 UNCLEAR) + 3 gezielte Exclude-Fixes:
                        exclude_global (defekt-Flexionsformen), handhelds
                        (sd karten Plural), office_pc (dynabook/latitude)
-  c9967ba           -- fix: Umlaut-Fingerprint-Bug behoben
-                       (duplicate_detection.normalize_title(), STATUS.md
-                       Nr. 11) -- wirkt NUR auf künftig neue Daten
-  dfe3eb9           -- feat(quality): menschlich verifiziertes Labeling
-                       (Listings 1-30 einzeln, 31-251 pauschal) +
-                       kontrollierte, read-only Preishistorie-
-                       Revalidierung v3
+  PR #32 (3c9a678)  -- fix: Umlaut-Fingerprint-Bug behoben (STATUS.md
+                       Nr. 11, wirkt NUR auf künftig neue Daten) +
+                       menschlich verifiziertes Labeling (Listings 1-30
+                       einzeln, 31-251 pauschal) + kontrollierte,
+                       read-only Preishistorie-Revalidierung v3
+  a6e8df1           -- fix: Zubehör/Ersatzteil-vs-Gerät-Fehltreffer
+                       geschlossen (STATUS.md Nr. 14): controller
+                       (Kompositum-Lücke "Lötaufsatz"), handhelds
+                       (ssd/festplatte/headset/kopfhörer/in-ear),
+                       netzteil (kabelset), konsolen_bundles
+                       (kontextbewusster joy-con-Exclude)
 ```
 
 Zusätzlich, außerhalb der Commit-Historie (freigegebene Datenänderung, kein Code-Commit):
@@ -58,19 +62,19 @@ gelöscht (siehe Abschnitt 3.12).
 In dieser Session tatsächlich lokal ausgeführt und verifiziert (nicht aus Commit-Historie übernommen):
 
 ```text
-pytest app/tests/ -> 1309 passed, 0 failed
+pytest app/tests/ -> 1315 passed, 0 failed (623,91s)
 
 rule_analyzer.py:
 355 Regeln, 19 Kategorien, 0 Findings
-Ruleset-Signatur (matcher.compute_ruleset_signature()): 98acd6152b61b8bb
-  -- GEÄNDERT seit PR #28/#29 (acd510eb61845cb5 -> 98acd6152b61b8bb), erwartbar:
-     PR #31 erweitert exclude_global und 2x exclude_category
+Ruleset-Signatur (matcher.compute_ruleset_signature()): ee2a6eb114525b55
+  -- GEÄNDERT seit PR #31/#32 (98acd6152b61b8bb -> ee2a6eb114525b55), erwartbar:
+     der Punkt-14-Fix erweitert exclude_category in 3 Kategorien + einen neuen
+     exclude_category_unless_also_contains-Schlüssel in konsolen_bundles
 ```
 
-Vorheriger dokumentierter Stand: 1296/1296 (PR #29 + Folge-Sessions). Die 13 neuen Tests: 9 aus
-PR #31 (`test_office_pc_dynabook_latitude_fix.py`, `test_handhelds_sd_karten_plural_fix.py`,
-`test_matcher_defekt_flexionsform_fix.py`) + 4 aus dem Umlaut-Fix
-(`test_duplicate_detection_umlaut_fix.py`) — kein Test wurde gelöscht oder abgeschwächt.
+Vorheriger dokumentierter Stand: 1309/1309 (PR #32). Die 6 neuen Tests:
+`test_zubehoer_ersatzteil_vs_geraet_fix.py` (Punkt-14-Fix, siehe Abschnitt 3.13) — kein Test
+wurde gelöscht oder abgeschwächt.
 
 ---
 
@@ -419,6 +423,29 @@ Alle Berichte: `tools/ruleset_quality/generated/reports/WORKSHEET_LABELING_BERIC
 `PREISHISTORIE_REVALIDIERUNG_V3_BERICHT_2026-08-14.md`,
 `ENTSCHEIDUNGEN_TECHNISCHE_VORBEREITUNG_BERICHT.md`.
 
+### 3.13 Zubehör/Ersatzteil-vs-Gerät-Fehlklassifikation gelöst (`a6e8df1`, Datenqualität Punkt 14)
+
+Direkte Fortsetzung von Abschnitt 3.12, Punkt 1 (KI-gestütztes Labeling, root_cause
+`zubehoer_statt_geraet`, 6 Fälle). Vier unabhängige Root Causes identifiziert und je gezielt
+gefixt, jeweils mit gemessenem Blast Radius (gegen `found.json` + `price_history.jsonl`) und
+Kollisionsprüfung:
+
+| Kategorie | Root Cause | Fix | Blast Radius | Kollisionen |
+|---|---|---|---|---|
+| `controller` | "Lötaufsatz" enthält "aufsatz" nicht als eigenes Wort (Kompositum, `_contains_term()`-Wortgrenzen) | `lötaufsatz`/`lötspitze` als explizite Kompositum-Begriffe ergänzt | 1 | 0 |
+| `handhelds` | `ssd`/`festplatte`/`headset`/`kopfhörer`/`in-ear` fehlten als bare Excludes | 5 bare Excludes ergänzt (kein Handheld-Gerät wird selbst so beworben) | 5 | 0 |
+| `netzteil` | Regel matcht rein über Watt-Detector (`requirements: min_psu_watt`), `exclude_category` deckte bisher nur komplette Systeme ab | `kabelset` ergänzt | 2 | 0 |
+| `konsolen_bundles` | "Joy-Con" ist Zubehör-Produktname, bare Exclude in früherer Session wegen 9 Kollisionen verworfen | neuer kontextbewusster Exclude `joy-con`/`joycon`/`joy con` (`exclude_category_unless_also_contains`, eigene Marker-Liste mit zusätzlich `konsole`) | ~21 blockiert | 0 (Kollisions-Stichprobe: alle bekannten Konsole+Joy-Con-Bundles bleiben erhalten) |
+
+Für `konsolen_bundles` wurden alle 61 "Joy-Con"-Titel aus `found.json` + `price_history.jsonl`
+einzeln klassifiziert (nicht nur eine Stichprobe): mit dem neuen Marker `konsole` bleiben alle
+bekannten Konsole+Joy-Con-Bundles korrekt erhalten, alle standalone Joy-Con-Sets werden korrekt
+blockiert — 0 Kollisionen.
+
+6 neue Regressionstests (`test_zubehoer_ersatzteil_vs_geraet_fix.py`), 190 kategorienbezogene
+Tests grün, volle Suite 1315/1315 grün, `rule_analyzer.py` 0 Findings. Ruleset-Signatur geändert
+(`98acd6152b61b8bb` → `ee2a6eb114525b55`).
+
 ---
 
 ## 4. Datenqualität
@@ -443,9 +470,9 @@ Der anschließende PR-#6-Audit adressiert bereits mehrere konkrete False Positiv
 
 - historische Alt-Kontamination in `price_history.jsonl`
 - 19 Regeln ohne Produktivdaten weiter beobachten
-- `RX 7600 XT`/`RX 7600`-Überlappung und `controller`-`ladekabel`-Exclude als dokumentierte Restlücken aus Phase 15 — weiterhin offen
+- `RX 7600 XT`/`RX 7600`-Überlappung — weiterhin offen. `controller`-`ladekabel`-Exclude: **nächster geplanter Einzelschritt** (noch nicht bearbeitet)
 - 9 Muster / 27 Titel aus dem Active-False-Positive-Audit (Abschnitt 3.9) bewusst zurückgestellt (P1/P2) — vollständige Liste: `docs/ACTIVE_FALSE_POSITIVE_AUDIT.md`
-- Zubehör/Ersatzteil-vs-Gerät-Fehlklassifikation (6 Fälle, Abschnitt 3.12, Punkt 2) — kein einfaches Exclude-Muster identifiziert
+- Zubehör/Ersatzteil-vs-Gerät-Fehlklassifikation: **erledigt** (Abschnitt 3.13) — 4 gezielte Exclude-Fixes
 - Spieltitel-ohne-Konsole (5 Fälle, jetzt auch in `retro_konsolen` bestätigt) — weiterhin offen
 - Umlaut-Fingerprint-Problem: **Code behoben, aber nicht rückwirkend** (Abschnitt 3.12, Punkt 4/6) — dauerhafte, dokumentierte Einschränkung für historische Daten in 4 Kategorien
 - Regel „Switch Pro Controller“ hat nur zwei statt drei Preisstufen — explizit auf Nutzerentscheidung **nicht** erweitert (keine belastbare Datenbasis)
@@ -511,25 +538,25 @@ Folgende Punkte sind **nicht** durch die Konsolidierung als abgeschlossen zu bet
 3. Resale-Confidence (z.B. HIGH/MEDIUM/LOW) ist konzeptionell sinnvoll, aber noch nicht als vollständiges Produktfeature etabliert.
 4. Datenqualitätswarnungen für Kategorien, Regeln und Preisverteilungen sollten langfristig automatisiert werden.
 5. Cross-Platform-Duplicate-Identity ist weiter ausbaufähig.
-6. Die dokumentierten Phase-15-Restlücken (`rx_7600_xt`, `controller.yaml`/`ladekabel`) warten auf eine bewusst getrennte Regeländerung.
+6. Die dokumentierten Phase-15-Restlücken (`rx_7600_xt`, `controller.yaml`/`ladekabel`) warten auf eine bewusst getrennte Regeländerung — `controller`/`ladekabel` ist der als Nächstes geplante Einzelschritt (Abschnitt 7).
 7. `konsolen_bundles`: "Spieltitel VOR Plattform ohne Bindestrich"-Restlücke (Abschnitt 3.8, z.B. "Donkey Kong Bananza Nintendo Switch 2 2025 OVP") — bewusst offen, kein kollisionsfreies Substring-Muster identifiziert.
 8. 9 Muster / 27 Titel aus dem Active-False-Positive-Audit (Abschnitt 3.9) bewusst zurückgestellt (P1/P2), nicht gefixt — vollständige Liste mit Einzelbegründung: `docs/ACTIVE_FALSE_POSITIVE_AUDIT.md`.
 9. Coverage-/False-Positive-Rate: 251-Listing-Stichprobe jetzt vollständig gelabelt (Abschnitt 3.12) — Precision 91,2%, aber nur 30 von 251 Listings unabhängig einzeln geprüft (Rest pauschal übernommen).
 10. Umlaut-Fingerprint-Problem in `app/rule_coverage.py::_is_still_valid()`: **Code-Fix umgesetzt** (Abschnitt 3.12, `c9967ba`), aber dauerhaft **nicht rückwirkend** für historische Daten in 4 Kategorien — bewusst keine weitere Aktion vorgesehen (Datenverlust nicht reparierbar).
 11. Regel „Switch Pro Controller“ ohne dritte Preisstufe — explizit auf Nutzerentscheidung nicht behoben (keine Datenbasis für eine Preisgrenze).
-12. Zubehör/Ersatzteil-vs-Gerät-Fehlklassifikation (Abschnitt 3.12, Punkt 2) — neu identifiziert, kein Fix-Ansatz gefunden.
+12. Zubehör/Ersatzteil-vs-Gerät-Fehlklassifikation: **erledigt** (Abschnitt 3.13).
 
 ---
 
 ## 7. Empfohlene nächste Reihenfolge
 
 ```text
-1. Scan-Performance messen
+1. controller/ladekabel-Exclude separat bewerten (Datenqualität Nr. 5,
+   Phase-15-Restlücke) -- nächster geplanter Einzelschritt
         ↓
-2. Resale-Confidence / weitere Datenqualität verbessern
+2. Scan-Performance messen
         ↓
-3. Zubehör/Ersatzteil-vs-Gerät-Fehlklassifikation: Lösungsansatz suchen
-   (Abschnitt 3.12, Punkt 2 -- noch keine Idee)
+3. Resale-Confidence / weitere Datenqualität verbessern
         ↓
 4. app.py nur bei konkretem Änderungsdruck weiter modularisieren
         ↓
@@ -537,7 +564,8 @@ Folgende Punkte sind **nicht** durch die Konsolidierung als abgeschlossen zu bet
 ```
 
 Stand 2026-08-14: die vorherige P0 (Stichproben-Worksheet labeln + kontrollierte
-Preishistorie-Revalidierung + Orphan-Modell-Freigabe) ist **abgeschlossen** (Abschnitt 3.12).
+Preishistorie-Revalidierung + Orphan-Modell-Freigabe + Zubehör/Ersatzteil-vs-Gerät-
+Fehlklassifikation) ist **abgeschlossen** (Abschnitt 3.12/3.13).
 
 ### Harte Regeln für Folgearbeiten
 
@@ -573,4 +601,4 @@ ABSCHLUSSBERICHT.md`, `FINALE_REVALIDIERUNG_ABSCHLUSSBERICHT.md`,
 `HUMAN_VERIFIED_LABELING_ABSCHLUSSBERICHT_2026-08-14.md`,
 `PREISHISTORIE_REVALIDIERUNG_V3_BERICHT_2026-08-14.md` (Abschnitt 3.12).
 
-Diese Dokumente liefern historische Details. Für den **aktuellen technischen Code-Stand** ist der Code-Commit `dfe3eb9` maßgeblich; für die technische Projektreferenz ist diese Datei maßgeblich.
+Diese Dokumente liefern historische Details. Für den **aktuellen technischen Code-Stand** ist der Code-Commit `a6e8df1` maßgeblich; für die technische Projektreferenz ist diese Datei maßgeblich.

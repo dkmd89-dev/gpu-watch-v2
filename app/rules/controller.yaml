@@ -30,6 +30,15 @@ exclude_category:
   - "case"
   - "grip"
   - "aufsatz"
+  # FIX (Ruleset-Qualitaetssystem, 251-Listing-Stichprobe 2026-08-14): das
+  # bestehende bare "aufsatz" greift nur als eigenes Wort (siehe
+  # matcher.py::_contains_term()-Wortgrenzen) -- "Lötaufsatz" ist ein
+  # Kompositum ohne Wortgrenze vor "aufsatz" und rutscht durch. Explizite
+  # Kompositum-Begriffe ergaenzt statt Wortgrenzen-Logik zu aendern
+  # (identisches Prinzip wie "dockingstation" neben bare "dock" in
+  # handhelds.yaml). Blast Radius gemessen: 1 Treffer, 0 Kollisionen.
+  - "lötaufsatz"
+  - "lötspitze"
   - "kabel"
   - "chinesisch"
   - "no name"

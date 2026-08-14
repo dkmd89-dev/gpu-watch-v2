@@ -200,6 +200,46 @@ exclude_category_unless_also_contains:
     - "gesprungen"
     - "gebrauchsspuren"
     - "verfärbt"
+  # FIX (Ruleset-Qualitaetssystem, 251-Listing-Stichprobe 2026-08-14):
+  # "Joy-Con" ist wie "Pro Controller" ein eindeutiger Zubehoer-Produktname,
+  # der als Standalone-Angebot faelschlich matcht (z.B. "SW - Original
+  # Nintendo Switch Joy-Con 2er-Set Grau"). Bewusst NICHT als bare
+  # exclude_category-Eintrag -- in einer frueheren Session verworfen
+  # (9 verifizierte Kollisionen mit echten Switch-Bundles wie "Nintendo
+  # Switch Konsole mit grauen Joy-Cons", siehe Kommentar weiter unten bei
+  # "Bewusst NICHT joy-con"). Stattdessen kontextbewusst: blockiert nur,
+  # wenn KEIN Geraete-Marker im Titel steht. Eigene Markerliste (nicht der
+  # &plattform_geraete_marker-Anker unten) mit zusaetzlich "konsole" --
+  # "Nintendo Switch KONSOLE mit grauen Joy-Cons" enthaelt sonst keinen der
+  # bestehenden Marker (kein "spielkonsole", keine Speichergroesse). Blast
+  # Radius gegen alle 61 Joy-Con-Titel aus found.json + price_history.jsonl
+  # geprueft: 0 Kollisionen (jedes Konsole+Joy-Con-Bundle bleibt ueber
+  # "konsole" erhalten), alle ca. 21 Standalone-Joy-Con-Sets bleiben
+  # korrekt blockiert.
+  "joy-con":
+    &joy_con_geraete_marker
+    - "konsole"
+    - "32gb"
+    - "64gb"
+    - "128gb"
+    - "256gb"
+    - "500gb"
+    - "512gb"
+    - "1tb"
+    - "2tb"
+    - "slim"
+    - "pro"
+    - "hac-001"
+    - "v1"
+    - "v2"
+    - "oled"
+    - "spielkonsole"
+    - "spielekonsole"
+    - "heimkonsole"
+    - "1. generation"
+    - "2. generation"
+  "joycon": *joy_con_geraete_marker
+  "joy con": *joy_con_geraete_marker
   "für nintendo switch": &plattform_geraete_marker
     - "32gb"
     - "64gb"

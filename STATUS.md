@@ -3,45 +3,42 @@
 > **Stand:** 2026-08-14  
 > **Repository:** `dkmd89-dev/gpu-watch-v2`  
 > **Branch:** `main`  
-> **Letzter Code-Commit auf `main` (vor dieser Doku-Aktualisierung):** `dfe3eb9` (davor `c9967ba`,
-> `c577207` = Merge PR #31)  
+> **Letzter Code-Commit auf `main` (vor dieser Doku-Aktualisierung):** `3c9a678` (Merge PR #32,
+> davor `dfe3eb9`, `c9967ba`, `c577207` = Merge PR #31)  
 > **Technische Referenz:** `TECHNISCHER_PROJEKTSTATUS.md`
 
 ## Gesamtstatus
 
 **Stabil / aktiv weiterentwickelbar.** Seit dem letzten dokumentierten Stand (`2745a95`, PR #29 +
 Folge-Sessions) wurde die 251-Listing-Stichprobe vollständig gelabelt (KI-gestützt + menschlich
-verifiziert), daraus resultierend 3 gezielte Exclude-Fixes umgesetzt (PR #31), der seit Längerem
-dokumentierte Umlaut-Fingerprint-Bug behoben (STATUS.md Nr. 11, Fix bereits, aber noch nicht
-gemerged), die freigegebene `lego_bundle`-Migration/-Bereinigung ausgeführt und eine kontrollierte
-Preishistorie-Revalidierung v3 durchgeführt. **Ruleset-Signatur hat sich geändert**
-(`acd510eb61845cb5` → `98acd6152b61b8bb`) — erwartbar, da PR #31 drei Exclude-Listen erweitert hat.
+verifiziert), daraus resultierend 3 gezielte Exclude-Fixes umgesetzt (PR #31), der Umlaut-
+Fingerprint-Bug behoben (PR #32), die freigegebene `lego_bundle`-Migration/-Bereinigung
+ausgeführt, eine kontrollierte Preishistorie-Revalidierung v3 durchgeführt (PR #32) und **STATUS.md
+Punkt 14 (Zubehör/Ersatzteil-vs-Gerät) gelöst** — 4 weitere gezielte Exclude-Fixes. **Ruleset-
+Signatur hat sich erneut geändert** (`98acd6152b61b8bb` → `ee2a6eb114525b55`) — erwartbar, der
+Punkt-14-Fix erweitert vier weitere Exclude-Listen.
 
 ## Verifizierter Stand
 
 ```text
-main (vor dieser Doku-Aktualisierung): dfe3eb9
-feat(quality): menschlich verifiziertes Labeling + Preishistorie-Revalidierung v3
+main (vor dieser Doku-Aktualisierung): 3c9a678 (Merge PR #32)
 
 Vollständiger Testlauf (in dieser Session lokal ausgeführt und verifiziert):
-pytest app/tests/ -> 1309 passed, 0 failed
+pytest app/tests/ -> 1315 passed, 0 failed (623,91s)
 
 Rule Analyzer:
 355 Regeln
 19 Kategorien
 0 Findings
-Ruleset-Signatur: 98acd6152b61b8bb (GEÄNDERT seit PR #28/#29 — PR #31 erweitert exclude_global
-  und 2× exclude_category)
+Ruleset-Signatur: ee2a6eb114525b55 (GEÄNDERT seit PR #31/#32 — Punkt-14-Fix erweitert
+  exclude_category in 3 Kategorien + einen neuen exclude_category_unless_also_contains-Schlüssel)
 
 data/found.json: 2500 Einträge
-data/price_history.jsonl: 14.899 Datenpunkte (vorher 15.554 — 655 gelöscht/5 migriert, siehe
-  Batch 3 unten)
+data/price_history.jsonl: 14.899 Datenpunkte (unverändert seit der lego_bundle-Bereinigung)
 ```
 
-Vorheriger dokumentierter Teststand: 1296/1296 (PR #29 + Folge-Sessions). Die 13 neuen Tests:
-9 aus PR #31 (`test_office_pc_dynabook_latitude_fix.py`,
-`test_handhelds_sd_karten_plural_fix.py`, `test_matcher_defekt_flexionsform_fix.py`) + 4 aus dem
-Umlaut-Fix (`test_duplicate_detection_umlaut_fix.py`).
+Vorheriger dokumentierter Teststand: 1309/1309 (PR #32). Die 6 neuen Tests:
+`test_zubehoer_ersatzteil_vs_geraet_fix.py` (Punkt-14-Fix, siehe Batch 8 unten).
 
 ## Zuletzt abgeschlossene Batches
 
@@ -123,6 +120,26 @@ Keine Korrektur-Aktion an `price_history.jsonl` vorgeschlagen oder ausgeführt �
 für die 4 betroffenen Kategorien keine verlässliche Einzelfallentscheidung. Details:
 `tools/ruleset_quality/generated/reports/PREISHISTORIE_REVALIDIERUNG_V3_BERICHT_2026-08-14.md`.
 
+### 8. Zubehör/Ersatzteil-vs-Gerät-Fehlklassifikation gelöst (Datenqualität Punkt 14)
+
+Vier unabhängige Root Causes für die 6 in der Stichprobe gefundenen Fälle, je gezielt gefixt
+(Blast Radius je gemessen, 0 Kollisionen):
+
+- **`controller`**: `lötaufsatz`/`lötspitze` ergänzt — Kompositum-Lücke (bestehendes bare
+  `"aufsatz"` greift nur als eigenes Wort, nicht in "Löt**aufsatz**").
+- **`handhelds`**: `ssd`/`festplatte`/`headset`/`kopfhörer`/`in-ear` ergänzt — bisher fehlende
+  bare Excludes (kein Handheld-Gerät wird selbst so beworben).
+- **`netzteil`**: `kabelset` ergänzt — Regel matcht rein über den Watt-Detector, exclude_category
+  deckte bisher nur komplette Systeme ab, kein PSU-Zubehör.
+- **`konsolen_bundles`**: neuer kontextbewusster Exclude `joy-con`/`joycon`/`joy con`
+  (`exclude_category_unless_also_contains`, blockiert nur ohne Geräte-Marker) — ein bare Exclude
+  wurde in einer früheren Session wegen 9 verifizierten Kollisionen mit echten
+  Konsole+Joy-Con-Bundles bewusst verworfen; neue Marker-Liste ergänzt `konsole` (fehlte in der
+  bestehenden Liste).
+
+6 neue Regressionstests (`test_zubehoer_ersatzteil_vs_geraet_fix.py`), 190 kategorienbezogene
+Tests + volle Suite 1315/1315 grün, `rule_analyzer.py` 0 Findings.
+
 ## Abgeschlossen
 
 - ursprüngliche Phasen 0–10
@@ -149,6 +166,7 @@ für die 4 betroffenen Kategorien keine verlässliche Einzelfallentscheidung. De
 - Umlaut-Fingerprint-Fix (`duplicate_detection.normalize_title()`)
 - `lego_bundle`-Migration/-Bereinigung ausgeführt (freigegeben)
 - Kontrollierte Preishistorie-Revalidierung v3 (read-only, Kernbefunde siehe Batch 7 oben)
+- Zubehör/Ersatzteil-vs-Gerät-Fehlklassifikation gelöst, 4 Kategorien (Batch 8 oben)
 
 ## Aktuelle Systemkette
 
@@ -205,25 +223,24 @@ Wichtige Architekturregeln:
     drei — explizit auf Nutzerentscheidung **nicht** um eine dritte Stufe erweitert (keine
     belastbare Datenbasis für eine Preisgrenze, siehe
     `ENTSCHEIDUNGEN_TECHNISCHE_VORBEREITUNG_BERICHT.md`).
-14. **Neu:** Zubehör/Ersatzteil-vs-Gerät-Fehlklassifikation (6 Fälle in der Stichprobe) — nicht
-    gefixt, kein einfaches Exclude-Muster identifiziert.
-15. **Neu:** `M.2`-Punktuation wird von `normalize_title()` entfernt (aus "M.2" wird "m 2"),
+14. Zubehör/Ersatzteil-vs-Gerät-Fehlklassifikation: **erledigt** (Batch 8) — 4 gezielte
+    Exclude-Fixes in `controller`/`handhelds`/`netzteil`/`konsolen_bundles`.
+15. `M.2`-Punktuation wird von `normalize_title()` entfernt (aus "M.2" wird "m 2"),
     wodurch ein Fingerprint vereinzelt andere Signalwörter enthalten kann als der echte Titel
     (1 beobachteter Fall: `m2_ssd` → `sata_ssd`-Fehlklassifikation bei Fingerprint-Revalidierung).
     Nur beobachtet, nicht verallgemeinert, keine Aktion.
 
 ## Nächste Prioritäten
 
-### P0 — offene Freigabe-Entscheidungen
+### P0 — nächster einzelner Schritt
 
-- Keine dringenden P0-Punkte mehr offen (Preishistorie-Revalidierung abgeschlossen, Orphan-Modelle
-  bereinigt). Diese Doku-Aktualisierung + Commit/Push/Merge ist der letzte Schritt dieses Batches.
+- Punkt 5: `controller`-`ladekabel`-Exclude separat bewerten (Analyse + ggf. Fix, als eigener
+  Schritt nach dieser Doku-Aktualisierung).
 
 ### P1 — Datenqualität
 
 - Resale-Confidence ausbauen.
 - Datenqualitätsdiagnosen automatisieren.
-- Zubehör/Ersatzteil-vs-Gerät-Fehlklassifikation (Nr. 14) — noch keine Lösungsidee.
 
 ### P2 — Wartbarkeit
 
