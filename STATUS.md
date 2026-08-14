@@ -3,8 +3,8 @@
 > **Stand:** 2026-08-15  
 > **Repository:** `dkmd89-dev/gpu-watch-v2`  
 > **Branch:** `main`  
-> **Letzter Code-Commit auf `main` (vor dieser Doku-Aktualisierung):** `6bc0def` (davor `efb842e`
-> = Merge PR #35, `c3b9443` = Merge PR #34)  
+> **Letzter Code-Commit auf `main` (vor dieser Doku-Aktualisierung):** `00a4053` (davor `a27e9d9`
+> = Merge PR #36, `efb842e` = Merge PR #35)  
 > **Technische Referenz:** `TECHNISCHER_PROJEKTSTATUS.md`
 
 ## Gesamtstatus
@@ -15,35 +15,35 @@ umgesetzt (PR #31), der Umlaut-Fingerprint-Bug behoben (PR #32), die freigegeben
 `lego_bundle`-Migration/-Bereinigung ausgeführt, eine kontrollierte Preishistorie-Revalidierung v3
 durchgeführt (PR #32), **STATUS.md Punkt 14 (Zubehör/Ersatzteil-vs-Gerät) gelöst** (PR #33),
 **Punkt 5 (`controller`/`ladekabel`) gelöst** (PR #34), **Punkt 4 (`RX 7600 XT`/`RX 7600`)
-gelöst** inkl. min_vram_gb-Fix bei 4 weiteren GPU-Modellen (PR #35) und jetzt eine **echte
-End-to-End-Scan-Performance-Messung** durchgeführt und direkt der größte gefundene Hebel
-umgesetzt: **Scraping parallelisiert** (88,9% der Scan-Zeit, bisher seriell) inkl. Behebung eines
-bestehenden Robustheitsproblems (ein fehlschlagender Scraper riss bisher den kompletten Scan ab).
-**Ruleset-Signatur unverändert** (reine Python-Änderung, keine YAML berührt).
+gelöst** inkl. min_vram_gb-Fix bei 4 weiteren GPU-Modellen (PR #35), **Scraping parallelisiert**
+(PR #36) und jetzt **Persistence-Batching** umgesetzt — Folgeschritt der Scan-Performance-Messung:
+`seen.json` (16,7 MB, nicht nur `found.json`) wurde bisher bei jedem einzelnen neuen Angebot
+komplett neu geschrieben. **Ruleset-Signatur unverändert** (reine Python-Änderung).
 
 ## Verifizierter Stand
 
 ```text
-main (vor dieser Doku-Aktualisierung): efb842e (Merge PR #35)
+main (vor dieser Doku-Aktualisierung): a27e9d9 (Merge PR #36)
 
 Vollständiger Testlauf (vom Nutzer lokal ausgeführt und verifiziert):
-pytest app/tests/ -> 1332 passed, 0 failed (76,41s)
+pytest app/tests/ -> 1334 passed, 0 failed (76,51s)
 
 Rule Analyzer:
 355 Regeln
 19 Kategorien
 0 Findings
-Ruleset-Signatur: 133dcd1a9f614e7e (unverändert -- der Scraping-Parallelisierungs-Fix
-  ist reiner Python-Code, keine app/rules/*.yaml-Änderung)
+Ruleset-Signatur: 133dcd1a9f614e7e (unverändert seit PR #35 -- Scraping-Parallelisierung
+  und Persistence-Batching sind reiner Python-Code, keine app/rules/*.yaml-Änderung)
 
 data/found.json: 2500 Einträge
 data/price_history.jsonl: 14.899 Datenpunkte (unverändert seit der lego_bundle-Bereinigung)
 ```
 
-Vorheriger dokumentierter Teststand: 1315/1315 (PR #33). Die 17 neuen Tests seit PR #33: 4 aus
+Vorheriger dokumentierter Teststand: 1315/1315 (PR #33). Die 19 neuen Tests seit PR #33: 4 aus
 PR #34 (`test_controller_ladezubehoer_fix.py`) + 10 aus PR #35 (`test_gpu_rx7600_vram_fix.py`,
-`test_gpu_low_vram_models_fix.py`) + 3 aus dem Scraping-Parallelisierungs-Fix
-(`test_app_parallel_scraping.py`, siehe Batch 11 unten) = 1315+4+10+3 = 1332.
+`test_gpu_low_vram_models_fix.py`) + 3 aus PR #36 (`test_app_parallel_scraping.py`) + 2 aus dem
+Persistence-Batching-Fix (`test_app_persistence_batching.py`, siehe Batch 12 unten) =
+1315+4+10+3+2 = 1334.
 
 ## Zuletzt abgeschlossene Batches
 
@@ -222,6 +222,33 @@ unverändert (reine Python-Änderung). Berichte: `docs/SCAN_PERFORMANCE_MESSUNG_
 rechnerisch (aus den 35 historischen Läufen abgeleitet), nicht durch einen tatsächlichen
 Nach-Fix-Scan bestätigt (erfordert Deployment: `docker compose up --build -d`).
 
+### 12. Persistence-Batching umgesetzt
+
+Folgeschritt zu Batch 11. **Korrektur der ursprünglichen Analyse:** der dominante Kostentreiber
+war nicht nur `found.json` (2,7 MB), sondern vor allem **`seen.json` — 16,7 MB, 47.355
+Einträge** —, das bisher bei **jedem einzelnen neu gesehenen Angebot** (nicht nur bei echten
+Treffern) komplett neu geschrieben wurde. Das erklärt die ursprünglich gemessene Korrelation
+(r=0,997) mit der `dedupliziert`-Zahl (neu gesehene Angebote), nicht mit `new_hits` (echte
+Treffer).
+
+**Fix:** neue Konstante `PERSIST_BATCH_INTERVAL_SECONDS` (Default 5s) + ein gemeinsamer
+Batching-Helper ersetzen beide bisherigen Sofort-Speicherstellen — schreibt `seen.json` und
+`found.json` gemeinsam, höchstens einmal je Intervall statt bei jedem einzelnen Ereignis. Der
+finale, unbedingte Save am Scan-Ende bleibt unverändert (Absicherung gegen Datenverlust).
+
+**Tradeoff (bewusst):** vorher 0 Sekunden Risikofenster bei einem Absturz zwischen "als gesehen
+markiert" und "persistiert", jetzt bis zu 5 Sekunden — bei einer Matching-Phase von nur ~6-9s
+Gesamtdauer ein kleines, begrenztes Fenster.
+
+2 neue Tests (`test_app_persistence_batching.py`), darunter ein Korrektheitsnachweis: mit
+künstlich hochgesetztem Intervall (999s) finden **0 Zwischen-Speicherungen** während des Scans
+statt (vorher: 1 Save je neuem Angebot), trotzdem sind am Scan-Ende alle Treffer und alle
+gesehenen URLs korrekt persistiert — kein Datenverlust. Volle Suite **1334/1334 grün** (vom
+Nutzer lokal verifiziert, 76,51s). Ruleset unverändert.
+
+**Reale Wirkung auf die Produktiv-Scandauer noch nicht verifiziert** (wie bei Batch 11 — erfordert
+Deployment + erneute Log-Auswertung).
+
 ## Abgeschlossen
 
 - ursprüngliche Phasen 0–10
@@ -253,6 +280,7 @@ Nach-Fix-Scan bestätigt (erfordert Deployment: `docker compose up --build -d`).
 - `RX 7600 XT`/`RX 7600`-Überlappung gelöst + min_vram_gb-Bug bei 4 weiteren GPU-Modellen
   (`rtx_3060_ti`/`rtx_3070`/`rtx_4060`/`rtx_2080_ti`) behoben (Batch 10 oben)
 - Echte End-to-End-Scan-Performance-Messung + Scraping parallelisiert (Batch 11 oben)
+- Persistence-Batching für seen.json/found.json (Batch 12 oben)
 
 ## Aktuelle Systemkette
 
@@ -323,16 +351,13 @@ Wichtige Architekturregeln:
 
 ### P0 — offene Punkte
 
-- Keine dringenden P0-Punkte mehr offen (alle in Batch 1–11 dokumentierten Punkte abgeschlossen,
-  Nr. 1–5 der Datenqualitätsliste sind vollständig erledigt, Scan-Performance gemessen +
-  größter Hebel umgesetzt). Nächste Schritte laut Datenqualität/offene Punkte: Nr. 6
+- Keine dringenden P0-Punkte mehr offen (alle in Batch 1–12 dokumentierten Punkte abgeschlossen,
+  Nr. 1–5 der Datenqualitätsliste sind vollständig erledigt, Scan-Performance gemessen + beide
+  identifizierten Hebel umgesetzt). Nächste Schritte laut Datenqualität/offene Punkte: Nr. 6
   (Resale-Confidence) oder P1/P2 unten.
-- **Noch offen aus Batch 11:** die reale Wirkung der Scraping-Parallelisierung auf die
-  Produktiv-Scandauer ist noch nicht verifiziert (erfordert Deployment,
-  `docker compose up --build -d`, dann erneute Log-Auswertung).
-- **Noch offen aus Batch 11:** ob das Persistence-Batching (10,1% der Scan-Zeit) angegangen wird,
-  ist eine offene Design-Entscheidung (Crash-Sicherheit vs. Geschwindigkeit) — nicht automatisch
-  als nächster Schritt anzunehmen.
+- **Noch offen aus Batch 11/12:** die reale Wirkung der Scraping-Parallelisierung UND des
+  Persistence-Batchings auf die Produktiv-Scandauer ist noch nicht verifiziert (erfordert
+  Deployment, `docker compose up --build -d`, dann erneute Log-Auswertung).
 - Ein möglicher, bisher nicht gemessener Verdacht: derselbe min_vram_gb-Musterbug (Batch 10)
   könnte theoretisch auch außerhalb von `gpu` relevant sein — bisher nicht geprüft, kein aktiver
   Punkt.
