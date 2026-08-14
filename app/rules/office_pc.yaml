@@ -89,6 +89,16 @@ search_terms:
 # echten Desktop-/Tower-/Bundle-Treffer geprueft (kein Fujitsu-Esprimo-,
 # Terra-, Dell-Optiplex/Precision- oder Bundle-Titel nennt einen dieser
 # Begriffe).
+#
+# FIX (Ruleset-Qualitaetssystem, 251-Listing-Stichprobe 2026-08-14): zwei
+# weitere Notebook-Markennamen, die dasselbe Luecken-Muster wie oben zeigen
+# (kein "laptop"/"notebook" im Titel) -- "Dynabook Satellite Pro" (Toshiba/
+# Dynabook-Businessnotebook-Linie) und "Dell Latitude" (Dell-Business-
+# notebook-Linie, mobile "U"-Prozessorreihe). Blast Radius gemessen: je 1
+# aktueller found.json-Treffer + 1 (Dynabook) bzw. 10 (Latitude, nach Abzug
+# der bereits ueber "notebook"/"laptop" erfassten) historische
+# price_history.jsonl-Punkte, alle zweifelsfrei echte Notebooks, 0
+# Kollisionen mit Desktop-Titeln geprueft.
 exclude_category:
   - "mainboard"
   - "motherboard"
@@ -101,6 +111,9 @@ exclude_category:
   - "ideapad"
   - "alienware"
   - "lifebook"
+  - "dynabook"
+  - "satellite pro"
+  - "latitude"
 
 rules:
   - label: "Office-PC (Mindestanforderung erfüllt)"

@@ -1,0 +1,788 @@
+{
+  "1_roehrenfernseher": {
+    "status": "FINAL -- Option A (eigenstaendig behalten), keine erneute Optionsbewertung",
+    "anzahl_punkte": 96,
+    "zeitraum": [
+      "2026-08-03",
+      "2026-08-14"
+    ],
+    "preisverteilung": {
+      "n": 96,
+      "median": 20.0,
+      "min": 1.0,
+      "max": 45.0,
+      "q25": 10.0,
+      "q75": 29.75
+    },
+    "titel_rekonstruierbar": 26,
+    "davon_valide_bei_neubewertung": 25,
+    "live_matchende_eintraege_heute": 13,
+    "aktion": "keine -- Modell aktiv und gesund, keine Regel-/Modell-/Datenaenderung"
+  },
+  "2_orphan_modelle": {
+    "lego_bundle_migration": {
+      "model": "lego_bundle",
+      "anzahl_punkte_gesamt": 404,
+      "selektionsregel": "MIGRIERBAR nur wenn (a) echter Titel rekonstruierbar (found.json ODER DASHBOARD_MATCH_FORENSICS.json) UND (b) Titel enthaelt woertlich 'minifig'/'minifigur' UND (c) evaluate(titel, preis, aktuelle_regeln) matcht auf Kategorie lego_minifiguren mit price_history_model in {lego_minifig_bundle, lego_ninjago_bundle}. Alle drei Kriterien muessen gleichzeitig erfuellt sein -- kein Kriterium wird einzeln als ausreichend gewertet.",
+      "zaehlung": {
+        "migrierbar": 5,
+        "nicht_migrierbar_aber_rekonstruierbar": 3,
+        "nicht_rekonstruierbar": 396
+      },
+      "migrierbar_nach_zielmodell": {
+        "lego_ninjago_bundle": 2,
+        "lego_minifig_bundle": 3
+      },
+      "migrierbar_details": [
+        {
+          "klasse": "MIGRIERBAR",
+          "title": "Lego Ninjago 8 besondere Minifiguren, Sammlung K6",
+          "price": 13.0,
+          "date": "2026-08-03T09:47:31.272742+00:00",
+          "eindeutiger_minifig_bezug": true,
+          "matched": true,
+          "neue_kategorie": "lego_minifiguren",
+          "neues_price_history_model": "lego_ninjago_bundle"
+        },
+        {
+          "klasse": "MIGRIERBAR",
+          "title": "LEGO Minifiguren Konvolut",
+          "price": 59.0,
+          "date": "2026-08-03T15:09:56.432342+00:00",
+          "eindeutiger_minifig_bezug": true,
+          "matched": true,
+          "neue_kategorie": "lego_minifiguren",
+          "neues_price_history_model": "lego_minifig_bundle"
+        },
+        {
+          "klasse": "MIGRIERBAR",
+          "title": "Lego Star Wars General Grievous Starfighter 8095 mit Minifiguren, Konvolut",
+          "price": 60.0,
+          "date": "2026-08-03T15:33:18.193469+00:00",
+          "eindeutiger_minifig_bezug": true,
+          "matched": true,
+          "neue_kategorie": "lego_minifiguren",
+          "neues_price_history_model": "lego_minifig_bundle"
+        },
+        {
+          "klasse": "MIGRIERBAR",
+          "title": "LEGO Minifiguren Konvolut",
+          "price": 40.0,
+          "date": "2026-08-03T16:44:29.196016+00:00",
+          "eindeutiger_minifig_bezug": true,
+          "matched": true,
+          "neue_kategorie": "lego_minifiguren",
+          "neues_price_history_model": "lego_minifig_bundle"
+        },
+        {
+          "klasse": "MIGRIERBAR",
+          "title": "LEGO Ninjago Minifiguren Sammlung",
+          "price": 1.0,
+          "date": "2026-08-03T18:19:05.140350+00:00",
+          "eindeutiger_minifig_bezug": true,
+          "matched": true,
+          "neue_kategorie": "lego_minifiguren",
+          "neues_price_history_model": "lego_ninjago_bundle"
+        }
+      ],
+      "nicht_migrierbar_details": [
+        {
+          "klasse": "NICHT_MIGRIERBAR",
+          "title": "LEGO Figuren Sammlung",
+          "price": 75.0,
+          "date": "2026-08-03T09:21:46.858594+00:00",
+          "eindeutiger_minifig_bezug": false,
+          "matched": false,
+          "neue_kategorie": null,
+          "neues_price_history_model": null
+        },
+        {
+          "klasse": "NICHT_MIGRIERBAR",
+          "title": "Lego star wars minifiguren Konvolut",
+          "price": 75.0,
+          "date": "2026-08-03T12:54:28.118011+00:00",
+          "eindeutiger_minifig_bezug": true,
+          "matched": false,
+          "neue_kategorie": null,
+          "neues_price_history_model": null
+        },
+        {
+          "klasse": "NICHT_MIGRIERBAR",
+          "title": "LEGO Star Wars Figuren Konvolut",
+          "price": 95.0,
+          "date": "2026-08-03T13:18:11.518079+00:00",
+          "eindeutiger_minifig_bezug": false,
+          "matched": false,
+          "neue_kategorie": null,
+          "neues_price_history_model": null
+        }
+      ],
+      "hinweis_nicht_rekonstruierbar": "396 von 404 Punkten haben keinen in found.json oder DASHBOARD_MATCH_FORENSICS.json auffindbaren Klartext-Titel (alter Bestand, laengst aus beiden Quellen herausrotiert). Diese Punkte koennen nach der hier definierten Regel NICHT migriert werden, da ein eindeutiger Minifiguren-Bezug nicht nachweisbar ist. Sie sind separat ausgewiesen, nicht geloescht und nicht migriert -- Verbleib erfordert eine gesonderte Entscheidung (z.B. pauschal beim alten/inaktiven Modellnamen belassen, archivieren, oder als 'nicht beurteilbar' kennzeichnen)."
+    },
+    "playmobil_bundle_loeschung": {
+      "model": "playmobil_bundle",
+      "selektionsregel": "Zeile in price_history.jsonl mit Feld model == 'playmobil_bundle' (exakte Gleichheit, kein Praefix-/Teilstring-Match)",
+      "anzahl_zu_loeschender_punkte": 210,
+      "titel_rekonstruierbar": 0,
+      "titel_nicht_rekonstruierbar": 210,
+      "hinweis_titelrekonstruktion": "Fuer die Loesch-Entscheidung irrelevant (kein Zielmodell vorhanden, unabhaengig vom Titel) -- nur zur Vollstaendigkeit mitgefuehrt.",
+      "zeitraum": [
+        "2026-08-03",
+        "2026-08-03"
+      ],
+      "preisverteilung": {
+        "n": 210,
+        "median": 29.16,
+        "min": 1.0,
+        "max": 100.0,
+        "q25": 12.0,
+        "q75": 49.0
+      },
+      "distinkte_fingerprints": 196,
+      "begruendung": "Kein aktives Regelwerk (0 Kategorien) matcht die urspruengliche Warengruppe von 'playmobil_bundle' -- strukturell verifiziert per grep ueber alle app/rules/*.yaml. Kein Zielmodell fuer eine Migration vorhanden.",
+      "reversibilitaet": "Vor Ausfuehrung: Sicherungskopie von data/price_history.jsonl (z.B. price_history.jsonl.bak-<datum>) ausserhalb des git-Verlaufs. Loeschung erfolgt als Zeilenfilter (model != '<wert>'), keine Neuschreibung anderer Zeilen -- bei Bedarf durch Zuruecklegen der Sicherungskopie vollstaendig reversibel, solange kein nachfolgender Scan-Lauf neue Zeilen angehaengt hat."
+    },
+    "spielzeug_bundle_sonstige_loeschung": {
+      "model": "spielzeug_bundle_sonstige",
+      "selektionsregel": "Zeile in price_history.jsonl mit Feld model == 'spielzeug_bundle_sonstige' (exakte Gleichheit, kein Praefix-/Teilstring-Match)",
+      "anzahl_zu_loeschender_punkte": 49,
+      "titel_rekonstruierbar": 0,
+      "titel_nicht_rekonstruierbar": 49,
+      "hinweis_titelrekonstruktion": "Fuer die Loesch-Entscheidung irrelevant (kein Zielmodell vorhanden, unabhaengig vom Titel) -- nur zur Vollstaendigkeit mitgefuehrt.",
+      "zeitraum": [
+        "2026-08-03",
+        "2026-08-03"
+      ],
+      "preisverteilung": {
+        "n": 49,
+        "median": 20.0,
+        "min": 2.5,
+        "max": 90.0,
+        "q25": 13.0,
+        "q75": 29.0
+      },
+      "distinkte_fingerprints": 49,
+      "begruendung": "Kein aktives Regelwerk (0 Kategorien) matcht die urspruengliche Warengruppe von 'spielzeug_bundle_sonstige' -- strukturell verifiziert per grep ueber alle app/rules/*.yaml. Kein Zielmodell fuer eine Migration vorhanden.",
+      "reversibilitaet": "Vor Ausfuehrung: Sicherungskopie von data/price_history.jsonl (z.B. price_history.jsonl.bak-<datum>) ausserhalb des git-Verlaufs. Loeschung erfolgt als Zeilenfilter (model != '<wert>'), keine Neuschreibung anderer Zeilen -- bei Bedarf durch Zuruecklegen der Sicherungskopie vollstaendig reversibel, solange kein nachfolgender Scan-Lauf neue Zeilen angehaengt hat."
+    }
+  },
+  "3_unclear_faelle": {
+    "anzahl_gesamt": 35,
+    "stabil": {
+      "anzahl": 22,
+      "faelle": [
+        {
+          "title": "Microsoft Xbox One X 1TB Schwarz Inkl OVP Ohne Controller",
+          "price": 85.0,
+          "url": "https://www.ebay.de/itm/366595666798",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_xbox_one",
+          "neu_matched_bei_echtem_preis": true,
+          "neue_kategorie_bei_echtem_preis": "konsolen_bundles",
+          "neues_price_history_model_bei_echtem_preis": "konsole_xbox_one",
+          "inhaltlich_matchbar_bei_minimalpreis": true,
+          "kategorie_bei_minimalpreis": "konsolen_bundles",
+          "price_history_model_bei_minimalpreis": "konsole_xbox_one"
+        },
+        {
+          "title": "Nintendo Switch Sports inkl. 12-in-1 Zubehör Set",
+          "price": 30.0,
+          "url": "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-sports-inkl-12-in-1-zubehoer-set/3480799134-227-2661",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": true,
+          "neue_kategorie_bei_echtem_preis": "konsolen_bundles",
+          "neues_price_history_model_bei_echtem_preis": "konsole_switch_standard",
+          "inhaltlich_matchbar_bei_minimalpreis": true,
+          "kategorie_bei_minimalpreis": "konsolen_bundles",
+          "price_history_model_bei_minimalpreis": "konsole_switch_standard"
+        },
+        {
+          "title": "Nintendo Switch Grau Bundle  Neue Sticks (Kein Drift) + Extras!",
+          "price": 120.0,
+          "url": "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-grau-bundle-neue-sticks-kein-drift-extras-/3480736743-279-9668",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": true,
+          "neue_kategorie_bei_echtem_preis": "konsolen_bundles",
+          "neues_price_history_model_bei_echtem_preis": "konsole_switch_standard",
+          "inhaltlich_matchbar_bei_minimalpreis": true,
+          "kategorie_bei_minimalpreis": "konsolen_bundles",
+          "price_history_model_bei_minimalpreis": "konsole_switch_standard"
+        },
+        {
+          "title": "Nintendo Pokémon Purpur Nintendo Switch neu/sealed in OVP",
+          "price": 40.0,
+          "url": "https://www.ebay.de/itm/407131833744",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": true,
+          "neue_kategorie_bei_echtem_preis": "konsolen_bundles",
+          "neues_price_history_model_bei_echtem_preis": "konsole_switch_standard",
+          "inhaltlich_matchbar_bei_minimalpreis": true,
+          "kategorie_bei_minimalpreis": "konsolen_bundles",
+          "price_history_model_bei_minimalpreis": "konsole_switch_standard"
+        },
+        {
+          "title": "Star Fox \"NEU & OVP\" (Nintendo Switch 2)",
+          "price": 49.99,
+          "url": "https://www.ebay.de/itm/227468705699",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": true,
+          "neue_kategorie_bei_echtem_preis": "konsolen_bundles",
+          "neues_price_history_model_bei_echtem_preis": "konsole_switch_standard",
+          "inhaltlich_matchbar_bei_minimalpreis": true,
+          "kategorie_bei_minimalpreis": "konsolen_bundles",
+          "price_history_model_bei_minimalpreis": "konsole_switch_standard"
+        },
+        {
+          "title": "Nintendo Switch Komplett Set OVP",
+          "price": 129.0,
+          "url": "https://www.ebay.de/itm/298572812276",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": true,
+          "neue_kategorie_bei_echtem_preis": "konsolen_bundles",
+          "neues_price_history_model_bei_echtem_preis": "konsole_switch_standard",
+          "inhaltlich_matchbar_bei_minimalpreis": true,
+          "kategorie_bei_minimalpreis": "konsolen_bundles",
+          "price_history_model_bei_minimalpreis": "konsole_switch_standard"
+        },
+        {
+          "title": "Nintendo Switch Neon Bundle  Neue Sticks (Kein Drift!) + Extras",
+          "price": 145.0,
+          "url": "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-neon-bundle-neue-sticks-kein-drift-extras/3480680031-279-9668",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": true,
+          "neue_kategorie_bei_echtem_preis": "konsolen_bundles",
+          "neues_price_history_model_bei_echtem_preis": "konsole_switch_standard",
+          "inhaltlich_matchbar_bei_minimalpreis": true,
+          "kategorie_bei_minimalpreis": "konsolen_bundles",
+          "price_history_model_bei_minimalpreis": "konsole_switch_standard"
+        },
+        {
+          "title": "Nintendo Switch V1 HAC-001 mit OVP + Komplett | BLITZVERSAND⚡️",
+          "price": 140.0,
+          "url": "https://www.ebay.de/itm/298572811262",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": true,
+          "neue_kategorie_bei_echtem_preis": "konsolen_bundles",
+          "neues_price_history_model_bei_echtem_preis": "konsole_switch_standard",
+          "inhaltlich_matchbar_bei_minimalpreis": true,
+          "kategorie_bei_minimalpreis": "konsolen_bundles",
+          "price_history_model_bei_minimalpreis": "konsole_switch_standard"
+        },
+        {
+          "title": "Xbox One S 1 TB + 1 Controller - Weiß - OVP - Top Zustand",
+          "price": 80.0,
+          "url": "https://www.ebay.de/itm/377405800415",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_xbox_one",
+          "neu_matched_bei_echtem_preis": true,
+          "neue_kategorie_bei_echtem_preis": "konsolen_bundles",
+          "neues_price_history_model_bei_echtem_preis": "konsole_xbox_one",
+          "inhaltlich_matchbar_bei_minimalpreis": true,
+          "kategorie_bei_minimalpreis": "controller",
+          "price_history_model_bei_minimalpreis": "controller_xbox_series"
+        },
+        {
+          "title": "Nintendo Switch Controller - Joy-Con 2er-Set Neon-Rot/Neon-Blau -NEU",
+          "price": 59.99,
+          "url": "https://www.ebay.de/itm/267751985916",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": true,
+          "neue_kategorie_bei_echtem_preis": "konsolen_bundles",
+          "neues_price_history_model_bei_echtem_preis": "konsole_switch_standard",
+          "inhaltlich_matchbar_bei_minimalpreis": true,
+          "kategorie_bei_minimalpreis": "konsolen_bundles",
+          "price_history_model_bei_minimalpreis": "konsole_switch_standard"
+        },
+        {
+          "title": "Nintendo Switch OLED Joy-Con Set - Pokemon Scarlet & Violet mit Handschlaufaufen",
+          "price": 119.0,
+          "url": "https://www.ebay.de/itm/128017856305",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": true,
+          "neue_kategorie_bei_echtem_preis": "konsolen_bundles",
+          "neues_price_history_model_bei_echtem_preis": "konsole_switch_standard",
+          "inhaltlich_matchbar_bei_minimalpreis": true,
+          "kategorie_bei_minimalpreis": "konsolen_bundles",
+          "price_history_model_bei_minimalpreis": "konsole_switch_standard"
+        },
+        {
+          "title": "Nintendo Switch HAC-001(-01) Joy-Controller Bundle 32GB Handheld-Spielekonsole -",
+          "price": 116.92,
+          "url": "https://www.ebay.de/itm/188766880820",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": true,
+          "neue_kategorie_bei_echtem_preis": "konsolen_bundles",
+          "neues_price_history_model_bei_echtem_preis": "konsole_switch_standard",
+          "inhaltlich_matchbar_bei_minimalpreis": true,
+          "kategorie_bei_minimalpreis": "konsolen_bundles",
+          "price_history_model_bei_minimalpreis": "konsole_switch_standard"
+        },
+        {
+          "title": "Nintendo Switch OLED Modell - Weiß - Komplett mit OVP",
+          "price": 150.0,
+          "url": "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-oled-modell-weiss-komplett-mit-ovp/3480437137-279-8400",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": true,
+          "neue_kategorie_bei_echtem_preis": "konsolen_bundles",
+          "neues_price_history_model_bei_echtem_preis": "konsole_switch_standard",
+          "inhaltlich_matchbar_bei_minimalpreis": true,
+          "kategorie_bei_minimalpreis": "konsolen_bundles",
+          "price_history_model_bei_minimalpreis": "konsole_switch_standard"
+        },
+        {
+          "title": "Nintendo Switch 1. Generation – Neon Blau/Rot – OVP  + Kaufbeleg",
+          "price": 125.0,
+          "url": "https://www.ebay.de/itm/287514519935",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": true,
+          "neue_kategorie_bei_echtem_preis": "konsolen_bundles",
+          "neues_price_history_model_bei_echtem_preis": "konsole_switch_standard",
+          "inhaltlich_matchbar_bei_minimalpreis": true,
+          "kategorie_bei_minimalpreis": "konsolen_bundles",
+          "price_history_model_bei_minimalpreis": "konsole_switch_standard"
+        },
+        {
+          "title": "Metroid Prime Remastered Nintendo Switch 2023 Gebraucht In OVP  guter Zustand ",
+          "price": 35.0,
+          "url": "https://www.ebay.de/itm/278262114576",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": true,
+          "neue_kategorie_bei_echtem_preis": "konsolen_bundles",
+          "neues_price_history_model_bei_echtem_preis": "konsole_switch_standard",
+          "inhaltlich_matchbar_bei_minimalpreis": true,
+          "kategorie_bei_minimalpreis": "konsolen_bundles",
+          "price_history_model_bei_minimalpreis": "konsole_switch_standard"
+        },
+        {
+          "title": "Super Smash Bros. Ultimate (Nintendo Switch) (Inklusive OVP)",
+          "price": 38.79,
+          "url": "https://www.ebay.de/itm/800481313890",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": true,
+          "neue_kategorie_bei_echtem_preis": "konsolen_bundles",
+          "neues_price_history_model_bei_echtem_preis": "konsole_switch_standard",
+          "inhaltlich_matchbar_bei_minimalpreis": true,
+          "kategorie_bei_minimalpreis": "konsolen_bundles",
+          "price_history_model_bei_minimalpreis": "konsole_switch_standard"
+        },
+        {
+          "title": "Nintendo DS Lite Handheld-System hellblau Touchscreen",
+          "price": 50.0,
+          "url": "https://www.ebay.de/itm/318701631164",
+          "alte_kategorie": "retro_konsolen",
+          "altes_price_history_model": "nintendo_retro_konsole",
+          "neu_matched_bei_echtem_preis": true,
+          "neue_kategorie_bei_echtem_preis": "retro_konsolen",
+          "neues_price_history_model_bei_echtem_preis": "nintendo_retro_konsole",
+          "inhaltlich_matchbar_bei_minimalpreis": true,
+          "kategorie_bei_minimalpreis": "retro_konsolen",
+          "price_history_model_bei_minimalpreis": "nintendo_retro_konsole"
+        },
+        {
+          "title": "Read Dead Redemption 1+2 PlayStation 4 PS4 Steelbook Bundle NEU OVP",
+          "price": 100.0,
+          "url": "https://www.ebay.de/itm/327297670888",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_ps4_bundle",
+          "neu_matched_bei_echtem_preis": true,
+          "neue_kategorie_bei_echtem_preis": "konsolen_bundles",
+          "neues_price_history_model_bei_echtem_preis": "konsole_ps4_bundle",
+          "inhaltlich_matchbar_bei_minimalpreis": true,
+          "kategorie_bei_minimalpreis": "konsolen_bundles",
+          "price_history_model_bei_minimalpreis": "konsole_ps4_bundle"
+        },
+        {
+          "title": "HORI Split Pad Pro Nintendo Switch Controller Schwarz mit OVP",
+          "price": 26.99,
+          "url": "https://www.ebay.de/itm/298569642364",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": true,
+          "neue_kategorie_bei_echtem_preis": "konsolen_bundles",
+          "neues_price_history_model_bei_echtem_preis": "konsole_switch_standard",
+          "inhaltlich_matchbar_bei_minimalpreis": true,
+          "kategorie_bei_minimalpreis": "konsolen_bundles",
+          "price_history_model_bei_minimalpreis": "konsole_switch_standard"
+        },
+        {
+          "title": "STAR FOX - Nintendo Switch 2 - NEU-OVP - Händler YAPIDO",
+          "price": 47.9,
+          "url": "https://www.ebay.de/itm/298566727139",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": true,
+          "neue_kategorie_bei_echtem_preis": "konsolen_bundles",
+          "neues_price_history_model_bei_echtem_preis": "konsole_switch_standard",
+          "inhaltlich_matchbar_bei_minimalpreis": true,
+          "kategorie_bei_minimalpreis": "konsolen_bundles",
+          "price_history_model_bei_minimalpreis": "konsole_switch_standard"
+        },
+        {
+          "title": "Nintendo Switch Spielkonsole mit Set - Guter Zustand",
+          "price": 116.49,
+          "url": "https://www.ebay.de/itm/188763698665",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": true,
+          "neue_kategorie_bei_echtem_preis": "konsolen_bundles",
+          "neues_price_history_model_bei_echtem_preis": "konsole_switch_standard",
+          "inhaltlich_matchbar_bei_minimalpreis": true,
+          "kategorie_bei_minimalpreis": "konsolen_bundles",
+          "price_history_model_bei_minimalpreis": "konsole_switch_standard"
+        },
+        {
+          "title": "Nintendo Switch Spielkonsole mit Set - Top Zustand",
+          "price": 127.49,
+          "url": "https://www.ebay.de/itm/188763696701",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": true,
+          "neue_kategorie_bei_echtem_preis": "konsolen_bundles",
+          "neues_price_history_model_bei_echtem_preis": "konsole_switch_standard",
+          "inhaltlich_matchbar_bei_minimalpreis": true,
+          "kategorie_bei_minimalpreis": "konsolen_bundles",
+          "price_history_model_bei_minimalpreis": "konsole_switch_standard"
+        }
+      ]
+    },
+    "veraendert": {
+      "anzahl": 13,
+      "faelle": [
+        {
+          "title": "Nintendo Switch 2 GameCube Controller | OVP | NEU",
+          "price": 85.0,
+          "url": "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-2-gamecube-controller-ovp-neu/3480875199-227-2761",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": false,
+          "neue_kategorie_bei_echtem_preis": null,
+          "neues_price_history_model_bei_echtem_preis": null,
+          "inhaltlich_matchbar_bei_minimalpreis": false,
+          "kategorie_bei_minimalpreis": null,
+          "price_history_model_bei_minimalpreis": null,
+          "preisschwellen_bedingt": false
+        },
+        {
+          "title": "Nintendo Switch 2 GameCube Controller – Nintendo Classics – OVP – NEU",
+          "price": 85.0,
+          "url": "https://www.ebay.de/itm/407132075434",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": false,
+          "neue_kategorie_bei_echtem_preis": null,
+          "neues_price_history_model_bei_echtem_preis": null,
+          "inhaltlich_matchbar_bei_minimalpreis": false,
+          "kategorie_bei_minimalpreis": null,
+          "price_history_model_bei_minimalpreis": null,
+          "preisschwellen_bedingt": false
+        },
+        {
+          "title": "Nintendo Switch - Minecraft FRA mit OVP",
+          "price": 19.89,
+          "url": "https://www.ebay.de/itm/800482418310",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": false,
+          "neue_kategorie_bei_echtem_preis": null,
+          "neues_price_history_model_bei_echtem_preis": null,
+          "inhaltlich_matchbar_bei_minimalpreis": false,
+          "kategorie_bei_minimalpreis": null,
+          "price_history_model_bei_minimalpreis": null,
+          "preisschwellen_bedingt": false
+        },
+        {
+          "title": "Pokémon Let’s Go Evoli! Nintendo Switch – OVP komplett",
+          "price": 39.0,
+          "url": "https://www.kleinanzeigen.de/s-anzeige/pok-mon-let-s-go-evoli-nintendo-switch-ovp-komplett/3480723859-227-3213",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": false,
+          "neue_kategorie_bei_echtem_preis": null,
+          "neues_price_history_model_bei_echtem_preis": null,
+          "inhaltlich_matchbar_bei_minimalpreis": false,
+          "kategorie_bei_minimalpreis": null,
+          "price_history_model_bei_minimalpreis": null,
+          "preisschwellen_bedingt": false
+        },
+        {
+          "title": "Nintendo Switch - Controller Joy-Con Neon-Grün / Neon-Pink 2er - NEU OVP",
+          "price": 59.99,
+          "url": "https://www.ebay.de/itm/267751986716",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": false,
+          "neue_kategorie_bei_echtem_preis": null,
+          "neues_price_history_model_bei_echtem_preis": null,
+          "inhaltlich_matchbar_bei_minimalpreis": false,
+          "kategorie_bei_minimalpreis": null,
+          "price_history_model_bei_minimalpreis": null,
+          "preisschwellen_bedingt": false
+        },
+        {
+          "title": "2x Nintendo Switch 2 Pro Controller NEU OVP",
+          "price": 130.0,
+          "url": "https://www.kleinanzeigen.de/s-anzeige/2x-nintendo-switch-2-pro-controller-neu-ovp/3480514740-279-924",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": false,
+          "neue_kategorie_bei_echtem_preis": null,
+          "neues_price_history_model_bei_echtem_preis": null,
+          "inhaltlich_matchbar_bei_minimalpreis": true,
+          "kategorie_bei_minimalpreis": "controller",
+          "price_history_model_bei_minimalpreis": "controller_switch_pro",
+          "preisschwellen_bedingt": true
+        },
+        {
+          "title": "Nintendo Switch Pro Controller - Schwarz mit OVP kaum genutzt",
+          "price": 39.0,
+          "url": "https://www.ebay.de/itm/336734053355",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": false,
+          "neue_kategorie_bei_echtem_preis": null,
+          "neues_price_history_model_bei_echtem_preis": null,
+          "inhaltlich_matchbar_bei_minimalpreis": true,
+          "kategorie_bei_minimalpreis": "controller",
+          "price_history_model_bei_minimalpreis": "controller_switch_pro",
+          "preisschwellen_bedingt": true
+        },
+        {
+          "title": "Nintendo Switch Pro Controller in OVP",
+          "price": 50.0,
+          "url": "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-pro-controller-in-ovp/3480100632-279-1186",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": false,
+          "neue_kategorie_bei_echtem_preis": null,
+          "neues_price_history_model_bei_echtem_preis": null,
+          "inhaltlich_matchbar_bei_minimalpreis": true,
+          "kategorie_bei_minimalpreis": "controller",
+          "price_history_model_bei_minimalpreis": "controller_switch_pro",
+          "preisschwellen_bedingt": true
+        },
+        {
+          "title": "Nintendo Switch Pro Controller, TOP Zustand mit OVP",
+          "price": 45.0,
+          "url": "https://www.ebay.de/itm/286899614096",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": false,
+          "neue_kategorie_bei_echtem_preis": null,
+          "neues_price_history_model_bei_echtem_preis": null,
+          "inhaltlich_matchbar_bei_minimalpreis": true,
+          "kategorie_bei_minimalpreis": "controller",
+          "price_history_model_bei_minimalpreis": "controller_switch_pro",
+          "preisschwellen_bedingt": true
+        },
+        {
+          "title": "NEU - OVP! Nintendo Switch Pro Controller - Monster Hunter Rise Sunbreak Edition",
+          "price": 75.0,
+          "url": "https://www.ebay.de/itm/398090521820",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": false,
+          "neue_kategorie_bei_echtem_preis": null,
+          "neues_price_history_model_bei_echtem_preis": null,
+          "inhaltlich_matchbar_bei_minimalpreis": true,
+          "kategorie_bei_minimalpreis": "controller",
+          "price_history_model_bei_minimalpreis": "controller_switch_pro",
+          "preisschwellen_bedingt": true
+        },
+        {
+          "title": "Nintendo Switch Pro Controller Original | OVP | TOP Zustand",
+          "price": 39.99,
+          "url": "https://www.ebay.de/itm/318646020850",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": false,
+          "neue_kategorie_bei_echtem_preis": null,
+          "neues_price_history_model_bei_echtem_preis": null,
+          "inhaltlich_matchbar_bei_minimalpreis": true,
+          "kategorie_bei_minimalpreis": "controller",
+          "price_history_model_bei_minimalpreis": "controller_switch_pro",
+          "preisschwellen_bedingt": true
+        },
+        {
+          "title": "Nintendo Switch 2 - Pro Controller NSWITCH 2 Neu & OVP",
+          "price": 79.99,
+          "url": "https://www.ebay.de/itm/407120679305",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_switch_standard",
+          "neu_matched_bei_echtem_preis": false,
+          "neue_kategorie_bei_echtem_preis": null,
+          "neues_price_history_model_bei_echtem_preis": null,
+          "inhaltlich_matchbar_bei_minimalpreis": true,
+          "kategorie_bei_minimalpreis": "controller",
+          "price_history_model_bei_minimalpreis": "controller_switch_pro",
+          "preisschwellen_bedingt": true
+        },
+        {
+          "title": "Bayonetta & Vanquish 10th Anniversary Bundle - PlayStation 4 - Neu & OVP",
+          "price": 19.0,
+          "url": "https://www.ebay.de/itm/137596202274",
+          "alte_kategorie": "konsolen_bundles",
+          "altes_price_history_model": "konsole_ps4_bundle",
+          "neu_matched_bei_echtem_preis": false,
+          "neue_kategorie_bei_echtem_preis": null,
+          "neues_price_history_model_bei_echtem_preis": null,
+          "inhaltlich_matchbar_bei_minimalpreis": false,
+          "kategorie_bei_minimalpreis": null,
+          "price_history_model_bei_minimalpreis": null,
+          "preisschwellen_bedingt": false
+        }
+      ]
+    },
+    "switch_pro_controller_vertiefung": {
+      "anzahl_faelle_mit_titel_pro_controller": 7,
+      "faelle": [
+        {
+          "title": "2x Nintendo Switch 2 Pro Controller NEU OVP",
+          "preis": 130.0,
+          "matcht_heute": false,
+          "kategorie_heute": null,
+          "price_history_model_heute": null
+        },
+        {
+          "title": "Nintendo Switch Pro Controller - Schwarz mit OVP kaum genutzt",
+          "preis": 39.0,
+          "matcht_heute": false,
+          "kategorie_heute": null,
+          "price_history_model_heute": null
+        },
+        {
+          "title": "Nintendo Switch Pro Controller in OVP",
+          "preis": 50.0,
+          "matcht_heute": false,
+          "kategorie_heute": null,
+          "price_history_model_heute": null
+        },
+        {
+          "title": "Nintendo Switch Pro Controller, TOP Zustand mit OVP",
+          "preis": 45.0,
+          "matcht_heute": false,
+          "kategorie_heute": null,
+          "price_history_model_heute": null
+        },
+        {
+          "title": "NEU - OVP! Nintendo Switch Pro Controller - Monster Hunter Rise Sunbreak Edition",
+          "preis": 75.0,
+          "matcht_heute": false,
+          "kategorie_heute": null,
+          "price_history_model_heute": null
+        },
+        {
+          "title": "Nintendo Switch Pro Controller Original | OVP | TOP Zustand",
+          "preis": 39.99,
+          "matcht_heute": false,
+          "kategorie_heute": null,
+          "price_history_model_heute": null
+        },
+        {
+          "title": "Nintendo Switch 2 - Pro Controller NSWITCH 2 Neu & OVP",
+          "preis": 79.99,
+          "matcht_heute": false,
+          "kategorie_heute": null,
+          "price_history_model_heute": null
+        }
+      ]
+    }
+  },
+  "3_switch_pro_controller_dritte_stufe_prep": {
+    "aktuelle_regel_ist_stand": {
+      "datei": "app/rules/controller.yaml",
+      "regeln": [
+        {
+          "label": "Switch Pro Controller ★ Top-Deal",
+          "max_price": 25,
+          "deal_rating": "Top-Deal"
+        },
+        {
+          "label": "Switch Pro Controller 👍 Guter Preis",
+          "max_price": 35,
+          "deal_rating": "Guter Preis"
+        }
+      ],
+      "require_all_of": [
+        [
+          "switch"
+        ],
+        [
+          "pro controller",
+          "pro-controller"
+        ]
+      ],
+      "exclude": [
+        "drift",
+        "defekt",
+        "bastler"
+      ],
+      "price_history_model": "controller_switch_pro"
+    },
+    "korrektur_ggue_letztem_bericht": "Der letzte Bericht bezeichnete die 2-Stufigkeit von 'Switch Pro Controller' als Ausnahme ('anders als fast alle anderen Regelfamilien'). Das ist bei erneuter Pruefung ueber ALLE app/rules/*.yaml NICHT korrekt: eine dritte '⚠️ Okay'-Preisstufe ist die Ausnahme, nicht die Regel -- sie kommt nur in gaming_pc, office_pc, retro_konsolen und vintage_elektronik vor (4 von 19 Kategorien). ALLE anderen controller.yaml-Regelfamilien (PS5 DualSense, Xbox Series/One, jeweils voll funktionsfaehig) haben ebenfalls nur 2 Stufen (bis 25€ bzw. 20€/35€). Eine dritte Stufe fuer Switch Pro Controller waere damit eine bewusste Abweichung vom in controller.yaml etablierten Muster, kein Angleich an eine bestehende Norm.",
+    "reale_preise_der_faelle": [
+      39.0,
+      39.99,
+      45.0,
+      50.0,
+      75.0,
+      79.99,
+      130.0
+    ],
+    "preisverteilung": {
+      "n": 7,
+      "median": 50.0,
+      "min": 39.0,
+      "max": 130.0,
+      "q25": 39.99,
+      "q75": 79.99
+    },
+    "faelle_ueber_aktueller_35e_obergrenze": 7,
+    "moegliche_preislogik_optionen": [
+      {
+        "option": "A -- keine dritte Stufe einfuehren",
+        "begruendung": "konsistent mit dem Muster der uebrigen controller.yaml-Regelfamilien (0 von 3 hat eine 3. Stufe)",
+        "konsequenz": "Angebote > 35€ bleiben KEIN_TREFFER, wie in den anderen Voll-funktionsfaehig-Controller-Regeln auch"
+      },
+      {
+        "option": "B -- dritte Stufe '⚠️ Okay' bis 45€",
+        "begruendung": "deckt 5 der aktuellen 7 Faelle ab (39/39.99/45/50/... je nach genauer Grenze), naeherungsweise am Median der Faelle orientiert",
+        "risiko_fp": "Erhoeht das Risiko, dass generische 'switch' + 'pro controller'-Treffer ohne starkes Zusatzsignal (z.B. Sondereditionen wie 'Monster Hunter Rise Sunbreak' zu 75€, deutlich ueber Marktwert eines Standard-Controllers) faelschlich als Deal markiert werden"
+      },
+      {
+        "option": "C -- dritte Stufe '⚠️ Okay' bis 80€ (deckt alle 7 aktuellen Faelle ab)",
+        "begruendung": "keine der 7 UNCLEAR-Faelle bliebe unmatcht",
+        "risiko_fp": "hoch -- 80€ liegt nahe am Neupreis eines Switch Pro Controllers, verwaesst die Deal-Definition erheblich; das 130€-Bundle (2 Controller) muesste ohnehin separat betrachtet werden (Stueckzahl-Ambiguitaet, evaluate() kann Bundle-Mengen nicht aus dem Titel zuverlaessig ableiten)"
+      }
+    ],
+    "benoetigte_regressionstests_bei_umsetzung": [
+      "app/tests/test_controller.py (oder aequivalent): neuer Testfall je Preisgrenze (genau an, knapp unter, knapp ueber der neuen Obergrenze)",
+      "Regressionstest, dass bestehende Top-Deal/Guter-Preis-Stufen unveraendert bleiben (keine Verschiebung bestehender max_price-Werte)",
+      "rule_analyzer.py-Lauf nach Aenderung (Duplikat-/Exclude-Konflikt-Check)",
+      "Stichprobe historischer price_history.jsonl-Punkte mit price_history_model=controller_switch_pro, um sicherzustellen, dass die neue Stufe keine bereits als KEIN_TREFFER akzeptierten Alt-Faelle unerwuenscht reaktiviert"
+    ],
+    "empfehlung": "Keine der drei Optionen wird hier final empfohlen -- das ist explizit eine Preisgrenzen-Entscheidung ohne belastbare Datenbasis (nur 7 Faelle, kein Markt-/Resale-Preisvergleich durchgefuehrt) und faellt damit unter CLAUDE.md Regel 4 (keine Threshold-Aenderung ohne Datenbasis). Diese Vorbereitung liefert nur die Fakten fuer eine spaetere, separat zu beauftragende Entscheidung."
+  },
+  "4_stichprobenplan_frische": {
+    "worksheet_groesse": 251,
+    "aktueller_korpus_groesse": 2500,
+    "aktueller_korpus_kategorien": 19,
+    "davon_noch_im_aktuellen_korpus_vorhanden": 251,
+    "abdeckung_pct": 100.0,
+    "empfehlung": "BESTEHENDE VORLAGE WEITER VERWENDBAR",
+    "begruendung": "Abdeckung ausreichend, bestehende Vorlage kann weiterverwendet werden."
+  }
+}

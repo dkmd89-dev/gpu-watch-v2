@@ -12,7 +12,21 @@ defaults:
   radius_km: 999999 # Unbegrenzt / ganz Deutschland
 exclude_global:
   # Defekt & Bastler
+  # "defekte"/"defekter"/"defektes"/"defekten" ergaenzt (Ruleset-
+  # Qualitaetssystem, 251-Listing-Stichprobe 2026-08-14): _contains_term()
+  # matcht Excludes als GANZES WORT -- der Wortstamm "defekt" erfasst daher
+  # keine deklinierten Formen ("Defekte Asus ROG Ally", "mit defekten
+  # Laser"). Blast Radius gemessen: 4 aktuelle found.json- + 19 historische
+  # price_history.jsonl-Treffer, alle eindeutig echte Defekt-Kontexte (u.a.
+  # defekte Displays/Buchsen/Laufwerke), keine Negationsfaelle ("ohne
+  # Defekte" o.ae.) gefunden. "tausch" bewusst NICHT um "tausche" erweitert
+  # -- dort ueberwiegt das Risiko, haeufige harmlose Wartungsformulierungen
+  # ("Akku tauschen") faelschlich auszuschliessen.
   - defekt
+  - defekte
+  - defekter
+  - defektes
+  - defekten
   - kaputt
   - bastler
   - ersatzteil
