@@ -5,17 +5,17 @@
 > Stand: **2026-08-15**
 > Repository: `dkmd89-dev/gpu-watch-v2`
 > Branch: `main`
-> **Letzter Code-Commit (vor dieser Doku-Aktualisierung):** `6bc0def` (perf(scan): Scraping
-> parallelisieren + Fehler-Isolation)
-> **HEAD (main, vor dieser Doku-Aktualisierung):** `efb842e` (Merge PR #35)
+> **Letzter Code-Commit (vor dieser Doku-Aktualisierung):** `00a4053` (perf(scan):
+> Persistence-Batching für seen.json/found.json)
+> **HEAD (main, vor dieser Doku-Aktualisierung):** `a27e9d9` (Merge PR #36)
 > Vorheriger dokumentierter Stand: `2745a95` (PR #29 + Folge-Sessions)
-> Vergleich `2745a95...6bc0def`: PR #31 (251-Listing-Worksheet gelabelt + 3 Exclude-Fixes,
+> Vergleich `2745a95...00a4053`: PR #31 (251-Listing-Worksheet gelabelt + 3 Exclude-Fixes,
 > `c577207`) + PR #32 (Umlaut-Fingerprint-Fix + menschliches Labeling + Preishistorie-
 > Revalidierung v3, `3c9a678`) + PR #33 (4 weitere Exclude-Fixes, Zubehör/Ersatzteil-vs-Gerät,
 > `5fea3ec`) + PR #34 (controller/ladekabel-Restlücke gelöst, `c3b9443`) + PR #35
-> (min_vram_gb-Bug bei 5 GPU-Modellen behoben, `efb842e`) + `6bc0def` (Scan-Performance-Messung +
-> Scraping parallelisiert) + freigegebene `lego_bundle`-Datenbereinigung
-> (`data/price_history.jsonl`, kein Code-Commit)
+> (min_vram_gb-Bug bei 5 GPU-Modellen behoben, `efb842e`) + PR #36 (Scan-Performance-Messung +
+> Scraping parallelisiert, `a27e9d9`) + `00a4053` (Persistence-Batching) + freigegebene
+> `lego_bundle`-Datenbereinigung (`data/price_history.jsonl`, kein Code-Commit)
 >
 > Diese Datei ersetzt `PROJEKTSTAND_KOMPLETT.md` (Datei mittlerweile aus dem Repository entfernt). Historische Phasenberichte bleiben als Detaildokumentation erhalten; widersprüchliche ältere Ist-Stand-Angaben gelten nicht mehr als aktuell.
 
@@ -25,7 +25,7 @@
 
 `gpu-watch-v2` ist ein modularer, YAML-gesteuerter **Hardware Deal Finder** für Second-Hand-Angebote. Das System kombiniert Scraper, kategoriebasiertes Matching, Hardware-Detektoren, Deal-Scoring, Marktpreis-/Resale-Statistik, Profit-/Flip-Bewertung, Duplicate Detection, Presence Tracking, Dashboard-KPIs und ntfy-Benachrichtigungen.
 
-Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und kontrollierter Weiterentwicklung**. Seit `d2effe7` wurden insbesondere Datenqualitäts-/Validierungslogik, Rule Analyzer/Coverage, Caching/Performance, neue Kategorien sowie ein umfangreicher False-Positive-Audit integriert. Seit 2026-08-14 ergänzt ein dediziertes, read-only **Ruleset-Qualitätssystem** (`tools/ruleset_quality/`, siehe Abschnitt 3.11) den bisherigen punktuellen Audit-Ansatz um reproduzierbare Regression-Benchmarks und Preishistorie-Simulationen. Im selben Tag (Abschnitt 3.12) wurde die 251-Listing-Stichprobe vollständig gelabelt, daraus resultierend 3 Exclude-Fixes umgesetzt (PR #31), der Umlaut-Fingerprint-Bug behoben und eine kontrollierte Preishistorie-Revalidierung v3 durchgeführt (PR #32) — mit dem wichtigen Befund, dass der Fix nicht rückwirkend auf bereits gespeicherte Daten wirkt. Direkt im Anschluss wurde Datenqualitätspunkt 14 (Abschnitt 3.13, Zubehör/Ersatzteil-vs-Gerät) mit 4 weiteren gezielten Exclude-Fixes gelöst (PR #33), gefolgt von Datenqualitätspunkt 5 (Abschnitt 3.14, `controller`/`ladekabel`-Restlücke, PR #34) und Datenqualitätspunkt 4 (Abschnitt 3.15, `RX 7600 XT`/`RX 7600`-Überlappung, PR #35) — Letzteres deckte einen strukturellen min_vram_gb-Bug auf, der zusätzlich 4 weitere GPU-Modelle betraf. Am 2026-08-15 (Abschnitt 3.16) wurde erstmals eine echte End-to-End-Scan-Performance-Messung anhand von 35 Produktiv-Scan-Läufen durchgeführt und der größte gefundene Hebel (Scraping macht 88,9% der Scanzeit aus, lief seriell) direkt umgesetzt: die drei Scraper-Quellen laufen jetzt parallel.
+Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und kontrollierter Weiterentwicklung**. Seit `d2effe7` wurden insbesondere Datenqualitäts-/Validierungslogik, Rule Analyzer/Coverage, Caching/Performance, neue Kategorien sowie ein umfangreicher False-Positive-Audit integriert. Seit 2026-08-14 ergänzt ein dediziertes, read-only **Ruleset-Qualitätssystem** (`tools/ruleset_quality/`, siehe Abschnitt 3.11) den bisherigen punktuellen Audit-Ansatz um reproduzierbare Regression-Benchmarks und Preishistorie-Simulationen. Im selben Tag (Abschnitt 3.12) wurde die 251-Listing-Stichprobe vollständig gelabelt, daraus resultierend 3 Exclude-Fixes umgesetzt (PR #31), der Umlaut-Fingerprint-Bug behoben und eine kontrollierte Preishistorie-Revalidierung v3 durchgeführt (PR #32) — mit dem wichtigen Befund, dass der Fix nicht rückwirkend auf bereits gespeicherte Daten wirkt. Direkt im Anschluss wurde Datenqualitätspunkt 14 (Abschnitt 3.13, Zubehör/Ersatzteil-vs-Gerät) mit 4 weiteren gezielten Exclude-Fixes gelöst (PR #33), gefolgt von Datenqualitätspunkt 5 (Abschnitt 3.14, `controller`/`ladekabel`-Restlücke, PR #34) und Datenqualitätspunkt 4 (Abschnitt 3.15, `RX 7600 XT`/`RX 7600`-Überlappung, PR #35) — Letzteres deckte einen strukturellen min_vram_gb-Bug auf, der zusätzlich 4 weitere GPU-Modelle betraf. Am 2026-08-15 (Abschnitt 3.16) wurde erstmals eine echte End-to-End-Scan-Performance-Messung anhand von 35 Produktiv-Scan-Läufen durchgeführt und der größte gefundene Hebel (Scraping macht 88,9% der Scanzeit aus, lief seriell) direkt umgesetzt: die drei Scraper-Quellen laufen jetzt parallel. Direkter Folgeschritt (Abschnitt 3.17): Persistence-Batching -- die ursprüngliche Analyse wurde dabei korrigiert, der dominante Kostentreiber war `seen.json` (16,7 MB), nicht primär `found.json`.
 
 ---
 
@@ -35,10 +35,10 @@ Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und ko
 
 ```text
 Branch: main
-Letzter Code-Commit (vor dieser Doku-Aktualisierung): 6bc0def
+Letzter Code-Commit (vor dieser Doku-Aktualisierung): 00a4053
 Vorheriger dokumentierter Stand: 2745a95 (PR #29 + Folge-Sessions)
 
-2745a95..6bc0def:
+2745a95..00a4053:
   PR #31 (c577207) -- 251-Listing-Worksheet KI-gestützt gelabelt (217 TP/
                        21 FP/13 UNCLEAR) + 3 gezielte Exclude-Fixes:
                        exclude_global (defekt-Flexionsformen), handhelds
@@ -59,8 +59,10 @@ Vorheriger dokumentierter Stand: 2745a95 (PR #29 + Folge-Sessions)
                        (nicht der ladekabel-Mechanismus selbst)
   PR #35 (efb842e)  -- fix: min_vram_gb-Bug bei RX 7600 + 4 weiteren
                        GPU-Modellen behoben (STATUS.md Nr. 4)
-  6bc0def           -- perf(scan): Scraping parallelisiert (88,9% der
+  PR #36 (a27e9d9)  -- perf(scan): Scraping parallelisiert (88,9% der
                        Scan-Zeit) + Fehler-Isolation je Scraper-Quelle
+  00a4053           -- perf(scan): Persistence-Batching für
+                       seen.json/found.json (10,1% der Scan-Zeit)
 ```
 
 Zusätzlich, außerhalb der Commit-Historie (freigegebene Datenänderung, kein Code-Commit):
@@ -70,20 +72,21 @@ gelöscht (siehe Abschnitt 3.12).
 ### Teststand
 
 ```text
-Zuletzt vollständig lokal ausgeführt und verifiziert (vom Nutzer, nach 6bc0def):
-pytest app/tests/ -> 1332 passed, 0 failed (76,41s)
+Zuletzt vollständig lokal ausgeführt und verifiziert (vom Nutzer, nach 00a4053):
+pytest app/tests/ -> 1334 passed, 0 failed (76,51s)
 
 rule_analyzer.py:
 355 Regeln, 19 Kategorien, 0 Findings
 Ruleset-Signatur (matcher.compute_ruleset_signature()): 133dcd1a9f614e7e
-  -- UNVERÄNDERT seit PR #35 (6bc0def ist reiner Python-Code, keine
-     app/rules/*.yaml-Änderung)
+  -- UNVERÄNDERT seit PR #35 (Scraping-Parallelisierung und Persistence-
+     Batching sind reiner Python-Code, keine app/rules/*.yaml-Änderung)
 ```
 
-Vorheriger dokumentierter Stand: 1315/1315 (PR #33). Die 17 neuen Tests: 4 aus PR #34
+Vorheriger dokumentierter Stand: 1315/1315 (PR #33). Die 19 neuen Tests: 4 aus PR #34
 (`test_controller_ladezubehoer_fix.py`) + 10 aus PR #35 (`test_gpu_rx7600_vram_fix.py`,
-`test_gpu_low_vram_models_fix.py`) + 3 aus `6bc0def` (`test_app_parallel_scraping.py`, siehe
-Abschnitt 3.16) = 1315+4+10+3 = 1332 — kein Test wurde gelöscht oder abgeschwächt.
+`test_gpu_low_vram_models_fix.py`) + 3 aus PR #36 (`test_app_parallel_scraping.py`) + 2 aus
+`00a4053` (`test_app_persistence_batching.py`, siehe Abschnitt 3.17) = 1315+4+10+3+2 = 1334 —
+kein Test wurde gelöscht oder abgeschwächt.
 
 ---
 
@@ -580,6 +583,40 @@ tatsächlichen Nach-Fix-Scan verifiziert):** Scraping-Zeit sinkt von der Summe a
 **~57% kürzere Gesamtdauer** (28,5 → ~12,2 Minuten). Die reale Wirkung ist erst nach Deployment
 (`docker compose up --build -d`) und einer erneuten Log-Auswertung nachweisbar.
 
+### 3.17 Persistence-Batching (`00a4053`)
+
+Direkter Folgeschritt zu Abschnitt 3.16. **Korrektur der ursprünglichen Analyse:** der
+dominante Kostentreiber der Persistence-Phase war nicht primär `found.json` (2,7 MB), sondern
+vor allem **`seen.json` — 16,7 MB, 47.355 Einträge** —, das bisher bei **jedem einzelnen neu
+gesehenen Angebot** (`already_seen == False`, nicht nur bei echten Regel-Treffern) komplett neu
+geschrieben wurde (`_save_json()`, atomar: Temp-Datei + `fsync()` + `os.replace()`). Das erklärt
+die in Abschnitt 3.16 gemessene Korrelation (r=0,997) korrekt mit der `dedupliziert`-Zahl (neu
+gesehene Angebote je Scan), nicht mit `new_hits` (tatsächliche Regel-Treffer, eine kleinere
+Teilmenge).
+
+**Fix:** neue Konstante `PERSIST_BATCH_INTERVAL_SECONDS` (Default 5s, per `.env` konfigurierbar)
++ ein gemeinsamer Batching-Helper (`_persist_seen_and_found_if_due()`) ersetzen beide bisherigen
+Sofort-Speicherstellen (`seen.json` bei neu gesehenen Angeboten, `found.json` bei neuen
+Treffern) — schreibt beide Dateien gemeinsam, höchstens einmal je Intervall. Der finale,
+unbedingte Save am Scan-Ende (unverändert) bleibt die eigentliche Daten-Absicherung.
+
+**Tradeoff (bewusst, wie in Abschnitt 3.16 angekündigt):** vorher 0 Sekunden Risikofenster bei
+einem Absturz zwischen "als gesehen markiert" und "persistiert", jetzt bis zu
+`PERSIST_BATCH_INTERVAL_SECONDS` (5s) — bei einer Matching-Phase von median nur 5,9s
+Gesamtdauer ein kleines, begrenztes Fenster, kein Verzicht auf die Crash-Sicherheit an sich.
+
+2 neue Regressionstests (`test_app_persistence_batching.py`), darunter ein expliziter
+Korrektheitsnachweis: mit künstlich hochgesetztem Intervall (999s) finden **0
+Zwischen-Speicherungen** während eines Scans mit 6 echten Treffern + 6 weiteren neu gesehenen
+Angeboten statt (vorher: 12 einzelne Saves), trotzdem sind am Scan-Ende alle 6 Treffer und alle
+12 gesehenen URLs korrekt persistiert — kein Datenverlust. Volle Suite **1334/1334 grün** (vom
+Nutzer lokal verifiziert, 76,51s). Ruleset-Signatur unverändert (reiner Python-Code).
+
+**Rechnerisches Potenzial (nicht durch einen tatsächlichen Nach-Fix-Scan verifiziert):**
+Persistence-Zeit sollte von bis zu 267s (median 173,6s) auf wenige einzelne Batch-Schreibvorgänge
+plus den finalen Save sinken — Größenordnung Sekunden statt Minuten. Wie bei Abschnitt 3.16 ist
+die reale Wirkung erst nach Deployment und erneuter Log-Auswertung nachweisbar.
+
 ---
 
 ## 4. Datenqualität
@@ -682,17 +719,18 @@ Folgende Punkte sind **nicht** durch die Konsolidierung als abgeschlossen zu bet
 13. min_vram_gb-Bug bei RX 7600 + 4 weiteren GPU-Modellen: **erledigt** (Abschnitt 3.15) — offene
     Beobachtung, ob derselbe Musterbug außerhalb von `gpu` relevant ist, nicht geprüft, kein
     aktiver Punkt.
-14. Scraping-Parallelisierung (Abschnitt 3.16): Code-Fix umgesetzt, volle Suite grün, aber reale
-    Wirkung auf die Produktiv-Scandauer **noch nicht verifiziert** (erfordert Deployment + erneute
-    Log-Auswertung). Persistence-Phase (10,1% der Scanzeit) bewusst nicht angefasst.
+14. Scraping-Parallelisierung (Abschnitt 3.16) + Persistence-Batching (Abschnitt 3.17): beide
+    Code-Fixes umgesetzt, volle Suite grün, aber reale Wirkung auf die Produktiv-Scandauer für
+    **beide** **noch nicht verifiziert** (erfordert Deployment + erneute Log-Auswertung).
 
 ---
 
 ## 7. Empfohlene nächste Reihenfolge
 
 ```text
-1. Reale Wirkung der Scraping-Parallelisierung verifizieren (Deployment +
-   erneute Log-Auswertung) -- optional, kein Blocker für Weiterarbeit
+1. Reale Wirkung von Scraping-Parallelisierung + Persistence-Batching
+   verifizieren (Deployment + erneute Log-Auswertung) -- optional, kein
+   Blocker für Weiterarbeit
         ↓
 2. Resale-Confidence / weitere Datenqualität verbessern
         ↓
@@ -703,9 +741,10 @@ Folgende Punkte sind **nicht** durch die Konsolidierung als abgeschlossen zu bet
 
 Stand 2026-08-15: Datenqualitätspunkte Nr. 1–5 (Coverage-Stichprobe, Regeln ohne Daten,
 Orphan-Modelle, RX-7600-Überlappung, controller/ladekabel) sind **alle abgeschlossen**
-(Abschnitt 3.12–3.15), ebenso die Scan-Performance-Messung + größter Hebel (Abschnitt 3.16).
-Keine offene, konkret benannte P0 mehr — nächster Schritt nach freiem Ermessen aus P1/P2 oder
-einer neuen Nutzeranfrage.
+(Abschnitt 3.12–3.15), ebenso die Scan-Performance-Messung + beide identifizierten Hebel
+(Abschnitt 3.16–3.17: Scraping-Parallelisierung + Persistence-Batching). Keine offene, konkret
+benannte P0 mehr — nächster Schritt nach freiem Ermessen aus P1/P2 oder einer neuen
+Nutzeranfrage.
 
 Stand 2026-08-14: die vorherige P0 (Stichproben-Worksheet labeln + kontrollierte
 Preishistorie-Revalidierung + Orphan-Modell-Freigabe + Zubehör/Ersatzteil-vs-Gerät-
@@ -745,4 +784,4 @@ ABSCHLUSSBERICHT.md`, `FINALE_REVALIDIERUNG_ABSCHLUSSBERICHT.md`,
 `HUMAN_VERIFIED_LABELING_ABSCHLUSSBERICHT_2026-08-14.md`,
 `PREISHISTORIE_REVALIDIERUNG_V3_BERICHT_2026-08-14.md` (Abschnitt 3.12).
 
-Diese Dokumente liefern historische Details. Für den **aktuellen technischen Code-Stand** ist der Code-Commit `6bc0def` maßgeblich; für die technische Projektreferenz ist diese Datei maßgeblich. Zusätzlich: `docs/SCAN_PERFORMANCE_MESSUNG_2026-08-15.md` (Abschnitt 3.16).
+Diese Dokumente liefern historische Details. Für den **aktuellen technischen Code-Stand** ist der Code-Commit `00a4053` maßgeblich; für die technische Projektreferenz ist diese Datei maßgeblich. Zusätzlich: `docs/SCAN_PERFORMANCE_MESSUNG_2026-08-15.md` (Abschnitt 3.16–3.17).
