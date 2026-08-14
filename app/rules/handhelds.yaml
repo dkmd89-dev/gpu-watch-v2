@@ -112,6 +112,20 @@ exclude_category:
   - "not working"
   - "batterieabdeckung"
 
+  # FIX (Ruleset-Qualitaetssystem, 251-Listing-Stichprobe 2026-08-14): "ssd"/
+  # "festplatte" und "headset"/"kopfhörer"/"in-ear" ergaenzt -- bare Woerter,
+  # da kein Steam-Deck/ROG-Ally/3DS/PS-Vita-GERAET jemals selbst als "SSD"
+  # oder "Headset" beworben wird (identisches Prinzip wie die bereits
+  # vorhandenen bare Excludes "akku"/"display"). Das bestehende "m.2 ssd"
+  # greift nur bei unmittelbarer Wortfolge ("M.2 2230 SSD" mit Zahl
+  # dazwischen bisher nicht erfasst). Blast Radius gemessen: 4 SSD- + 1
+  # Headset-Treffer, 0 Kollisionen.
+  - "ssd"
+  - "festplatte"
+  - "headset"
+  - "kopfhörer"
+  - "in-ear"
+
   # FIX (kontrollierter Review, DASHBOARD_MATCH_FORENSICS.md): weitere
   # Standalone-Zubehör-Muster, die bei Regeln mit nur EINER
   # require_all_of-Gruppe (Steam Deck, ROG Ally/Legion Go -- siehe

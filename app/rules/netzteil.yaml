@@ -97,6 +97,14 @@ exclude_category:
   - "spielekonsole"
   - "konsole"
 
+  # Zubehör (kein einzeln kaufbares Netzteil, sondern eine Komponente dafür)
+  # FIX (Ruleset-Qualitaetssystem, 251-Listing-Stichprobe 2026-08-14):
+  # "Kabelset für [Netzteil]" matcht bisher ueber den reinen Watt-Detector
+  # (requirements: min_psu_watt), ohne Textpruefung -- exclude_category
+  # deckte bisher nur komplette Systeme ab, kein PSU-Zubehoer. Blast Radius
+  # gemessen: 2 Treffer, 0 Kollisionen.
+  - "kabelset"
+
   # Bekannte Komplett-PC-/Workstation-/Server-Modellreihen (ohne "pc"
   # im Titel, gleiche Logik wie sata_ssd.yaml)
   - "optiplex"
