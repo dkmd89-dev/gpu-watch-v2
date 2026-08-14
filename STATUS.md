@@ -1,43 +1,44 @@
 # STATUS — Aktueller technischer Projektstatus
 
-> **Stand:** 2026-08-14  
+> **Stand:** 2026-08-15  
 > **Repository:** `dkmd89-dev/gpu-watch-v2`  
 > **Branch:** `main`  
-> **Letzter Code-Commit auf `main` (vor dieser Doku-Aktualisierung):** `5a01516` (davor `5fea3ec`
-> = Merge PR #33, `3c9a678` = Merge PR #32)  
+> **Letzter Code-Commit auf `main` (vor dieser Doku-Aktualisierung):** `1ac95ef` (davor `c3b9443`
+> = Merge PR #34, `5fea3ec` = Merge PR #33)  
 > **Technische Referenz:** `TECHNISCHER_PROJEKTSTATUS.md`
 
 ## Gesamtstatus
 
 **Stabil / aktiv weiterentwickelbar.** Seit dem letzten dokumentierten Stand (`2745a95`, PR #29 +
-Folge-Sessions) wurde die 251-Listing-Stichprobe vollständig gelabelt (KI-gestützt + menschlich
-verifiziert), daraus resultierend 3 gezielte Exclude-Fixes umgesetzt (PR #31), der Umlaut-
-Fingerprint-Bug behoben (PR #32), die freigegebene `lego_bundle`-Migration/-Bereinigung
-ausgeführt, eine kontrollierte Preishistorie-Revalidierung v3 durchgeführt (PR #32), **STATUS.md
-Punkt 14 (Zubehör/Ersatzteil-vs-Gerät) gelöst** (PR #33) und jetzt **Punkt 5 (`controller`/
-`ladekabel`) gelöst** — Lade-Stationen/-Geräte-Zubehör ausgeschlossen. **Ruleset-Signatur hat sich
-erneut geändert** (`ee2a6eb114525b55` → `0d63c38b5dbf261c`).
+Folge-Sessions) wurde die 251-Listing-Stichprobe vollständig gelabelt, 3 gezielte Exclude-Fixes
+umgesetzt (PR #31), der Umlaut-Fingerprint-Bug behoben (PR #32), die freigegebene
+`lego_bundle`-Migration/-Bereinigung ausgeführt, eine kontrollierte Preishistorie-Revalidierung v3
+durchgeführt (PR #32), **STATUS.md Punkt 14 (Zubehör/Ersatzteil-vs-Gerät) gelöst** (PR #33),
+**Punkt 5 (`controller`/`ladekabel`) gelöst** (PR #34) und jetzt **Punkt 4 (`RX 7600 XT`/`RX 7600`)
+gelöst** — inklusive eines wichtigen Zusatzfundes: derselbe VRAM-Filter-Bug betraf strukturell 4
+weitere GPU-Modelle (`rtx_3060_ti`, `rtx_3070`, `rtx_4060`, `rtx_2080_ti`), ebenfalls mitgefixt.
+**Ruleset-Signatur hat sich erneut geändert** (`0d63c38b5dbf261c` → `133dcd1a9f614e7e`).
 
 ## Verifizierter Stand
 
 ```text
-main (vor dieser Doku-Aktualisierung): 5fea3ec (Merge PR #33)
+main (vor dieser Doku-Aktualisierung): c3b9443 (Merge PR #34)
 
 Rule Analyzer:
 355 Regeln
 19 Kategorien
 0 Findings
-Ruleset-Signatur: 0d63c38b5dbf261c (GEÄNDERT seit PR #33 — Punkt-5-Fix erweitert
-  exclude_category in controller.yaml)
+Ruleset-Signatur: 133dcd1a9f614e7e (GEÄNDERT seit PR #34 — Punkt-4-Fix ergänzt
+  min_vram_gb: 0 bei 5 GPU-Modellen/10 Regeln in gpu.yaml)
 
 data/found.json: 2500 Einträge
 data/price_history.jsonl: 14.899 Datenpunkte (unverändert seit der lego_bundle-Bereinigung)
 ```
 
-Teststand: 4 neue Tests (`test_controller_ladezubehoer_fix.py`) + 73 `controller`-bezogene Tests
-lokal grün verifiziert. Volle Suite zuletzt bei 1315/1315 (PR #33, vom Nutzer lokal verifiziert) —
-für diesen kleinen Einzelkategorie-Fix nicht erneut automatisch ausgeführt (CLAUDE.md-Regel: nur
-nach expliziter Freigabe).
+Teststand: 10 neue Tests (`test_gpu_rx7600_vram_fix.py`, `test_gpu_low_vram_models_fix.py`) + 54
+`gpu`-bezogene Tests lokal grün verifiziert. Volle Suite zuletzt bei 1315/1315 (PR #33, vom Nutzer
+lokal verifiziert) — für diesen Einzelkategorie-Fix nicht erneut automatisch ausgeführt
+(CLAUDE.md-Regel: nur nach expliziter Freigabe).
 
 ## Zuletzt abgeschlossene Batches
 
@@ -158,6 +159,32 @@ gefunden). Blast Radius: 3 Treffer, 0 Kollisionen. 4 neue Regressionstests
 (`test_controller_ladezubehoer_fix.py`), 73 `controller`-Tests grün, `rule_analyzer.py` 0
 Findings.
 
+### 10. `RX 7600 XT`/`RX 7600`-Überlappung gelöst + 4 weitere GPU-Modelle (Datenqualität Punkt 4)
+
+Die ursprünglich dokumentierte Match-Präzedenz-Überlappung war bereits vor dieser Session
+gefixt. Die tatsächliche, bisher unentdeckte Ursache für die weiterhin extrem dünne
+`rx_7600`-Datenlage (nur 1 Punkt in `price_history.jsonl`): ohne eigenes `min_vram_gb` fiel die
+Regel auf den globalen Default (`_global.yaml`, `min_vram_gb: 12`) zurück — RX 7600 hat aber nur
+8GB VRAM. `matcher.py::_vram_gb()` erkennt "8GB" im Titel, nicht "8G" — jedes Angebot mit der
+weit häufigeren Schreibweise "8GB" wurde fälschlich verworfen (real verifiziert: identischer
+Titel, nur "8G"→"8GB" geändert, Match verschwindet komplett).
+
+**Wichtiger Zusatzfund, direkt mitgefixt:** derselbe strukturelle Bug betraf 4 weitere
+GPU-Modelle ohne eigenes `min_vram_gb` und VRAM < 12GB:
+
+| Modell | VRAM | Historische Punkte | Aktuell im Live-Korpus |
+|---|---|---|---|
+| `rtx_3070` | 8GB | 149 | 16 |
+| `rtx_3060_ti` | 8GB | 110 | 12 |
+| `rtx_2080_ti` | 11GB | 60 | 3 |
+| `rtx_4060` | 8GB | 29 | 4 |
+
+Alle 5 Modelle (10 Regeln) erhalten `min_vram_gb: 0` — match-Begriffe bereits eindeutig
+modellspezifisch, bestehende Excludes (z.B. RTX 3070 Ti/RTX 4060 Ti/RTX 2080 Super) bleiben
+unverändert wirksam (per Kollisions-Test verifiziert). 10 neue Regressionstests
+(`test_gpu_rx7600_vram_fix.py`, `test_gpu_low_vram_models_fix.py`), 54 `gpu`-Tests grün,
+`rule_analyzer.py` 0 Findings.
+
 ## Abgeschlossen
 
 - ursprüngliche Phasen 0–10
@@ -186,6 +213,8 @@ Findings.
 - Kontrollierte Preishistorie-Revalidierung v3 (read-only, Kernbefunde siehe Batch 7 oben)
 - Zubehör/Ersatzteil-vs-Gerät-Fehlklassifikation gelöst, 4 Kategorien (Batch 8 oben)
 - `controller`/`ladekabel`-Restlücke gelöst (Batch 9 oben)
+- `RX 7600 XT`/`RX 7600`-Überlappung gelöst + min_vram_gb-Bug bei 4 weiteren GPU-Modellen
+  (`rtx_3060_ti`/`rtx_3070`/`rtx_4060`/`rtx_2080_ti`) behoben (Batch 10 oben)
 
 ## Aktuelle Systemkette
 
@@ -224,7 +253,9 @@ Wichtige Architekturregeln:
 2. 19 Regeln ohne Produktivdaten weiter beobachten.
 3. Orphan-Datenpunkte aus der entfernten `spielzeug_bundles`-Kategorie: **erledigt** (Batch 6) —
    5 migriert, 655 gelöscht, 3 bewusst erhalten.
-4. dokumentierte `RX 7600 XT`/`RX 7600`-Überlappung — weiterhin offen.
+4. `RX 7600 XT`/`RX 7600`-Überlappung: **erledigt** (Batch 10) — die eigentliche Ursache war ein
+   min_vram_gb-Bug (globaler 12GB-Default blockierte 8GB-Karten mit "8GB"-Schreibweise im Titel),
+   nicht die längst gefixte Match-Präzedenz. Gleicher Bug bei 4 weiteren GPU-Modellen mitgefixt.
 5. `controller`-`ladekabel`-Exclude: **erledigt** (Batch 9) — Lücke betraf Lade-Stationen/-Geräte,
    nicht den Kabel-Mechanismus selbst (der bereits korrekt funktionierte).
 6. Resale-Confidence (`HIGH/MEDIUM/LOW`) ist eine mögliche nächste Qualitätsstufe.
@@ -254,9 +285,12 @@ Wichtige Architekturregeln:
 
 ### P0 — offene Punkte
 
-- Keine dringenden P0-Punkte mehr offen (alle in Batch 1–9 dokumentierten Punkte abgeschlossen).
-  Nächste Schritte laut Datenqualität/offene Punkte: `RX 7600 XT`/`RX 7600`-Überlappung (Nr. 4,
-  noch keine Analyse) oder P1/P2 unten.
+- Keine dringenden P0-Punkte mehr offen (alle in Batch 1–10 dokumentierten Punkte abgeschlossen,
+  Nr. 1–5 der Datenqualitätsliste sind jetzt vollständig erledigt). Nächste Schritte laut
+  Datenqualität/offene Punkte: Nr. 6 (Resale-Confidence) oder P1/P2 unten. Ein möglicher, bisher
+  nicht gemessener Verdacht: derselbe min_vram_gb-Musterbug (Batch 10) könnte theoretisch auch
+  außerhalb von `gpu` relevant sein, wo Kategorien VRAM-abhängige Modelle mit eigenem
+  `min_vram_gb` nutzen — bisher nicht geprüft, keine konkrete Evidenz, kein aktiver Punkt.
 
 ### P1 — Datenqualität
 
