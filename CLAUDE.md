@@ -131,10 +131,12 @@ app/
 ├── category_validation.py      # Kategorie-Revalidierung
 ├── data_quality.py             # Datenqualitäts-Diagnosen
 ├── deal_intelligence.py        # Deal-Intelligence-Layer
+├── price_history.py            # Preishistorie-I/O (PricePoint, Fingerprint)
 ├── scan/
 │   └── scheduler.py            # Scan-Scheduling (aus orchestrator-Refactoring hervorgegangen)
-├── scrapers/                   # Kleinanzeigen-/eBay-Scraper (Plugin-Registry)
+├── scrapers/                   # Kleinanzeigen-/Quoka-Scraper (Plugin-Registry), eBay als Erweiterung vorgesehen
 ├── rules/                      # ein YAML pro Kategorie, `_global.yaml` = globale Excludes/Thresholds
+│   └── mappings/                # unterstützende Mapping-Tabellen
 ├── scoring/                    # Deal-Score, Profit-/Flip-Berechnung (scoring/profit.py)
 ├── categories/detectors/       # Kategorie-spezifische Ausstattungs-/Zustands-/Lieferumfang-Detektoren
 ├── api/                        # Flask-Blueprints
@@ -146,6 +148,9 @@ app/
 ├── persistence/
 │   └── json_store.py           # JSON-/Log-I/O-Helfer (seen.json, found.json, price_history.jsonl)
 └── tests/                       # pytest-Suite (synthetische Fixtures + echtes Produktiv-Regelwerk)
+
+tools/ruleset_quality/          # read-only Regression-Benchmark-/Qualitätssystem
+                                 # (kein Import durch app.py/matcher.py), siehe eigenes README
 ```
 
 ### Grundprinzipien (nicht aufweichen)
@@ -185,17 +190,15 @@ app/
 
 ## 6. Aktuell offene Punkte (siehe STATUS.md für Priorität)
 
-**P0 — Messen/Verifizieren**
-- Echten End-to-End-Scan messen (Scraping, Dedup, Matching, Scoring,
-  Statistik, Persistence, Notification je Zeitanteil).
-- False-Positive-/Coverage-Rate erneut messen, sobald überwiegend
-  Post-Fix-Daten vorliegen (letzter Wert: 17,2 %, als Alt-Beobachtungswert
-  markiert, nicht belastbar).
+**P0 — offen**
+- Fix-Queue für die 23 `LIKELY_FALSE_POSITIVE`-Fälle aus Batch 20e (35er-
+  UNCLEAR-Set, forensisch klassifiziert, noch **kein** YAML-Fix umgesetzt).
+  Braucht eigene Freigabe; vermutlich derselbe „ovp"/„bundle"/„set"-
+  Weak-Signal-Mechanismus wie in früheren Batches.
 
 **P1 — Datenqualität**
 - Resale-Confidence (`HIGH/MEDIUM/LOW`) ausbauen.
 - Datenqualitätsdiagnosen automatisieren.
-- Alt-/Neu-Daten in `price_history.jsonl` methodisch trennen.
 
 **P2 — Wartbarkeit**
 - `app.py` nur bei konkretem Änderungsdruck weiter modularisieren — kein
@@ -205,26 +208,30 @@ app/
 - Neue Kategorien/Deal-Intelligence erst nach den Stabilitäts-/Qualitätsschritten.
 
 **Explizit dokumentierte Restlücken (nicht ohne separaten Auftrag anfassen):**
-- 663 historische Orphan-Datenpunkte aus entfernter Kategorie `spielzeug_bundles`
-  — nicht löschen ohne separaten Auftrag.
-- `RX 7600 XT` / `RX 7600`-Überlappung.
-- `controller`-`ladekabel`-Exclude.
-- 22 Regeln ohne Produktivdaten weiter beobachten, nicht vorschnell entfernen.
+- `retro_konsolen`/DS-Lite (Manual-Review) und `konsolen_bundles`/Switch+Xbox
+  (Ground-Truth-Konflikt) — bewusste Nicht-Fixes, siehe
+  `TECHNISCHER_PROJEKTSTATUS.md` Abschnitt 6.
+- Umlaut-Fingerprint-Fix wirkt nicht rückwirkend auf historische
+  `price_history.jsonl`-Zeilen in 4 Kategorien.
+- 19 Regeln ohne Produktivdaten weiter beobachten, nicht vorschnell entfernen.
+- Tausch-/Barter-Anzeigen-Erkennung aus Notification/Preisstatistik
+  ausschließen — mögliche Folgeaufgabe, noch nicht freigegeben.
 
-## 7. Verifizierter Repo-Stand (Stand 2026-08-10 — vor jeder Session gegen STATUS.md prüfen!)
+## 7. Verifizierter Repo-Stand (Stand 2026-08-16 — vor jeder Session gegen STATUS.md prüfen!)
 
 ```
 Branch: main
-Letzter Code-Commit: fa218a0 — "fix: reduce false positives across five categories"
-Vergleich d2effe7...main: 61 Commits ahead, 0 behind
-Letzter dokumentierter Testlauf: 1142 passed, 0 failed
+HEAD: ee26893 — Merge PR #51 (Batch 20)
+Letzter dokumentierter Testlauf: 1470 passed, 0 failed (66,9s)
 Rule Analyzer: 355 Regeln, 19 Kategorien, 0 Findings
+Ruleset-Signatur: f8e07b8b8d97d61a
 ```
 
-⚠️ Dieser Stand stammt aus dem gemergten PR #6 und wurde nicht in jeder
-Session live gegen einen lokalen Checkout verifiziert. Vor Behauptungen über
-den aktuellen Teststand: `pytest app/tests/` tatsächlich ausführen, nicht
-aus der Dokumentation übernehmen.
+⚠️ Dieser Stand ist ein Snapshot zum Zeitpunkt der letzten Doku-Aktualisierung
+und wird nicht in jeder Session automatisch neu verifiziert. Vor Behauptungen
+über den aktuellen Teststand: `pytest app/tests/` tatsächlich ausführen, nicht
+aus der Dokumentation übernehmen. Maßgeblich für den technischen Ist-Zustand
+bleiben `TECHNISCHER_PROJEKTSTATUS.md` und `STATUS.md`.
 
 ## 8. Vor jeder Regeländerung
 

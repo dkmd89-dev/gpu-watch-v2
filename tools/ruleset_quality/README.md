@@ -69,7 +69,24 @@ forensics_false_positives.py   docs/DASHBOARD_MATCH_FORENSICS.json
    │                         (FP je Kategorie gruppiert, Root-Cause-Klassifikation,
    │                         Cross-Category-Routing-Status A/B/C/D)
    │                       → generated/false_positive_fix_queue.{json,md}
-   │                         (priorisierte, NICHT automatisch angewendete Fix-Queue)
+   │                         (priorisierte, NICHT automatisch angewendete Fix-Queue;
+   │                         queue_category strikt 1:1 aus assessment.status abgeleitet,
+   │                         validate_queue_consistency() prüft Assessment↔Queue-Konsistenz)
+   ▼
+ground_truth_routing_assessment.py   reine Report-Schicht über forensics_false_positives.py,
+   │                                 keine eigene Matching-/Klassifikationslogik
+   │                       → generated/reports/ground_truth_routing_assessment.{json,md}
+   │                         (historical_ground_truth strikt getrennt von
+   │                         current_routing_assessment; Default STILL_ACTIVE, nur
+   │                         dokumentierte manuelle Overrides vergeben
+   │                         GROUND_TRUTH_CONFLICT/MANUAL_REVIEW)
+   ▼
+unclear_routing_assessment.py   docs/DASHBOARD_MATCH_FORENSICS.json (nur historische
+   │                            UNCLEAR-Fälle) + forensics_false_positives.extract_cases()
+   │                       → generated/reports/unclear_routing_assessment.{json,md}
+   │                         (LIKELY_TRUE_POSITIVE/LIKELY_FALSE_POSITIVE/
+   │                         GROUND_TRUTH_CONFLICT/MANUAL_REVIEW je UNCLEAR-Fall,
+   │                         rein diagnostisch — keine YAML-Änderung)
 
 price_history_revalidation.py   data/price_history.jsonl (nur lesend)
                                 → generated/reports/price_history_revalidation_simulation.json
@@ -159,6 +176,63 @@ python -m tools.ruleset_quality.forensics_false_positives --only-fp
 python -m tools.ruleset_quality.forensics_false_positives --category handhelds
 ```
 
+### `ground_truth_routing_assessment.py` — saubere Zweiebenen-Trennung
+
+Reine Report-/Präsentationsschicht über `forensics_false_positives.py` — enthält
+selbst **keine eigene Matching-/Klassifikationslogik**. Jeder Fall (bestätigter
+`FALSE_POSITIVE` oder `UNCLEAR`-Kandidat) wird aus `extract_cases()` übernommen
+und explizit in drei getrennte Felder übersetzt:
+
+| Feld | Herkunft |
+|---|---|
+| `historical_ground_truth` | ausschließlich Forensik-Snapshot, wird **nie** verändert |
+| `current_routing_assessment` | ausschließlich echter Produktionspfad (`common.evaluate()`) |
+| `assessment` (status/confidence/evidence) | automatisch abgeleitet ODER dokumentiert manuell übersteuert |
+
+Ein historisches `FALSE_POSITIVE`-Label bedeutet **nicht** automatisch „aktuell
+noch ein Fehltreffer" (Beispiel: Switch-/Xbox-Bundles, deren aktuelle Evidenz dem
+historischen Label widerspricht → `GROUND_TRUTH_CONFLICT`). Ein aktueller
+`GLEICHE_KATEGORIE`-Treffer bedeutet **nicht** automatisch „Label war falsch" —
+Default bleibt `STILL_ACTIVE`, nur ein dokumentierter manueller Override
+(`_MANUAL_ASSESSMENT_OVERRIDES` in `forensics_false_positives.py`) darf
+`GROUND_TRUTH_CONFLICT`/`MANUAL_REVIEW` vergeben.
+
+```bash
+python -m tools.ruleset_quality.ground_truth_routing_assessment
+```
+
+### `unclear_routing_assessment.py` — forensische Klassifikation der UNCLEAR-Fälle
+
+Betrifft ausschließlich Fälle mit historischem Ground-Truth-Verdict `UNCLEAR`
+(35 Fälle aus `docs/DASHBOARD_MATCH_FORENSICS.json`) — niemals bereits über
+`forensics_false_positives.py`/`ground_truth_routing_assessment.py` behandelte
+`TRUE_POSITIVE`/`FALSE_POSITIVE`-Fälle. Kernproblem: das automatisierte
+`require_all_of`-Kriterium wurde bei jedem der 35 Fälle nur über ein generisches
+Sekundärsignal (`ovp`/`set`/`bundle`) erfüllt, ohne stärkere Alternative
+(`konsole`/`system`) im selben Treffer — die automatisierte Erkennung kann daher
+nicht zuverlässig zwischen echter Konsole und Spiel/Zubehör mit generischem
+Verpackungshinweis unterscheiden.
+
+Liest deshalb den vollen Titeltext und klassifiziert
+`LIKELY_TRUE_POSITIVE`/`LIKELY_FALSE_POSITIVE`/`GROUND_TRUTH_CONFLICT`/
+`MANUAL_REVIEW` + Confidence. Die Zuordnung ist eine kuratierte, dokumentierte
+Tabelle (`_UNCLEAR_ASSESSMENTS`) — keine automatische/heuristische
+Klassifikation, ein alleiniges Keyword wird nie als hinreichende Evidenz
+behandelt. `GROUND_TRUTH_CONFLICT` wird hier bewusst nicht vergeben: anders als
+bei den 19 bestätigten `FALSE_POSITIVE`-Fällen (menschliches Vor-Urteil) war der
+historische Status hier per Definition kein gefälltes Urteil, sondern eine
+mechanische Beschränkung des Forensik-Tools.
+
+**Rein diagnostisch — ändert nie `app/rules/*.yaml` oder
+`docs/DASHBOARD_MATCH_FORENSICS.json`.** Aktuelles Ergebnis (siehe
+`STATUS.md`/`TECHNISCHER_PROJEKTSTATUS.md`): 11× `LIKELY_TRUE_POSITIVE`, 23×
+`LIKELY_FALSE_POSITIVE`, 0× `GROUND_TRUTH_CONFLICT`, 1× `MANUAL_REVIEW` — die
+23 `LIKELY_FALSE_POSITIVE`-Fälle sind noch **nicht** in YAML-Fixes umgesetzt.
+
+```bash
+python -m tools.ruleset_quality.unclear_routing_assessment
+```
+
 ### `price_history_revalidation.py` — Preishistorie-Revalidierung (Simulation)
 
 Baut auf `app/rule_coverage.py` (`compute_rule_coverage()`) auf und ergänzt eine
@@ -200,10 +274,16 @@ python -m tools.ruleset_quality.price_history_revalidation
 
 # 7. Category-False-Positive-Forensics + Fix-Queue
 python -m tools.ruleset_quality.forensics_false_positives --verbose
+
+# 8. Ground-Truth- vs. aktuelle Routing-Bewertung sauber getrennt darstellen
+python -m tools.ruleset_quality.ground_truth_routing_assessment
+
+# 9. Historische UNCLEAR-Fälle forensisch klassifizieren
+python -m tools.ruleset_quality.unclear_routing_assessment
 ```
 
 Empfohlene Reihenfolge bei einem kompletten Lauf: 1 → 2 → 3 → 4 (für beide Baselines)
-→ 5 → 6 → 7.
+→ 5 → 6 → 7 → 8 → 9 (8/9 bauen auf dem Ergebnis von 7 auf).
 
 ## Erzeugte Artefakte (`generated/`)
 
@@ -219,6 +299,10 @@ generated/
     ├── category_quality_historical_regression.json
     ├── price_history_revalidation_simulation.json
     ├── forensics_false_positives_report.{json,md}   FP je Kategorie (forensics_false_positives.py)
+    ├── ground_truth_routing_assessment.{json,md}     historisch vs. aktuell getrennt
+    │                                                  (ground_truth_routing_assessment.py)
+    ├── unclear_routing_assessment.{json,md}           35 UNCLEAR-Fälle klassifiziert
+    │                                                  (unclear_routing_assessment.py)
     └── ABSCHLUSSBERICHT.md                    zusammenfassender Bericht Phase 19.1–19.5
 
 false_positive_fix_queue.{json,md}             priorisierte Fix-Queue (forensics_false_positives.py)
@@ -234,7 +318,12 @@ Klassifikations-/Parsing-Bausteine ab, die keine eigene Matching-Entscheidung tr
 (`_after_match_state()`, `classify_gate()`, `parse_forensics()`). `app/tests/test_forensics_false_positives.py`
 (24 Tests) deckt zusätzlich `forensics_false_positives.py` ab: FP/Kandidaten-Trennung, Routing-Status
 A/B/C/D, Root-Cause-Übersetzung ohne Erfindung unbelegter Werte, fehlende Forensik-Felder →
-`NOT_AVAILABLE` statt Exception. Läuft als Teil der normalen Testsuite:
+`NOT_AVAILABLE` statt Exception. Für `ground_truth_routing_assessment.py`: 44 Tests, decken alle
+6 im Auftrag geforderten Fälle ab (FIXED/STILL_ACTIVE/CATEGORY_CHANGED/MANUAL_REVIEW/
+GROUND_TRUTH_CONFLICT/unveränderte Ground-Truth-Datei) sowie den korrigierten
+`queue_category`-Bug (strikt 1:1 aus `assessment.status`, `CATEGORY_CHANGED` nicht mehr
+fälschlich zu `ACTIVE_ROUTING_FP` zusammengelegt) inkl. `validate_queue_consistency()`. Läuft
+als Teil der normalen Testsuite:
 
 ```bash
 pytest app/tests/test_ruleset_quality_tooling.py app/tests/test_forensics_false_positives.py -v
