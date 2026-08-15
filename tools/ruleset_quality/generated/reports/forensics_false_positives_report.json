@@ -16,7 +16,7 @@
       "keine Abweichung zum bekannten Referenzstand"
     ],
     "filter_category": null,
-    "filter_only_fp": true,
+    "filter_only_fp": false,
     "confirmed_fp_count_total": 19,
     "confirmed_fp_count_filtered": 19,
     "fp_candidate_count_total": 35,
@@ -163,19 +163,19 @@
         "stored_category": "iphone",
         "ground_truth_verdict": "FALSE_POSITIVE",
         "stored_rule": "iPhone 15 Pro Max (≥512GB) 👍 Guter Preis",
-        "current_category": "iphone",
-        "current_rule": "iPhone 15 Pro Max (≥512GB) 👍 Guter Preis",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
         "match_path_before": "iphone :: iPhone 15 Pro Max (≥512GB) 👍 Guter Preis",
-        "match_path_after": "iphone :: iPhone 15 Pro Max (≥512GB) 👍 Guter Preis",
-        "match_state": "GLEICHE_KATEGORIE",
-        "routing_status": "A_SAME_WRONG_CATEGORY",
-        "already_resolved": false,
+        "match_path_after": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "already_resolved": true,
         "root_cause": "replacement_part_false_positive",
         "root_cause_confidence": "confirmed",
         "root_cause_evidence": [
           "Forensik-Snapshot root_cause: \"Ersatzteil statt Hauptprodukt\"",
           "Forensik-Snapshot reason: \"Titel enthaelt 'Mainboard'/'Motherboard' -- eindeutiges Einzelteil-Signal, unabhaengig von sonst erfuellten require_all_of-Gruppen (z.B. RAM-Groesse des verbauten Speichers auf dem Board selbst)\"",
-          "aktueller Match-Zustand: GLEICHE_KATEGORIE (routing_status=A_SAME_WRONG_CATEGORY)"
+          "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
         ],
         "recommended_fix_type": "add_replacement_part_guard",
         "regression_risk": "LOW"
@@ -503,35 +503,433 @@
       }
     ]
   },
-  "candidates_by_category": {},
+  "candidates_by_category": {
+    "konsolen_bundles": [
+      {
+        "listing_id": "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-2-gamecube-controller-ovp-neu/3480875199-227-2761",
+        "title": "Nintendo Switch 2 GameCube Controller | OVP | NEU",
+        "price": 85.0,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/366595666798",
+        "title": "Microsoft Xbox One X 1TB Schwarz Inkl OVP Ohne Controller",
+        "price": 85.0,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Xbox One S / One X 👍 Guter Preis",
+        "current_category": "konsolen_bundles",
+        "current_rule": "Xbox One S / One X 👍 Guter Preis",
+        "match_state": "GLEICHE_KATEGORIE",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/407132075434",
+        "title": "Nintendo Switch 2 GameCube Controller – Nintendo Classics – OVP – NEU",
+        "price": 85.0,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-sports-inkl-12-in-1-zubehoer-set/3480799134-227-2661",
+        "title": "Nintendo Switch Sports inkl. 12-in-1 Zubehör Set",
+        "price": 30.0,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-grau-bundle-neue-sticks-kein-drift-extras-/3480736743-279-9668",
+        "title": "Nintendo Switch Grau Bundle  Neue Sticks (Kein Drift) + Extras!",
+        "price": 120.0,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "current_category": "konsolen_bundles",
+        "current_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "match_state": "GLEICHE_KATEGORIE",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/407131833744",
+        "title": "Nintendo Pokémon Purpur Nintendo Switch neu/sealed in OVP",
+        "price": 40.0,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/800482418310",
+        "title": "Nintendo Switch - Minecraft FRA mit OVP",
+        "price": 19.89,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.kleinanzeigen.de/s-anzeige/pok-mon-let-s-go-evoli-nintendo-switch-ovp-komplett/3480723859-227-3213",
+        "title": "Pokémon Let’s Go Evoli! Nintendo Switch – OVP komplett",
+        "price": 39.0,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/227468705699",
+        "title": "Star Fox \"NEU & OVP\" (Nintendo Switch 2)",
+        "price": 49.99,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/298572812276",
+        "title": "Nintendo Switch Komplett Set OVP",
+        "price": 129.0,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "current_category": "konsolen_bundles",
+        "current_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "match_state": "GLEICHE_KATEGORIE",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-neon-bundle-neue-sticks-kein-drift-extras/3480680031-279-9668",
+        "title": "Nintendo Switch Neon Bundle  Neue Sticks (Kein Drift!) + Extras",
+        "price": 145.0,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "current_category": "konsolen_bundles",
+        "current_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "match_state": "GLEICHE_KATEGORIE",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/298572811262",
+        "title": "Nintendo Switch V1 HAC-001 mit OVP + Komplett | BLITZVERSAND⚡️",
+        "price": 140.0,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "current_category": "konsolen_bundles",
+        "current_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "match_state": "GLEICHE_KATEGORIE",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/377405800415",
+        "title": "Xbox One S 1 TB + 1 Controller - Weiß - OVP - Top Zustand",
+        "price": 80.0,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Xbox One S / One X 👍 Guter Preis",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/267751985916",
+        "title": "Nintendo Switch Controller - Joy-Con 2er-Set Neon-Rot/Neon-Blau -NEU",
+        "price": 59.99,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/267751986716",
+        "title": "Nintendo Switch - Controller Joy-Con Neon-Grün / Neon-Pink 2er - NEU OVP",
+        "price": 59.99,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/128017856305",
+        "title": "Nintendo Switch OLED Joy-Con Set - Pokemon Scarlet & Violet mit Handschlaufaufen",
+        "price": 119.0,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "current_category": "konsolen_bundles",
+        "current_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "match_state": "GLEICHE_KATEGORIE",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/188766880820",
+        "title": "Nintendo Switch HAC-001(-01) Joy-Controller Bundle 32GB Handheld-Spielekonsole -",
+        "price": 116.92,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "current_category": "konsolen_bundles",
+        "current_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "match_state": "GLEICHE_KATEGORIE",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.kleinanzeigen.de/s-anzeige/2x-nintendo-switch-2-pro-controller-neu-ovp/3480514740-279-924",
+        "title": "2x Nintendo Switch 2 Pro Controller NEU OVP",
+        "price": 130.0,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-oled-modell-weiss-komplett-mit-ovp/3480437137-279-8400",
+        "title": "Nintendo Switch OLED Modell - Weiß - Komplett mit OVP",
+        "price": 150.0,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "current_category": "konsolen_bundles",
+        "current_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "match_state": "GLEICHE_KATEGORIE",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/287514519935",
+        "title": "Nintendo Switch 1. Generation – Neon Blau/Rot – OVP  + Kaufbeleg",
+        "price": 125.0,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/336734053355",
+        "title": "Nintendo Switch Pro Controller - Schwarz mit OVP kaum genutzt",
+        "price": 39.0,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/278262114576",
+        "title": "Metroid Prime Remastered Nintendo Switch 2023 Gebraucht In OVP  guter Zustand ",
+        "price": 35.0,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/800481313890",
+        "title": "Super Smash Bros. Ultimate (Nintendo Switch) (Inklusive OVP)",
+        "price": 38.79,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-pro-controller-in-ovp/3480100632-279-1186",
+        "title": "Nintendo Switch Pro Controller in OVP",
+        "price": 50.0,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/327297670888",
+        "title": "Read Dead Redemption 1+2 PlayStation 4 PS4 Steelbook Bundle NEU OVP",
+        "price": 100.0,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "PS4 Slim / Pro Bundle 👍 Guter Preis",
+        "current_category": "konsolen_bundles",
+        "current_rule": "PS4 Slim / Pro Bundle 👍 Guter Preis",
+        "match_state": "GLEICHE_KATEGORIE",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/286899614096",
+        "title": "Nintendo Switch Pro Controller, TOP Zustand mit OVP",
+        "price": 45.0,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/298569642364",
+        "title": "HORI Split Pad Pro Nintendo Switch Controller Schwarz mit OVP",
+        "price": 26.99,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+        "current_category": "konsolen_bundles",
+        "current_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+        "match_state": "GLEICHE_KATEGORIE",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/398090521820",
+        "title": "NEU - OVP! Nintendo Switch Pro Controller - Monster Hunter Rise Sunbreak Edition",
+        "price": 75.0,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/318646020850",
+        "title": "Nintendo Switch Pro Controller Original | OVP | TOP Zustand",
+        "price": 39.99,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/407120679305",
+        "title": "Nintendo Switch 2 - Pro Controller NSWITCH 2 Neu & OVP",
+        "price": 79.99,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/137596202274",
+        "title": "Bayonetta & Vanquish 10th Anniversary Bundle - PlayStation 4 - Neu & OVP",
+        "price": 19.0,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "PS4 Slim / Pro Bundle ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/298566727139",
+        "title": "STAR FOX - Nintendo Switch 2 - NEU-OVP - Händler YAPIDO",
+        "price": 47.9,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/188763698665",
+        "title": "Nintendo Switch Spielkonsole mit Set - Guter Zustand",
+        "price": 116.49,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "current_category": "konsolen_bundles",
+        "current_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "match_state": "GLEICHE_KATEGORIE",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/188763696701",
+        "title": "Nintendo Switch Spielkonsole mit Set - Top Zustand",
+        "price": 127.49,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "current_category": "konsolen_bundles",
+        "current_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "match_state": "GLEICHE_KATEGORIE",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      }
+    ],
+    "retro_konsolen": [
+      {
+        "listing_id": "https://www.ebay.de/itm/318701631164",
+        "title": "Nintendo DS Lite Handheld-System hellblau Touchscreen",
+        "price": 50.0,
+        "stored_category": "retro_konsolen",
+        "ground_truth_verdict": "UNCLEAR",
+        "stored_rule": "Nintendo Retro-Konsole (N64/GameCube/DS) 👍 Guter Preis",
+        "current_category": "retro_konsolen",
+        "current_rule": "Nintendo Retro-Konsole (N64/GameCube/DS) 👍 Guter Preis",
+        "match_state": "GLEICHE_KATEGORIE",
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+      }
+    ]
+  },
   "fix_queue": [
-    {
-      "priority": "P0",
-      "category": "iphone",
-      "affected_count": 1,
-      "representative_listings": [
-        {
-          "listing_id": "https://www.ebay.de/itm/236995682525",
-          "title": "Apple iPhone 15 Pro Max 512GB Mainboard Platine mit FaceID und Kameramodul ",
-          "price": 400.0
-        }
-      ],
-      "root_cause": "replacement_part_false_positive",
-      "confidence": "confirmed",
-      "current_rule": "iPhone 15 Pro Max (≥512GB) 👍 Guter Preis",
-      "recommended_fix_type": "add_replacement_part_guard",
-      "regression_risk": "LOW",
-      "affected_categories": [
-        "iphone"
-      ],
-      "test_requirements": [
-        "bestehende TRUE_POSITIVE-Tests fuer Regel 'iPhone 15 Pro Max (≥512GB) 👍 Guter Preis' in Kategorie 'iphone' (z.B. app/tests/test_iphone.py, falls vorhanden) muessen weiterhin gruen bleiben",
-        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
-        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
-      ],
-      "still_active_count": 1,
-      "priority_score": 4
-    },
     {
       "priority": "P1",
       "category": "konsolen_bundles",
@@ -699,6 +1097,33 @@
       "test_requirements": [
         "bestehende TRUE_POSITIVE-Tests fuer Regel 'Valve Steam Deck ★ Top-Deal' in Kategorie 'handhelds' (z.B. app/tests/test_handhelds.py, falls vorhanden) muessen weiterhin gruen bleiben",
         "Regression gegen alle 3 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      ],
+      "still_active_count": 0,
+      "priority_score": 2
+    },
+    {
+      "priority": "P1",
+      "category": "iphone",
+      "affected_count": 1,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.ebay.de/itm/236995682525",
+          "title": "Apple iPhone 15 Pro Max 512GB Mainboard Platine mit FaceID und Kameramodul ",
+          "price": 400.0
+        }
+      ],
+      "root_cause": "replacement_part_false_positive",
+      "confidence": "confirmed",
+      "current_rule": "iPhone 15 Pro Max (≥512GB) 👍 Guter Preis",
+      "recommended_fix_type": "add_replacement_part_guard",
+      "regression_risk": "LOW",
+      "affected_categories": [
+        "iphone"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'iPhone 15 Pro Max (≥512GB) 👍 Guter Preis' in Kategorie 'iphone' (z.B. app/tests/test_iphone.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
         "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
       ],
       "still_active_count": 0,

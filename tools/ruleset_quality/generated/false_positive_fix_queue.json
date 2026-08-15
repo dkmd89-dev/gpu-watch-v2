@@ -1,32 +1,5 @@
 [
   {
-    "priority": "P0",
-    "category": "iphone",
-    "affected_count": 1,
-    "representative_listings": [
-      {
-        "listing_id": "https://www.ebay.de/itm/236995682525",
-        "title": "Apple iPhone 15 Pro Max 512GB Mainboard Platine mit FaceID und Kameramodul ",
-        "price": 400.0
-      }
-    ],
-    "root_cause": "replacement_part_false_positive",
-    "confidence": "confirmed",
-    "current_rule": "iPhone 15 Pro Max (≥512GB) 👍 Guter Preis",
-    "recommended_fix_type": "add_replacement_part_guard",
-    "regression_risk": "LOW",
-    "affected_categories": [
-      "iphone"
-    ],
-    "test_requirements": [
-      "bestehende TRUE_POSITIVE-Tests fuer Regel 'iPhone 15 Pro Max (≥512GB) 👍 Guter Preis' in Kategorie 'iphone' (z.B. app/tests/test_iphone.py, falls vorhanden) muessen weiterhin gruen bleiben",
-      "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
-      "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
-    ],
-    "still_active_count": 1,
-    "priority_score": 4
-  },
-  {
     "priority": "P1",
     "category": "konsolen_bundles",
     "affected_count": 1,
@@ -193,6 +166,33 @@
     "test_requirements": [
       "bestehende TRUE_POSITIVE-Tests fuer Regel 'Valve Steam Deck ★ Top-Deal' in Kategorie 'handhelds' (z.B. app/tests/test_handhelds.py, falls vorhanden) muessen weiterhin gruen bleiben",
       "Regression gegen alle 3 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+      "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+    ],
+    "still_active_count": 0,
+    "priority_score": 2
+  },
+  {
+    "priority": "P1",
+    "category": "iphone",
+    "affected_count": 1,
+    "representative_listings": [
+      {
+        "listing_id": "https://www.ebay.de/itm/236995682525",
+        "title": "Apple iPhone 15 Pro Max 512GB Mainboard Platine mit FaceID und Kameramodul ",
+        "price": 400.0
+      }
+    ],
+    "root_cause": "replacement_part_false_positive",
+    "confidence": "confirmed",
+    "current_rule": "iPhone 15 Pro Max (≥512GB) 👍 Guter Preis",
+    "recommended_fix_type": "add_replacement_part_guard",
+    "regression_risk": "LOW",
+    "affected_categories": [
+      "iphone"
+    ],
+    "test_requirements": [
+      "bestehende TRUE_POSITIVE-Tests fuer Regel 'iPhone 15 Pro Max (≥512GB) 👍 Guter Preis' in Kategorie 'iphone' (z.B. app/tests/test_iphone.py, falls vorhanden) muessen weiterhin gruen bleiben",
+      "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
       "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
     ],
     "still_active_count": 0,
