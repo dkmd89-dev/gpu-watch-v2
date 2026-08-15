@@ -15,10 +15,10 @@
     "consistency_notes": [
       "keine Abweichung zum bekannten Referenzstand"
     ],
-    "filter_category": "konsolen_bundles",
+    "filter_category": null,
     "filter_only_fp": true,
     "confirmed_fp_count_total": 19,
-    "confirmed_fp_count_filtered": 6,
+    "confirmed_fp_count_filtered": 19,
     "fp_candidate_count_total": 35,
     "categories_with_confirmed_fp": [
       "gaming_pc",
@@ -31,6 +31,156 @@
     ]
   },
   "confirmed_by_category": {
+    "gaming_pc": [
+      {
+        "listing_id": "https://www.kleinanzeigen.de/s-anzeige/mainboard-set-h310m-d2p-i5-9500-gtx-1050ti-nwme-16gb-ddr4-/3480520958-225-8182",
+        "title": "MAINBOARD SET H310M D2P. i5-9500. GTX 1050TI. NWMe. 16GB DDR4.",
+        "price": 90.0,
+        "stored_category": "gaming_pc",
+        "ground_truth_verdict": "FALSE_POSITIVE",
+        "stored_rule": "Gaming-PC (Mindestanforderung erfüllt)",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_path_before": "gaming_pc :: Gaming-PC (Mindestanforderung erfüllt)",
+        "match_path_after": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "already_resolved": true,
+        "root_cause": "replacement_part_false_positive",
+        "root_cause_confidence": "confirmed",
+        "root_cause_evidence": [
+          "Forensik-Snapshot root_cause: \"Ersatzteil statt Hauptprodukt\"",
+          "Forensik-Snapshot reason: \"Titel enthaelt 'Mainboard'/'Motherboard' -- eindeutiges Einzelteil-Signal, unabhaengig von sonst erfuellten require_all_of-Gruppen (z.B. RAM-Groesse des verbauten Speichers auf dem Board selbst)\"",
+          "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+        ],
+        "recommended_fix_type": "add_replacement_part_guard",
+        "regression_risk": "LOW"
+      }
+    ],
+    "handhelds": [
+      {
+        "listing_id": "https://www.ebay.de/itm/255925725429",
+        "title": "USB-C HUB für Steam Deck HDMI 4k 60Hz USB 3.0 PD",
+        "price": 41.99,
+        "stored_category": "handhelds",
+        "ground_truth_verdict": "FALSE_POSITIVE",
+        "stored_rule": "Valve Steam Deck ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_path_before": "handhelds :: Valve Steam Deck ★ Top-Deal",
+        "match_path_after": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "already_resolved": true,
+        "root_cause": "missing_exclude",
+        "root_cause_confidence": "confirmed",
+        "root_cause_evidence": [
+          "Forensik-Snapshot root_cause: \"fehlendes Exclude\"",
+          "Forensik-Snapshot reason: \"Nur 1 unabhaengige(s) Positiv-Kriterium, Zubehoer-/Ersatzteil-Begriff(e) ohne jeden Exclude-Schutz: ['hub']\"",
+          "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+        ],
+        "recommended_fix_type": "add_exclude",
+        "regression_risk": "LOW"
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/304780620667",
+        "title": "Steam Deck Skin Faceplate Schutz Klebefolie Design Vinyl Aufkleber Skins OLED",
+        "price": 19.95,
+        "stored_category": "handhelds",
+        "ground_truth_verdict": "FALSE_POSITIVE",
+        "stored_rule": "Valve Steam Deck ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_path_before": "handhelds :: Valve Steam Deck ★ Top-Deal",
+        "match_path_after": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "already_resolved": true,
+        "root_cause": "missing_exclude",
+        "root_cause_confidence": "confirmed",
+        "root_cause_evidence": [
+          "Forensik-Snapshot root_cause: \"fehlendes Exclude\"",
+          "Forensik-Snapshot reason: \"Nur 1 unabhaengige(s) Positiv-Kriterium, Zubehoer-/Ersatzteil-Begriff(e) ohne jeden Exclude-Schutz: ['skin', 'faceplate', 'klebefolie', 'aufkleber']\"",
+          "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+        ],
+        "recommended_fix_type": "add_exclude",
+        "regression_risk": "LOW"
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/205573628921",
+        "title": "VITURE USB-C an Brille, Ladeadapter, Laden und Spielen für Switch, Steam Deck",
+        "price": 49.0,
+        "stored_category": "handhelds",
+        "ground_truth_verdict": "FALSE_POSITIVE",
+        "stored_rule": "Valve Steam Deck ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_path_before": "handhelds :: Valve Steam Deck ★ Top-Deal",
+        "match_path_after": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "already_resolved": true,
+        "root_cause": "missing_exclude",
+        "root_cause_confidence": "confirmed",
+        "root_cause_evidence": [
+          "Forensik-Snapshot root_cause: \"fehlendes Exclude\"",
+          "Forensik-Snapshot reason: \"Nur 1 unabhaengige(s) Positiv-Kriterium, Zubehoer-/Ersatzteil-Begriff(e) ohne jeden Exclude-Schutz: ['ladeadapter']\"",
+          "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+        ],
+        "recommended_fix_type": "add_exclude",
+        "regression_risk": "LOW"
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/307112118573",
+        "title": "JSAUX Slim-Reisetasche Für Lenovo Legion Go/Go S/Go 2, Hartschalenbeutel | Schla",
+        "price": 41.48,
+        "stored_category": "handhelds",
+        "ground_truth_verdict": "FALSE_POSITIVE",
+        "stored_rule": "Asus ROG Ally / Lenovo Legion Go ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_path_before": "handhelds :: Asus ROG Ally / Lenovo Legion Go ★ Top-Deal",
+        "match_path_after": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "already_resolved": true,
+        "root_cause": "missing_exclude",
+        "root_cause_confidence": "confirmed",
+        "root_cause_evidence": [
+          "Forensik-Snapshot root_cause: \"fehlendes Exclude\"",
+          "Forensik-Snapshot reason: \"Nur 1 unabhaengige(s) Positiv-Kriterium, Zubehoer-/Ersatzteil-Begriff(e) ohne jeden Exclude-Schutz: ['reisetasche']\"",
+          "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+        ],
+        "recommended_fix_type": "add_exclude",
+        "regression_risk": "LOW"
+      }
+    ],
+    "iphone": [
+      {
+        "listing_id": "https://www.ebay.de/itm/236995682525",
+        "title": "Apple iPhone 15 Pro Max 512GB Mainboard Platine mit FaceID und Kameramodul ",
+        "price": 400.0,
+        "stored_category": "iphone",
+        "ground_truth_verdict": "FALSE_POSITIVE",
+        "stored_rule": "iPhone 15 Pro Max (≥512GB) 👍 Guter Preis",
+        "current_category": "iphone",
+        "current_rule": "iPhone 15 Pro Max (≥512GB) 👍 Guter Preis",
+        "match_path_before": "iphone :: iPhone 15 Pro Max (≥512GB) 👍 Guter Preis",
+        "match_path_after": "iphone :: iPhone 15 Pro Max (≥512GB) 👍 Guter Preis",
+        "match_state": "GLEICHE_KATEGORIE",
+        "routing_status": "A_SAME_WRONG_CATEGORY",
+        "already_resolved": false,
+        "root_cause": "replacement_part_false_positive",
+        "root_cause_confidence": "confirmed",
+        "root_cause_evidence": [
+          "Forensik-Snapshot root_cause: \"Ersatzteil statt Hauptprodukt\"",
+          "Forensik-Snapshot reason: \"Titel enthaelt 'Mainboard'/'Motherboard' -- eindeutiges Einzelteil-Signal, unabhaengig von sonst erfuellten require_all_of-Gruppen (z.B. RAM-Groesse des verbauten Speichers auf dem Board selbst)\"",
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE (routing_status=A_SAME_WRONG_CATEGORY)"
+        ],
+        "recommended_fix_type": "add_replacement_part_guard",
+        "regression_risk": "LOW"
+      }
+    ],
     "konsolen_bundles": [
       {
         "listing_id": "https://www.kleinanzeigen.de/s-anzeige/luigi-s-mansion-2-hd-fuer-nintendo-switch-neu-ovp/3480890852-227-23706",
@@ -63,19 +213,19 @@
         "stored_category": "konsolen_bundles",
         "ground_truth_verdict": "FALSE_POSITIVE",
         "stored_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
-        "current_category": "KEIN_TREFFER",
-        "current_rule": "KEIN_TREFFER",
+        "current_category": "konsolen_bundles",
+        "current_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
         "match_path_before": "konsolen_bundles :: Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
-        "match_path_after": "KEIN_TREFFER",
-        "match_state": "KEIN_TREFFER",
-        "routing_status": "C_NO_LONGER_MATCHES",
-        "already_resolved": true,
+        "match_path_after": "konsolen_bundles :: Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "match_state": "GLEICHE_KATEGORIE",
+        "routing_status": "A_SAME_WRONG_CATEGORY",
+        "already_resolved": false,
         "root_cause": "weak_signal",
         "root_cause_confidence": "confirmed",
         "root_cause_evidence": [
           "Forensik-Snapshot root_cause: \"falsches Positivsignal\"",
           "Forensik-Snapshot reason: \"Ein require_all_of-Kriterium wurde AUSSCHLIESSLICH ueber generisches Signal ['bundle'] erfuellt (kein staerkeres Alternativwort im selben Treffer), Titel enthaelt zusaetzlich Zubehoer-/Ersatzteil-/Spiel-Indikatoren (['dock'])\"",
-          "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE (routing_status=A_SAME_WRONG_CATEGORY)"
         ],
         "recommended_fix_type": "strengthen_positive_signal",
         "regression_risk": "HIGH"
@@ -87,20 +237,20 @@
         "stored_category": "konsolen_bundles",
         "ground_truth_verdict": "FALSE_POSITIVE",
         "stored_rule": "PS4 Slim / Pro Bundle ★ Top-Deal",
-        "current_category": "KEIN_TREFFER",
-        "current_rule": "KEIN_TREFFER",
+        "current_category": "konsolen_bundles",
+        "current_rule": "PS4 Slim / Pro Bundle ★ Top-Deal",
         "match_path_before": "konsolen_bundles :: PS4 Slim / Pro Bundle ★ Top-Deal",
-        "match_path_after": "KEIN_TREFFER",
-        "match_state": "KEIN_TREFFER",
-        "routing_status": "C_NO_LONGER_MATCHES",
-        "already_resolved": true,
+        "match_path_after": "konsolen_bundles :: PS4 Slim / Pro Bundle ★ Top-Deal",
+        "match_state": "GLEICHE_KATEGORIE",
+        "routing_status": "A_SAME_WRONG_CATEGORY",
+        "already_resolved": false,
         "root_cause": "ambiguous",
         "root_cause_confidence": "manual_review",
         "root_cause_evidence": [
           "Forensik-Snapshot root_cause: \"sonstiges\"",
           "Forensik-Snapshot reason: \"Reparatur-/Service-Dienstleistungs-Indikator im Titel: ['reparatur']\"",
           "Kein bekannter Uebersetzungseintrag fuer diesen Forensik-root_cause-Wert -- keine automatische Taxonomie-Zuordnung ohne Beleg.",
-          "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE (routing_status=A_SAME_WRONG_CATEGORY)"
         ],
         "recommended_fix_type": "manual_review",
         "regression_risk": "MEDIUM"
@@ -136,19 +286,19 @@
         "stored_category": "konsolen_bundles",
         "ground_truth_verdict": "FALSE_POSITIVE",
         "stored_rule": "Xbox One S / One X 👍 Guter Preis",
-        "current_category": "KEIN_TREFFER",
-        "current_rule": "KEIN_TREFFER",
+        "current_category": "konsolen_bundles",
+        "current_rule": "Xbox One S / One X 👍 Guter Preis",
         "match_path_before": "konsolen_bundles :: Xbox One S / One X 👍 Guter Preis",
-        "match_path_after": "KEIN_TREFFER",
-        "match_state": "KEIN_TREFFER",
-        "routing_status": "C_NO_LONGER_MATCHES",
-        "already_resolved": true,
+        "match_path_after": "konsolen_bundles :: Xbox One S / One X 👍 Guter Preis",
+        "match_state": "GLEICHE_KATEGORIE",
+        "routing_status": "A_SAME_WRONG_CATEGORY",
+        "already_resolved": false,
         "root_cause": "weak_signal",
         "root_cause_confidence": "confirmed",
         "root_cause_evidence": [
           "Forensik-Snapshot root_cause: \"falsches Positivsignal\"",
           "Forensik-Snapshot reason: \"Ein require_all_of-Kriterium wurde AUSSCHLIESSLICH ueber generisches Signal ['mit spiele'] erfuellt (kein staerkeres Alternativwort im selben Treffer), Titel enthaelt zusaetzlich Zubehoer-/Ersatzteil-/Spiel-Indikatoren ([])\"",
-          "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE (routing_status=A_SAME_WRONG_CATEGORY)"
         ],
         "recommended_fix_type": "strengthen_positive_signal",
         "regression_risk": "HIGH"
@@ -177,10 +327,469 @@
         "recommended_fix_type": "strengthen_positive_signal",
         "regression_risk": "HIGH"
       }
+    ],
+    "notebook_resell": [
+      {
+        "listing_id": "https://www.ebay.de/itm/357718779954",
+        "title": "Lenovo ThinkPad X390 Mainboard Intel Core i5-8365U 8GB RAM NM-B891",
+        "price": 49.0,
+        "stored_category": "notebook_resell",
+        "ground_truth_verdict": "FALSE_POSITIVE",
+        "stored_rule": "ThinkPad T14/X13 (Ryzen/Modern) ★ Resell-Top",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_path_before": "notebook_resell :: ThinkPad T14/X13 (Ryzen/Modern) ★ Resell-Top",
+        "match_path_after": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "already_resolved": true,
+        "root_cause": "replacement_part_false_positive",
+        "root_cause_confidence": "confirmed",
+        "root_cause_evidence": [
+          "Forensik-Snapshot root_cause: \"Ersatzteil statt Hauptprodukt\"",
+          "Forensik-Snapshot reason: \"Titel enthaelt 'Mainboard'/'Motherboard' -- eindeutiges Einzelteil-Signal, unabhaengig von sonst erfuellten require_all_of-Gruppen (z.B. RAM-Groesse des verbauten Speichers auf dem Board selbst)\"",
+          "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+        ],
+        "recommended_fix_type": "add_replacement_part_guard",
+        "regression_risk": "LOW"
+      }
+    ],
+    "office_pc": [
+      {
+        "listing_id": "https://www.kleinanzeigen.de/s-anzeige/intel-core-i5-8500-mainboard-bundle-16gb-ddr4-ram-netzteil/3480038290-225-13379",
+        "title": "Intel Core i5-8500 Mainboard Bundle 16GB DDR4 RAM Netzteil",
+        "price": 160.0,
+        "stored_category": "office_pc",
+        "ground_truth_verdict": "FALSE_POSITIVE",
+        "stored_rule": "Office-PC (Mindestanforderung erfüllt)",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_path_before": "office_pc :: Office-PC (Mindestanforderung erfüllt)",
+        "match_path_after": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "already_resolved": true,
+        "root_cause": "replacement_part_false_positive",
+        "root_cause_confidence": "confirmed",
+        "root_cause_evidence": [
+          "Forensik-Snapshot root_cause: \"Ersatzteil statt Hauptprodukt\"",
+          "Forensik-Snapshot reason: \"Titel enthaelt 'Mainboard'/'Motherboard' -- eindeutiges Einzelteil-Signal, unabhaengig von sonst erfuellten require_all_of-Gruppen (z.B. RAM-Groesse des verbauten Speichers auf dem Board selbst)\"",
+          "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+        ],
+        "recommended_fix_type": "add_replacement_part_guard",
+        "regression_risk": "LOW"
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/356717584177",
+        "title": "Lenovo ThinkPad T490s Mainboard nm-b891 Intel i5-8365U / i5-8265U 8GB RAM",
+        "price": 69.0,
+        "stored_category": "office_pc",
+        "ground_truth_verdict": "FALSE_POSITIVE",
+        "stored_rule": "Office-PC (Mindestanforderung erfüllt)",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_path_before": "office_pc :: Office-PC (Mindestanforderung erfüllt)",
+        "match_path_after": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "already_resolved": true,
+        "root_cause": "replacement_part_false_positive",
+        "root_cause_confidence": "confirmed",
+        "root_cause_evidence": [
+          "Forensik-Snapshot root_cause: \"Ersatzteil statt Hauptprodukt\"",
+          "Forensik-Snapshot reason: \"Titel enthaelt 'Mainboard'/'Motherboard' -- eindeutiges Einzelteil-Signal, unabhaengig von sonst erfuellten require_all_of-Gruppen (z.B. RAM-Groesse des verbauten Speichers auf dem Board selbst)\"",
+          "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+        ],
+        "recommended_fix_type": "add_replacement_part_guard",
+        "regression_risk": "LOW"
+      }
+    ],
+    "retro_konsolen": [
+      {
+        "listing_id": "https://www.ebay.de/itm/398266334210",
+        "title": "Nintendo DS Lite Handheld-System Weiß Touchscreen inkl. 4 Spiele",
+        "price": 80.0,
+        "stored_category": "retro_konsolen",
+        "ground_truth_verdict": "FALSE_POSITIVE",
+        "stored_rule": "Nintendo Retro-Konsole (N64/GameCube/DS) ⚠️ Okay",
+        "current_category": "retro_konsolen",
+        "current_rule": "Nintendo Retro-Konsole (N64/GameCube/DS) ⚠️ Okay",
+        "match_path_before": "retro_konsolen :: Nintendo Retro-Konsole (N64/GameCube/DS) ⚠️ Okay",
+        "match_path_after": "retro_konsolen :: Nintendo Retro-Konsole (N64/GameCube/DS) ⚠️ Okay",
+        "match_state": "GLEICHE_KATEGORIE",
+        "routing_status": "A_SAME_WRONG_CATEGORY",
+        "already_resolved": false,
+        "root_cause": "weak_signal",
+        "root_cause_confidence": "confirmed",
+        "root_cause_evidence": [
+          "Forensik-Snapshot root_cause: \"falsches Positivsignal\"",
+          "Forensik-Snapshot reason: \"Ein require_all_of-Kriterium wurde AUSSCHLIESSLICH ueber generisches Signal ['system'] erfuellt (kein staerkeres Alternativwort im selben Treffer), Titel enthaelt zusaetzlich Zubehoer-/Ersatzteil-/Spiel-Indikatoren ([])\"",
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE (routing_status=A_SAME_WRONG_CATEGORY)"
+        ],
+        "recommended_fix_type": "strengthen_positive_signal",
+        "regression_risk": "HIGH"
+      },
+      {
+        "listing_id": "https://www.kleinanzeigen.de/s-anzeige/sony-playstation-2-original-netzteil-videokabel-memorycard/3480159305-279-756",
+        "title": "Sony PlayStation 2 + Original Netzteil, Videokabel, MemoryCard",
+        "price": 50.0,
+        "stored_category": "retro_konsolen",
+        "ground_truth_verdict": "FALSE_POSITIVE",
+        "stored_rule": "Sony Retro-Konsole (PS1/PS2) 👍 Guter Preis",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_path_before": "retro_konsolen :: Sony Retro-Konsole (PS1/PS2) 👍 Guter Preis",
+        "match_path_after": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "already_resolved": true,
+        "root_cause": "weak_signal",
+        "root_cause_confidence": "confirmed",
+        "root_cause_evidence": [
+          "Forensik-Snapshot root_cause: \"falsches Positivsignal\"",
+          "Forensik-Snapshot reason: \"Ein require_all_of-Kriterium wurde AUSSCHLIESSLICH durch Zubehoer-Begriff(e) erfuellt (kein staerkeres Alternativwort im selben Treffer): ['netzteil']\"",
+          "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+        ],
+        "recommended_fix_type": "strengthen_positive_signal",
+        "regression_risk": "HIGH"
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/227468195928",
+        "title": "Nintendo Gamecube Netzteil - original DOL-002 (EUR) - 12V / 3.25A",
+        "price": 12.0,
+        "stored_category": "retro_konsolen",
+        "ground_truth_verdict": "FALSE_POSITIVE",
+        "stored_rule": "Nintendo Retro-Konsole (N64/GameCube/DS) ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_path_before": "retro_konsolen :: Nintendo Retro-Konsole (N64/GameCube/DS) ★ Top-Deal",
+        "match_path_after": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "already_resolved": true,
+        "root_cause": "weak_signal",
+        "root_cause_confidence": "confirmed",
+        "root_cause_evidence": [
+          "Forensik-Snapshot root_cause: \"falsches Positivsignal\"",
+          "Forensik-Snapshot reason: \"Ein require_all_of-Kriterium wurde AUSSCHLIESSLICH durch Zubehoer-Begriff(e) erfuellt (kein staerkeres Alternativwort im selben Treffer): ['netzteil']\"",
+          "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+        ],
+        "recommended_fix_type": "strengthen_positive_signal",
+        "regression_risk": "HIGH"
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/307106426592",
+        "title": "N64 USB-C Netzteil für Nintendo 64 Ersatznetzteil",
+        "price": 30.0,
+        "stored_category": "retro_konsolen",
+        "ground_truth_verdict": "FALSE_POSITIVE",
+        "stored_rule": "Nintendo Retro-Konsole (N64/GameCube/DS) ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_path_before": "retro_konsolen :: Nintendo Retro-Konsole (N64/GameCube/DS) ★ Top-Deal",
+        "match_path_after": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "already_resolved": true,
+        "root_cause": "weak_signal",
+        "root_cause_confidence": "confirmed",
+        "root_cause_evidence": [
+          "Forensik-Snapshot root_cause: \"falsches Positivsignal\"",
+          "Forensik-Snapshot reason: \"Ein require_all_of-Kriterium wurde AUSSCHLIESSLICH durch Zubehoer-Begriff(e) erfuellt (kein staerkeres Alternativwort im selben Treffer): ['netzteil']\"",
+          "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+        ],
+        "recommended_fix_type": "strengthen_positive_signal",
+        "regression_risk": "HIGH"
+      }
     ]
   },
   "candidates_by_category": {},
   "fix_queue": [
+    {
+      "priority": "P0",
+      "category": "iphone",
+      "affected_count": 1,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.ebay.de/itm/236995682525",
+          "title": "Apple iPhone 15 Pro Max 512GB Mainboard Platine mit FaceID und Kameramodul ",
+          "price": 400.0
+        }
+      ],
+      "root_cause": "replacement_part_false_positive",
+      "confidence": "confirmed",
+      "current_rule": "iPhone 15 Pro Max (≥512GB) 👍 Guter Preis",
+      "recommended_fix_type": "add_replacement_part_guard",
+      "regression_risk": "LOW",
+      "affected_categories": [
+        "iphone"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'iPhone 15 Pro Max (≥512GB) 👍 Guter Preis' in Kategorie 'iphone' (z.B. app/tests/test_iphone.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      ],
+      "still_active_count": 1,
+      "priority_score": 4
+    },
+    {
+      "priority": "P1",
+      "category": "konsolen_bundles",
+      "affected_count": 1,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.ebay.de/itm/137602406753",
+          "title": "Nintendo Switch 32GB Mario Kart 8 Deluxe Bundle Neon Blau/Rot mit Dock",
+          "price": 135.0
+        }
+      ],
+      "root_cause": "weak_signal",
+      "confidence": "confirmed",
+      "current_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+      "recommended_fix_type": "strengthen_positive_signal",
+      "regression_risk": "HIGH",
+      "affected_categories": [
+        "konsolen_bundles"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Nintendo Switch (V1/V2/OLED) 👍 Guter Preis' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      ],
+      "still_active_count": 1,
+      "priority_score": 3
+    },
+    {
+      "priority": "P1",
+      "category": "konsolen_bundles",
+      "affected_count": 1,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.kleinanzeigen.de/s-anzeige/xbox-one-s-1tb-mit-spiele/3479889108-279-4400",
+          "title": "Xbox One S 1TB mit Spiele",
+          "price": 80.0
+        }
+      ],
+      "root_cause": "weak_signal",
+      "confidence": "confirmed",
+      "current_rule": "Xbox One S / One X 👍 Guter Preis",
+      "recommended_fix_type": "strengthen_positive_signal",
+      "regression_risk": "HIGH",
+      "affected_categories": [
+        "konsolen_bundles"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Xbox One S / One X 👍 Guter Preis' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      ],
+      "still_active_count": 1,
+      "priority_score": 3
+    },
+    {
+      "priority": "P1",
+      "category": "retro_konsolen",
+      "affected_count": 1,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.ebay.de/itm/398266334210",
+          "title": "Nintendo DS Lite Handheld-System Weiß Touchscreen inkl. 4 Spiele",
+          "price": 80.0
+        }
+      ],
+      "root_cause": "weak_signal",
+      "confidence": "confirmed",
+      "current_rule": "Nintendo Retro-Konsole (N64/GameCube/DS) ⚠️ Okay",
+      "recommended_fix_type": "strengthen_positive_signal",
+      "regression_risk": "HIGH",
+      "affected_categories": [
+        "retro_konsolen"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Nintendo Retro-Konsole (N64/GameCube/DS) ⚠️ Okay' in Kategorie 'retro_konsolen' (z.B. app/tests/test_retro_konsolen.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      ],
+      "still_active_count": 1,
+      "priority_score": 3
+    },
+    {
+      "priority": "P1",
+      "category": "gaming_pc",
+      "affected_count": 1,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.kleinanzeigen.de/s-anzeige/mainboard-set-h310m-d2p-i5-9500-gtx-1050ti-nwme-16gb-ddr4-/3480520958-225-8182",
+          "title": "MAINBOARD SET H310M D2P. i5-9500. GTX 1050TI. NWMe. 16GB DDR4.",
+          "price": 90.0
+        }
+      ],
+      "root_cause": "replacement_part_false_positive",
+      "confidence": "confirmed",
+      "current_rule": "Gaming-PC (Mindestanforderung erfüllt)",
+      "recommended_fix_type": "add_replacement_part_guard",
+      "regression_risk": "LOW",
+      "affected_categories": [
+        "gaming_pc"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Gaming-PC (Mindestanforderung erfüllt)' in Kategorie 'gaming_pc' (z.B. app/tests/test_gaming_pc.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      ],
+      "still_active_count": 0,
+      "priority_score": 2
+    },
+    {
+      "priority": "P1",
+      "category": "handhelds",
+      "affected_count": 1,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.ebay.de/itm/307112118573",
+          "title": "JSAUX Slim-Reisetasche Für Lenovo Legion Go/Go S/Go 2, Hartschalenbeutel | Schla",
+          "price": 41.48
+        }
+      ],
+      "root_cause": "missing_exclude",
+      "confidence": "confirmed",
+      "current_rule": "Asus ROG Ally / Lenovo Legion Go ★ Top-Deal",
+      "recommended_fix_type": "add_exclude",
+      "regression_risk": "LOW",
+      "affected_categories": [
+        "handhelds"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Asus ROG Ally / Lenovo Legion Go ★ Top-Deal' in Kategorie 'handhelds' (z.B. app/tests/test_handhelds.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      ],
+      "still_active_count": 0,
+      "priority_score": 2
+    },
+    {
+      "priority": "P1",
+      "category": "handhelds",
+      "affected_count": 3,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.ebay.de/itm/255925725429",
+          "title": "USB-C HUB für Steam Deck HDMI 4k 60Hz USB 3.0 PD",
+          "price": 41.99
+        },
+        {
+          "listing_id": "https://www.ebay.de/itm/304780620667",
+          "title": "Steam Deck Skin Faceplate Schutz Klebefolie Design Vinyl Aufkleber Skins OLED",
+          "price": 19.95
+        },
+        {
+          "listing_id": "https://www.ebay.de/itm/205573628921",
+          "title": "VITURE USB-C an Brille, Ladeadapter, Laden und Spielen für Switch, Steam Deck",
+          "price": 49.0
+        }
+      ],
+      "root_cause": "missing_exclude",
+      "confidence": "confirmed",
+      "current_rule": "Valve Steam Deck ★ Top-Deal",
+      "recommended_fix_type": "add_exclude",
+      "regression_risk": "LOW",
+      "affected_categories": [
+        "handhelds"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Valve Steam Deck ★ Top-Deal' in Kategorie 'handhelds' (z.B. app/tests/test_handhelds.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 3 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      ],
+      "still_active_count": 0,
+      "priority_score": 2
+    },
+    {
+      "priority": "P1",
+      "category": "konsolen_bundles",
+      "affected_count": 1,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.kleinanzeigen.de/s-anzeige/playstation-5-ps4-ps5-slim-hdmi-port-nintendo-reparatur-usb-pro/3431533294-226-3438",
+          "title": "Playstation 5 PS4 PS5 Slim HDMI Port Nintendo Reparatur USB PRO",
+          "price": 50.0
+        }
+      ],
+      "root_cause": "ambiguous",
+      "confidence": "manual_review",
+      "current_rule": "PS4 Slim / Pro Bundle ★ Top-Deal",
+      "recommended_fix_type": "manual_review",
+      "regression_risk": "MEDIUM",
+      "affected_categories": [
+        "konsolen_bundles"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'PS4 Slim / Pro Bundle ★ Top-Deal' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      ],
+      "still_active_count": 1,
+      "priority_score": 2
+    },
+    {
+      "priority": "P1",
+      "category": "notebook_resell",
+      "affected_count": 1,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.ebay.de/itm/357718779954",
+          "title": "Lenovo ThinkPad X390 Mainboard Intel Core i5-8365U 8GB RAM NM-B891",
+          "price": 49.0
+        }
+      ],
+      "root_cause": "replacement_part_false_positive",
+      "confidence": "confirmed",
+      "current_rule": "ThinkPad T14/X13 (Ryzen/Modern) ★ Resell-Top",
+      "recommended_fix_type": "add_replacement_part_guard",
+      "regression_risk": "LOW",
+      "affected_categories": [
+        "notebook_resell"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'ThinkPad T14/X13 (Ryzen/Modern) ★ Resell-Top' in Kategorie 'notebook_resell' (z.B. app/tests/test_notebook_resell.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      ],
+      "still_active_count": 0,
+      "priority_score": 2
+    },
+    {
+      "priority": "P1",
+      "category": "office_pc",
+      "affected_count": 2,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.kleinanzeigen.de/s-anzeige/intel-core-i5-8500-mainboard-bundle-16gb-ddr4-ram-netzteil/3480038290-225-13379",
+          "title": "Intel Core i5-8500 Mainboard Bundle 16GB DDR4 RAM Netzteil",
+          "price": 160.0
+        },
+        {
+          "listing_id": "https://www.ebay.de/itm/356717584177",
+          "title": "Lenovo ThinkPad T490s Mainboard nm-b891 Intel i5-8365U / i5-8265U 8GB RAM",
+          "price": 69.0
+        }
+      ],
+      "root_cause": "replacement_part_false_positive",
+      "confidence": "confirmed",
+      "current_rule": "Office-PC (Mindestanforderung erfüllt)",
+      "recommended_fix_type": "add_replacement_part_guard",
+      "regression_risk": "LOW",
+      "affected_categories": [
+        "office_pc"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Office-PC (Mindestanforderung erfüllt)' in Kategorie 'office_pc' (z.B. app/tests/test_office_pc.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 2 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      ],
+      "still_active_count": 0,
+      "priority_score": 2
+    },
     {
       "priority": "P2",
       "category": "konsolen_bundles",
@@ -220,26 +829,31 @@
     },
     {
       "priority": "P2",
-      "category": "konsolen_bundles",
-      "affected_count": 1,
+      "category": "retro_konsolen",
+      "affected_count": 2,
       "representative_listings": [
         {
-          "listing_id": "https://www.ebay.de/itm/137602406753",
-          "title": "Nintendo Switch 32GB Mario Kart 8 Deluxe Bundle Neon Blau/Rot mit Dock",
-          "price": 135.0
+          "listing_id": "https://www.ebay.de/itm/227468195928",
+          "title": "Nintendo Gamecube Netzteil - original DOL-002 (EUR) - 12V / 3.25A",
+          "price": 12.0
+        },
+        {
+          "listing_id": "https://www.ebay.de/itm/307106426592",
+          "title": "N64 USB-C Netzteil für Nintendo 64 Ersatznetzteil",
+          "price": 30.0
         }
       ],
       "root_cause": "weak_signal",
       "confidence": "confirmed",
-      "current_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+      "current_rule": "Nintendo Retro-Konsole (N64/GameCube/DS) ★ Top-Deal",
       "recommended_fix_type": "strengthen_positive_signal",
       "regression_risk": "HIGH",
       "affected_categories": [
-        "konsolen_bundles"
+        "retro_konsolen"
       ],
       "test_requirements": [
-        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Nintendo Switch (V1/V2/OLED) 👍 Guter Preis' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
-        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Nintendo Retro-Konsole (N64/GameCube/DS) ★ Top-Deal' in Kategorie 'retro_konsolen' (z.B. app/tests/test_retro_konsolen.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 2 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
         "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
       ],
       "still_active_count": 0,
@@ -247,57 +861,30 @@
     },
     {
       "priority": "P2",
-      "category": "konsolen_bundles",
+      "category": "retro_konsolen",
       "affected_count": 1,
       "representative_listings": [
         {
-          "listing_id": "https://www.kleinanzeigen.de/s-anzeige/xbox-one-s-1tb-mit-spiele/3479889108-279-4400",
-          "title": "Xbox One S 1TB mit Spiele",
-          "price": 80.0
+          "listing_id": "https://www.kleinanzeigen.de/s-anzeige/sony-playstation-2-original-netzteil-videokabel-memorycard/3480159305-279-756",
+          "title": "Sony PlayStation 2 + Original Netzteil, Videokabel, MemoryCard",
+          "price": 50.0
         }
       ],
       "root_cause": "weak_signal",
       "confidence": "confirmed",
-      "current_rule": "Xbox One S / One X 👍 Guter Preis",
+      "current_rule": "Sony Retro-Konsole (PS1/PS2) 👍 Guter Preis",
       "recommended_fix_type": "strengthen_positive_signal",
       "regression_risk": "HIGH",
       "affected_categories": [
-        "konsolen_bundles"
+        "retro_konsolen"
       ],
       "test_requirements": [
-        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Xbox One S / One X 👍 Guter Preis' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Sony Retro-Konsole (PS1/PS2) 👍 Guter Preis' in Kategorie 'retro_konsolen' (z.B. app/tests/test_retro_konsolen.py, falls vorhanden) muessen weiterhin gruen bleiben",
         "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
         "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
       ],
       "still_active_count": 0,
       "priority_score": 1
-    },
-    {
-      "priority": "P3",
-      "category": "konsolen_bundles",
-      "affected_count": 1,
-      "representative_listings": [
-        {
-          "listing_id": "https://www.kleinanzeigen.de/s-anzeige/playstation-5-ps4-ps5-slim-hdmi-port-nintendo-reparatur-usb-pro/3431533294-226-3438",
-          "title": "Playstation 5 PS4 PS5 Slim HDMI Port Nintendo Reparatur USB PRO",
-          "price": 50.0
-        }
-      ],
-      "root_cause": "ambiguous",
-      "confidence": "manual_review",
-      "current_rule": "PS4 Slim / Pro Bundle ★ Top-Deal",
-      "recommended_fix_type": "manual_review",
-      "regression_risk": "MEDIUM",
-      "affected_categories": [
-        "konsolen_bundles"
-      ],
-      "test_requirements": [
-        "bestehende TRUE_POSITIVE-Tests fuer Regel 'PS4 Slim / Pro Bundle ★ Top-Deal' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
-        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
-        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
-      ],
-      "still_active_count": 0,
-      "priority_score": 0
     }
   ]
 }
