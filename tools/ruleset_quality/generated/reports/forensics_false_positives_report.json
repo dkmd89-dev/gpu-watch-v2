@@ -1,0 +1,303 @@
+{
+  "meta": {
+    "input_source": "/mnt/128ssd/claude/docs/DASHBOARD_MATCH_FORENSICS.json",
+    "total_entries_in_source": 2306,
+    "verdict_distribution_in_source": {
+      "TRUE_POSITIVE": 2252,
+      "FALSE_POSITIVE": 19,
+      "UNCLEAR": 35
+    },
+    "known_reference_counts": {
+      "TRUE_POSITIVE": 2252,
+      "FALSE_POSITIVE": 19,
+      "UNCLEAR": 35
+    },
+    "consistency_notes": [
+      "keine Abweichung zum bekannten Referenzstand"
+    ],
+    "filter_category": "konsolen_bundles",
+    "filter_only_fp": true,
+    "confirmed_fp_count_total": 19,
+    "confirmed_fp_count_filtered": 6,
+    "fp_candidate_count_total": 35,
+    "categories_with_confirmed_fp": [
+      "gaming_pc",
+      "handhelds",
+      "iphone",
+      "konsolen_bundles",
+      "notebook_resell",
+      "office_pc",
+      "retro_konsolen"
+    ]
+  },
+  "confirmed_by_category": {
+    "konsolen_bundles": [
+      {
+        "listing_id": "https://www.kleinanzeigen.de/s-anzeige/luigi-s-mansion-2-hd-fuer-nintendo-switch-neu-ovp/3480890852-227-23706",
+        "title": "Luigi's Mansion 2 HD für Nintendo Switch - NEU & OVP",
+        "price": 35.0,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "FALSE_POSITIVE",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_path_before": "konsolen_bundles :: Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+        "match_path_after": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "already_resolved": true,
+        "root_cause": "weak_signal",
+        "root_cause_confidence": "confirmed",
+        "root_cause_evidence": [
+          "Forensik-Snapshot root_cause: \"falsches Positivsignal\"",
+          "Forensik-Snapshot reason: \"Ein require_all_of-Kriterium wurde AUSSCHLIESSLICH ueber generisches Signal ['ovp'] erfuellt (kein staerkeres Alternativwort im selben Treffer), Titel enthaelt zusaetzlich Zubehoer-/Ersatzteil-/Spiel-Indikatoren ([])\"",
+          "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+        ],
+        "recommended_fix_type": "strengthen_positive_signal",
+        "regression_risk": "HIGH"
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/137602406753",
+        "title": "Nintendo Switch 32GB Mario Kart 8 Deluxe Bundle Neon Blau/Rot mit Dock",
+        "price": 135.0,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "FALSE_POSITIVE",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_path_before": "konsolen_bundles :: Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "match_path_after": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "already_resolved": true,
+        "root_cause": "weak_signal",
+        "root_cause_confidence": "confirmed",
+        "root_cause_evidence": [
+          "Forensik-Snapshot root_cause: \"falsches Positivsignal\"",
+          "Forensik-Snapshot reason: \"Ein require_all_of-Kriterium wurde AUSSCHLIESSLICH ueber generisches Signal ['bundle'] erfuellt (kein staerkeres Alternativwort im selben Treffer), Titel enthaelt zusaetzlich Zubehoer-/Ersatzteil-/Spiel-Indikatoren (['dock'])\"",
+          "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+        ],
+        "recommended_fix_type": "strengthen_positive_signal",
+        "regression_risk": "HIGH"
+      },
+      {
+        "listing_id": "https://www.kleinanzeigen.de/s-anzeige/playstation-5-ps4-ps5-slim-hdmi-port-nintendo-reparatur-usb-pro/3431533294-226-3438",
+        "title": "Playstation 5 PS4 PS5 Slim HDMI Port Nintendo Reparatur USB PRO",
+        "price": 50.0,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "FALSE_POSITIVE",
+        "stored_rule": "PS4 Slim / Pro Bundle ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_path_before": "konsolen_bundles :: PS4 Slim / Pro Bundle ★ Top-Deal",
+        "match_path_after": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "already_resolved": true,
+        "root_cause": "ambiguous",
+        "root_cause_confidence": "manual_review",
+        "root_cause_evidence": [
+          "Forensik-Snapshot root_cause: \"sonstiges\"",
+          "Forensik-Snapshot reason: \"Reparatur-/Service-Dienstleistungs-Indikator im Titel: ['reparatur']\"",
+          "Kein bekannter Uebersetzungseintrag fuer diesen Forensik-root_cause-Wert -- keine automatische Taxonomie-Zuordnung ohne Beleg.",
+          "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+        ],
+        "recommended_fix_type": "manual_review",
+        "regression_risk": "MEDIUM"
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/257670779909",
+        "title": "Mario Kart World für Nintendo Switch 2 – NEU  und OVP",
+        "price": 54.99,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "FALSE_POSITIVE",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_path_before": "konsolen_bundles :: Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+        "match_path_after": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "already_resolved": true,
+        "root_cause": "weak_signal",
+        "root_cause_confidence": "confirmed",
+        "root_cause_evidence": [
+          "Forensik-Snapshot root_cause: \"falsches Positivsignal\"",
+          "Forensik-Snapshot reason: \"Ein require_all_of-Kriterium wurde AUSSCHLIESSLICH ueber generisches Signal ['ovp'] erfuellt (kein staerkeres Alternativwort im selben Treffer), Titel enthaelt zusaetzlich Zubehoer-/Ersatzteil-/Spiel-Indikatoren ([])\"",
+          "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+        ],
+        "recommended_fix_type": "strengthen_positive_signal",
+        "regression_risk": "HIGH"
+      },
+      {
+        "listing_id": "https://www.kleinanzeigen.de/s-anzeige/xbox-one-s-1tb-mit-spiele/3479889108-279-4400",
+        "title": "Xbox One S 1TB mit Spiele",
+        "price": 80.0,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "FALSE_POSITIVE",
+        "stored_rule": "Xbox One S / One X 👍 Guter Preis",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_path_before": "konsolen_bundles :: Xbox One S / One X 👍 Guter Preis",
+        "match_path_after": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "already_resolved": true,
+        "root_cause": "weak_signal",
+        "root_cause_confidence": "confirmed",
+        "root_cause_evidence": [
+          "Forensik-Snapshot root_cause: \"falsches Positivsignal\"",
+          "Forensik-Snapshot reason: \"Ein require_all_of-Kriterium wurde AUSSCHLIESSLICH ueber generisches Signal ['mit spiele'] erfuellt (kein staerkeres Alternativwort im selben Treffer), Titel enthaelt zusaetzlich Zubehoer-/Ersatzteil-/Spiel-Indikatoren ([])\"",
+          "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+        ],
+        "recommended_fix_type": "strengthen_positive_signal",
+        "regression_risk": "HIGH"
+      },
+      {
+        "listing_id": "https://www.kleinanzeigen.de/s-anzeige/nba-2k26-fuer-nintendo-switch-2-ovp-schneller-versand/3479886837-227-7978",
+        "title": "NBA 2K26 für Nintendo Switch 2 - OVP Schneller Versand",
+        "price": 14.0,
+        "stored_category": "konsolen_bundles",
+        "ground_truth_verdict": "FALSE_POSITIVE",
+        "stored_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
+        "match_path_before": "konsolen_bundles :: Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+        "match_path_after": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "already_resolved": true,
+        "root_cause": "weak_signal",
+        "root_cause_confidence": "confirmed",
+        "root_cause_evidence": [
+          "Forensik-Snapshot root_cause: \"falsches Positivsignal\"",
+          "Forensik-Snapshot reason: \"Ein require_all_of-Kriterium wurde AUSSCHLIESSLICH ueber generisches Signal ['ovp'] erfuellt (kein staerkeres Alternativwort im selben Treffer), Titel enthaelt zusaetzlich Zubehoer-/Ersatzteil-/Spiel-Indikatoren ([])\"",
+          "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+        ],
+        "recommended_fix_type": "strengthen_positive_signal",
+        "regression_risk": "HIGH"
+      }
+    ]
+  },
+  "candidates_by_category": {},
+  "fix_queue": [
+    {
+      "priority": "P2",
+      "category": "konsolen_bundles",
+      "affected_count": 3,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.kleinanzeigen.de/s-anzeige/luigi-s-mansion-2-hd-fuer-nintendo-switch-neu-ovp/3480890852-227-23706",
+          "title": "Luigi's Mansion 2 HD für Nintendo Switch - NEU & OVP",
+          "price": 35.0
+        },
+        {
+          "listing_id": "https://www.ebay.de/itm/257670779909",
+          "title": "Mario Kart World für Nintendo Switch 2 – NEU  und OVP",
+          "price": 54.99
+        },
+        {
+          "listing_id": "https://www.kleinanzeigen.de/s-anzeige/nba-2k26-fuer-nintendo-switch-2-ovp-schneller-versand/3479886837-227-7978",
+          "title": "NBA 2K26 für Nintendo Switch 2 - OVP Schneller Versand",
+          "price": 14.0
+        }
+      ],
+      "root_cause": "weak_signal",
+      "confidence": "confirmed",
+      "current_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+      "recommended_fix_type": "strengthen_positive_signal",
+      "regression_risk": "HIGH",
+      "affected_categories": [
+        "konsolen_bundles"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Nintendo Switch (V1/V2/OLED) ★ Top-Deal' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 3 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      ],
+      "still_active_count": 0,
+      "priority_score": 1
+    },
+    {
+      "priority": "P2",
+      "category": "konsolen_bundles",
+      "affected_count": 1,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.ebay.de/itm/137602406753",
+          "title": "Nintendo Switch 32GB Mario Kart 8 Deluxe Bundle Neon Blau/Rot mit Dock",
+          "price": 135.0
+        }
+      ],
+      "root_cause": "weak_signal",
+      "confidence": "confirmed",
+      "current_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+      "recommended_fix_type": "strengthen_positive_signal",
+      "regression_risk": "HIGH",
+      "affected_categories": [
+        "konsolen_bundles"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Nintendo Switch (V1/V2/OLED) 👍 Guter Preis' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      ],
+      "still_active_count": 0,
+      "priority_score": 1
+    },
+    {
+      "priority": "P2",
+      "category": "konsolen_bundles",
+      "affected_count": 1,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.kleinanzeigen.de/s-anzeige/xbox-one-s-1tb-mit-spiele/3479889108-279-4400",
+          "title": "Xbox One S 1TB mit Spiele",
+          "price": 80.0
+        }
+      ],
+      "root_cause": "weak_signal",
+      "confidence": "confirmed",
+      "current_rule": "Xbox One S / One X 👍 Guter Preis",
+      "recommended_fix_type": "strengthen_positive_signal",
+      "regression_risk": "HIGH",
+      "affected_categories": [
+        "konsolen_bundles"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Xbox One S / One X 👍 Guter Preis' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      ],
+      "still_active_count": 0,
+      "priority_score": 1
+    },
+    {
+      "priority": "P3",
+      "category": "konsolen_bundles",
+      "affected_count": 1,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.kleinanzeigen.de/s-anzeige/playstation-5-ps4-ps5-slim-hdmi-port-nintendo-reparatur-usb-pro/3431533294-226-3438",
+          "title": "Playstation 5 PS4 PS5 Slim HDMI Port Nintendo Reparatur USB PRO",
+          "price": 50.0
+        }
+      ],
+      "root_cause": "ambiguous",
+      "confidence": "manual_review",
+      "current_rule": "PS4 Slim / Pro Bundle ★ Top-Deal",
+      "recommended_fix_type": "manual_review",
+      "regression_risk": "MEDIUM",
+      "affected_categories": [
+        "konsolen_bundles"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'PS4 Slim / Pro Bundle ★ Top-Deal' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      ],
+      "still_active_count": 0,
+      "priority_score": 0
+    }
+  ]
+}
