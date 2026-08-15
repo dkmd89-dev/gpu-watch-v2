@@ -103,17 +103,17 @@ iphone (1)
     title: Apple iPhone 15 Pro Max 512GB Mainboard Platine mit FaceID und Kameramodul 
     url: https://www.ebay.de/itm/236995682525
     stored_category: iphone
-    current_category: iphone
+    current_category: KEIN_TREFFER
     stored_rule: iPhone 15 Pro Max (≥512GB) 👍 Guter Preis
-    current_rule: iPhone 15 Pro Max (≥512GB) 👍 Guter Preis
-    match_path: iphone :: iPhone 15 Pro Max (≥512GB) 👍 Guter Preis -> iphone :: iPhone 15 Pro Max (≥512GB) 👍 Guter Preis
-    match_state: GLEICHE_KATEGORIE (routing_status=A_SAME_WRONG_CATEGORY)
+    current_rule: KEIN_TREFFER
+    match_path: iphone :: iPhone 15 Pro Max (≥512GB) 👍 Guter Preis -> KEIN_TREFFER
+    match_state: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)
     root_cause: replacement_part_false_positive
     confidence: confirmed
     evidence:
       - Forensik-Snapshot root_cause: "Ersatzteil statt Hauptprodukt"
       - Forensik-Snapshot reason: "Titel enthaelt 'Mainboard'/'Motherboard' -- eindeutiges Einzelteil-Signal, unabhaengig von sonst erfuellten require_all_of-Gruppen (z.B. RAM-Groesse des verbauten Speichers auf dem Board selbst)"
-      - aktueller Match-Zustand: GLEICHE_KATEGORIE (routing_status=A_SAME_WRONG_CATEGORY)
+      - aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)
     recommended_fix: add_replacement_part_guard
     regression_risk: LOW
 
@@ -160,18 +160,18 @@ konsolen_bundles (6)
     title: Playstation 5 PS4 PS5 Slim HDMI Port Nintendo Reparatur USB PRO
     url: https://www.kleinanzeigen.de/s-anzeige/playstation-5-ps4-ps5-slim-hdmi-port-nintendo-reparatur-usb-pro/3431533294-226-3438
     stored_category: konsolen_bundles
-    current_category: konsolen_bundles
+    current_category: KEIN_TREFFER
     stored_rule: PS4 Slim / Pro Bundle ★ Top-Deal
-    current_rule: PS4 Slim / Pro Bundle ★ Top-Deal
-    match_path: konsolen_bundles :: PS4 Slim / Pro Bundle ★ Top-Deal -> konsolen_bundles :: PS4 Slim / Pro Bundle ★ Top-Deal
-    match_state: GLEICHE_KATEGORIE (routing_status=A_SAME_WRONG_CATEGORY)
+    current_rule: KEIN_TREFFER
+    match_path: konsolen_bundles :: PS4 Slim / Pro Bundle ★ Top-Deal -> KEIN_TREFFER
+    match_state: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)
     root_cause: ambiguous
     confidence: manual_review
     evidence:
       - Forensik-Snapshot root_cause: "sonstiges"
       - Forensik-Snapshot reason: "Reparatur-/Service-Dienstleistungs-Indikator im Titel: ['reparatur']"
       - Kein bekannter Uebersetzungseintrag fuer diesen Forensik-root_cause-Wert -- keine automatische Taxonomie-Zuordnung ohne Beleg.
-      - aktueller Match-Zustand: GLEICHE_KATEGORIE (routing_status=A_SAME_WRONG_CATEGORY)
+      - aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)
     recommended_fix: manual_review
     regression_risk: MEDIUM
 
@@ -365,22 +365,37 @@ retro_konsolen (4)
     regression_risk: HIGH
 
 
+FP-KANDIDATEN (Ground-Truth-Verdict UNCLEAR -- KEINE bestaetigten FPs)
+======================================================================
+konsolen_bundles (34)
+  - Nintendo Switch 2 GameCube Controller | OVP | NEU [KEIN_TREFFER]
+  - Microsoft Xbox One X 1TB Schwarz Inkl OVP Ohne Controller [GLEICHE_KATEGORIE]
+  - Nintendo Switch 2 GameCube Controller – Nintendo Classics – OVP – NEU [KEIN_TREFFER]
+  - Nintendo Switch Sports inkl. 12-in-1 Zubehör Set [KEIN_TREFFER]
+  - Nintendo Switch Grau Bundle  Neue Sticks (Kein Drift) + Extras! [GLEICHE_KATEGORIE]
+  - Nintendo Pokémon Purpur Nintendo Switch neu/sealed in OVP [KEIN_TREFFER]
+  - Nintendo Switch - Minecraft FRA mit OVP [KEIN_TREFFER]
+  - Pokémon Let’s Go Evoli! Nintendo Switch – OVP komplett [KEIN_TREFFER]
+  - Star Fox "NEU & OVP" (Nintendo Switch 2) [KEIN_TREFFER]
+  - Nintendo Switch Komplett Set OVP [GLEICHE_KATEGORIE]
+  ... und 24 weitere
+
+retro_konsolen (1)
+  - Nintendo DS Lite Handheld-System hellblau Touchscreen [GLEICHE_KATEGORIE]
+
 CATEGORY SUMMARY
 ================
 category             | confirmed FP | candidates | root causes                                   | priority
 gaming_pc            | 1            | 0          | replacement_part_false_positive               | P1
 handhelds            | 4            | 0          | missing_exclude                               | P1
-iphone               | 1            | 0          | replacement_part_false_positive               | P0
-konsolen_bundles     | 6            | 0          | ambiguous, weak_signal                        | P1, P2
+iphone               | 1            | 0          | replacement_part_false_positive               | P1
+konsolen_bundles     | 6            | 34         | ambiguous, weak_signal                        | P1, P2, P3
 notebook_resell      | 1            | 0          | replacement_part_false_positive               | P1
 office_pc            | 2            | 0          | replacement_part_false_positive               | P1
-retro_konsolen       | 4            | 0          | weak_signal                                   | P1, P2
+retro_konsolen       | 4            | 1          | weak_signal                                   | P1, P2
 
 FIX QUEUE
 =========
-P0:
-  [iphone] Regel 'iPhone 15 Pro Max (≥512GB) 👍 Guter Preis' -- root_cause=replacement_part_false_positive (confidence=confirmed), 1 Fall/Faelle (1 weiterhin aktiv) -- fix=add_replacement_part_guard, risk=LOW
-
 P1:
   [konsolen_bundles] Regel 'Nintendo Switch (V1/V2/OLED) 👍 Guter Preis' -- root_cause=weak_signal (confidence=confirmed), 1 Fall/Faelle (1 weiterhin aktiv) -- fix=strengthen_positive_signal, risk=HIGH
   [konsolen_bundles] Regel 'Xbox One S / One X 👍 Guter Preis' -- root_cause=weak_signal (confidence=confirmed), 1 Fall/Faelle (1 weiterhin aktiv) -- fix=strengthen_positive_signal, risk=HIGH
@@ -388,7 +403,7 @@ P1:
   [gaming_pc] Regel 'Gaming-PC (Mindestanforderung erfüllt)' -- root_cause=replacement_part_false_positive (confidence=confirmed), 1 Fall/Faelle (0 weiterhin aktiv) -- fix=add_replacement_part_guard, risk=LOW
   [handhelds] Regel 'Asus ROG Ally / Lenovo Legion Go ★ Top-Deal' -- root_cause=missing_exclude (confidence=confirmed), 1 Fall/Faelle (0 weiterhin aktiv) -- fix=add_exclude, risk=LOW
   [handhelds] Regel 'Valve Steam Deck ★ Top-Deal' -- root_cause=missing_exclude (confidence=confirmed), 3 Fall/Faelle (0 weiterhin aktiv) -- fix=add_exclude, risk=LOW
-  [konsolen_bundles] Regel 'PS4 Slim / Pro Bundle ★ Top-Deal' -- root_cause=ambiguous (confidence=manual_review), 1 Fall/Faelle (1 weiterhin aktiv) -- fix=manual_review, risk=MEDIUM
+  [iphone] Regel 'iPhone 15 Pro Max (≥512GB) 👍 Guter Preis' -- root_cause=replacement_part_false_positive (confidence=confirmed), 1 Fall/Faelle (0 weiterhin aktiv) -- fix=add_replacement_part_guard, risk=LOW
   [notebook_resell] Regel 'ThinkPad T14/X13 (Ryzen/Modern) ★ Resell-Top' -- root_cause=replacement_part_false_positive (confidence=confirmed), 1 Fall/Faelle (0 weiterhin aktiv) -- fix=add_replacement_part_guard, risk=LOW
   [office_pc] Regel 'Office-PC (Mindestanforderung erfüllt)' -- root_cause=replacement_part_false_positive (confidence=confirmed), 2 Fall/Faelle (0 weiterhin aktiv) -- fix=add_replacement_part_guard, risk=LOW
 
@@ -396,3 +411,6 @@ P2:
   [konsolen_bundles] Regel 'Nintendo Switch (V1/V2/OLED) ★ Top-Deal' -- root_cause=weak_signal (confidence=confirmed), 3 Fall/Faelle (0 weiterhin aktiv) -- fix=strengthen_positive_signal, risk=HIGH
   [retro_konsolen] Regel 'Nintendo Retro-Konsole (N64/GameCube/DS) ★ Top-Deal' -- root_cause=weak_signal (confidence=confirmed), 2 Fall/Faelle (0 weiterhin aktiv) -- fix=strengthen_positive_signal, risk=HIGH
   [retro_konsolen] Regel 'Sony Retro-Konsole (PS1/PS2) 👍 Guter Preis' -- root_cause=weak_signal (confidence=confirmed), 1 Fall/Faelle (0 weiterhin aktiv) -- fix=strengthen_positive_signal, risk=HIGH
+
+P3:
+  [konsolen_bundles] Regel 'PS4 Slim / Pro Bundle ★ Top-Deal' -- root_cause=ambiguous (confidence=manual_review), 1 Fall/Faelle (0 weiterhin aktiv) -- fix=manual_review, risk=MEDIUM

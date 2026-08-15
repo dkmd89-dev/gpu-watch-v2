@@ -111,6 +111,22 @@ exclude_category:
   # Preis allein schon ein starkes Indiz gegen ein echtes Gerät).
   - "leere originalverpackung"
 
+  # FIX (Category-False-Positive-Forensics, Fix-Queue P0, root_cause
+  # replacement_part_false_positive): "mainboard"/"motherboard" (bare
+  # Wort) -- identisches, bereits in gaming_pc.yaml/office_pc.yaml/
+  # notebook_resell.yaml/handhelds.yaml/konsolen_bundles.yaml etabliertes
+  # Muster: ein bloßes Mainboard-/Ersatzteil-Angebot ist kein komplettes
+  # Gerät. Bestätigter Fehltreffer: "Apple iPhone 15 Pro Max 512GB
+  # Mainboard Platine mit FaceID und Kameramodul" (400€, matchte als
+  # "iPhone 15 Pro Max (≥512GB) 👍 Guter Preis"). Blast Radius geprüft:
+  # 0 Kollisionen gegen alle 478 historischen iphone-TRUE_POSITIVE-Titel
+  # (docs/DASHBOARD_MATCH_FORENSICS.json) und den aktuellen found.json-
+  # Korpus -- alle 3 im price_history.jsonl-Korpus gefundenen "mainboard"/
+  # "motherboard"-Titel sind eindeutige Ersatzteil-Angebote, kein
+  # komplettes iPhone nennt dieses Wort.
+  - "mainboard"
+  - "motherboard"
+
 # Phase 15 (kontrollierter Folge-Review, "Gehäuse/Shell-Fix"): "gehäuse"
 # ist zweideutig (lose Ersatzschale/Backcover vs. Zustandsbeschreibung
 # eines kompletten iPhones, z.B. "Gehäuse minimal verkratzt") -- schließt

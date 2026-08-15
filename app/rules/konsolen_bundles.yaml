@@ -353,6 +353,54 @@ exclude_category_unless_also_contains:
     - "gesprungen"
     - "gebrauchsspuren"
     - "verfärbt"
+  # FIX (Category-False-Positive-Forensics, Fix-Queue P1, root_cause
+  # ambiguous/manual_review, umgesetzt nach Nutzer-Vorschlag mit
+  # Korrektur): "reparatur" (bare Wort) deutet meist auf ein
+  # Reparatur-DIENSTLEISTUNGS-/Werkzeug-Angebot statt einen Geräteverkauf
+  # hin (bestätigter Fehltreffer: "Playstation 5 PS4 PS5 Slim HDMI Port
+  # Nintendo Reparatur USB PRO", matchte über "slim"+"pro" -- weder aus
+  # "PS4 Pro" noch "PS4 Slim", sondern aus "PS5 Slim"/"USB PRO"). Bewusst
+  # NICHT als unbedingter exclude_category-Eintrag (Risiko: würde echte
+  # "frisch repariert, funktioniert einwandfrei"-Zustandsbeschreibungen
+  # blockieren, auch wenn im aktuellen Korpus kein solcher Fall
+  # nachweisbar ist) -- stattdessen identischer Kontext-Mechanismus wie
+  # "spiele"/"ovp" oben. WICHTIG, Korrektur ggü. einem ersten Entwurf:
+  # KEINE Markennamen ("nintendo"/"playstation"/"xbox") als Kontext --
+  # jede Regel dieser Datei verlangt ohnehin eine Markennennung in
+  # require_all_of-Gruppe 1, d.h. ein Titel, der die Kategorie ueberhaupt
+  # erreicht, enthaelt fast tautologisch einen Markennamen (der Zielfall
+  # selbst enthaelt sowohl "Nintendo" als auch "Playstation" als reine
+  # Markennennungen, ohne dass eines der beiden Geraete verkauft wird).
+  # Ebenso bewusst OHNE "slim"/"pro"/"bundle"/"mit spiele": die
+  # auslösende Regel "PS4 Slim / Pro Bundle" hat "slim"+"pro" selbst in
+  # ihrer require_all_of-Gruppe 2 -- als Kontext-Marker verwendet, waeren
+  # sie fuer genau diesen Regelfamilien-Fall immer trivial erfuellt und
+  # wuerden das Gate wirkungslos machen. Blast Radius: 0 Belege fuer eine
+  # echte "repariert"-Zustandsbeschreibung im gesamten verfuegbaren
+  # Korpus (docs/DASHBOARD_MATCH_FORENSICS.json, found.json,
+  # price_history.jsonl via title_recovery) -- alle 3 gefundenen
+  # "reparatur"/"repariert"-Titel in dieser Kategorie sind Reparatur-
+  # Dienstleistungs-/Werkzeug-Angebote.
+  reparatur:
+    - "konsole"
+    - "spielkonsole"
+    - "spielekonsole"
+    - "heimkonsole"
+    - "system"
+    - "1tb"
+    - "500gb"
+    - "128gb"
+    - "64gb"
+    - "32gb"
+    - "256gb"
+    - "512gb"
+    - "2tb"
+    - "xl"
+    - "oled"
+    - "lite"
+    - "v1"
+    - "v2"
+    - "ovp"
   # FIX (Ruleset-Qualitaetssystem, 251-Listing-Stichprobe 2026-08-14):
   # "Joy-Con" ist wie "Pro Controller" ein eindeutiger Zubehoer-Produktname,
   # der als Standalone-Angebot faelschlich matcht (z.B. "SW - Original
