@@ -257,6 +257,51 @@ exclude_category_unless_also_contains:
     - "lite"
     - "v1"
     - "v2"
+  # FIX (Nutzer-Meldung 2026-08-15, Live-Fehltreffer): "ovp" ist in der
+  # Switch-Standard- und Xbox-One-require_all_of-Gruppe-2 bewusst als
+  # Positivsignal erhalten, die reine Wort-Praesenz-Pruefung
+  # (matcher.py::_contains_term()) erkennt aber keine Verneinung -- "ohne
+  # OVP"/"keine OVP" (== OHNE Originalverpackung, ein reines
+  # Zustandsmerkmal, das bei EINZELSPIELEN genauso haeufig vorkommt wie bei
+  # Konsolen) wird faelschlich als Geraete-Nachweis gewertet. Real
+  # bestaetigt: "Hogwarts Legacy - ohne OVP - Nintendo Switch" (25€,
+  # Top-Deal), "Ring Fit Adventure (Nintendo Switch) keine OVP" (23€),
+  # "POKEMON SCHILD OHNE OVP NINTENDO SWITCH" (22€) -- alle drei
+  # Einzelspiele, keine Konsole. Kontextliste: Vereinigung der
+  # Switch-Standard- und Xbox-One-Gruppe-2-Positivsignale OHNE "ovp" selbst
+  # (das waere der urspruengliche schwache Marker) -- identisches Prinzip
+  # wie "komplett" in retro_konsolen.yaml. PS4-Regel nicht betroffen (deren
+  # eigene Gruppe 2 enthaelt "ovp" gar nicht). Blast-Radius-Check gegen den
+  # vollen 2.474-Titel-Korpus: alle 3 Treffer mit "ohne/kein/keine ovp" in
+  # dieser Kategorie sind reale Fehltreffer, 0 Kollisionen (kein einziges
+  # Konsolen-Bundle mit verneintem OVP im gesamten Korpus).
+  "ohne ovp":
+    - "konsole"
+    - "spielkonsole"
+    - "spielekonsole"
+    - "heimkonsole"
+    - "bundle"
+    - "set"
+    - "mit spiele"
+    - "system"
+  "kein ovp":
+    - "konsole"
+    - "spielkonsole"
+    - "spielekonsole"
+    - "heimkonsole"
+    - "bundle"
+    - "set"
+    - "mit spiele"
+    - "system"
+  "keine ovp":
+    - "konsole"
+    - "spielkonsole"
+    - "spielekonsole"
+    - "heimkonsole"
+    - "bundle"
+    - "set"
+    - "mit spiele"
+    - "system"
   gehäuse:
     - "vergilbt"
     - "verkratzt"
@@ -343,6 +388,29 @@ exclude_category_unless_also_contains:
   "für xbox": *plattform_geraete_marker
   "für xbox one": *plattform_geraete_marker
   "für xbox series": *plattform_geraete_marker
+  # FIX (Nutzer-Meldung 2026-08-15, Live-Fehltreffer): "für die Switch"
+  # (Artikel zwischen "für" und Plattformname eingeschoben) wird von "für
+  # switch"/"für nintendo switch" oben NICHT erfasst, da
+  # matcher.py::_contains_term() die komplette Phrase als zusammenhaengenden
+  # Substring prueft (siehe Docstring) -- ein eingeschobenes Wort bricht den
+  # Treffer. Real bestaetigt: "Luigis Mansion 2 HD für die Switch, Switch
+  # Lite, Switch2" (35€, Top-Deal ueber die Switch-Lite-Regel, die -- anders
+  # als die Standard-Switch-Regel -- gar keine eigene Geraete-Marker-Gruppe
+  # hat, siehe Kommentar dort) -- ein Einzelspiel mit Plattform-
+  # Kompatibilitaetsliste, keine Konsole. Da exclude_category_unless_also_
+  # contains kategorieweit (nicht pro Regel) greift, deckt dieser Eintrag
+  # automatisch auch die Switch-Lite-Regel mit ab, ohne deren eigene
+  # require_all_of anzufassen (eine generelle Geraete-Marker-Pflicht dort
+  # wuerde ~25 von 30 echten Standalone-Switch-Lite-Verkaeufen zerstoeren,
+  # siehe Blast-Radius-Check -- "Nintendo Switch Lite" ist als Markenname
+  # bereits eng genug, im Gegensatz zu "Nintendo Switch"). 0 Kollisionen im
+  # vollstaendigen Korpus (kein einziger Treffer fuer dieses Muster).
+  # Bekannte Restluecke: "den"/"einen"/"eine" als Artikel-Variante sowie
+  # PS4/PS5/Xbox-Aequivalente bewusst NICHT ergaenzt -- kein bestaetigter
+  # Fall, analog zur Dokumentationskonvention dieser Datei (nur real
+  # bestaetigte Muster, keine Spekulation).
+  "für die switch": *plattform_geraete_marker
+  "für die nintendo switch": *plattform_geraete_marker
   # Nachtrag (Dashboard-Match-Validierung Variante C, Schritt 2 --
   # separate Review-Runde): "[Plattform] - [Spieltitel]" ist wie "für
   # [Plattform]" praktisch immer eine Formulierung fuer ein Spiel/
