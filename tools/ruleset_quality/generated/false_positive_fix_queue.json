@@ -28,6 +28,60 @@
   },
   {
     "priority": "P1",
+    "category": "konsolen_bundles",
+    "affected_count": 1,
+    "representative_listings": [
+      {
+        "listing_id": "https://www.ebay.de/itm/137602406753",
+        "title": "Nintendo Switch 32GB Mario Kart 8 Deluxe Bundle Neon Blau/Rot mit Dock",
+        "price": 135.0
+      }
+    ],
+    "root_cause": "weak_signal",
+    "confidence": "confirmed",
+    "current_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+    "recommended_fix_type": "strengthen_positive_signal",
+    "regression_risk": "HIGH",
+    "affected_categories": [
+      "konsolen_bundles"
+    ],
+    "test_requirements": [
+      "bestehende TRUE_POSITIVE-Tests fuer Regel 'Nintendo Switch (V1/V2/OLED) 👍 Guter Preis' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
+      "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+      "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+    ],
+    "still_active_count": 1,
+    "priority_score": 3
+  },
+  {
+    "priority": "P1",
+    "category": "konsolen_bundles",
+    "affected_count": 1,
+    "representative_listings": [
+      {
+        "listing_id": "https://www.kleinanzeigen.de/s-anzeige/xbox-one-s-1tb-mit-spiele/3479889108-279-4400",
+        "title": "Xbox One S 1TB mit Spiele",
+        "price": 80.0
+      }
+    ],
+    "root_cause": "weak_signal",
+    "confidence": "confirmed",
+    "current_rule": "Xbox One S / One X 👍 Guter Preis",
+    "recommended_fix_type": "strengthen_positive_signal",
+    "regression_risk": "HIGH",
+    "affected_categories": [
+      "konsolen_bundles"
+    ],
+    "test_requirements": [
+      "bestehende TRUE_POSITIVE-Tests fuer Regel 'Xbox One S / One X 👍 Guter Preis' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
+      "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+      "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+    ],
+    "still_active_count": 1,
+    "priority_score": 3
+  },
+  {
+    "priority": "P1",
     "category": "retro_konsolen",
     "affected_count": 1,
     "representative_listings": [
@@ -146,6 +200,33 @@
   },
   {
     "priority": "P1",
+    "category": "konsolen_bundles",
+    "affected_count": 1,
+    "representative_listings": [
+      {
+        "listing_id": "https://www.kleinanzeigen.de/s-anzeige/playstation-5-ps4-ps5-slim-hdmi-port-nintendo-reparatur-usb-pro/3431533294-226-3438",
+        "title": "Playstation 5 PS4 PS5 Slim HDMI Port Nintendo Reparatur USB PRO",
+        "price": 50.0
+      }
+    ],
+    "root_cause": "ambiguous",
+    "confidence": "manual_review",
+    "current_rule": "PS4 Slim / Pro Bundle ★ Top-Deal",
+    "recommended_fix_type": "manual_review",
+    "regression_risk": "MEDIUM",
+    "affected_categories": [
+      "konsolen_bundles"
+    ],
+    "test_requirements": [
+      "bestehende TRUE_POSITIVE-Tests fuer Regel 'PS4 Slim / Pro Bundle ★ Top-Deal' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
+      "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+      "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+    ],
+    "still_active_count": 1,
+    "priority_score": 2
+  },
+  {
+    "priority": "P1",
     "category": "notebook_resell",
     "affected_count": 1,
     "representative_listings": [
@@ -242,60 +323,6 @@
   },
   {
     "priority": "P2",
-    "category": "konsolen_bundles",
-    "affected_count": 1,
-    "representative_listings": [
-      {
-        "listing_id": "https://www.ebay.de/itm/137602406753",
-        "title": "Nintendo Switch 32GB Mario Kart 8 Deluxe Bundle Neon Blau/Rot mit Dock",
-        "price": 135.0
-      }
-    ],
-    "root_cause": "weak_signal",
-    "confidence": "confirmed",
-    "current_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
-    "recommended_fix_type": "strengthen_positive_signal",
-    "regression_risk": "HIGH",
-    "affected_categories": [
-      "konsolen_bundles"
-    ],
-    "test_requirements": [
-      "bestehende TRUE_POSITIVE-Tests fuer Regel 'Nintendo Switch (V1/V2/OLED) 👍 Guter Preis' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
-      "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
-      "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
-    ],
-    "still_active_count": 0,
-    "priority_score": 1
-  },
-  {
-    "priority": "P2",
-    "category": "konsolen_bundles",
-    "affected_count": 1,
-    "representative_listings": [
-      {
-        "listing_id": "https://www.kleinanzeigen.de/s-anzeige/xbox-one-s-1tb-mit-spiele/3479889108-279-4400",
-        "title": "Xbox One S 1TB mit Spiele",
-        "price": 80.0
-      }
-    ],
-    "root_cause": "weak_signal",
-    "confidence": "confirmed",
-    "current_rule": "Xbox One S / One X 👍 Guter Preis",
-    "recommended_fix_type": "strengthen_positive_signal",
-    "regression_risk": "HIGH",
-    "affected_categories": [
-      "konsolen_bundles"
-    ],
-    "test_requirements": [
-      "bestehende TRUE_POSITIVE-Tests fuer Regel 'Xbox One S / One X 👍 Guter Preis' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
-      "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
-      "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
-    ],
-    "still_active_count": 0,
-    "priority_score": 1
-  },
-  {
-    "priority": "P2",
     "category": "retro_konsolen",
     "affected_count": 2,
     "representative_listings": [
@@ -352,32 +379,5 @@
     ],
     "still_active_count": 0,
     "priority_score": 1
-  },
-  {
-    "priority": "P3",
-    "category": "konsolen_bundles",
-    "affected_count": 1,
-    "representative_listings": [
-      {
-        "listing_id": "https://www.kleinanzeigen.de/s-anzeige/playstation-5-ps4-ps5-slim-hdmi-port-nintendo-reparatur-usb-pro/3431533294-226-3438",
-        "title": "Playstation 5 PS4 PS5 Slim HDMI Port Nintendo Reparatur USB PRO",
-        "price": 50.0
-      }
-    ],
-    "root_cause": "ambiguous",
-    "confidence": "manual_review",
-    "current_rule": "PS4 Slim / Pro Bundle ★ Top-Deal",
-    "recommended_fix_type": "manual_review",
-    "regression_risk": "MEDIUM",
-    "affected_categories": [
-      "konsolen_bundles"
-    ],
-    "test_requirements": [
-      "bestehende TRUE_POSITIVE-Tests fuer Regel 'PS4 Slim / Pro Bundle ★ Top-Deal' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
-      "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
-      "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
-    ],
-    "still_active_count": 0,
-    "priority_score": 0
   }
 ]

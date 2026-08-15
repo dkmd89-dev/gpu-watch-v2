@@ -3,7 +3,7 @@
 > **Stand:** 2026-08-15  
 > **Repository:** `dkmd89-dev/gpu-watch-v2`  
 > **Branch:** `main`  
-> **Letzter Code-Commit auf `main` (vor dieser Doku-Aktualisierung):** `7eff392` (Merge PR #42)  
+> **Letzter Code-Commit auf `main` (vor dieser Doku-Aktualisierung):** `9ec8f86` (Merge PR #44)  
 > **Technische Referenz:** `TECHNISCHER_PROJEKTSTATUS.md`
 
 ## Gesamtstatus
@@ -11,33 +11,52 @@
 **Stabil / aktiv weiterentwickelbar.** Seit dem letzten dokumentierten Stand (`7eff392`, PR #42)
 wurde eine vom Nutzer erstellte, manuelle Fehltreffer-Analyse (`FALSE_POSITIVES_ANALYSE_2026-08-15.txt`,
 40 einzeln geprüfte Live-Treffer aus `konsolen_bundles`/`retro_konsolen`/`handhelds`) schrittweise
-mit Einzelfreigabe abgearbeitet (Batch 18 unten): **25 der 34 bestätigten Fehltreffer über 3
+mit Einzelfreigabe abgearbeitet (Batch 18): **25 der 34 bestätigten Fehltreffer über 3
 Kategorien behoben** (Fix A–D), Preis-Anomalie (Fix E) bewusst **nicht** als Regeländerung
-umgesetzt (kein isolierter Root Cause, siehe Batch 18).
+umgesetzt (kein isolierter Root Cause, siehe Batch 18). Direkter Folgeschritt (Batch 19a, PR #45,
+Merge-Commit `8008414`): ein neues read-only Forensik-Tool
+(`tools/ruleset_quality/forensics_false_positives.py`) extrahiert bestätigte FALSE_POSITIVE-Fälle
+kategorienweise und leitet eine priorisierte Fix-Queue ab — **keine YAML-Änderung**. Dieser Batch
+(19b, noch ohne PR-Nummer) enthält zusätzlich eine reine Korrektur: eine bereits vor dieser Session
+im Working Tree versehentlich gelöschte, aktive Produktionsregel (`app/rules/konsolen_bundles.yaml`)
+wurde wiederhergestellt (siehe Batch 19).
 
 ## Verifizierter Stand
 
 ```text
-main (vor dieser Doku-Aktualisierung): 7eff392 (Merge PR #42)
+main (vor dieser Doku-Aktualisierung): 9ec8f86 (Merge PR #44)
 
-Zielgerichteter Testlauf (diese Session, Claude-ausgeführt):
-pytest app/tests/ -k "konsolen_bundle or retro_konsolen or handheld or vita or switch or ovp or kabel"
-  -> 218 passed, 0 failed (20,85s)
+Batch 19a (PR #45, forensics_false_positives.py):
+pytest app/tests/test_forensics_false_positives.py -v -> 24 passed, 0 failed
+pytest app/tests/ -k "ruleset_quality or forensics" -v -> 63 passed, 0 failed
+Tool gegen echten Forensik-Datensatz: 19 bestaetigte FP, Konsistenz mit bekanntem
+  Referenzstand (TP 2252/FP 19/UNCLEAR 35) bestaetigt. 17/19 bereits durch spaetere
+  Fixes verschwunden (KEIN_TREFFER), 2 weiterhin aktiv (iphone P0, retro_konsolen P1).
+Keine app/rules/*.yaml-, matcher.py-, data/*-Aenderung (rein additiv, read-only Tool).
+
+Batch 19b (diese Doku-Aktualisierung, noch ohne PR-Nummer):
+app/rules/konsolen_bundles.yaml -- vor dieser Session versehentlich im Working Tree
+  geloescht (unbestaetigt, kein Commit, keine dokumentierte Migration), wiederhergestellt
+  via `git checkout HEAD -- app/rules/konsolen_bundles.yaml` (reine Restauration, keine
+  inhaltliche Aenderung).
+pytest app/tests/ -k "matcher or category_validation or ruleset" -v
+  -> 373 passed, 0 failed (zuvor 4 failed, siehe Batch 19)
 
 Rule Analyzer:
 355 Regeln
 19 Kategorien
 0 Findings
-Ruleset-Signatur: f6216b45c6440ab5 (geändert gegenüber 59f03f5a2f2c1d7c -- YAML-Änderungen
-  in konsolen_bundles.yaml/retro_konsolen.yaml/handhelds.yaml, siehe Batch 18)
+Ruleset-Signatur: f6216b45c6440ab5 (unveraendert -- reine Restauration, keine inhaltliche
+  YAML-Aenderung in diesem Batch)
 
-data/found.json: 2500 Einträge
-data/price_history.jsonl: 15.199 Datenpunkte (laufender Produktivbetrieb, nicht Teil dieses Batches)
+data/found.json: laufender Produktivbetrieb (Scanner aktiv, PID verifiziert), nicht Teil
+  dieses Batches -- Zaehlung daher hier bewusst nicht erneut ausgewiesen.
 ```
 
 **Volle Suite in dieser Session NICHT ausgeführt** (CLAUDE.md Abschnitt 3.4.4: nur nach expliziter
-Nutzer-Freigabe). Vorheriger dokumentierter Vollstand (Batch 17): 1372/1372. 12 neue Tests in
-diesem Batch (1 bestehender Test angepasst, siehe Batch 18) — Vollverifikation steht noch aus.
+Nutzer-Freigabe). Vorheriger dokumentierter Vollstand (Batch 17): 1372/1372. Batch 18: 13 neue
+Tests. Batch 19a: 24 neue Tests (`test_forensics_false_positives.py`). Batch 19b: keine neuen
+Tests (reine Restauration) — Vollverifikation steht weiterhin aus.
 
 ## Zuletzt abgeschlossene Batches
 
@@ -557,6 +576,50 @@ Volle Suite in dieser Session **nicht** ausgeführt (CLAUDE.md Abschnitt 3.4.4, 
 Nutzer-Freigabe). `rule_analyzer.py`: 0 Findings. Ruleset-Signatur geändert
 (`59f03f5a2f2c1d7c` → `f6216b45c6440ab5`). Reiner YAML-Fix, kein Rebuild nötig.
 
+### 19. Category-False-Positive-Forensics-Tool + Fix-Queue (PR #45, `8008414`) + Korrektur: versehentlich gelöschte `konsolen_bundles.yaml` wiederhergestellt
+
+**19a — neues Tool (`tools/ruleset_quality/forensics_false_positives.py`).** Setzt den
+vom Nutzer vorgegebenen Auftrag „Category False-Positive Forensics + gezielte Fix-Queue" um.
+Vorab vollständige Analyse der bestehenden `tools/ruleset_quality/`-Toolchain (Phase 19.1–19.5) —
+das neue Tool baut **ausschließlich** auf vorhandenen Bausteinen auf
+(`benchmark._after_match_state()`, `label_store.py`, `common.evaluate()`/`load_current_rules()`),
+keine zweite Matching-/Bewertungslogik. Extrahiert die 19 bestätigten `FALSE_POSITIVE`-Fälle aus
+`docs/DASHBOARD_MATCH_FORENSICS.json`, gruppiert sie nach gespeicherter Kategorie, ermittelt den
+aktuellen Match-Zustand über den echten Produktionspfad und leitet eine priorisierte Fix-Queue ab
+(P0–P3). `UNCLEAR`-Fälle werden strikt getrennt als FP-Kandidaten geführt, nie mit bestätigten FP
+vermischt. Root-Cause-Klassifikation übersetzt nur das im Forensik-Snapshot bereits belegte
+`root_cause`/`reason`-Feld in eine feste Taxonomie (`missing_exclude`/`weak_signal`/
+`replacement_part_false_positive`/…) mit `confidence` — unbekannte Werte werden als
+`ambiguous`/`manual_review` ausgewiesen, nie geraten. `FALSE_POSITIVE → andere Kategorie` zählt
+nirgends automatisch als Fix. **Ändert keine YAML-Regeln.**
+
+Lauf gegen den echten Datensatz: 19 bestätigte FP, Konsistenz mit dem bekannten Referenzstand
+(TP 2252/FP 19/UNCLEAR 35) bestätigt. **17 von 19 bereits durch spätere Fixes verschwunden**
+(`KEIN_TREFFER`), 2 weiterhin aktiv: `iphone` (P0, `replacement_part_false_positive`, "Mainboard
+Platine" matcht weiterhin `iPhone 15 Pro Max (≥512GB)`) und `retro_konsolen` (P1, `weak_signal`,
+ein Nintendo-DS-Lite-Fall). 24 neue Tests (`test_forensics_false_positives.py`), zielgerichtete
+Suite `pytest app/tests/ -k "ruleset_quality or forensics"` → 63 passed. Reiner Zusatz unter
+`tools/ruleset_quality/` + `tools/ruleset_quality/generated/` — keine Produktionsdatei berührt.
+
+**19b — Korrektur einer vorbestehenden, unbeabsichtigten Löschung.** Bei der routinemäßigen
+gestuften Testverifikation nach 19a fielen 4 Tests fehl (`test_matcher_handheld_false_positives.py`
+u. a., "Nintendo Switch Lite" matcht nicht mehr). Ursache: `app/rules/konsolen_bundles.yaml` war
+bereits **vor** dieser Session im Working Tree gelöscht — unbestätigt, ohne Commit, ohne
+dokumentierte Migration (verifiziert: kein `konsolen_bundles`-Inhalt in einer anderen YAML
+aufgegangen, `konsolen_bundles` ist weiterhin eine aktive, in `STATUS.md` 28-fach referenzierte
+Kategorie). Vor der Korrektur geprüft, ob ein laufender Prozess dafür verantwortlich sein könnte:
+nein — der aktiv laufende Produktions-Scanner (`python app.py`, seit 05:41 Uhr) liest YAML nur
+lesend, schreibt sie nie. Datei wiederhergestellt via `git checkout HEAD -- app/rules/
+konsolen_bundles.yaml` (reine Restauration bereits committeten Inhalts, keine inhaltliche
+Änderung, Ruleset-Signatur unverändert). Nachweislich behoben: `pytest app/tests/ -k "matcher or
+category_validation or ruleset"` → 373 passed (zuvor 4 failed). **Bewusst nicht angefasst:**
+`data/found.json`/`price_history.jsonl`/`time_to_sell.jsonl` (+ neue `data/seen.json`/
+`gpu_watch.log`) — deren Diffs sind kein Fehler, sondern Live-Laufzeitzustand des aktiv laufenden
+Produktions-Scanners; ein Zurücksetzen hätte reale, über Stunden gesammelte Scan-Ergebnisse
+gelöscht. Ebenfalls bewusst nicht angefasst: mehrere gelöschte, durch neuere Zeitstempel-Versionen
+ersetzte Diagnose-Reports unter `tools/ruleset_quality/generated/` — auf Nutzerentscheidung als
+beabsichtigtes Aufräumen belassen, keine Produktionsauswirkung.
+
 ## Abgeschlossen
 
 - ursprüngliche Phasen 0–10
@@ -601,6 +664,10 @@ Nutzer-Freigabe). `rule_analyzer.py`: 0 Findings. Ruleset-Signatur geändert
 - Nutzer-Fehltreffer-Analyse: 25 von 34 bestätigten Fehltreffern über `konsolen_bundles`/
   `retro_konsolen`/`handhelds` behoben (Fix A–D), 1€-Preisanomalie bewusst nicht als Regeländerung
   umgesetzt, kein isolierter Root Cause (Fix E, Batch 18 oben)
+- Category-False-Positive-Forensics-Tool + priorisierte Fix-Queue umgesetzt (`tools/ruleset_quality/
+  forensics_false_positives.py`, PR #45), read-only, keine YAML-Änderung (Batch 19a oben)
+- Vorbestehende, unbeabsichtigte Löschung von `app/rules/konsolen_bundles.yaml` erkannt und
+  wiederhergestellt (Batch 19b oben)
 
 ## Aktuelle Systemkette
 
@@ -690,14 +757,22 @@ Wichtige Architekturregeln:
     Tausch-/Barter-Platzhalter-Preise, unbekannter Einzelfall) statt eines isolierten Root Cause
     wie beim GPU-0€-Fund (Batch 16) — keine Datenbasis für eine neue Preisschwelle. Mögliche
     Folgeaufgabe: Tausch-/Barter-Anzeigen-Erkennung als eigener, separat zu entscheidender Schritt.
+20. Category-False-Positive-Forensics-Tool (Batch 19a): **2 der 19 bekannten historischen FP
+    weiterhin aktiv** — `iphone` (P0, Regel "iPhone 15 Pro Max (≥512GB)", matcht weiterhin
+    "Mainboard Platine", `add_replacement_part_guard` empfohlen) und `retro_konsolen` (P1,
+    `weak_signal`). Vollständige Fix-Queue: `tools/ruleset_quality/generated/
+    false_positive_fix_queue.md`. **Noch nicht umgesetzt** — YAML-Fix erfordert eigene Freigabe.
 
 ## Nächste Prioritäten
 
 ### P0 — offene Punkte
 
-- **Volle Testsuite steht nach Batch 18 noch aus** (nur zielgerichtete Suite in dieser Session
-  gelaufen, 218 passed) — vor der nächsten Behauptung über den Gesamt-Teststand `pytest
-  app/tests/` nach expliziter Freigabe tatsächlich ausführen.
+- **Volle Testsuite steht seit Batch 18 noch aus** (Batch 18: nur zielgerichtete Suite, 218
+  passed; Batch 19a: 63 passed; Batch 19b: 373 passed) — vor der nächsten Behauptung über den
+  Gesamt-Teststand `pytest app/tests/` nach expliziter Freigabe tatsächlich ausführen.
+- Fix-Queue-P0-Eintrag aus Batch 19a (`iphone`, `replacement_part_false_positive`) — konkreter,
+  evidenzbasierter Fix-Vorschlag liegt vor, noch nicht umgesetzt, braucht eigene Freigabe (siehe
+  Datenqualität Punkt 20).
 - 9 bewusst offene Restlücken aus der Batch-18-Analyse (Teil 2, „zweifelhafte Treffer") — nur bei
   neuem, eindeutigerem Datenpunkt erneut aufgreifen.
 - Mögliche Folgeaufgabe (noch nicht freigegeben): Tausch-/Barter-Anzeigen-Erkennung
