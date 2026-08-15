@@ -36,9 +36,27 @@ Kategorie" gilt NICHT automatisch als Fix (routing_status B) -- das wird
 in already_resolved explizit abgebildet und fliesst so in die Fix-Queue-
 Priorisierung ein.
 
-Schreibt/aendert NIEMALS app/rules/*.yaml oder sonstige Produktionsdateien.
-Alle Ausgaben landen unter tools/ruleset_quality/generated/.
+Zwei-Ebenen-Assessment (Auftrag "Saubere Trennung historical ground truth /
+current routing assessment"): jeder Fall traegt SEPARAT (1) den historischen
+Ground-Truth-Verdict + gespeicherte Kategorie/Regel (kommt ausschliesslich
+aus dem Forensik-Snapshot, wird NIEMALS veraendert), (2) den aktuellen
+Match-Zustand ueber evaluate() (kommt ausschliesslich aus dem echten
+Produktionspfad) und (3) ein daraus abgeleitetes assessment.status/
+confidence/evidence. Ein historisches FALSE_POSITIVE-Label bedeutet NICHT
+automatisch "aktuell noch ein Fehltreffer" -- und ein aktueller
+GLEICHE_KATEGORIE-Treffer bedeutet NICHT automatisch "historisches Label
+war falsch". Die einzige Ausnahme von der rein automatischen Ableitung ist
+_MANUAL_ASSESSMENT_OVERRIDES: ein kleines, im Code dokumentiertes,
+NIEMALS heuristisch erzeugtes Lookup fuer die wenigen Faelle, in denen ein
+Mensch (siehe active_fp_fix_progress.md) nach Pruefung zusaetzlicher Evidenz
+explizit GROUND_TRUTH_CONFLICT oder MANUAL_REVIEW festgestellt hat --
+"Keine automatische Entscheidung erfinden" gilt uneingeschraenkt.
+
+Schreibt/aendert NIEMALS app/rules/*.yaml, docs/DASHBOARD_MATCH_FORENSICS.json
+oder sonstige Produktionsdateien. Alle Ausgaben landen unter
+tools/ruleset_quality/generated/.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -102,7 +120,10 @@ CONFIDENCE_MANUAL_REVIEW = "manual_review"
 # Werte 1:1 in die Auftrags-Taxonomie. Kein Eintrag hier => keine Vermutung,
 # siehe _translate_root_cause().
 _FORENSICS_ROOT_CAUSE_TRANSLATION: dict[str, tuple[str, str]] = {
-    "Ersatzteil statt Hauptprodukt": (ROOT_CAUSE_REPLACEMENT_PART, CONFIDENCE_CONFIRMED),
+    "Ersatzteil statt Hauptprodukt": (
+        ROOT_CAUSE_REPLACEMENT_PART,
+        CONFIDENCE_CONFIRMED,
+    ),
     "fehlendes Exclude": (ROOT_CAUSE_MISSING_EXCLUDE, CONFIDENCE_CONFIRMED),
     "falsches Positivsignal": (ROOT_CAUSE_WEAK_SIGNAL, CONFIDENCE_CONFIRMED),
 }
@@ -145,6 +166,73 @@ _CONFIDENCE_WEIGHT = {
     CONFIDENCE_MANUAL_REVIEW: 0,
 }
 
+# --- Zwei-Ebenen-Assessment (Auftrag "Saubere Trennung historical ground
+# truth / current routing assessment") --------------------------------------
+
+ASSESSMENT_FIXED = "FIXED"
+ASSESSMENT_STILL_ACTIVE = "STILL_ACTIVE"
+ASSESSMENT_CATEGORY_CHANGED = "CATEGORY_CHANGED"
+ASSESSMENT_MANUAL_REVIEW = "MANUAL_REVIEW"
+ASSESSMENT_GROUND_TRUTH_CONFLICT = "GROUND_TRUTH_CONFLICT"
+
+QUEUE_CATEGORY_ACTIVE_ROUTING_FP = "ACTIVE_ROUTING_FP"
+QUEUE_CATEGORY_GROUND_TRUTH_CONFLICT = "GROUND_TRUTH_CONFLICT"
+QUEUE_CATEGORY_MANUAL_REVIEW = "MANUAL_REVIEW"
+QUEUE_CATEGORY_ALREADY_FIXED = "ALREADY_FIXED"
+
+# Manuelle, kuratierte Uebersteuerungen der automatischen Assessment-
+# Ableitung -- NIEMALS heuristisch/automatisch erzeugt (Auftrag "Keine
+# automatische Entscheidung erfinden"). Jeder Eintrag entspricht einer
+# tatsaechlich im Chat getroffenen, dokumentierten Entscheidung (siehe
+# tools/ruleset_quality/generated/reports/active_fp_fix_progress.md).
+# Key = listing_id (URL). Uebersteuert NUR assessment.status/confidence/
+# evidence -- historical_ground_truth und current_routing_assessment
+# bleiben IMMER die tatsaechlich beobachteten Werte (Forensik-Snapshot
+# bzw. evaluate()) und werden hier nie veraendert.
+_MANUAL_ASSESSMENT_OVERRIDES: dict[str, tuple[str, str, list[str]]] = {
+    # Nintendo Switch 32GB Mario Kart 8 Deluxe Bundle Neon Blau/Rot mit Dock
+    "https://www.ebay.de/itm/137602406753": (
+        ASSESSMENT_GROUND_TRUTH_CONFLICT,
+        CONFIDENCE_HIGH,
+        [
+            "Titel enthaelt echten Speichergroessen-Marker '32GB' (Basis-Switch-Modell) "
+            "sowie ein Spiel (Mario Kart 8 Deluxe) und Zubehoer (Dock) -- liest sich als "
+            "vollstaendiger Konsolenverkauf, nicht als Zubehoer-/Spiele-Angebot.",
+            "Vom Nutzer am 2026-08-15 nach Vorlage der Matchpfad-Analyse explizit als "
+            "korrekt gematchter TRUE_POSITIVE bestaetigt (siehe active_fp_fix_progress.md).",
+            "Keine YAML-Aenderung vorgenommen -- das FALSE_POSITIVE-Label im historischen "
+            "Forensik-Snapshot (Commit 01afd5b, 2026-08-10) ist vermutlich selbst fehlerhaft.",
+        ],
+    ),
+    # Xbox One S 1TB mit Spiele
+    "https://www.kleinanzeigen.de/s-anzeige/xbox-one-s-1tb-mit-spiele/3479889108-279-4400": (
+        ASSESSMENT_GROUND_TRUTH_CONFLICT,
+        CONFIDENCE_HIGH,
+        [
+            "Titel enthaelt echten Speichergroessen-Marker '1TB' (Xbox One S 1TB-Variante), "
+            "keine Zubehoer-/Ersatzteil-Indikatoren.",
+            "Vom Nutzer am 2026-08-15 nach Vorlage der Matchpfad-Analyse explizit als "
+            "korrekt gematchter TRUE_POSITIVE bestaetigt (siehe active_fp_fix_progress.md).",
+            "Keine YAML-Aenderung vorgenommen -- das FALSE_POSITIVE-Label im historischen "
+            "Forensik-Snapshot ist vermutlich selbst fehlerhaft.",
+        ],
+    ),
+    # Nintendo DS Lite Handheld-System Weiss Touchscreen inkl. 4 Spiele
+    "https://www.ebay.de/itm/398266334210": (
+        ASSESSMENT_MANUAL_REVIEW,
+        CONFIDENCE_LOW,
+        [
+            "3 weitere, lexikalisch identisch formulierte 'Handheld-System'-Titel im "
+            "aktuellen Korpus/Preishistorie gefunden, davon 1 selbst als UNCLEAR (nicht "
+            "FALSE_POSITIVE) gelabelt -- kein lexikalisches Unterscheidungsmerkmal zwischen "
+            "dem bestaetigten FP und den mutmasslich echten Treffern gefunden.",
+            "Nutzerentscheidung 2026-08-15 nach Rueckfrage: nicht fixen, aber auch nicht als "
+            "Ground-Truth-Konflikt einstufen -- Status bleibt unsicher (siehe "
+            "active_fp_fix_progress.md).",
+        ],
+    ),
+}
+
 
 @dataclass
 class FalsePositiveCase:
@@ -166,6 +254,13 @@ class FalsePositiveCase:
     root_cause_evidence: list[str]
     recommended_fix_type: str
     regression_risk: str
+    # Zwei-Ebenen-Assessment (siehe Moduldocstring): getrennt vom rohen
+    # routing_status, da routing_status ein objektiver evaluate()-Zustand
+    # ist, waehrend assessment_status auch eine (dokumentierte, nie
+    # automatisch erfundene) menschliche Uebersteuerung einschliessen kann.
+    assessment_status: str = ASSESSMENT_STILL_ACTIVE
+    assessment_confidence: str = CONFIDENCE_MANUAL_REVIEW
+    assessment_evidence: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -180,6 +275,14 @@ class FpCandidateCase:
     current_rule: str
     match_state: str
     note: str
+    # additiv, fuer ein einheitliches Zwei-Ebenen-Schema mit FalsePositiveCase
+    # (siehe ground_truth_routing_assessment.py).
+    routing_status: str = NOT_AVAILABLE
+    # UNCLEAR-Faelle erhalten IMMER MANUAL_REVIEW -- niemals automatisch zu
+    # FALSE_POSITIVE/TRUE_POSITIVE aufgeloest (Auftrag "Fall E").
+    assessment_status: str = ASSESSMENT_MANUAL_REVIEW
+    assessment_confidence: str = CONFIDENCE_MANUAL_REVIEW
+    assessment_evidence: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -197,6 +300,10 @@ class FixQueueEntry:
     test_requirements: list[str] = field(default_factory=list)
     still_active_count: int = 0
     priority_score: int = 0
+    # Auftrag "Fix-Queue-Anpassung": darf NICHT mehr implizieren, dass jeder
+    # historische FP ein aktuell zu fixender Fall ist. Nur
+    # ACTIVE_ROUTING_FP-Eintraege bekommen eine P0-P3-Prioritaet.
+    queue_category: str = QUEUE_CATEGORY_MANUAL_REVIEW
 
 
 def _match_path(category: str | None, rule: str | None) -> str:
@@ -215,14 +322,20 @@ def load_forensics_entries(path: Path = FORENSICS_SOURCE) -> list[dict]:
     return data.get("entries", [])
 
 
-def _translate_root_cause(raw_root_cause: str | None, reason: str | None) -> tuple[str, str, list[str]]:
+def _translate_root_cause(
+    raw_root_cause: str | None, reason: str | None
+) -> tuple[str, str, list[str]]:
     evidence: list[str] = []
     if raw_root_cause:
         evidence.append(f'Forensik-Snapshot root_cause: "{raw_root_cause}"')
     if reason:
         evidence.append(f'Forensik-Snapshot reason: "{reason}"')
 
-    translation = _FORENSICS_ROOT_CAUSE_TRANSLATION.get(raw_root_cause) if raw_root_cause else None
+    translation = (
+        _FORENSICS_ROOT_CAUSE_TRANSLATION.get(raw_root_cause)
+        if raw_root_cause
+        else None
+    )
     if translation is None:
         evidence.append(
             "Kein bekannter Uebersetzungseintrag fuer diesen Forensik-root_cause-Wert -- "
@@ -234,6 +347,59 @@ def _translate_root_cause(raw_root_cause: str | None, reason: str | None) -> tup
     return canonical, confidence, evidence
 
 
+def _compute_fp_assessment(
+    listing_id: str, routing_status: str
+) -> tuple[str, str, list[str]]:
+    """Leitet assessment.status/confidence/evidence rein aus dem objektiven
+    routing_status ab (Faelle A-C des Auftrags) -- AUSSER es existiert ein
+    dokumentierter manueller Override (Fall D des Auftrags: 'zusaetzliche
+    manuelle Evidenz zeigt, dass der historische FP vermutlich eigentlich
+    ein TRUE_POSITIVE war'). Erfindet nichts: ANDERE_REGEL (gleiche
+    Kategorie, anderer Matchpfad) wird nie automatisch als TP/FP entschieden,
+    sondern als MANUAL_REVIEW ausgewiesen (Auftrag "FALSE_POSITIVE -> OTHER_
+    RULE = separat pruefen")."""
+    override = _MANUAL_ASSESSMENT_OVERRIDES.get(listing_id)
+    if override:
+        return override
+
+    if routing_status == ROUTING_STATUS_NO_MATCH:
+        return (
+            ASSESSMENT_FIXED,
+            CONFIDENCE_CONFIRMED,
+            [
+                "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+            ],
+        )
+    if routing_status == ROUTING_STATUS_SAME_CATEGORY:
+        return (
+            ASSESSMENT_STILL_ACTIVE,
+            CONFIDENCE_CONFIRMED,
+            [
+                "aktueller Match-Zustand: GLEICHE_KATEGORIE -- Fehltreffer weiterhin "
+                "unveraendert aktiv (keine dokumentierte Uebersteuerung vorhanden)."
+            ],
+        )
+    if routing_status == ROUTING_STATUS_CATEGORY_CHANGED:
+        return (
+            ASSESSMENT_CATEGORY_CHANGED,
+            CONFIDENCE_CONFIRMED,
+            [
+                "aktueller Match-Zustand: ANDERE_KATEGORIE -- gilt NICHT automatisch als "
+                "Fix (Auftragsvorgabe), erfordert gesonderte Pruefung.",
+            ],
+        )
+    if routing_status == ROUTING_STATUS_RULE_CHANGED:
+        return (
+            ASSESSMENT_MANUAL_REVIEW,
+            CONFIDENCE_MEDIUM,
+            [
+                "aktueller Match-Zustand: ANDERE_REGEL (gleiche Kategorie, anderer "
+                "Matchpfad) -- separat zu pruefen, kein automatisches TP/FP-Urteil moeglich.",
+            ],
+        )
+    raise ValueError(f"unbekannter routing_status: {routing_status!r}")  # pragma: no cover
+
+
 def build_case(entry: dict, rules_cfg: dict) -> FalsePositiveCase:
     title = entry.get("title")
     price = entry.get("price", 0.0) or 0.0
@@ -242,18 +408,28 @@ def build_case(entry: dict, rules_cfg: dict) -> FalsePositiveCase:
     stored_rule = entry.get("stored_rule_label") or NOT_AVAILABLE
 
     result = evaluate(title, price, rules_cfg) if title else None
-    after_state = _after_match_state(result, entry.get("category"), entry.get("stored_rule_label"))
+    after_state = _after_match_state(
+        result, entry.get("category"), entry.get("stored_rule_label")
+    )
     routing_status = _AFTER_STATE_TO_ROUTING_STATUS[after_state]
 
     matched = bool(result and result.matched)
     current_category = result.category if matched else "KEIN_TREFFER"
     current_rule = result.rule_label if matched else "KEIN_TREFFER"
 
-    root_cause, confidence, evidence = _translate_root_cause(entry.get("root_cause"), entry.get("reason"))
-    evidence.append(f"aktueller Match-Zustand: {after_state} (routing_status={routing_status})")
+    root_cause, confidence, evidence = _translate_root_cause(
+        entry.get("root_cause"), entry.get("reason")
+    )
+    evidence.append(
+        f"aktueller Match-Zustand: {after_state} (routing_status={routing_status})"
+    )
 
     fix_type = _FIX_TYPE_BY_ROOT_CAUSE.get(root_cause, "unknown")
     risk = _REGRESSION_RISK_BY_FIX_TYPE.get(fix_type, "MEDIUM")
+
+    assessment_status, assessment_confidence, assessment_evidence = (
+        _compute_fp_assessment(url, routing_status)
+    )
 
     return FalsePositiveCase(
         listing_id=url,
@@ -264,8 +440,12 @@ def build_case(entry: dict, rules_cfg: dict) -> FalsePositiveCase:
         stored_rule=stored_rule,
         current_category=current_category,
         current_rule=current_rule,
-        match_path_before=_match_path(entry.get("category"), entry.get("stored_rule_label")),
-        match_path_after=_match_path(result.category, result.rule_label) if matched else "KEIN_TREFFER",
+        match_path_before=_match_path(
+            entry.get("category"), entry.get("stored_rule_label")
+        ),
+        match_path_after=_match_path(result.category, result.rule_label)
+        if matched
+        else "KEIN_TREFFER",
         match_state=after_state,
         routing_status=routing_status,
         already_resolved=routing_status in RESOLVED_ROUTING_STATUSES,
@@ -274,6 +454,9 @@ def build_case(entry: dict, rules_cfg: dict) -> FalsePositiveCase:
         root_cause_evidence=evidence,
         recommended_fix_type=fix_type,
         regression_risk=risk,
+        assessment_status=assessment_status,
+        assessment_confidence=assessment_confidence,
+        assessment_evidence=assessment_evidence,
     )
 
 
@@ -282,8 +465,11 @@ def build_candidate(entry: dict, rules_cfg: dict) -> FpCandidateCase:
     price = entry.get("price", 0.0) or 0.0
 
     result = evaluate(title, price, rules_cfg) if title else None
-    after_state = _after_match_state(result, entry.get("category"), entry.get("stored_rule_label"))
+    after_state = _after_match_state(
+        result, entry.get("category"), entry.get("stored_rule_label")
+    )
     matched = bool(result and result.matched)
+    routing_status = _AFTER_STATE_TO_ROUTING_STATUS[after_state]
 
     return FpCandidateCase(
         listing_id=entry.get("url") or NOT_AVAILABLE,
@@ -295,10 +481,17 @@ def build_candidate(entry: dict, rules_cfg: dict) -> FpCandidateCase:
         current_category=result.category if matched else "KEIN_TREFFER",
         current_rule=result.rule_label if matched else "KEIN_TREFFER",
         match_state=after_state,
+        routing_status=routing_status,
         note=(
             "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter "
             "Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
         ),
+        assessment_evidence=[
+            "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird "
+            "gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder "
+            "TRUE_POSITIVE aufgeloest.",
+            f"aktueller Match-Zustand: {after_state}",
+        ],
     )
 
 
@@ -334,7 +527,8 @@ def _priority_score(bucket_cases: list[FalsePositiveCase]) -> int:
     confidence = bucket_cases[0].root_cause_confidence
     risk = bucket_cases[0].regression_risk
     cross_category = any(
-        c.routing_status in (ROUTING_STATUS_CATEGORY_CHANGED, ROUTING_STATUS_RULE_CHANGED)
+        c.routing_status
+        in (ROUTING_STATUS_CATEGORY_CHANGED, ROUTING_STATUS_RULE_CHANGED)
         for c in bucket_cases
     )
     score = 2 * still_active + _CONFIDENCE_WEIGHT.get(confidence, 0)
@@ -355,21 +549,71 @@ def _priority_tier(score: int) -> str:
     return "P3"
 
 
+# Praezedenz, wenn ein Bucket (Kategorie+Regel+root_cause) Faelle mit
+# unterschiedlichem assessment_status mischt (in der aktuellen Datenlage
+# nicht der Fall, aber nicht ausgeschlossen): der "dringendste" Status
+# bestimmt die queue_category des gesamten Buckets.
+_ASSESSMENT_TO_QUEUE_CATEGORY = {
+    ASSESSMENT_STILL_ACTIVE: QUEUE_CATEGORY_ACTIVE_ROUTING_FP,
+    ASSESSMENT_CATEGORY_CHANGED: QUEUE_CATEGORY_ACTIVE_ROUTING_FP,
+    ASSESSMENT_MANUAL_REVIEW: QUEUE_CATEGORY_MANUAL_REVIEW,
+    ASSESSMENT_GROUND_TRUTH_CONFLICT: QUEUE_CATEGORY_GROUND_TRUTH_CONFLICT,
+    ASSESSMENT_FIXED: QUEUE_CATEGORY_ALREADY_FIXED,
+}
+_QUEUE_CATEGORY_PRECEDENCE = [
+    QUEUE_CATEGORY_ACTIVE_ROUTING_FP,
+    QUEUE_CATEGORY_MANUAL_REVIEW,
+    QUEUE_CATEGORY_GROUND_TRUTH_CONFLICT,
+    QUEUE_CATEGORY_ALREADY_FIXED,
+]
+
+
+def _bucket_queue_category(bucket_cases: list[FalsePositiveCase]) -> str:
+    present = {
+        _ASSESSMENT_TO_QUEUE_CATEGORY[c.assessment_status] for c in bucket_cases
+    }
+    for qc in _QUEUE_CATEGORY_PRECEDENCE:
+        if qc in present:
+            return qc
+    return QUEUE_CATEGORY_MANUAL_REVIEW  # pragma: no cover -- defensiver Fallback
+
+
 def build_fix_queue(cases: list[FalsePositiveCase]) -> list[FixQueueEntry]:
     """Baut die priorisierte Fix-Queue (Auftrag Funktion 6/7). Ein Bucket =
     eine Kategorie + eine Regel + eine root_cause, da eine YAML-Aenderung
-    typischerweise genau eine Regel adressiert. Aendert NIE selbst YAML."""
+    typischerweise genau eine Regel adressiert. Aendert NIE selbst YAML.
+
+    WICHTIG (Auftrag "Fix-Queue-Anpassung"): ein historischer FP impliziert
+    NICHT mehr automatisch einen aktuell zu fixenden Fall. Nur Buckets mit
+    queue_category=ACTIVE_ROUTING_FP bekommen eine P0-P3-Prioritaet;
+    GROUND_TRUTH_CONFLICT/MANUAL_REVIEW/ALREADY_FIXED-Buckets werden nie
+    als aktiver YAML-Fix priorisiert (priority="N/A")."""
     buckets: dict[tuple[str, str, str], list[FalsePositiveCase]] = defaultdict(list)
     for c in cases:
         buckets[(c.stored_category, c.stored_rule, c.root_cause)].append(c)
 
     entries: list[FixQueueEntry] = []
     for (category, rule, root_cause), bucket_cases in buckets.items():
-        score = _priority_score(bucket_cases)
-        still_active = sum(1 for c in bucket_cases if not c.already_resolved)
+        queue_category = _bucket_queue_category(bucket_cases)
+        if queue_category == QUEUE_CATEGORY_ACTIVE_ROUTING_FP:
+            score = _priority_score(bucket_cases)
+            priority = _priority_tier(score)
+        else:
+            score = 0
+            priority = "N/A"
+        still_active = sum(
+            1
+            for c in bucket_cases
+            if c.assessment_status
+            in (ASSESSMENT_STILL_ACTIVE, ASSESSMENT_CATEGORY_CHANGED)
+        )
         affected_categories = sorted(
             {category}
-            | {c.current_category for c in bucket_cases if c.current_category not in (category, "KEIN_TREFFER")}
+            | {
+                c.current_category
+                for c in bucket_cases
+                if c.current_category not in (category, "KEIN_TREFFER")
+            }
         )
         fix_type = bucket_cases[0].recommended_fix_type
         risk = bucket_cases[0].regression_risk
@@ -390,10 +634,20 @@ def build_fix_queue(cases: list[FalsePositiveCase]) -> list[FixQueueEntry]:
         test_requirements.append(
             "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
         )
+        if queue_category == QUEUE_CATEGORY_GROUND_TRUTH_CONFLICT:
+            test_requirements.append(
+                "KEINE YAML-Aenderung geplant -- historisches FALSE_POSITIVE-Label gilt als "
+                "vermutlich fehlerhaft, aktuelles Matcher-Verhalten wird als korrekt eingestuft."
+            )
+        elif queue_category == QUEUE_CATEGORY_MANUAL_REVIEW:
+            test_requirements.append(
+                "KEINE automatische YAML-Aenderung -- Status bleibt unsicher, erfordert "
+                "zusaetzliche Evidenz (z.B. Beschreibungstext/Bildmaterial) vor einer Entscheidung."
+            )
 
         entries.append(
             FixQueueEntry(
-                priority=_priority_tier(score),
+                priority=priority,
                 category=category,
                 affected_count=len(bucket_cases),
                 representative_listings=[
@@ -409,10 +663,24 @@ def build_fix_queue(cases: list[FalsePositiveCase]) -> list[FixQueueEntry]:
                 test_requirements=test_requirements,
                 still_active_count=still_active,
                 priority_score=score,
+                queue_category=queue_category,
             )
         )
 
-    entries.sort(key=lambda e: (-e.priority_score, e.category, e.current_rule))
+    _queue_category_order = {
+        QUEUE_CATEGORY_ACTIVE_ROUTING_FP: 0,
+        QUEUE_CATEGORY_MANUAL_REVIEW: 1,
+        QUEUE_CATEGORY_GROUND_TRUTH_CONFLICT: 2,
+        QUEUE_CATEGORY_ALREADY_FIXED: 3,
+    }
+    entries.sort(
+        key=lambda e: (
+            _queue_category_order.get(e.queue_category, 9),
+            -e.priority_score,
+            e.category,
+            e.current_rule,
+        )
+    )
     return entries
 
 
@@ -450,7 +718,9 @@ def build_report(
     confirmed_all, candidates_all = extract_cases(entries, rules_cfg, category=None)
     fix_queue_canonical = build_fix_queue(confirmed_all)
 
-    confirmed_view, candidates_view = extract_cases(entries, rules_cfg, category=category)
+    confirmed_view, candidates_view = extract_cases(
+        entries, rules_cfg, category=category
+    )
     if only_fp:
         candidates_view = []
 
@@ -458,7 +728,9 @@ def build_report(
     candidates_by_category = group_by_category(candidates_view)
 
     fix_queue_view = (
-        [e for e in fix_queue_canonical if e.category == category] if category else fix_queue_canonical
+        [e for e in fix_queue_canonical if e.category == category]
+        if category
+        else fix_queue_canonical
     )
 
     return {
@@ -485,8 +757,14 @@ def build_report(
 def _serialize(report: dict) -> dict:
     return {
         "meta": report["meta"],
-        "confirmed_by_category": {k: [asdict(c) for c in v] for k, v in report["confirmed_by_category"].items()},
-        "candidates_by_category": {k: [asdict(c) for c in v] for k, v in report["candidates_by_category"].items()},
+        "confirmed_by_category": {
+            k: [asdict(c) for c in v]
+            for k, v in report["confirmed_by_category"].items()
+        },
+        "candidates_by_category": {
+            k: [asdict(c) for c in v]
+            for k, v in report["candidates_by_category"].items()
+        },
         "fix_queue": [asdict(e) for e in report["fix_queue_view"]],
     }
 
@@ -502,7 +780,9 @@ def render_text_report(report: dict) -> str:
     lines.append("")
 
     if not confirmed_by_category:
-        lines.append("(keine bestaetigten FALSE_POSITIVE-Faelle fuer den aktuellen Filter)")
+        lines.append(
+            "(keine bestaetigten FALSE_POSITIVE-Faelle fuer den aktuellen Filter)"
+        )
         lines.append("")
 
     for category, cases in confirmed_by_category.items():
@@ -516,8 +796,12 @@ def render_text_report(report: dict) -> str:
             lines.append(f"    current_category: {c.current_category}")
             lines.append(f"    stored_rule: {c.stored_rule}")
             lines.append(f"    current_rule: {c.current_rule}")
-            lines.append(f"    match_path: {c.match_path_before} -> {c.match_path_after}")
-            lines.append(f"    match_state: {c.match_state} (routing_status={c.routing_status})")
+            lines.append(
+                f"    match_path: {c.match_path_before} -> {c.match_path_after}"
+            )
+            lines.append(
+                f"    match_state: {c.match_state} (routing_status={c.routing_status})"
+            )
             lines.append(f"    root_cause: {c.root_cause}")
             lines.append(f"    confidence: {c.root_cause_confidence}")
             lines.append("    evidence:")
@@ -525,11 +809,18 @@ def render_text_report(report: dict) -> str:
                 lines.append(f"      - {ev}")
             lines.append(f"    recommended_fix: {c.recommended_fix_type}")
             lines.append(f"    regression_risk: {c.regression_risk}")
+            lines.append(
+                f"    assessment: {c.assessment_status} (confidence={c.assessment_confidence})"
+            )
+            for ev in c.assessment_evidence:
+                lines.append(f"      - {ev}")
             lines.append("")
         lines.append("")
 
     if candidates_by_category:
-        lines.append("FP-KANDIDATEN (Ground-Truth-Verdict UNCLEAR -- KEINE bestaetigten FPs)")
+        lines.append(
+            "FP-KANDIDATEN (Ground-Truth-Verdict UNCLEAR -- KEINE bestaetigten FPs)"
+        )
         lines.append("=" * 70)
         for category, cases in candidates_by_category.items():
             lines.append(f"{category} ({len(cases)})")
@@ -547,8 +838,12 @@ def render_text_report(report: dict) -> str:
     for category in all_categories:
         confirmed_n = len(confirmed_by_category.get(category, []))
         candidate_n = len(candidates_by_category.get(category, []))
-        root_causes = sorted({c.root_cause for c in confirmed_by_category.get(category, [])})
-        cat_priorities = sorted({e.priority for e in fix_queue if e.category == category})
+        root_causes = sorted(
+            {c.root_cause for c in confirmed_by_category.get(category, [])}
+        )
+        cat_priorities = sorted(
+            {e.priority for e in fix_queue if e.category == category}
+        )
         lines.append(
             f"{category:<20} | {confirmed_n:<12} | {candidate_n:<10} | "
             f"{', '.join(root_causes) or '-':<45} | {', '.join(cat_priorities) or '-'}"
@@ -557,18 +852,31 @@ def render_text_report(report: dict) -> str:
 
     lines.append("FIX QUEUE")
     lines.append("=" * 9)
-    for tier in ("P0", "P1", "P2", "P3"):
-        tier_entries = [e for e in fix_queue if e.priority == tier]
-        if not tier_entries:
+    lines.append(
+        "Gruppiert nach queue_category -- nur ACTIVE_ROUTING_FP hat eine P0-P3-Prioritaet, "
+        "die anderen Kategorien implizieren KEINEN offenen YAML-Fix-Bedarf."
+    )
+    lines.append("")
+    for qc in (
+        QUEUE_CATEGORY_ACTIVE_ROUTING_FP,
+        QUEUE_CATEGORY_MANUAL_REVIEW,
+        QUEUE_CATEGORY_GROUND_TRUTH_CONFLICT,
+        QUEUE_CATEGORY_ALREADY_FIXED,
+    ):
+        qc_entries = [e for e in fix_queue if e.queue_category == qc]
+        if not qc_entries:
             continue
-        lines.append(f"{tier}:")
-        for e in tier_entries:
-            lines.append(
-                f"  [{e.category}] Regel '{e.current_rule}' -- root_cause={e.root_cause} "
-                f"(confidence={e.confidence}), {e.affected_count} Fall/Faelle "
-                f"({e.still_active_count} weiterhin aktiv) -- "
-                f"fix={e.recommended_fix_type}, risk={e.regression_risk}"
-            )
+        lines.append(f"{qc}:")
+        for tier in ("P0", "P1", "P2", "P3", "N/A"):
+            tier_entries = [e for e in qc_entries if e.priority == tier]
+            for e in tier_entries:
+                prio = f"{tier}: " if tier != "N/A" else ""
+                lines.append(
+                    f"  {prio}[{e.category}] Regel '{e.current_rule}' -- root_cause={e.root_cause} "
+                    f"(confidence={e.confidence}), {e.affected_count} Fall/Faelle "
+                    f"({e.still_active_count} weiterhin aktiv) -- "
+                    f"fix={e.recommended_fix_type}, risk={e.regression_risk}"
+                )
         lines.append("")
 
     return "\n".join(lines)
@@ -582,23 +890,36 @@ def render_fix_queue_markdown(fix_queue: list[FixQueueEntry]) -> str:
         "Aendert KEINE YAML-Regeln -- die Entscheidung liegt beim Entwickler.",
         "",
     ]
-    for tier in ("P0", "P1", "P2", "P3"):
-        tier_entries = [e for e in fix_queue if e.priority == tier]
-        if not tier_entries:
+    for qc in (
+        QUEUE_CATEGORY_ACTIVE_ROUTING_FP,
+        QUEUE_CATEGORY_MANUAL_REVIEW,
+        QUEUE_CATEGORY_GROUND_TRUTH_CONFLICT,
+        QUEUE_CATEGORY_ALREADY_FIXED,
+    ):
+        qc_entries = [e for e in fix_queue if e.queue_category == qc]
+        if not qc_entries:
             continue
-        lines.append(f"## {tier}")
+        lines.append(f"## {qc}")
         lines.append("")
-        for e in tier_entries:
-            lines.append(f"### {e.category} :: {e.current_rule}")
+        for e in qc_entries:
+            heading = (
+                f"### [{e.priority}] {e.category} :: {e.current_rule}"
+                if e.priority != "N/A"
+                else f"### {e.category} :: {e.current_rule}"
+            )
+            lines.append(heading)
             lines.append("")
             lines.append(
-                f"- **Problem**: {e.affected_count} bestaetigte(r) Fehltreffer, "
+                f"- **Problem**: {e.affected_count} bestaetigte(r) historische(r) Fehltreffer, "
                 f"root_cause=`{e.root_cause}` (confidence={e.confidence}), "
-                f"{e.still_active_count} davon weiterhin aktiv."
+                f"{e.still_active_count} davon aktuell noch als aktives Routing-Problem "
+                "eingestuft."
             )
             lines.append(f"- **Vorschlag**: `{e.recommended_fix_type}`")
             lines.append(f"- **Regression-Risiko**: {e.regression_risk}")
-            lines.append(f"- **Betroffene Kategorien**: {', '.join(e.affected_categories)}")
+            lines.append(
+                f"- **Betroffene Kategorien**: {', '.join(e.affected_categories)}"
+            )
             lines.append("- **Regressionstests**:")
             for t in e.test_requirements:
                 lines.append(f"  - {t}")
@@ -633,10 +954,17 @@ def write_outputs(report: dict, output_path: Path | None = None) -> dict[str, Pa
     # Fix-Queue: kanonisches Artefakt an fixem Pfad (Auftrag Funktion 6),
     # IMMER aus dem vollstaendigen ungefilterten Datensatz.
     with FIX_QUEUE_JSON.open("w", encoding="utf-8") as f:
-        json.dump([asdict(e) for e in report["fix_queue_canonical"]], f, indent=2, ensure_ascii=False)
+        json.dump(
+            [asdict(e) for e in report["fix_queue_canonical"]],
+            f,
+            indent=2,
+            ensure_ascii=False,
+        )
     written["fix_queue_json"] = FIX_QUEUE_JSON
 
-    FIX_QUEUE_MD.write_text(render_fix_queue_markdown(report["fix_queue_canonical"]), encoding="utf-8")
+    FIX_QUEUE_MD.write_text(
+        render_fix_queue_markdown(report["fix_queue_canonical"]), encoding="utf-8"
+    )
     written["fix_queue_md"] = FIX_QUEUE_MD
 
     return written
@@ -651,19 +979,28 @@ def _parse_args(argv=None) -> argparse.Namespace:
         ),
     )
     parser.add_argument(
-        "--input", type=Path, default=FORENSICS_SOURCE,
+        "--input",
+        type=Path,
+        default=FORENSICS_SOURCE,
         help="Pfad zum Forensik-Ground-Truth-Artefakt (Default: docs/DASHBOARD_MATCH_FORENSICS.json)",
     )
     parser.add_argument(
-        "--output", type=Path, default=None,
+        "--output",
+        type=Path,
+        default=None,
         help="Pfad fuer den Text-/JSON-Report (Default: generated/reports/forensics_false_positives_report.md)",
     )
-    parser.add_argument("--category", type=str, default=None, help="Nur diese Kategorie anzeigen")
     parser.add_argument(
-        "--only-fp", action="store_true",
+        "--category", type=str, default=None, help="Nur diese Kategorie anzeigen"
+    )
+    parser.add_argument(
+        "--only-fp",
+        action="store_true",
         help="Nur bestaetigte FALSE_POSITIVE anzeigen, keine UNCLEAR-FP-Kandidaten",
     )
-    parser.add_argument("--verbose", action="store_true", help="Zusaetzliche Fortschrittsausgaben")
+    parser.add_argument(
+        "--verbose", action="store_true", help="Zusaetzliche Fortschrittsausgaben"
+    )
     return parser.parse_args(argv)
 
 
@@ -675,7 +1012,10 @@ def main(argv=None) -> int:
 
     rules_cfg = load_current_rules()
     report = build_report(
-        input_path=args.input, category=args.category, only_fp=args.only_fp, rules_cfg=rules_cfg,
+        input_path=args.input,
+        category=args.category,
+        only_fp=args.only_fp,
+        rules_cfg=rules_cfg,
     )
 
     if args.verbose:

@@ -293,3 +293,141 @@ class TestBuildReportKonsistenzUndFilter:
         report = build_report(input_path=tmp_path / "nicht_vorhanden.json", rules_cfg={})
         assert report["meta"]["total_entries_in_source"] == 0
         assert report["confirmed_by_category"] == {}
+
+
+class TestZweiEbenenAssessment:
+    """Auftrag "Saubere Trennung historical ground truth / current routing
+    assessment": historical_ground_truth und current_routing_assessment
+    werden getrennt gespeichert, assessment.status wird daraus abgeleitet
+    -- AUSSER ein dokumentierter manueller Override greift (nie eine
+    erfundene Heuristik). Deckt die 6 im Auftrag geforderten Faelle ab."""
+
+    def test_1_historische_fp_kein_treffer_ist_fixed(self, monkeypatch):
+        monkeypatch.setattr(ffp, "evaluate", lambda title, price, cfg: _FakeResult(matched=False))
+        case = build_case(_entry(url="szenario-1"), rules_cfg={})
+        assert case.assessment_status == ffp.ASSESSMENT_FIXED
+        assert case.assessment_confidence == ffp.CONFIDENCE_CONFIRMED
+
+    def test_2_historische_fp_gleiche_kategorie_ist_still_active(self, monkeypatch):
+        monkeypatch.setattr(
+            ffp, "evaluate",
+            lambda title, price, cfg: _FakeResult(matched=True, category="handhelds", rule_label="Steam Deck"),
+        )
+        case = build_case(
+            _entry(url="szenario-2", category="handhelds", stored_rule_label="Steam Deck"), rules_cfg={}
+        )
+        assert case.assessment_status == ffp.ASSESSMENT_STILL_ACTIVE
+
+    def test_3_historische_fp_andere_kategorie_ist_category_changed(self, monkeypatch):
+        monkeypatch.setattr(
+            ffp, "evaluate",
+            lambda title, price, cfg: _FakeResult(matched=True, category="notebook_resell", rule_label="Y"),
+        )
+        case = build_case(_entry(url="szenario-3", category="office_pc"), rules_cfg={})
+        assert case.assessment_status == ffp.ASSESSMENT_CATEGORY_CHANGED
+        # explizit NICHT als FIXED/STILL_ACTIVE fehlinterpretiert:
+        assert case.assessment_status not in (ffp.ASSESSMENT_FIXED, ffp.ASSESSMENT_STILL_ACTIVE)
+
+    def test_4_historische_unclear_ist_immer_manual_review(self, monkeypatch):
+        monkeypatch.setattr(ffp, "evaluate", lambda title, price, cfg: _FakeResult(matched=False))
+        candidate = build_candidate(
+            _entry(url="szenario-4", verdict="UNCLEAR", root_cause="sonstiges"), rules_cfg={}
+        )
+        assert candidate.assessment_status == ffp.ASSESSMENT_MANUAL_REVIEW
+        assert candidate.assessment_confidence == ffp.CONFIDENCE_MANUAL_REVIEW
+
+    def test_5_dokumentierter_override_ergibt_ground_truth_conflict(self, monkeypatch):
+        # Testet den Override-MECHANISMUS generisch (nicht die konkreten
+        # Produktions-URLs aus _MANUAL_ASSESSMENT_OVERRIDES) -- die
+        # Uebersteuerung darf NUR ueber einen expliziten, dokumentierten
+        # Eintrag erfolgen, nie automatisch aus evaluate() abgeleitet werden.
+        monkeypatch.setattr(
+            ffp, "evaluate",
+            lambda title, price, cfg: _FakeResult(matched=True, category="handhelds", rule_label="Steam Deck"),
+        )
+        monkeypatch.setitem(
+            ffp._MANUAL_ASSESSMENT_OVERRIDES,
+            "szenario-5-url",
+            (ffp.ASSESSMENT_GROUND_TRUTH_CONFLICT, ffp.CONFIDENCE_HIGH, ["kuratierte Testevidenz"]),
+        )
+        case = build_case(
+            _entry(url="szenario-5-url", category="handhelds", stored_rule_label="Steam Deck"), rules_cfg={}
+        )
+        assert case.assessment_status == ffp.ASSESSMENT_GROUND_TRUTH_CONFLICT
+        assert case.assessment_confidence == ffp.CONFIDENCE_HIGH
+        assert case.assessment_evidence == ["kuratierte Testevidenz"]
+
+    def test_5b_ohne_override_bleibt_gleiche_kategorie_still_active(self, monkeypatch):
+        # Gegenprobe zu Fall 5: OHNE registrierten Override darf GLEICHE_
+        # KATEGORIE NIEMALS automatisch zu GROUND_TRUTH_CONFLICT werden.
+        monkeypatch.setattr(
+            ffp, "evaluate",
+            lambda title, price, cfg: _FakeResult(matched=True, category="handhelds", rule_label="Steam Deck"),
+        )
+        case = build_case(
+            _entry(url="szenario-5b-kein-override", category="handhelds", stored_rule_label="Steam Deck"),
+            rules_cfg={},
+        )
+        assert case.assessment_status == ffp.ASSESSMENT_STILL_ACTIVE
+        assert case.assessment_status != ffp.ASSESSMENT_GROUND_TRUTH_CONFLICT
+
+    def test_6_ground_truth_datei_wird_niemals_veraendert(self, monkeypatch, tmp_path):
+        monkeypatch.setattr(ffp, "evaluate", lambda title, price, cfg: _FakeResult(matched=False))
+        import json
+
+        data_path = tmp_path / "forensics.json"
+        original_content = json.dumps({"entries": [_entry(url="szenario-6")]})
+        data_path.write_text(original_content, encoding="utf-8")
+
+        build_report(input_path=data_path, rules_cfg={})
+        build_case(_entry(url="szenario-6"), rules_cfg={})
+
+        assert data_path.read_text(encoding="utf-8") == original_content
+
+    def test_andere_regel_gleiche_kategorie_ist_manual_review(self, monkeypatch):
+        # ANDERE_REGEL (Auftrag "FALSE_POSITIVE -> OTHER_RULE = separat
+        # pruefen") wird nie automatisch zu TP/FP entschieden.
+        monkeypatch.setattr(
+            ffp, "evaluate",
+            lambda title, price, cfg: _FakeResult(matched=True, category="handhelds", rule_label="Andere Regel"),
+        )
+        case = build_case(
+            _entry(url="szenario-regel", category="handhelds", stored_rule_label="Steam Deck"), rules_cfg={}
+        )
+        assert case.assessment_status == ffp.ASSESSMENT_MANUAL_REVIEW
+
+    def test_queue_category_ground_truth_conflict_bekommt_keine_prioritaet(self, monkeypatch):
+        monkeypatch.setattr(
+            ffp, "evaluate",
+            lambda title, price, cfg: _FakeResult(matched=True, category="handhelds", rule_label="Steam Deck"),
+        )
+        monkeypatch.setitem(
+            ffp._MANUAL_ASSESSMENT_OVERRIDES,
+            "szenario-queue-url",
+            (ffp.ASSESSMENT_GROUND_TRUTH_CONFLICT, ffp.CONFIDENCE_HIGH, ["Testevidenz"]),
+        )
+        case = build_case(
+            _entry(url="szenario-queue-url", category="handhelds", stored_rule_label="Steam Deck"), rules_cfg={}
+        )
+        queue = build_fix_queue([case])
+        assert queue[0].queue_category == ffp.QUEUE_CATEGORY_GROUND_TRUTH_CONFLICT
+        assert queue[0].priority == "N/A"
+
+    def test_queue_category_still_active_wird_priorisiert(self, monkeypatch):
+        monkeypatch.setattr(
+            ffp, "evaluate",
+            lambda title, price, cfg: _FakeResult(matched=True, category="handhelds", rule_label="Steam Deck"),
+        )
+        case = build_case(
+            _entry(url="szenario-active-queue", category="handhelds", stored_rule_label="Steam Deck"), rules_cfg={}
+        )
+        queue = build_fix_queue([case])
+        assert queue[0].queue_category == ffp.QUEUE_CATEGORY_ACTIVE_ROUTING_FP
+        assert queue[0].priority in ("P0", "P1", "P2", "P3")
+
+    def test_queue_category_fixed_wird_als_already_fixed_gefuehrt(self, monkeypatch):
+        monkeypatch.setattr(ffp, "evaluate", lambda title, price, cfg: _FakeResult(matched=False))
+        case = build_case(_entry(url="szenario-fixed-queue"), rules_cfg={})
+        queue = build_fix_queue([case])
+        assert queue[0].queue_category == ffp.QUEUE_CATEGORY_ALREADY_FIXED
+        assert queue[0].priority == "N/A"

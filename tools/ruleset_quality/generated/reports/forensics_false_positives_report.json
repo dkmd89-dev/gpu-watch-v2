@@ -54,7 +54,12 @@
           "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
         ],
         "recommended_fix_type": "add_replacement_part_guard",
-        "regression_risk": "LOW"
+        "regression_risk": "LOW",
+        "assessment_status": "FIXED",
+        "assessment_confidence": "confirmed",
+        "assessment_evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
       }
     ],
     "handhelds": [
@@ -80,7 +85,12 @@
           "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
         ],
         "recommended_fix_type": "add_exclude",
-        "regression_risk": "LOW"
+        "regression_risk": "LOW",
+        "assessment_status": "FIXED",
+        "assessment_confidence": "confirmed",
+        "assessment_evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/304780620667",
@@ -104,7 +114,12 @@
           "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
         ],
         "recommended_fix_type": "add_exclude",
-        "regression_risk": "LOW"
+        "regression_risk": "LOW",
+        "assessment_status": "FIXED",
+        "assessment_confidence": "confirmed",
+        "assessment_evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/205573628921",
@@ -128,7 +143,12 @@
           "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
         ],
         "recommended_fix_type": "add_exclude",
-        "regression_risk": "LOW"
+        "regression_risk": "LOW",
+        "assessment_status": "FIXED",
+        "assessment_confidence": "confirmed",
+        "assessment_evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/307112118573",
@@ -152,7 +172,12 @@
           "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
         ],
         "recommended_fix_type": "add_exclude",
-        "regression_risk": "LOW"
+        "regression_risk": "LOW",
+        "assessment_status": "FIXED",
+        "assessment_confidence": "confirmed",
+        "assessment_evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
       }
     ],
     "iphone": [
@@ -178,7 +203,12 @@
           "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
         ],
         "recommended_fix_type": "add_replacement_part_guard",
-        "regression_risk": "LOW"
+        "regression_risk": "LOW",
+        "assessment_status": "FIXED",
+        "assessment_confidence": "confirmed",
+        "assessment_evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
       }
     ],
     "konsolen_bundles": [
@@ -204,7 +234,12 @@
           "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
         ],
         "recommended_fix_type": "strengthen_positive_signal",
-        "regression_risk": "HIGH"
+        "regression_risk": "HIGH",
+        "assessment_status": "FIXED",
+        "assessment_confidence": "confirmed",
+        "assessment_evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/137602406753",
@@ -228,7 +263,14 @@
           "aktueller Match-Zustand: GLEICHE_KATEGORIE (routing_status=A_SAME_WRONG_CATEGORY)"
         ],
         "recommended_fix_type": "strengthen_positive_signal",
-        "regression_risk": "HIGH"
+        "regression_risk": "HIGH",
+        "assessment_status": "GROUND_TRUTH_CONFLICT",
+        "assessment_confidence": "high",
+        "assessment_evidence": [
+          "Titel enthaelt echten Speichergroessen-Marker '32GB' (Basis-Switch-Modell) sowie ein Spiel (Mario Kart 8 Deluxe) und Zubehoer (Dock) -- liest sich als vollstaendiger Konsolenverkauf, nicht als Zubehoer-/Spiele-Angebot.",
+          "Vom Nutzer am 2026-08-15 nach Vorlage der Matchpfad-Analyse explizit als korrekt gematchter TRUE_POSITIVE bestaetigt (siehe active_fp_fix_progress.md).",
+          "Keine YAML-Aenderung vorgenommen -- das FALSE_POSITIVE-Label im historischen Forensik-Snapshot (Commit 01afd5b, 2026-08-10) ist vermutlich selbst fehlerhaft."
+        ]
       },
       {
         "listing_id": "https://www.kleinanzeigen.de/s-anzeige/playstation-5-ps4-ps5-slim-hdmi-port-nintendo-reparatur-usb-pro/3431533294-226-3438",
@@ -253,7 +295,12 @@
           "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
         ],
         "recommended_fix_type": "manual_review",
-        "regression_risk": "MEDIUM"
+        "regression_risk": "MEDIUM",
+        "assessment_status": "FIXED",
+        "assessment_confidence": "confirmed",
+        "assessment_evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/257670779909",
@@ -277,7 +324,12 @@
           "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
         ],
         "recommended_fix_type": "strengthen_positive_signal",
-        "regression_risk": "HIGH"
+        "regression_risk": "HIGH",
+        "assessment_status": "FIXED",
+        "assessment_confidence": "confirmed",
+        "assessment_evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
       },
       {
         "listing_id": "https://www.kleinanzeigen.de/s-anzeige/xbox-one-s-1tb-mit-spiele/3479889108-279-4400",
@@ -301,7 +353,14 @@
           "aktueller Match-Zustand: GLEICHE_KATEGORIE (routing_status=A_SAME_WRONG_CATEGORY)"
         ],
         "recommended_fix_type": "strengthen_positive_signal",
-        "regression_risk": "HIGH"
+        "regression_risk": "HIGH",
+        "assessment_status": "GROUND_TRUTH_CONFLICT",
+        "assessment_confidence": "high",
+        "assessment_evidence": [
+          "Titel enthaelt echten Speichergroessen-Marker '1TB' (Xbox One S 1TB-Variante), keine Zubehoer-/Ersatzteil-Indikatoren.",
+          "Vom Nutzer am 2026-08-15 nach Vorlage der Matchpfad-Analyse explizit als korrekt gematchter TRUE_POSITIVE bestaetigt (siehe active_fp_fix_progress.md).",
+          "Keine YAML-Aenderung vorgenommen -- das FALSE_POSITIVE-Label im historischen Forensik-Snapshot ist vermutlich selbst fehlerhaft."
+        ]
       },
       {
         "listing_id": "https://www.kleinanzeigen.de/s-anzeige/nba-2k26-fuer-nintendo-switch-2-ovp-schneller-versand/3479886837-227-7978",
@@ -325,7 +384,12 @@
           "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
         ],
         "recommended_fix_type": "strengthen_positive_signal",
-        "regression_risk": "HIGH"
+        "regression_risk": "HIGH",
+        "assessment_status": "FIXED",
+        "assessment_confidence": "confirmed",
+        "assessment_evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
       }
     ],
     "notebook_resell": [
@@ -351,7 +415,12 @@
           "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
         ],
         "recommended_fix_type": "add_replacement_part_guard",
-        "regression_risk": "LOW"
+        "regression_risk": "LOW",
+        "assessment_status": "FIXED",
+        "assessment_confidence": "confirmed",
+        "assessment_evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
       }
     ],
     "office_pc": [
@@ -377,7 +446,12 @@
           "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
         ],
         "recommended_fix_type": "add_replacement_part_guard",
-        "regression_risk": "LOW"
+        "regression_risk": "LOW",
+        "assessment_status": "FIXED",
+        "assessment_confidence": "confirmed",
+        "assessment_evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/356717584177",
@@ -401,7 +475,12 @@
           "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
         ],
         "recommended_fix_type": "add_replacement_part_guard",
-        "regression_risk": "LOW"
+        "regression_risk": "LOW",
+        "assessment_status": "FIXED",
+        "assessment_confidence": "confirmed",
+        "assessment_evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
       }
     ],
     "retro_konsolen": [
@@ -427,7 +506,13 @@
           "aktueller Match-Zustand: GLEICHE_KATEGORIE (routing_status=A_SAME_WRONG_CATEGORY)"
         ],
         "recommended_fix_type": "strengthen_positive_signal",
-        "regression_risk": "HIGH"
+        "regression_risk": "HIGH",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "low",
+        "assessment_evidence": [
+          "3 weitere, lexikalisch identisch formulierte 'Handheld-System'-Titel im aktuellen Korpus/Preishistorie gefunden, davon 1 selbst als UNCLEAR (nicht FALSE_POSITIVE) gelabelt -- kein lexikalisches Unterscheidungsmerkmal zwischen dem bestaetigten FP und den mutmasslich echten Treffern gefunden.",
+          "Nutzerentscheidung 2026-08-15 nach Rueckfrage: nicht fixen, aber auch nicht als Ground-Truth-Konflikt einstufen -- Status bleibt unsicher (siehe active_fp_fix_progress.md)."
+        ]
       },
       {
         "listing_id": "https://www.kleinanzeigen.de/s-anzeige/sony-playstation-2-original-netzteil-videokabel-memorycard/3480159305-279-756",
@@ -451,7 +536,12 @@
           "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
         ],
         "recommended_fix_type": "strengthen_positive_signal",
-        "regression_risk": "HIGH"
+        "regression_risk": "HIGH",
+        "assessment_status": "FIXED",
+        "assessment_confidence": "confirmed",
+        "assessment_evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/227468195928",
@@ -475,7 +565,12 @@
           "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
         ],
         "recommended_fix_type": "strengthen_positive_signal",
-        "regression_risk": "HIGH"
+        "regression_risk": "HIGH",
+        "assessment_status": "FIXED",
+        "assessment_confidence": "confirmed",
+        "assessment_evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/307106426592",
@@ -499,7 +594,12 @@
           "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
         ],
         "recommended_fix_type": "strengthen_positive_signal",
-        "regression_risk": "HIGH"
+        "regression_risk": "HIGH",
+        "assessment_status": "FIXED",
+        "assessment_confidence": "confirmed",
+        "assessment_evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
       }
     ]
   },
@@ -515,7 +615,14 @@
         "current_category": "KEIN_TREFFER",
         "current_rule": "KEIN_TREFFER",
         "match_state": "KEIN_TREFFER",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/366595666798",
@@ -527,7 +634,14 @@
         "current_category": "konsolen_bundles",
         "current_rule": "Xbox One S / One X 👍 Guter Preis",
         "match_state": "GLEICHE_KATEGORIE",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "A_SAME_WRONG_CATEGORY",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE"
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/407132075434",
@@ -539,7 +653,14 @@
         "current_category": "KEIN_TREFFER",
         "current_rule": "KEIN_TREFFER",
         "match_state": "KEIN_TREFFER",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
       },
       {
         "listing_id": "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-sports-inkl-12-in-1-zubehoer-set/3480799134-227-2661",
@@ -551,7 +672,14 @@
         "current_category": "KEIN_TREFFER",
         "current_rule": "KEIN_TREFFER",
         "match_state": "KEIN_TREFFER",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
       },
       {
         "listing_id": "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-grau-bundle-neue-sticks-kein-drift-extras-/3480736743-279-9668",
@@ -563,7 +691,14 @@
         "current_category": "konsolen_bundles",
         "current_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
         "match_state": "GLEICHE_KATEGORIE",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "A_SAME_WRONG_CATEGORY",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE"
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/407131833744",
@@ -575,7 +710,14 @@
         "current_category": "KEIN_TREFFER",
         "current_rule": "KEIN_TREFFER",
         "match_state": "KEIN_TREFFER",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/800482418310",
@@ -587,7 +729,14 @@
         "current_category": "KEIN_TREFFER",
         "current_rule": "KEIN_TREFFER",
         "match_state": "KEIN_TREFFER",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
       },
       {
         "listing_id": "https://www.kleinanzeigen.de/s-anzeige/pok-mon-let-s-go-evoli-nintendo-switch-ovp-komplett/3480723859-227-3213",
@@ -599,7 +748,14 @@
         "current_category": "KEIN_TREFFER",
         "current_rule": "KEIN_TREFFER",
         "match_state": "KEIN_TREFFER",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/227468705699",
@@ -611,7 +767,14 @@
         "current_category": "KEIN_TREFFER",
         "current_rule": "KEIN_TREFFER",
         "match_state": "KEIN_TREFFER",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/298572812276",
@@ -623,7 +786,14 @@
         "current_category": "konsolen_bundles",
         "current_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
         "match_state": "GLEICHE_KATEGORIE",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "A_SAME_WRONG_CATEGORY",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE"
+        ]
       },
       {
         "listing_id": "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-neon-bundle-neue-sticks-kein-drift-extras/3480680031-279-9668",
@@ -635,7 +805,14 @@
         "current_category": "konsolen_bundles",
         "current_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
         "match_state": "GLEICHE_KATEGORIE",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "A_SAME_WRONG_CATEGORY",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE"
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/298572811262",
@@ -647,7 +824,14 @@
         "current_category": "konsolen_bundles",
         "current_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
         "match_state": "GLEICHE_KATEGORIE",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "A_SAME_WRONG_CATEGORY",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE"
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/377405800415",
@@ -659,7 +843,14 @@
         "current_category": "KEIN_TREFFER",
         "current_rule": "KEIN_TREFFER",
         "match_state": "KEIN_TREFFER",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/267751985916",
@@ -671,7 +862,14 @@
         "current_category": "KEIN_TREFFER",
         "current_rule": "KEIN_TREFFER",
         "match_state": "KEIN_TREFFER",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/267751986716",
@@ -683,7 +881,14 @@
         "current_category": "KEIN_TREFFER",
         "current_rule": "KEIN_TREFFER",
         "match_state": "KEIN_TREFFER",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/128017856305",
@@ -695,7 +900,14 @@
         "current_category": "konsolen_bundles",
         "current_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
         "match_state": "GLEICHE_KATEGORIE",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "A_SAME_WRONG_CATEGORY",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE"
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/188766880820",
@@ -707,7 +919,14 @@
         "current_category": "konsolen_bundles",
         "current_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
         "match_state": "GLEICHE_KATEGORIE",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "A_SAME_WRONG_CATEGORY",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE"
+        ]
       },
       {
         "listing_id": "https://www.kleinanzeigen.de/s-anzeige/2x-nintendo-switch-2-pro-controller-neu-ovp/3480514740-279-924",
@@ -719,7 +938,14 @@
         "current_category": "KEIN_TREFFER",
         "current_rule": "KEIN_TREFFER",
         "match_state": "KEIN_TREFFER",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
       },
       {
         "listing_id": "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-oled-modell-weiss-komplett-mit-ovp/3480437137-279-8400",
@@ -731,7 +957,14 @@
         "current_category": "konsolen_bundles",
         "current_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
         "match_state": "GLEICHE_KATEGORIE",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "A_SAME_WRONG_CATEGORY",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE"
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/287514519935",
@@ -743,7 +976,14 @@
         "current_category": "KEIN_TREFFER",
         "current_rule": "KEIN_TREFFER",
         "match_state": "KEIN_TREFFER",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/336734053355",
@@ -755,7 +995,14 @@
         "current_category": "KEIN_TREFFER",
         "current_rule": "KEIN_TREFFER",
         "match_state": "KEIN_TREFFER",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/278262114576",
@@ -767,7 +1014,14 @@
         "current_category": "KEIN_TREFFER",
         "current_rule": "KEIN_TREFFER",
         "match_state": "KEIN_TREFFER",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/800481313890",
@@ -779,7 +1033,14 @@
         "current_category": "KEIN_TREFFER",
         "current_rule": "KEIN_TREFFER",
         "match_state": "KEIN_TREFFER",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
       },
       {
         "listing_id": "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-pro-controller-in-ovp/3480100632-279-1186",
@@ -791,7 +1052,14 @@
         "current_category": "KEIN_TREFFER",
         "current_rule": "KEIN_TREFFER",
         "match_state": "KEIN_TREFFER",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/327297670888",
@@ -803,7 +1071,14 @@
         "current_category": "konsolen_bundles",
         "current_rule": "PS4 Slim / Pro Bundle 👍 Guter Preis",
         "match_state": "GLEICHE_KATEGORIE",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "A_SAME_WRONG_CATEGORY",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE"
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/286899614096",
@@ -815,7 +1090,14 @@
         "current_category": "KEIN_TREFFER",
         "current_rule": "KEIN_TREFFER",
         "match_state": "KEIN_TREFFER",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/298569642364",
@@ -827,7 +1109,14 @@
         "current_category": "konsolen_bundles",
         "current_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
         "match_state": "GLEICHE_KATEGORIE",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "A_SAME_WRONG_CATEGORY",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE"
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/398090521820",
@@ -839,7 +1128,14 @@
         "current_category": "KEIN_TREFFER",
         "current_rule": "KEIN_TREFFER",
         "match_state": "KEIN_TREFFER",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/318646020850",
@@ -851,7 +1147,14 @@
         "current_category": "KEIN_TREFFER",
         "current_rule": "KEIN_TREFFER",
         "match_state": "KEIN_TREFFER",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/407120679305",
@@ -863,7 +1166,14 @@
         "current_category": "KEIN_TREFFER",
         "current_rule": "KEIN_TREFFER",
         "match_state": "KEIN_TREFFER",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/137596202274",
@@ -875,7 +1185,14 @@
         "current_category": "KEIN_TREFFER",
         "current_rule": "KEIN_TREFFER",
         "match_state": "KEIN_TREFFER",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/298566727139",
@@ -887,7 +1204,14 @@
         "current_category": "KEIN_TREFFER",
         "current_rule": "KEIN_TREFFER",
         "match_state": "KEIN_TREFFER",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/188763698665",
@@ -899,7 +1223,14 @@
         "current_category": "konsolen_bundles",
         "current_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
         "match_state": "GLEICHE_KATEGORIE",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "A_SAME_WRONG_CATEGORY",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE"
+        ]
       },
       {
         "listing_id": "https://www.ebay.de/itm/188763696701",
@@ -911,7 +1242,14 @@
         "current_category": "konsolen_bundles",
         "current_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
         "match_state": "GLEICHE_KATEGORIE",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "A_SAME_WRONG_CATEGORY",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE"
+        ]
       }
     ],
     "retro_konsolen": [
@@ -925,67 +1263,20 @@
         "current_category": "retro_konsolen",
         "current_rule": "Nintendo Retro-Konsole (N64/GameCube/DS) 👍 Guter Preis",
         "match_state": "GLEICHE_KATEGORIE",
-        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+        "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg.",
+        "routing_status": "A_SAME_WRONG_CATEGORY",
+        "assessment_status": "MANUAL_REVIEW",
+        "assessment_confidence": "manual_review",
+        "assessment_evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE"
+        ]
       }
     ]
   },
   "fix_queue": [
     {
-      "priority": "P1",
-      "category": "konsolen_bundles",
-      "affected_count": 1,
-      "representative_listings": [
-        {
-          "listing_id": "https://www.ebay.de/itm/137602406753",
-          "title": "Nintendo Switch 32GB Mario Kart 8 Deluxe Bundle Neon Blau/Rot mit Dock",
-          "price": 135.0
-        }
-      ],
-      "root_cause": "weak_signal",
-      "confidence": "confirmed",
-      "current_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
-      "recommended_fix_type": "strengthen_positive_signal",
-      "regression_risk": "HIGH",
-      "affected_categories": [
-        "konsolen_bundles"
-      ],
-      "test_requirements": [
-        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Nintendo Switch (V1/V2/OLED) 👍 Guter Preis' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
-        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
-        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
-      ],
-      "still_active_count": 1,
-      "priority_score": 3
-    },
-    {
-      "priority": "P1",
-      "category": "konsolen_bundles",
-      "affected_count": 1,
-      "representative_listings": [
-        {
-          "listing_id": "https://www.kleinanzeigen.de/s-anzeige/xbox-one-s-1tb-mit-spiele/3479889108-279-4400",
-          "title": "Xbox One S 1TB mit Spiele",
-          "price": 80.0
-        }
-      ],
-      "root_cause": "weak_signal",
-      "confidence": "confirmed",
-      "current_rule": "Xbox One S / One X 👍 Guter Preis",
-      "recommended_fix_type": "strengthen_positive_signal",
-      "regression_risk": "HIGH",
-      "affected_categories": [
-        "konsolen_bundles"
-      ],
-      "test_requirements": [
-        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Xbox One S / One X 👍 Guter Preis' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
-        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
-        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
-      ],
-      "still_active_count": 1,
-      "priority_score": 3
-    },
-    {
-      "priority": "P1",
+      "priority": "N/A",
       "category": "retro_konsolen",
       "affected_count": 1,
       "representative_listings": [
@@ -1006,13 +1297,73 @@
       "test_requirements": [
         "bestehende TRUE_POSITIVE-Tests fuer Regel 'Nintendo Retro-Konsole (N64/GameCube/DS) ⚠️ Okay' in Kategorie 'retro_konsolen' (z.B. app/tests/test_retro_konsolen.py, falls vorhanden) muessen weiterhin gruen bleiben",
         "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
-        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)",
+        "KEINE automatische YAML-Aenderung -- Status bleibt unsicher, erfordert zusaetzliche Evidenz (z.B. Beschreibungstext/Bildmaterial) vor einer Entscheidung."
       ],
-      "still_active_count": 1,
-      "priority_score": 3
+      "still_active_count": 0,
+      "priority_score": 0,
+      "queue_category": "MANUAL_REVIEW"
     },
     {
-      "priority": "P1",
+      "priority": "N/A",
+      "category": "konsolen_bundles",
+      "affected_count": 1,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.ebay.de/itm/137602406753",
+          "title": "Nintendo Switch 32GB Mario Kart 8 Deluxe Bundle Neon Blau/Rot mit Dock",
+          "price": 135.0
+        }
+      ],
+      "root_cause": "weak_signal",
+      "confidence": "confirmed",
+      "current_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+      "recommended_fix_type": "strengthen_positive_signal",
+      "regression_risk": "HIGH",
+      "affected_categories": [
+        "konsolen_bundles"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Nintendo Switch (V1/V2/OLED) 👍 Guter Preis' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)",
+        "KEINE YAML-Aenderung geplant -- historisches FALSE_POSITIVE-Label gilt als vermutlich fehlerhaft, aktuelles Matcher-Verhalten wird als korrekt eingestuft."
+      ],
+      "still_active_count": 0,
+      "priority_score": 0,
+      "queue_category": "GROUND_TRUTH_CONFLICT"
+    },
+    {
+      "priority": "N/A",
+      "category": "konsolen_bundles",
+      "affected_count": 1,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.kleinanzeigen.de/s-anzeige/xbox-one-s-1tb-mit-spiele/3479889108-279-4400",
+          "title": "Xbox One S 1TB mit Spiele",
+          "price": 80.0
+        }
+      ],
+      "root_cause": "weak_signal",
+      "confidence": "confirmed",
+      "current_rule": "Xbox One S / One X 👍 Guter Preis",
+      "recommended_fix_type": "strengthen_positive_signal",
+      "regression_risk": "HIGH",
+      "affected_categories": [
+        "konsolen_bundles"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Xbox One S / One X 👍 Guter Preis' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)",
+        "KEINE YAML-Aenderung geplant -- historisches FALSE_POSITIVE-Label gilt als vermutlich fehlerhaft, aktuelles Matcher-Verhalten wird als korrekt eingestuft."
+      ],
+      "still_active_count": 0,
+      "priority_score": 0,
+      "queue_category": "GROUND_TRUTH_CONFLICT"
+    },
+    {
+      "priority": "N/A",
       "category": "gaming_pc",
       "affected_count": 1,
       "representative_listings": [
@@ -1036,10 +1387,11 @@
         "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
       ],
       "still_active_count": 0,
-      "priority_score": 2
+      "priority_score": 0,
+      "queue_category": "ALREADY_FIXED"
     },
     {
-      "priority": "P1",
+      "priority": "N/A",
       "category": "handhelds",
       "affected_count": 1,
       "representative_listings": [
@@ -1063,10 +1415,11 @@
         "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
       ],
       "still_active_count": 0,
-      "priority_score": 2
+      "priority_score": 0,
+      "queue_category": "ALREADY_FIXED"
     },
     {
-      "priority": "P1",
+      "priority": "N/A",
       "category": "handhelds",
       "affected_count": 3,
       "representative_listings": [
@@ -1100,10 +1453,11 @@
         "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
       ],
       "still_active_count": 0,
-      "priority_score": 2
+      "priority_score": 0,
+      "queue_category": "ALREADY_FIXED"
     },
     {
-      "priority": "P1",
+      "priority": "N/A",
       "category": "iphone",
       "affected_count": 1,
       "representative_listings": [
@@ -1127,69 +1481,11 @@
         "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
       ],
       "still_active_count": 0,
-      "priority_score": 2
+      "priority_score": 0,
+      "queue_category": "ALREADY_FIXED"
     },
     {
-      "priority": "P1",
-      "category": "notebook_resell",
-      "affected_count": 1,
-      "representative_listings": [
-        {
-          "listing_id": "https://www.ebay.de/itm/357718779954",
-          "title": "Lenovo ThinkPad X390 Mainboard Intel Core i5-8365U 8GB RAM NM-B891",
-          "price": 49.0
-        }
-      ],
-      "root_cause": "replacement_part_false_positive",
-      "confidence": "confirmed",
-      "current_rule": "ThinkPad T14/X13 (Ryzen/Modern) ★ Resell-Top",
-      "recommended_fix_type": "add_replacement_part_guard",
-      "regression_risk": "LOW",
-      "affected_categories": [
-        "notebook_resell"
-      ],
-      "test_requirements": [
-        "bestehende TRUE_POSITIVE-Tests fuer Regel 'ThinkPad T14/X13 (Ryzen/Modern) ★ Resell-Top' in Kategorie 'notebook_resell' (z.B. app/tests/test_notebook_resell.py, falls vorhanden) muessen weiterhin gruen bleiben",
-        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
-        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
-      ],
-      "still_active_count": 0,
-      "priority_score": 2
-    },
-    {
-      "priority": "P1",
-      "category": "office_pc",
-      "affected_count": 2,
-      "representative_listings": [
-        {
-          "listing_id": "https://www.kleinanzeigen.de/s-anzeige/intel-core-i5-8500-mainboard-bundle-16gb-ddr4-ram-netzteil/3480038290-225-13379",
-          "title": "Intel Core i5-8500 Mainboard Bundle 16GB DDR4 RAM Netzteil",
-          "price": 160.0
-        },
-        {
-          "listing_id": "https://www.ebay.de/itm/356717584177",
-          "title": "Lenovo ThinkPad T490s Mainboard nm-b891 Intel i5-8365U / i5-8265U 8GB RAM",
-          "price": 69.0
-        }
-      ],
-      "root_cause": "replacement_part_false_positive",
-      "confidence": "confirmed",
-      "current_rule": "Office-PC (Mindestanforderung erfüllt)",
-      "recommended_fix_type": "add_replacement_part_guard",
-      "regression_risk": "LOW",
-      "affected_categories": [
-        "office_pc"
-      ],
-      "test_requirements": [
-        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Office-PC (Mindestanforderung erfüllt)' in Kategorie 'office_pc' (z.B. app/tests/test_office_pc.py, falls vorhanden) muessen weiterhin gruen bleiben",
-        "Regression gegen alle 2 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
-        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
-      ],
-      "still_active_count": 0,
-      "priority_score": 2
-    },
-    {
-      "priority": "P2",
+      "priority": "N/A",
       "category": "konsolen_bundles",
       "affected_count": 3,
       "representative_listings": [
@@ -1223,10 +1519,100 @@
         "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
       ],
       "still_active_count": 0,
-      "priority_score": 1
+      "priority_score": 0,
+      "queue_category": "ALREADY_FIXED"
     },
     {
-      "priority": "P2",
+      "priority": "N/A",
+      "category": "konsolen_bundles",
+      "affected_count": 1,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.kleinanzeigen.de/s-anzeige/playstation-5-ps4-ps5-slim-hdmi-port-nintendo-reparatur-usb-pro/3431533294-226-3438",
+          "title": "Playstation 5 PS4 PS5 Slim HDMI Port Nintendo Reparatur USB PRO",
+          "price": 50.0
+        }
+      ],
+      "root_cause": "ambiguous",
+      "confidence": "manual_review",
+      "current_rule": "PS4 Slim / Pro Bundle ★ Top-Deal",
+      "recommended_fix_type": "manual_review",
+      "regression_risk": "MEDIUM",
+      "affected_categories": [
+        "konsolen_bundles"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'PS4 Slim / Pro Bundle ★ Top-Deal' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      ],
+      "still_active_count": 0,
+      "priority_score": 0,
+      "queue_category": "ALREADY_FIXED"
+    },
+    {
+      "priority": "N/A",
+      "category": "notebook_resell",
+      "affected_count": 1,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.ebay.de/itm/357718779954",
+          "title": "Lenovo ThinkPad X390 Mainboard Intel Core i5-8365U 8GB RAM NM-B891",
+          "price": 49.0
+        }
+      ],
+      "root_cause": "replacement_part_false_positive",
+      "confidence": "confirmed",
+      "current_rule": "ThinkPad T14/X13 (Ryzen/Modern) ★ Resell-Top",
+      "recommended_fix_type": "add_replacement_part_guard",
+      "regression_risk": "LOW",
+      "affected_categories": [
+        "notebook_resell"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'ThinkPad T14/X13 (Ryzen/Modern) ★ Resell-Top' in Kategorie 'notebook_resell' (z.B. app/tests/test_notebook_resell.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      ],
+      "still_active_count": 0,
+      "priority_score": 0,
+      "queue_category": "ALREADY_FIXED"
+    },
+    {
+      "priority": "N/A",
+      "category": "office_pc",
+      "affected_count": 2,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.kleinanzeigen.de/s-anzeige/intel-core-i5-8500-mainboard-bundle-16gb-ddr4-ram-netzteil/3480038290-225-13379",
+          "title": "Intel Core i5-8500 Mainboard Bundle 16GB DDR4 RAM Netzteil",
+          "price": 160.0
+        },
+        {
+          "listing_id": "https://www.ebay.de/itm/356717584177",
+          "title": "Lenovo ThinkPad T490s Mainboard nm-b891 Intel i5-8365U / i5-8265U 8GB RAM",
+          "price": 69.0
+        }
+      ],
+      "root_cause": "replacement_part_false_positive",
+      "confidence": "confirmed",
+      "current_rule": "Office-PC (Mindestanforderung erfüllt)",
+      "recommended_fix_type": "add_replacement_part_guard",
+      "regression_risk": "LOW",
+      "affected_categories": [
+        "office_pc"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Office-PC (Mindestanforderung erfüllt)' in Kategorie 'office_pc' (z.B. app/tests/test_office_pc.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 2 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      ],
+      "still_active_count": 0,
+      "priority_score": 0,
+      "queue_category": "ALREADY_FIXED"
+    },
+    {
+      "priority": "N/A",
       "category": "retro_konsolen",
       "affected_count": 2,
       "representative_listings": [
@@ -1255,10 +1641,11 @@
         "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
       ],
       "still_active_count": 0,
-      "priority_score": 1
+      "priority_score": 0,
+      "queue_category": "ALREADY_FIXED"
     },
     {
-      "priority": "P2",
+      "priority": "N/A",
       "category": "retro_konsolen",
       "affected_count": 1,
       "representative_listings": [
@@ -1282,34 +1669,8 @@
         "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
       ],
       "still_active_count": 0,
-      "priority_score": 1
-    },
-    {
-      "priority": "P3",
-      "category": "konsolen_bundles",
-      "affected_count": 1,
-      "representative_listings": [
-        {
-          "listing_id": "https://www.kleinanzeigen.de/s-anzeige/playstation-5-ps4-ps5-slim-hdmi-port-nintendo-reparatur-usb-pro/3431533294-226-3438",
-          "title": "Playstation 5 PS4 PS5 Slim HDMI Port Nintendo Reparatur USB PRO",
-          "price": 50.0
-        }
-      ],
-      "root_cause": "ambiguous",
-      "confidence": "manual_review",
-      "current_rule": "PS4 Slim / Pro Bundle ★ Top-Deal",
-      "recommended_fix_type": "manual_review",
-      "regression_risk": "MEDIUM",
-      "affected_categories": [
-        "konsolen_bundles"
-      ],
-      "test_requirements": [
-        "bestehende TRUE_POSITIVE-Tests fuer Regel 'PS4 Slim / Pro Bundle ★ Top-Deal' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
-        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
-        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
-      ],
-      "still_active_count": 0,
-      "priority_score": 0
+      "priority_score": 0,
+      "queue_category": "ALREADY_FIXED"
     }
   ]
 }

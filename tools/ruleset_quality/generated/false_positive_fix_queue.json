@@ -1,60 +1,6 @@
 [
   {
-    "priority": "P1",
-    "category": "konsolen_bundles",
-    "affected_count": 1,
-    "representative_listings": [
-      {
-        "listing_id": "https://www.ebay.de/itm/137602406753",
-        "title": "Nintendo Switch 32GB Mario Kart 8 Deluxe Bundle Neon Blau/Rot mit Dock",
-        "price": 135.0
-      }
-    ],
-    "root_cause": "weak_signal",
-    "confidence": "confirmed",
-    "current_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
-    "recommended_fix_type": "strengthen_positive_signal",
-    "regression_risk": "HIGH",
-    "affected_categories": [
-      "konsolen_bundles"
-    ],
-    "test_requirements": [
-      "bestehende TRUE_POSITIVE-Tests fuer Regel 'Nintendo Switch (V1/V2/OLED) 👍 Guter Preis' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
-      "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
-      "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
-    ],
-    "still_active_count": 1,
-    "priority_score": 3
-  },
-  {
-    "priority": "P1",
-    "category": "konsolen_bundles",
-    "affected_count": 1,
-    "representative_listings": [
-      {
-        "listing_id": "https://www.kleinanzeigen.de/s-anzeige/xbox-one-s-1tb-mit-spiele/3479889108-279-4400",
-        "title": "Xbox One S 1TB mit Spiele",
-        "price": 80.0
-      }
-    ],
-    "root_cause": "weak_signal",
-    "confidence": "confirmed",
-    "current_rule": "Xbox One S / One X 👍 Guter Preis",
-    "recommended_fix_type": "strengthen_positive_signal",
-    "regression_risk": "HIGH",
-    "affected_categories": [
-      "konsolen_bundles"
-    ],
-    "test_requirements": [
-      "bestehende TRUE_POSITIVE-Tests fuer Regel 'Xbox One S / One X 👍 Guter Preis' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
-      "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
-      "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
-    ],
-    "still_active_count": 1,
-    "priority_score": 3
-  },
-  {
-    "priority": "P1",
+    "priority": "N/A",
     "category": "retro_konsolen",
     "affected_count": 1,
     "representative_listings": [
@@ -75,13 +21,73 @@
     "test_requirements": [
       "bestehende TRUE_POSITIVE-Tests fuer Regel 'Nintendo Retro-Konsole (N64/GameCube/DS) ⚠️ Okay' in Kategorie 'retro_konsolen' (z.B. app/tests/test_retro_konsolen.py, falls vorhanden) muessen weiterhin gruen bleiben",
       "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
-      "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)",
+      "KEINE automatische YAML-Aenderung -- Status bleibt unsicher, erfordert zusaetzliche Evidenz (z.B. Beschreibungstext/Bildmaterial) vor einer Entscheidung."
     ],
-    "still_active_count": 1,
-    "priority_score": 3
+    "still_active_count": 0,
+    "priority_score": 0,
+    "queue_category": "MANUAL_REVIEW"
   },
   {
-    "priority": "P1",
+    "priority": "N/A",
+    "category": "konsolen_bundles",
+    "affected_count": 1,
+    "representative_listings": [
+      {
+        "listing_id": "https://www.ebay.de/itm/137602406753",
+        "title": "Nintendo Switch 32GB Mario Kart 8 Deluxe Bundle Neon Blau/Rot mit Dock",
+        "price": 135.0
+      }
+    ],
+    "root_cause": "weak_signal",
+    "confidence": "confirmed",
+    "current_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+    "recommended_fix_type": "strengthen_positive_signal",
+    "regression_risk": "HIGH",
+    "affected_categories": [
+      "konsolen_bundles"
+    ],
+    "test_requirements": [
+      "bestehende TRUE_POSITIVE-Tests fuer Regel 'Nintendo Switch (V1/V2/OLED) 👍 Guter Preis' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
+      "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+      "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)",
+      "KEINE YAML-Aenderung geplant -- historisches FALSE_POSITIVE-Label gilt als vermutlich fehlerhaft, aktuelles Matcher-Verhalten wird als korrekt eingestuft."
+    ],
+    "still_active_count": 0,
+    "priority_score": 0,
+    "queue_category": "GROUND_TRUTH_CONFLICT"
+  },
+  {
+    "priority": "N/A",
+    "category": "konsolen_bundles",
+    "affected_count": 1,
+    "representative_listings": [
+      {
+        "listing_id": "https://www.kleinanzeigen.de/s-anzeige/xbox-one-s-1tb-mit-spiele/3479889108-279-4400",
+        "title": "Xbox One S 1TB mit Spiele",
+        "price": 80.0
+      }
+    ],
+    "root_cause": "weak_signal",
+    "confidence": "confirmed",
+    "current_rule": "Xbox One S / One X 👍 Guter Preis",
+    "recommended_fix_type": "strengthen_positive_signal",
+    "regression_risk": "HIGH",
+    "affected_categories": [
+      "konsolen_bundles"
+    ],
+    "test_requirements": [
+      "bestehende TRUE_POSITIVE-Tests fuer Regel 'Xbox One S / One X 👍 Guter Preis' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
+      "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+      "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)",
+      "KEINE YAML-Aenderung geplant -- historisches FALSE_POSITIVE-Label gilt als vermutlich fehlerhaft, aktuelles Matcher-Verhalten wird als korrekt eingestuft."
+    ],
+    "still_active_count": 0,
+    "priority_score": 0,
+    "queue_category": "GROUND_TRUTH_CONFLICT"
+  },
+  {
+    "priority": "N/A",
     "category": "gaming_pc",
     "affected_count": 1,
     "representative_listings": [
@@ -105,10 +111,11 @@
       "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
     ],
     "still_active_count": 0,
-    "priority_score": 2
+    "priority_score": 0,
+    "queue_category": "ALREADY_FIXED"
   },
   {
-    "priority": "P1",
+    "priority": "N/A",
     "category": "handhelds",
     "affected_count": 1,
     "representative_listings": [
@@ -132,10 +139,11 @@
       "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
     ],
     "still_active_count": 0,
-    "priority_score": 2
+    "priority_score": 0,
+    "queue_category": "ALREADY_FIXED"
   },
   {
-    "priority": "P1",
+    "priority": "N/A",
     "category": "handhelds",
     "affected_count": 3,
     "representative_listings": [
@@ -169,10 +177,11 @@
       "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
     ],
     "still_active_count": 0,
-    "priority_score": 2
+    "priority_score": 0,
+    "queue_category": "ALREADY_FIXED"
   },
   {
-    "priority": "P1",
+    "priority": "N/A",
     "category": "iphone",
     "affected_count": 1,
     "representative_listings": [
@@ -196,69 +205,11 @@
       "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
     ],
     "still_active_count": 0,
-    "priority_score": 2
+    "priority_score": 0,
+    "queue_category": "ALREADY_FIXED"
   },
   {
-    "priority": "P1",
-    "category": "notebook_resell",
-    "affected_count": 1,
-    "representative_listings": [
-      {
-        "listing_id": "https://www.ebay.de/itm/357718779954",
-        "title": "Lenovo ThinkPad X390 Mainboard Intel Core i5-8365U 8GB RAM NM-B891",
-        "price": 49.0
-      }
-    ],
-    "root_cause": "replacement_part_false_positive",
-    "confidence": "confirmed",
-    "current_rule": "ThinkPad T14/X13 (Ryzen/Modern) ★ Resell-Top",
-    "recommended_fix_type": "add_replacement_part_guard",
-    "regression_risk": "LOW",
-    "affected_categories": [
-      "notebook_resell"
-    ],
-    "test_requirements": [
-      "bestehende TRUE_POSITIVE-Tests fuer Regel 'ThinkPad T14/X13 (Ryzen/Modern) ★ Resell-Top' in Kategorie 'notebook_resell' (z.B. app/tests/test_notebook_resell.py, falls vorhanden) muessen weiterhin gruen bleiben",
-      "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
-      "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
-    ],
-    "still_active_count": 0,
-    "priority_score": 2
-  },
-  {
-    "priority": "P1",
-    "category": "office_pc",
-    "affected_count": 2,
-    "representative_listings": [
-      {
-        "listing_id": "https://www.kleinanzeigen.de/s-anzeige/intel-core-i5-8500-mainboard-bundle-16gb-ddr4-ram-netzteil/3480038290-225-13379",
-        "title": "Intel Core i5-8500 Mainboard Bundle 16GB DDR4 RAM Netzteil",
-        "price": 160.0
-      },
-      {
-        "listing_id": "https://www.ebay.de/itm/356717584177",
-        "title": "Lenovo ThinkPad T490s Mainboard nm-b891 Intel i5-8365U / i5-8265U 8GB RAM",
-        "price": 69.0
-      }
-    ],
-    "root_cause": "replacement_part_false_positive",
-    "confidence": "confirmed",
-    "current_rule": "Office-PC (Mindestanforderung erfüllt)",
-    "recommended_fix_type": "add_replacement_part_guard",
-    "regression_risk": "LOW",
-    "affected_categories": [
-      "office_pc"
-    ],
-    "test_requirements": [
-      "bestehende TRUE_POSITIVE-Tests fuer Regel 'Office-PC (Mindestanforderung erfüllt)' in Kategorie 'office_pc' (z.B. app/tests/test_office_pc.py, falls vorhanden) muessen weiterhin gruen bleiben",
-      "Regression gegen alle 2 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
-      "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
-    ],
-    "still_active_count": 0,
-    "priority_score": 2
-  },
-  {
-    "priority": "P2",
+    "priority": "N/A",
     "category": "konsolen_bundles",
     "affected_count": 3,
     "representative_listings": [
@@ -292,10 +243,100 @@
       "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
     ],
     "still_active_count": 0,
-    "priority_score": 1
+    "priority_score": 0,
+    "queue_category": "ALREADY_FIXED"
   },
   {
-    "priority": "P2",
+    "priority": "N/A",
+    "category": "konsolen_bundles",
+    "affected_count": 1,
+    "representative_listings": [
+      {
+        "listing_id": "https://www.kleinanzeigen.de/s-anzeige/playstation-5-ps4-ps5-slim-hdmi-port-nintendo-reparatur-usb-pro/3431533294-226-3438",
+        "title": "Playstation 5 PS4 PS5 Slim HDMI Port Nintendo Reparatur USB PRO",
+        "price": 50.0
+      }
+    ],
+    "root_cause": "ambiguous",
+    "confidence": "manual_review",
+    "current_rule": "PS4 Slim / Pro Bundle ★ Top-Deal",
+    "recommended_fix_type": "manual_review",
+    "regression_risk": "MEDIUM",
+    "affected_categories": [
+      "konsolen_bundles"
+    ],
+    "test_requirements": [
+      "bestehende TRUE_POSITIVE-Tests fuer Regel 'PS4 Slim / Pro Bundle ★ Top-Deal' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
+      "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+      "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+    ],
+    "still_active_count": 0,
+    "priority_score": 0,
+    "queue_category": "ALREADY_FIXED"
+  },
+  {
+    "priority": "N/A",
+    "category": "notebook_resell",
+    "affected_count": 1,
+    "representative_listings": [
+      {
+        "listing_id": "https://www.ebay.de/itm/357718779954",
+        "title": "Lenovo ThinkPad X390 Mainboard Intel Core i5-8365U 8GB RAM NM-B891",
+        "price": 49.0
+      }
+    ],
+    "root_cause": "replacement_part_false_positive",
+    "confidence": "confirmed",
+    "current_rule": "ThinkPad T14/X13 (Ryzen/Modern) ★ Resell-Top",
+    "recommended_fix_type": "add_replacement_part_guard",
+    "regression_risk": "LOW",
+    "affected_categories": [
+      "notebook_resell"
+    ],
+    "test_requirements": [
+      "bestehende TRUE_POSITIVE-Tests fuer Regel 'ThinkPad T14/X13 (Ryzen/Modern) ★ Resell-Top' in Kategorie 'notebook_resell' (z.B. app/tests/test_notebook_resell.py, falls vorhanden) muessen weiterhin gruen bleiben",
+      "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+      "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+    ],
+    "still_active_count": 0,
+    "priority_score": 0,
+    "queue_category": "ALREADY_FIXED"
+  },
+  {
+    "priority": "N/A",
+    "category": "office_pc",
+    "affected_count": 2,
+    "representative_listings": [
+      {
+        "listing_id": "https://www.kleinanzeigen.de/s-anzeige/intel-core-i5-8500-mainboard-bundle-16gb-ddr4-ram-netzteil/3480038290-225-13379",
+        "title": "Intel Core i5-8500 Mainboard Bundle 16GB DDR4 RAM Netzteil",
+        "price": 160.0
+      },
+      {
+        "listing_id": "https://www.ebay.de/itm/356717584177",
+        "title": "Lenovo ThinkPad T490s Mainboard nm-b891 Intel i5-8365U / i5-8265U 8GB RAM",
+        "price": 69.0
+      }
+    ],
+    "root_cause": "replacement_part_false_positive",
+    "confidence": "confirmed",
+    "current_rule": "Office-PC (Mindestanforderung erfüllt)",
+    "recommended_fix_type": "add_replacement_part_guard",
+    "regression_risk": "LOW",
+    "affected_categories": [
+      "office_pc"
+    ],
+    "test_requirements": [
+      "bestehende TRUE_POSITIVE-Tests fuer Regel 'Office-PC (Mindestanforderung erfüllt)' in Kategorie 'office_pc' (z.B. app/tests/test_office_pc.py, falls vorhanden) muessen weiterhin gruen bleiben",
+      "Regression gegen alle 2 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+      "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+    ],
+    "still_active_count": 0,
+    "priority_score": 0,
+    "queue_category": "ALREADY_FIXED"
+  },
+  {
+    "priority": "N/A",
     "category": "retro_konsolen",
     "affected_count": 2,
     "representative_listings": [
@@ -324,10 +365,11 @@
       "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
     ],
     "still_active_count": 0,
-    "priority_score": 1
+    "priority_score": 0,
+    "queue_category": "ALREADY_FIXED"
   },
   {
-    "priority": "P2",
+    "priority": "N/A",
     "category": "retro_konsolen",
     "affected_count": 1,
     "representative_listings": [
@@ -351,33 +393,7 @@
       "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
     ],
     "still_active_count": 0,
-    "priority_score": 1
-  },
-  {
-    "priority": "P3",
-    "category": "konsolen_bundles",
-    "affected_count": 1,
-    "representative_listings": [
-      {
-        "listing_id": "https://www.kleinanzeigen.de/s-anzeige/playstation-5-ps4-ps5-slim-hdmi-port-nintendo-reparatur-usb-pro/3431533294-226-3438",
-        "title": "Playstation 5 PS4 PS5 Slim HDMI Port Nintendo Reparatur USB PRO",
-        "price": 50.0
-      }
-    ],
-    "root_cause": "ambiguous",
-    "confidence": "manual_review",
-    "current_rule": "PS4 Slim / Pro Bundle ★ Top-Deal",
-    "recommended_fix_type": "manual_review",
-    "regression_risk": "MEDIUM",
-    "affected_categories": [
-      "konsolen_bundles"
-    ],
-    "test_requirements": [
-      "bestehende TRUE_POSITIVE-Tests fuer Regel 'PS4 Slim / Pro Bundle ★ Top-Deal' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
-      "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
-      "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
-    ],
-    "still_active_count": 0,
-    "priority_score": 0
+    "priority_score": 0,
+    "queue_category": "ALREADY_FIXED"
   }
 ]

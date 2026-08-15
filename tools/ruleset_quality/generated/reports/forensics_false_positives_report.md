@@ -20,6 +20,8 @@ gaming_pc (1)
       - aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)
     recommended_fix: add_replacement_part_guard
     regression_risk: LOW
+    assessment: FIXED (confidence=confirmed)
+      - aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt.
 
 
 handhelds (4)
@@ -41,6 +43,8 @@ handhelds (4)
       - aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)
     recommended_fix: add_exclude
     regression_risk: LOW
+    assessment: FIXED (confidence=confirmed)
+      - aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt.
 
   FP #2
     title: Steam Deck Skin Faceplate Schutz Klebefolie Design Vinyl Aufkleber Skins OLED
@@ -59,6 +63,8 @@ handhelds (4)
       - aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)
     recommended_fix: add_exclude
     regression_risk: LOW
+    assessment: FIXED (confidence=confirmed)
+      - aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt.
 
   FP #3
     title: VITURE USB-C an Brille, Ladeadapter, Laden und Spielen für Switch, Steam Deck
@@ -77,6 +83,8 @@ handhelds (4)
       - aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)
     recommended_fix: add_exclude
     regression_risk: LOW
+    assessment: FIXED (confidence=confirmed)
+      - aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt.
 
   FP #4
     title: JSAUX Slim-Reisetasche Für Lenovo Legion Go/Go S/Go 2, Hartschalenbeutel | Schla
@@ -95,6 +103,8 @@ handhelds (4)
       - aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)
     recommended_fix: add_exclude
     regression_risk: LOW
+    assessment: FIXED (confidence=confirmed)
+      - aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt.
 
 
 iphone (1)
@@ -116,6 +126,8 @@ iphone (1)
       - aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)
     recommended_fix: add_replacement_part_guard
     regression_risk: LOW
+    assessment: FIXED (confidence=confirmed)
+      - aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt.
 
 
 konsolen_bundles (6)
@@ -137,6 +149,8 @@ konsolen_bundles (6)
       - aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)
     recommended_fix: strengthen_positive_signal
     regression_risk: HIGH
+    assessment: FIXED (confidence=confirmed)
+      - aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt.
 
   FP #2
     title: Nintendo Switch 32GB Mario Kart 8 Deluxe Bundle Neon Blau/Rot mit Dock
@@ -155,6 +169,10 @@ konsolen_bundles (6)
       - aktueller Match-Zustand: GLEICHE_KATEGORIE (routing_status=A_SAME_WRONG_CATEGORY)
     recommended_fix: strengthen_positive_signal
     regression_risk: HIGH
+    assessment: GROUND_TRUTH_CONFLICT (confidence=high)
+      - Titel enthaelt echten Speichergroessen-Marker '32GB' (Basis-Switch-Modell) sowie ein Spiel (Mario Kart 8 Deluxe) und Zubehoer (Dock) -- liest sich als vollstaendiger Konsolenverkauf, nicht als Zubehoer-/Spiele-Angebot.
+      - Vom Nutzer am 2026-08-15 nach Vorlage der Matchpfad-Analyse explizit als korrekt gematchter TRUE_POSITIVE bestaetigt (siehe active_fp_fix_progress.md).
+      - Keine YAML-Aenderung vorgenommen -- das FALSE_POSITIVE-Label im historischen Forensik-Snapshot (Commit 01afd5b, 2026-08-10) ist vermutlich selbst fehlerhaft.
 
   FP #3
     title: Playstation 5 PS4 PS5 Slim HDMI Port Nintendo Reparatur USB PRO
@@ -174,6 +192,8 @@ konsolen_bundles (6)
       - aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)
     recommended_fix: manual_review
     regression_risk: MEDIUM
+    assessment: FIXED (confidence=confirmed)
+      - aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt.
 
   FP #4
     title: Mario Kart World für Nintendo Switch 2 – NEU  und OVP
@@ -192,6 +212,8 @@ konsolen_bundles (6)
       - aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)
     recommended_fix: strengthen_positive_signal
     regression_risk: HIGH
+    assessment: FIXED (confidence=confirmed)
+      - aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt.
 
   FP #5
     title: Xbox One S 1TB mit Spiele
@@ -210,6 +232,10 @@ konsolen_bundles (6)
       - aktueller Match-Zustand: GLEICHE_KATEGORIE (routing_status=A_SAME_WRONG_CATEGORY)
     recommended_fix: strengthen_positive_signal
     regression_risk: HIGH
+    assessment: GROUND_TRUTH_CONFLICT (confidence=high)
+      - Titel enthaelt echten Speichergroessen-Marker '1TB' (Xbox One S 1TB-Variante), keine Zubehoer-/Ersatzteil-Indikatoren.
+      - Vom Nutzer am 2026-08-15 nach Vorlage der Matchpfad-Analyse explizit als korrekt gematchter TRUE_POSITIVE bestaetigt (siehe active_fp_fix_progress.md).
+      - Keine YAML-Aenderung vorgenommen -- das FALSE_POSITIVE-Label im historischen Forensik-Snapshot ist vermutlich selbst fehlerhaft.
 
   FP #6
     title: NBA 2K26 für Nintendo Switch 2 - OVP Schneller Versand
@@ -228,6 +254,8 @@ konsolen_bundles (6)
       - aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)
     recommended_fix: strengthen_positive_signal
     regression_risk: HIGH
+    assessment: FIXED (confidence=confirmed)
+      - aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt.
 
 
 notebook_resell (1)
@@ -249,6 +277,8 @@ notebook_resell (1)
       - aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)
     recommended_fix: add_replacement_part_guard
     regression_risk: LOW
+    assessment: FIXED (confidence=confirmed)
+      - aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt.
 
 
 office_pc (2)
@@ -270,6 +300,8 @@ office_pc (2)
       - aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)
     recommended_fix: add_replacement_part_guard
     regression_risk: LOW
+    assessment: FIXED (confidence=confirmed)
+      - aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt.
 
   FP #2
     title: Lenovo ThinkPad T490s Mainboard nm-b891 Intel i5-8365U / i5-8265U 8GB RAM
@@ -288,6 +320,8 @@ office_pc (2)
       - aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)
     recommended_fix: add_replacement_part_guard
     regression_risk: LOW
+    assessment: FIXED (confidence=confirmed)
+      - aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt.
 
 
 retro_konsolen (4)
@@ -309,6 +343,9 @@ retro_konsolen (4)
       - aktueller Match-Zustand: GLEICHE_KATEGORIE (routing_status=A_SAME_WRONG_CATEGORY)
     recommended_fix: strengthen_positive_signal
     regression_risk: HIGH
+    assessment: MANUAL_REVIEW (confidence=low)
+      - 3 weitere, lexikalisch identisch formulierte 'Handheld-System'-Titel im aktuellen Korpus/Preishistorie gefunden, davon 1 selbst als UNCLEAR (nicht FALSE_POSITIVE) gelabelt -- kein lexikalisches Unterscheidungsmerkmal zwischen dem bestaetigten FP und den mutmasslich echten Treffern gefunden.
+      - Nutzerentscheidung 2026-08-15 nach Rueckfrage: nicht fixen, aber auch nicht als Ground-Truth-Konflikt einstufen -- Status bleibt unsicher (siehe active_fp_fix_progress.md).
 
   FP #2
     title: Sony PlayStation 2 + Original Netzteil, Videokabel, MemoryCard
@@ -327,6 +364,8 @@ retro_konsolen (4)
       - aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)
     recommended_fix: strengthen_positive_signal
     regression_risk: HIGH
+    assessment: FIXED (confidence=confirmed)
+      - aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt.
 
   FP #3
     title: Nintendo Gamecube Netzteil - original DOL-002 (EUR) - 12V / 3.25A
@@ -345,6 +384,8 @@ retro_konsolen (4)
       - aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)
     recommended_fix: strengthen_positive_signal
     regression_risk: HIGH
+    assessment: FIXED (confidence=confirmed)
+      - aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt.
 
   FP #4
     title: N64 USB-C Netzteil für Nintendo 64 Ersatznetzteil
@@ -363,6 +404,8 @@ retro_konsolen (4)
       - aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)
     recommended_fix: strengthen_positive_signal
     regression_risk: HIGH
+    assessment: FIXED (confidence=confirmed)
+      - aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt.
 
 
 FP-KANDIDATEN (Ground-Truth-Verdict UNCLEAR -- KEINE bestaetigten FPs)
@@ -386,31 +429,33 @@ retro_konsolen (1)
 CATEGORY SUMMARY
 ================
 category             | confirmed FP | candidates | root causes                                   | priority
-gaming_pc            | 1            | 0          | replacement_part_false_positive               | P1
-handhelds            | 4            | 0          | missing_exclude                               | P1
-iphone               | 1            | 0          | replacement_part_false_positive               | P1
-konsolen_bundles     | 6            | 34         | ambiguous, weak_signal                        | P1, P2, P3
-notebook_resell      | 1            | 0          | replacement_part_false_positive               | P1
-office_pc            | 2            | 0          | replacement_part_false_positive               | P1
-retro_konsolen       | 4            | 1          | weak_signal                                   | P1, P2
+gaming_pc            | 1            | 0          | replacement_part_false_positive               | N/A
+handhelds            | 4            | 0          | missing_exclude                               | N/A
+iphone               | 1            | 0          | replacement_part_false_positive               | N/A
+konsolen_bundles     | 6            | 34         | ambiguous, weak_signal                        | N/A
+notebook_resell      | 1            | 0          | replacement_part_false_positive               | N/A
+office_pc            | 2            | 0          | replacement_part_false_positive               | N/A
+retro_konsolen       | 4            | 1          | weak_signal                                   | N/A
 
 FIX QUEUE
 =========
-P1:
-  [konsolen_bundles] Regel 'Nintendo Switch (V1/V2/OLED) 👍 Guter Preis' -- root_cause=weak_signal (confidence=confirmed), 1 Fall/Faelle (1 weiterhin aktiv) -- fix=strengthen_positive_signal, risk=HIGH
-  [konsolen_bundles] Regel 'Xbox One S / One X 👍 Guter Preis' -- root_cause=weak_signal (confidence=confirmed), 1 Fall/Faelle (1 weiterhin aktiv) -- fix=strengthen_positive_signal, risk=HIGH
-  [retro_konsolen] Regel 'Nintendo Retro-Konsole (N64/GameCube/DS) ⚠️ Okay' -- root_cause=weak_signal (confidence=confirmed), 1 Fall/Faelle (1 weiterhin aktiv) -- fix=strengthen_positive_signal, risk=HIGH
+Gruppiert nach queue_category -- nur ACTIVE_ROUTING_FP hat eine P0-P3-Prioritaet, die anderen Kategorien implizieren KEINEN offenen YAML-Fix-Bedarf.
+
+MANUAL_REVIEW:
+  [retro_konsolen] Regel 'Nintendo Retro-Konsole (N64/GameCube/DS) ⚠️ Okay' -- root_cause=weak_signal (confidence=confirmed), 1 Fall/Faelle (0 weiterhin aktiv) -- fix=strengthen_positive_signal, risk=HIGH
+
+GROUND_TRUTH_CONFLICT:
+  [konsolen_bundles] Regel 'Nintendo Switch (V1/V2/OLED) 👍 Guter Preis' -- root_cause=weak_signal (confidence=confirmed), 1 Fall/Faelle (0 weiterhin aktiv) -- fix=strengthen_positive_signal, risk=HIGH
+  [konsolen_bundles] Regel 'Xbox One S / One X 👍 Guter Preis' -- root_cause=weak_signal (confidence=confirmed), 1 Fall/Faelle (0 weiterhin aktiv) -- fix=strengthen_positive_signal, risk=HIGH
+
+ALREADY_FIXED:
   [gaming_pc] Regel 'Gaming-PC (Mindestanforderung erfüllt)' -- root_cause=replacement_part_false_positive (confidence=confirmed), 1 Fall/Faelle (0 weiterhin aktiv) -- fix=add_replacement_part_guard, risk=LOW
   [handhelds] Regel 'Asus ROG Ally / Lenovo Legion Go ★ Top-Deal' -- root_cause=missing_exclude (confidence=confirmed), 1 Fall/Faelle (0 weiterhin aktiv) -- fix=add_exclude, risk=LOW
   [handhelds] Regel 'Valve Steam Deck ★ Top-Deal' -- root_cause=missing_exclude (confidence=confirmed), 3 Fall/Faelle (0 weiterhin aktiv) -- fix=add_exclude, risk=LOW
   [iphone] Regel 'iPhone 15 Pro Max (≥512GB) 👍 Guter Preis' -- root_cause=replacement_part_false_positive (confidence=confirmed), 1 Fall/Faelle (0 weiterhin aktiv) -- fix=add_replacement_part_guard, risk=LOW
+  [konsolen_bundles] Regel 'Nintendo Switch (V1/V2/OLED) ★ Top-Deal' -- root_cause=weak_signal (confidence=confirmed), 3 Fall/Faelle (0 weiterhin aktiv) -- fix=strengthen_positive_signal, risk=HIGH
+  [konsolen_bundles] Regel 'PS4 Slim / Pro Bundle ★ Top-Deal' -- root_cause=ambiguous (confidence=manual_review), 1 Fall/Faelle (0 weiterhin aktiv) -- fix=manual_review, risk=MEDIUM
   [notebook_resell] Regel 'ThinkPad T14/X13 (Ryzen/Modern) ★ Resell-Top' -- root_cause=replacement_part_false_positive (confidence=confirmed), 1 Fall/Faelle (0 weiterhin aktiv) -- fix=add_replacement_part_guard, risk=LOW
   [office_pc] Regel 'Office-PC (Mindestanforderung erfüllt)' -- root_cause=replacement_part_false_positive (confidence=confirmed), 2 Fall/Faelle (0 weiterhin aktiv) -- fix=add_replacement_part_guard, risk=LOW
-
-P2:
-  [konsolen_bundles] Regel 'Nintendo Switch (V1/V2/OLED) ★ Top-Deal' -- root_cause=weak_signal (confidence=confirmed), 3 Fall/Faelle (0 weiterhin aktiv) -- fix=strengthen_positive_signal, risk=HIGH
   [retro_konsolen] Regel 'Nintendo Retro-Konsole (N64/GameCube/DS) ★ Top-Deal' -- root_cause=weak_signal (confidence=confirmed), 2 Fall/Faelle (0 weiterhin aktiv) -- fix=strengthen_positive_signal, risk=HIGH
   [retro_konsolen] Regel 'Sony Retro-Konsole (PS1/PS2) 👍 Guter Preis' -- root_cause=weak_signal (confidence=confirmed), 1 Fall/Faelle (0 weiterhin aktiv) -- fix=strengthen_positive_signal, risk=HIGH
-
-P3:
-  [konsolen_bundles] Regel 'PS4 Slim / Pro Bundle ★ Top-Deal' -- root_cause=ambiguous (confidence=manual_review), 1 Fall/Faelle (0 weiterhin aktiv) -- fix=manual_review, risk=MEDIUM
