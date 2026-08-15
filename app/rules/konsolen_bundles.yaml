@@ -71,6 +71,23 @@ exclude_category:
   - "panzerglas"
   - "displayschutz"
 
+  # FIX (Nutzer-Freigabe 2026-08-15, FALSE_POSITIVES_ANALYSE Teil 1 D):
+  # drei Einzelfall-Zubehör-/Ersatzteil-Produktnamen, real bestätigt gegen
+  # found.json/price_history.jsonl, 0 Kollisionen im vollständigen Korpus:
+  # "SanDisk microSDXC Extreme 512GB U3 Nintendo Switch 100MB/s Neu OVP"
+  # (SD-Karten-Zubehör, matchte über "512gb", das als Gruppe-2-Signal
+  # bewusst erhalten bleibt), "Toshiba MQ01ABD050V ... Interne Festplatte
+  # (Original PS4)" und "... (Original PS4 Pro)" (Ersatzfestplatte statt
+  # Gerät, matchte über "500gb"/"1tb"), "Nintendo Switch Deluxe
+  # System/Travelcase/Tragetasche" (Tragetasche, matchte über "system";
+  # das bereits vorhandene bare "tasche" oben greift wegen Wortgrenzen-
+  # Matching nicht beim Kompositum "Tragetasche", identisches Muster wie
+  # "zubehör-set"/"zubehörset" oben).
+  - "microsdxc"
+  - "interne festplatte"
+  - "travelcase"
+  - "tragetasche"
+
   # Phase 15 (kontrollierter Review, "Service/Modding-Fix"): Reparatur-/
   # Modding-DIENSTLEISTUNGS-Angebote statt Konsolenverkauf. Bewusst als
   # Mehrwort-Phrase, NICHT bare "service" -- ein bare Exclude waere fuer
@@ -257,6 +274,54 @@ exclude_category_unless_also_contains:
     - "lite"
     - "v1"
     - "v2"
+  # FIX (Nutzer-Freigabe 2026-08-15, FALSE_POSITIVES_ANALYSE Teil 1 A):
+  # bare "ovp" OHNE jeden Geräte-Marker matcht Nintendo-Switch-SPIELTITEL
+  # als Konsole (18 bestätigte Fehltreffer, z.B. "Nintendo Switch Pokemon
+  # Arceus OVP", "Zelda Tears of The Kingdom Nintendo Switch 1 + Ovp").
+  # Auftragsvorgabe "ovp bleibt Positivsignal" (siehe Kommentar oben,
+  # "ovp bleibt Positivsignal") bleibt UNVERÄNDERT gültig für Titel MIT
+  # Geräte-Marker -- "ovp" wird bewusst NICHT aus require_all_of entfernt,
+  # sondern wie "spiele" nur kontextbewusst blockiert, wenn im gesamten
+  # Titel kein Marker vorkommt. Identische Geräte-Marker-Liste wie
+  # "spiele" oben, zusätzlich "bundle"/"set"/"mit spiele" -- das sind die
+  # übrigen require_all_of-Gruppe-2-Signale der Switch-/Xbox-Regeln, die
+  # ohne diese Ergänzung fälschlich mitblockiert würden (z.B. ein echtes
+  # "Xbox One S Bundle mit OVP" ohne sonstigen Marker). Gegen found.json +
+  # price_history.jsonl verifiziert: alle 16 aktuell noch aktiven FP aus
+  # der Analyse (2 der 18 waren bereits über den "spiele"-Exclude
+  # abgefangen) haben KEINEN der Marker, 0 Kollisionen mit den dort
+  # ebenfalls über bare "ovp" matchenden echten Bundles ("Nintendo Switch
+  # 32GB Konsole mit Dock, Joy-Cons ... & OVP", drei Xbox-One-S-Titel).
+  # Bekannte Restlücke (bewusst in Kauf genommen, siehe Analyse Teil 2
+  # Fall #40): "nintendo switch 1 nur getestet Garantie rechnung ovp
+  # +online" (150€) hat ebenfalls keinen Marker und wird dadurch
+  # mitblockiert, obwohl die Analyse ihn als vermutlich echten Verkauf
+  # einstuft -- Einzelfall ohne belastbares Unterscheidungsmerkmal zu den
+  # 18 Spiele-FP, nicht separat gelöst.
+  ovp:
+    - "konsole"
+    - "spielkonsole"
+    - "spielekonsole"
+    - "heimkonsole"
+    - "system"
+    - "slim"
+    - "pro"
+    - "1tb"
+    - "500gb"
+    - "128gb"
+    - "64gb"
+    - "32gb"
+    - "256gb"
+    - "512gb"
+    - "2tb"
+    - "xl"
+    - "oled"
+    - "lite"
+    - "v1"
+    - "v2"
+    - "bundle"
+    - "set"
+    - "mit spiele"
   gehäuse:
     - "vergilbt"
     - "verkratzt"
