@@ -97,19 +97,6 @@ Automatisch generiert von `tools/ruleset_quality/forensics_false_positives.py`. 
 - **Beispiel-Listings**:
   - Apple iPhone 15 Pro Max 512GB Mainboard Platine mit FaceID und Kameramodul  (https://www.ebay.de/itm/236995682525)
 
-### konsolen_bundles :: PS4 Slim / Pro Bundle ★ Top-Deal
-
-- **Problem**: 1 bestaetigte(r) Fehltreffer, root_cause=`ambiguous` (confidence=manual_review), 1 davon weiterhin aktiv.
-- **Vorschlag**: `manual_review`
-- **Regression-Risiko**: MEDIUM
-- **Betroffene Kategorien**: konsolen_bundles
-- **Regressionstests**:
-  - bestehende TRUE_POSITIVE-Tests fuer Regel 'PS4 Slim / Pro Bundle ★ Top-Deal' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben
-  - Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)
-  - tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)
-- **Beispiel-Listings**:
-  - Playstation 5 PS4 PS5 Slim HDMI Port Nintendo Reparatur USB PRO (https://www.kleinanzeigen.de/s-anzeige/playstation-5-ps4-ps5-slim-hdmi-port-nintendo-reparatur-usb-pro/3431533294-226-3438)
-
 ### notebook_resell :: ThinkPad T14/X13 (Ryzen/Modern) ★ Resell-Top
 
 - **Problem**: 1 bestaetigte(r) Fehltreffer, root_cause=`replacement_part_false_positive` (confidence=confirmed), 0 davon weiterhin aktiv.
@@ -180,3 +167,18 @@ Automatisch generiert von `tools/ruleset_quality/forensics_false_positives.py`. 
   - tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)
 - **Beispiel-Listings**:
   - Sony PlayStation 2 + Original Netzteil, Videokabel, MemoryCard (https://www.kleinanzeigen.de/s-anzeige/sony-playstation-2-original-netzteil-videokabel-memorycard/3480159305-279-756)
+
+## P3
+
+### konsolen_bundles :: PS4 Slim / Pro Bundle ★ Top-Deal
+
+- **Problem**: 1 bestaetigte(r) Fehltreffer, root_cause=`ambiguous` (confidence=manual_review), 0 davon weiterhin aktiv.
+- **Vorschlag**: `manual_review`
+- **Regression-Risiko**: MEDIUM
+- **Betroffene Kategorien**: konsolen_bundles
+- **Regressionstests**:
+  - bestehende TRUE_POSITIVE-Tests fuer Regel 'PS4 Slim / Pro Bundle ★ Top-Deal' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben
+  - Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)
+  - tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)
+- **Beispiel-Listings**:
+  - Playstation 5 PS4 PS5 Slim HDMI Port Nintendo Reparatur USB PRO (https://www.kleinanzeigen.de/s-anzeige/playstation-5-ps4-ps5-slim-hdmi-port-nintendo-reparatur-usb-pro/3431533294-226-3438)

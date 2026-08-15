@@ -237,20 +237,20 @@
         "stored_category": "konsolen_bundles",
         "ground_truth_verdict": "FALSE_POSITIVE",
         "stored_rule": "PS4 Slim / Pro Bundle ★ Top-Deal",
-        "current_category": "konsolen_bundles",
-        "current_rule": "PS4 Slim / Pro Bundle ★ Top-Deal",
+        "current_category": "KEIN_TREFFER",
+        "current_rule": "KEIN_TREFFER",
         "match_path_before": "konsolen_bundles :: PS4 Slim / Pro Bundle ★ Top-Deal",
-        "match_path_after": "konsolen_bundles :: PS4 Slim / Pro Bundle ★ Top-Deal",
-        "match_state": "GLEICHE_KATEGORIE",
-        "routing_status": "A_SAME_WRONG_CATEGORY",
-        "already_resolved": false,
+        "match_path_after": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES",
+        "already_resolved": true,
         "root_cause": "ambiguous",
         "root_cause_confidence": "manual_review",
         "root_cause_evidence": [
           "Forensik-Snapshot root_cause: \"sonstiges\"",
           "Forensik-Snapshot reason: \"Reparatur-/Service-Dienstleistungs-Indikator im Titel: ['reparatur']\"",
           "Kein bekannter Uebersetzungseintrag fuer diesen Forensik-root_cause-Wert -- keine automatische Taxonomie-Zuordnung ohne Beleg.",
-          "aktueller Match-Zustand: GLEICHE_KATEGORIE (routing_status=A_SAME_WRONG_CATEGORY)"
+          "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
         ],
         "recommended_fix_type": "manual_review",
         "regression_risk": "MEDIUM"
@@ -1131,33 +1131,6 @@
     },
     {
       "priority": "P1",
-      "category": "konsolen_bundles",
-      "affected_count": 1,
-      "representative_listings": [
-        {
-          "listing_id": "https://www.kleinanzeigen.de/s-anzeige/playstation-5-ps4-ps5-slim-hdmi-port-nintendo-reparatur-usb-pro/3431533294-226-3438",
-          "title": "Playstation 5 PS4 PS5 Slim HDMI Port Nintendo Reparatur USB PRO",
-          "price": 50.0
-        }
-      ],
-      "root_cause": "ambiguous",
-      "confidence": "manual_review",
-      "current_rule": "PS4 Slim / Pro Bundle ★ Top-Deal",
-      "recommended_fix_type": "manual_review",
-      "regression_risk": "MEDIUM",
-      "affected_categories": [
-        "konsolen_bundles"
-      ],
-      "test_requirements": [
-        "bestehende TRUE_POSITIVE-Tests fuer Regel 'PS4 Slim / Pro Bundle ★ Top-Deal' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
-        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
-        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
-      ],
-      "still_active_count": 1,
-      "priority_score": 2
-    },
-    {
-      "priority": "P1",
       "category": "notebook_resell",
       "affected_count": 1,
       "representative_listings": [
@@ -1310,6 +1283,33 @@
       ],
       "still_active_count": 0,
       "priority_score": 1
+    },
+    {
+      "priority": "P3",
+      "category": "konsolen_bundles",
+      "affected_count": 1,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.kleinanzeigen.de/s-anzeige/playstation-5-ps4-ps5-slim-hdmi-port-nintendo-reparatur-usb-pro/3431533294-226-3438",
+          "title": "Playstation 5 PS4 PS5 Slim HDMI Port Nintendo Reparatur USB PRO",
+          "price": 50.0
+        }
+      ],
+      "root_cause": "ambiguous",
+      "confidence": "manual_review",
+      "current_rule": "PS4 Slim / Pro Bundle ★ Top-Deal",
+      "recommended_fix_type": "manual_review",
+      "regression_risk": "MEDIUM",
+      "affected_categories": [
+        "konsolen_bundles"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'PS4 Slim / Pro Bundle ★ Top-Deal' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      ],
+      "still_active_count": 0,
+      "priority_score": 0
     }
   ]
 }

@@ -2,22 +2,22 @@
   "meta": {
     "baseline_id": "historical_forensics_baseline",
     "baseline_ruleset_signature": "1e7fcec77b51c375",
-    "current_ruleset_signature": "cbf94fc5d1f354ec",
+    "current_ruleset_signature": "f8e07b8b8d97d61a",
     "ruleset_unveraendert": false,
     "anzahl_eintraege": 2306,
     "severity_counts": {
       "NEUTRAL": 2088,
       "CRITICAL": 99,
-      "INFO": 50,
-      "HIGH_CANDIDATE": 69
+      "INFO": 51,
+      "HIGH_CANDIDATE": 68
     },
     "gate_label_counts": {
       "TRUE_POSITIVE -> TRUE_POSITIVE (stabil)": 2088,
       "TRUE_POSITIVE -> kein Treffer": 99,
-      "FALSE_POSITIVE -> kein Treffer": 15,
+      "FALSE_POSITIVE -> kein Treffer": 16,
       "UNCLEAR -> kein Treffer": 22,
       "UNCLEAR weiterhin unklar": 13,
-      "FALSE_POSITIVE weiterhin aktiv": 4,
+      "FALSE_POSITIVE weiterhin aktiv": 3,
       "TRUE_POSITIVE, aber anderer Matchpfad": 65
     }
   },
@@ -9895,12 +9895,12 @@
       "category": "konsolen_bundles",
       "before_verdict": "FALSE_POSITIVE",
       "before_rule": "PS4 Slim / Pro Bundle ★ Top-Deal",
-      "after_match_state": "GLEICHE_KATEGORIE",
-      "after_category": "konsolen_bundles",
-      "after_rule": "PS4 Slim / Pro Bundle ★ Top-Deal",
-      "severity": "HIGH_CANDIDATE",
-      "gate_label": "FALSE_POSITIVE weiterhin aktiv",
-      "explanation": "Bekannter Fehltreffer matcht weiterhin unveraendert dieselbe Kategorie/Regel -- nicht gefixt."
+      "after_match_state": "KEIN_TREFFER",
+      "after_category": null,
+      "after_rule": null,
+      "severity": "INFO",
+      "gate_label": "FALSE_POSITIVE -> kein Treffer",
+      "explanation": "Bekannter Fehltreffer matcht jetzt nicht mehr (Fix wirkt wie erwartet)."
     },
     {
       "url": "https://www.kleinanzeigen.de/s-anzeige/ps4-playstation-pro/3480412573-279-26481",
