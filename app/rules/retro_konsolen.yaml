@@ -279,6 +279,28 @@ exclude_category_unless_also_contains:
     - "controller"
     - "konsole"
     - "ersatzkonsole"
+  # FIX (Nutzer-Freigabe 2026-08-15, FALSE_POSITIVES_ANALYSE Teil 1 B):
+  # identisches Problem wie "netzteil"/"memory card" oben -- "kabel" ist
+  # als Gruppe-2-Geräte-Signal bewusst erhalten (rettet reale Bundles wie
+  # "N64 + Controller + Kabel"), reicht aber auch für Standalone-AV-/
+  # Anschlusskabel-Angebote OHNE jedes Gerät aus (4 bestätigte Fehltreffer:
+  # "AV Kabel - Bild Kabel für N64, SNES und Gamecube!", "Sony Playstation
+  # PS1 PS2 3 Original AV TV Fernseh Chinch Anschluss Kabel Stecker",
+  # "Mad Catz Universal HD Component AV-Kabel(PS2&3, Wii, Xbox) 1,8m",
+  # "Original Sony PlayStation AV-Kabel (PS1 / PS2 / PS3)"). Identischer
+  # Mechanismus und identische Kontextliste wie "netzteil": blockiert
+  # "kabel" nur, wenn im GESAMTEN Titel kein Geräte-Kontextbegriff
+  # vorkommt. Bekannte Restlücke (bewusst in Kauf genommen, siehe Analyse
+  # Teil 2 Fälle #36/#39): "Verkaufe Playstation 2 Mit Kabel und spiele"
+  # und "Nintendo 64 / N64 + Kabel" haben ebenfalls kein "controller"/
+  # "konsole" im Titel und werden dadurch mitblockiert, obwohl die
+  # Analyse sie tendenziell als echte Verkäufe einstuft -- lexikalisch
+  # nicht von den 4 bestätigten Kabel-FP unterscheidbar, kein separates
+  # Fix möglich ohne neue Datenbasis.
+  kabel:
+    - "controller"
+    - "konsole"
+    - "ersatzkonsole"
 
 # Scoring: kein Hardware-Detector anwendbar (analog sata_ssd.yaml) --
 # Preis ist das mit Abstand aussagekraeftigste Signal. Ausstattung/
