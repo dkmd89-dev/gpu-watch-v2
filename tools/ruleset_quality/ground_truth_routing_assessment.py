@@ -34,6 +34,7 @@ from __future__ import annotations
 
 import argparse
 from collections import defaultdict
+from dataclasses import asdict
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -187,6 +188,27 @@ def build_report(
         )
     )
 
+    # Auftrag "false_positive_fix_queue.json an Ground-Truth-Routing-
+    # Assessment koppeln": die Fix-Queue wird HIER aus genau denselben
+    # `confirmed`-Cases abgeleitet (ffp.build_fix_queue()), die auch die
+    # obige assessment-Ebene liefern -- keine zweite, abweichende
+    # Ableitung. Die Konsistenzpruefung stellt sicher, dass queue_category
+    # ausschliesslich aus assessment.status folgt.
+    fix_queue = ffp.build_fix_queue(confirmed)
+    queue_consistency = ffp.validate_queue_consistency(confirmed, fix_queue)
+
+    queue_category_counts = {
+        ffp.QUEUE_CATEGORY_ALREADY_FIXED: 0,
+        ffp.QUEUE_CATEGORY_ACTIVE_ROUTING_FP: 0,
+        ffp.QUEUE_CATEGORY_CATEGORY_CHANGED: 0,
+        ffp.QUEUE_CATEGORY_GROUND_TRUTH_CONFLICT: 0,
+        ffp.QUEUE_CATEGORY_MANUAL_REVIEW: 0,
+    }
+    for entry in fix_queue:
+        queue_category_counts[entry.queue_category] = (
+            queue_category_counts.get(entry.queue_category, 0) + entry.affected_count
+        )
+
     return {
         "metadata": {
             "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -197,6 +219,9 @@ def build_report(
         "summary": summary,
         "categories": categories,
         "cases": cases,
+        "fix_queue": [asdict(e) for e in fix_queue],
+        "queue_category_counts": queue_category_counts,
+        "queue_consistency": queue_consistency,
     }
 
 
@@ -267,6 +292,29 @@ def render_markdown(report: dict) -> str:
             lines.append(f"  - {ev}")
         lines.append("")
 
+    qc = report["queue_consistency"]
+    qcc = report["queue_category_counts"]
+    lines.append("## QUEUE CONSISTENCY")
+    lines.append("")
+    lines.append(
+        "Prueft, ob jeder Assessment-Fall genau einmal in der Fix-Queue auftaucht und "
+        "dort dieselbe queue_category traegt, die assessment.status vorschreibt "
+        "(`tools/ruleset_quality/generated/false_positive_fix_queue.json`)."
+    )
+    lines.append("")
+    lines.append(f"- total_cases: {qc['total_cases']}")
+    lines.append(f"- matched_cases: {qc['matched_cases']}")
+    lines.append(f"- missing_in_queue: {len(qc['missing_in_queue'])}")
+    lines.append(f"- missing_in_assessment: {len(qc['missing_in_assessment'])}")
+    lines.append(f"- duplicate_case_ids: {len(qc['duplicate_case_ids'])}")
+    lines.append(f"- status_mismatches: {len(qc['status_mismatches'])}")
+    lines.append(f"- consistency_ok: {qc['consistency_ok']}")
+    lines.append("")
+    lines.append("## QUEUE CATEGORY COUNTS")
+    lines.append("")
+    for qcat, n in qcc.items():
+        lines.append(f"- {qcat}: {n}")
+
     return "\n".join(lines)
 
 
@@ -283,12 +331,67 @@ def write_outputs(report: dict) -> dict[str, Path]:
     return {"json_report": REPORT_JSON, "md_report": REPORT_MD}
 
 
+# Auftrag "VALIDIERUNG": die 4 explizit zu pruefenden Referenzfaelle, ueber
+# ihre stabile listing_id identifiziert (nicht ueber Titel-String-Matching).
+_VALIDATION_CASES = {
+    "PS5-HDMI": "https://www.kleinanzeigen.de/s-anzeige/playstation-5-ps4-ps5-slim-hdmi-port-nintendo-reparatur-usb-pro/3431533294-226-3438",
+    "Nintendo Switch": "https://www.ebay.de/itm/137602406753",
+    "Xbox": "https://www.kleinanzeigen.de/s-anzeige/xbox-one-s-1tb-mit-spiele/3479889108-279-4400",
+    "Nintendo DS Lite": "https://www.ebay.de/itm/398266334210",
+}
+
+
+def _print_queue_consistency_summary(report: dict) -> None:
+    qc = report["queue_consistency"]
+    qcc = report["queue_category_counts"]
+
+    print("Assessment / Queue Consistency")
+    print("=" * 31)
+    print("Total cases:", qc["total_cases"])
+    print("Matched:", qc["matched_cases"])
+    print("Missing:", len(qc["missing_in_queue"]) + len(qc["missing_in_assessment"]))
+    print("Duplicates:", len(qc["duplicate_case_ids"]))
+    print("Status mismatches:", len(qc["status_mismatches"]))
+    print("Consistency:", qc["consistency_ok"])
+    print()
+
+    print("FIXED:", qcc[ffp.QUEUE_CATEGORY_ALREADY_FIXED])
+    print("ACTIVE_ROUTING_FP:", qcc[ffp.QUEUE_CATEGORY_ACTIVE_ROUTING_FP])
+    print("CATEGORY_CHANGED:", qcc[ffp.QUEUE_CATEGORY_CATEGORY_CHANGED])
+    print("GROUND_TRUTH_CONFLICT:", qcc[ffp.QUEUE_CATEGORY_GROUND_TRUTH_CONFLICT])
+    print("MANUAL_REVIEW:", qcc[ffp.QUEUE_CATEGORY_MANUAL_REVIEW])
+    print()
+
+    case_by_id = {c["listing_id"]: c for c in report["cases"]}
+    queue_category_by_id: dict[str, str] = {}
+    for entry in report["fix_queue"]:
+        for listing_id in entry["case_listing_ids"]:
+            queue_category_by_id[listing_id] = entry["queue_category"]
+
+    for label, listing_id in _VALIDATION_CASES.items():
+        case = case_by_id.get(listing_id)
+        if case is None:
+            print(f"{label}: NICHT GEFUNDEN (listing_id={listing_id})")
+            continue
+        assessment_status = case["assessment"]["status"]
+        queue_category = queue_category_by_id.get(listing_id, "FEHLT_IN_QUEUE")
+        expected = ffp._ASSESSMENT_TO_QUEUE_CATEGORY.get(assessment_status)
+        consistent = queue_category == expected
+        print(
+            f"{label}: assessment.status={assessment_status}, "
+            f"queue_category={queue_category}, consistent={consistent}"
+        )
+    print()
+
+
 def _print_final_summary(report: dict) -> None:
     """Auftrag-ABSCHLUSS-Format: Kennzahlen + Details je nicht geloestem
     FALSE_POSITIVE-Ursprungsfall. Die 35 UNCLEAR-Kandidaten werden bewusst
     NICHT einzeln in dieser Terminal-Zusammenfassung aufgelistet (nur ihre
     Gesamtzahl via historical_unclear) -- vollstaendig einsehbar in
     ground_truth_routing_assessment.{json,md}."""
+    _print_queue_consistency_summary(report)
+
     summary = report["summary"]
     print("Historical FP:", summary["historical_fp"])
     print("Currently active routing FP:", summary["current_active_fp"])
@@ -360,6 +463,11 @@ def main(argv=None) -> int:
         print(f"geschrieben ({label}): {path}")
     print()
     _print_final_summary(report)
+
+    if not report["queue_consistency"]["consistency_ok"]:
+        print("ERROR: Assessment<->Fix-Queue-Konsistenz verletzt (siehe oben).")
+        return 1
+
     return 0
 
 

@@ -6,7 +6,7 @@ Automatisch generiert von `tools/ruleset_quality/forensics_false_positives.py`. 
 
 ### retro_konsolen :: Nintendo Retro-Konsole (N64/GameCube/DS) ⚠️ Okay
 
-- **Problem**: 1 bestaetigte(r) historische(r) Fehltreffer, root_cause=`weak_signal` (confidence=confirmed), 0 davon aktuell noch als aktives Routing-Problem eingestuft.
+- **Problem**: 1 bestaetigte(r) historische(r) Fehltreffer, root_cause=`weak_signal` (confidence=confirmed), 1 davon aktuell noch als aktives Routing-Problem eingestuft.
 - **Vorschlag**: `strengthen_positive_signal`
 - **Regression-Risiko**: HIGH
 - **Betroffene Kategorien**: retro_konsolen
@@ -22,7 +22,7 @@ Automatisch generiert von `tools/ruleset_quality/forensics_false_positives.py`. 
 
 ### konsolen_bundles :: Nintendo Switch (V1/V2/OLED) 👍 Guter Preis
 
-- **Problem**: 1 bestaetigte(r) historische(r) Fehltreffer, root_cause=`weak_signal` (confidence=confirmed), 0 davon aktuell noch als aktives Routing-Problem eingestuft.
+- **Problem**: 1 bestaetigte(r) historische(r) Fehltreffer, root_cause=`weak_signal` (confidence=confirmed), 1 davon aktuell noch als aktives Routing-Problem eingestuft.
 - **Vorschlag**: `strengthen_positive_signal`
 - **Regression-Risiko**: HIGH
 - **Betroffene Kategorien**: konsolen_bundles
@@ -36,7 +36,7 @@ Automatisch generiert von `tools/ruleset_quality/forensics_false_positives.py`. 
 
 ### konsolen_bundles :: Xbox One S / One X 👍 Guter Preis
 
-- **Problem**: 1 bestaetigte(r) historische(r) Fehltreffer, root_cause=`weak_signal` (confidence=confirmed), 0 davon aktuell noch als aktives Routing-Problem eingestuft.
+- **Problem**: 1 bestaetigte(r) historische(r) Fehltreffer, root_cause=`weak_signal` (confidence=confirmed), 1 davon aktuell noch als aktives Routing-Problem eingestuft.
 - **Vorschlag**: `strengthen_positive_signal`
 - **Regression-Risiko**: HIGH
 - **Betroffene Kategorien**: konsolen_bundles

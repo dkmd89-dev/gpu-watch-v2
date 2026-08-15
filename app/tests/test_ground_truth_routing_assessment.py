@@ -172,6 +172,42 @@ class TestGroundTruthWirdNieVeraendert:
         assert "docs" not in str(written["json_report"])
 
 
+class TestFixQueueKopplung:
+    """Auftrag "false_positive_fix_queue.json an Ground-Truth-Routing-
+    Assessment koppeln": build_report() liefert Fix-Queue + Konsistenz-
+    pruefung, abgeleitet aus denselben Cases wie die Assessment-Ebene."""
+
+    def test_fix_queue_und_consistency_sind_im_report_enthalten(self, monkeypatch, tmp_path):
+        monkeypatch.setattr(ffp, "evaluate", lambda title, price, cfg: _FakeResult(matched=False))
+        path = _write_forensics(tmp_path, [_entry(url="a")])
+        report = gtra.build_report(input_path=path, rules_cfg={})
+        assert "fix_queue" in report
+        assert "queue_consistency" in report
+        assert "queue_category_counts" in report
+        assert report["queue_consistency"]["consistency_ok"] is True
+
+    def test_konsistenter_report_hat_keine_status_mismatches(self, monkeypatch, tmp_path):
+        monkeypatch.setattr(
+            ffp, "evaluate",
+            lambda title, price, cfg: _FakeResult(matched=True, category="handhelds", rule_label="Valve Steam Deck * Top-Deal"),
+        )
+        entries = [
+            _entry(url="a", category="handhelds"),
+            _entry(url="b", category="gaming_pc"),
+        ]
+        path = _write_forensics(tmp_path, entries)
+        report = gtra.build_report(input_path=path, rules_cfg={})
+        assert report["queue_consistency"]["status_mismatches"] == []
+        assert report["queue_consistency"]["consistency_ok"] is True
+
+    def test_queue_category_counts_summieren_zu_historical_fp(self, monkeypatch, tmp_path):
+        monkeypatch.setattr(ffp, "evaluate", lambda title, price, cfg: _FakeResult(matched=False))
+        entries = [_entry(url=f"u{i}") for i in range(4)]
+        path = _write_forensics(tmp_path, entries)
+        report = gtra.build_report(input_path=path, rules_cfg={})
+        assert sum(report["queue_category_counts"].values()) == report["summary"]["historical_fp"] == 4
+
+
 class TestDeterminismus:
     def test_wiederholter_lauf_liefert_identische_cases_reihenfolge(self, monkeypatch, tmp_path):
         monkeypatch.setattr(ffp, "evaluate", lambda title, price, cfg: _FakeResult(matched=False))
