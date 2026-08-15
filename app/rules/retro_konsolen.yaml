@@ -279,6 +279,45 @@ exclude_category_unless_also_contains:
     - "controller"
     - "konsole"
     - "ersatzkonsole"
+  # FIX (Claude-Session 2026-08-15, found.json-Vollanalyse Blast-Radius-
+  # Check): identisches Muster wie oben -- "system" ist als Gruppe-2-
+  # Geraete-Signal bewusst erhalten (rettet reale Bundles wie "Nintendo DS
+  # Handheld-System grün (PAL) Touchscreen, Mikrofon, Kopfhöreranschluss",
+  # die sonst ueber kein anderes Gruppe-2-Wort verfuegen), reicht aber auch
+  # zufaellig, wenn "System" Teil eines Spiel-UNTERTITELS ist (real
+  # bestaetigt: "Metal Arms-Glitch in The System (Sony PlayStation 2) PS2
+  # Gebraucht", 10,99€, Top-Deal -- Einzelspiel, kein Geraet). Systematischer
+  # Blast-Radius-Check gegen den vollen 2.474-Titel-Korpus: von 3 Titeln, die
+  # AUSSCHLIESSLICH ueber "system" matchen (kein anderes Gruppe-2-Wort), sind
+  # 2 echte Handheld-System-Konsolen (beide enthalten "handheld") und genau
+  # der obige 1 Fehltreffer (enthaelt kein "handheld"). Kontextliste: die
+  # bestehende Gruppe-2-Marker-Liste (identisch zu "komplett"/"spiel"/
+  # "spiele" oben, kostenlos wiederverwendet) plus "handheld" als neuer,
+  # spezifisch fuer diesen Fall verifizierter Kontextbegriff.
+  #
+  # Nachtrag (Regressionstest aufgedeckt): "Nintendo DS Lite Konvolut
+  # 3xHandheld-System USG-001 (2xSilber, 1x Grün)" ist ein zweiter realer
+  # TRUE_POSITIVE, der ausschliesslich ueber "system" matcht -- "handheld"
+  # allein reicht hier NICHT als Kontextbegriff, da "3xHandheld" ohne
+  # Leerzeichen zusammengeschrieben ist und die Wortgrenzen-Pruefung in
+  # _contains_term() das Wort "handheld" daher nicht als eigenstaendig
+  # erkennt (direkt vorausgehendes "x" ist ein Wortzeichen). "konvolut"
+  # zusaetzlich ergaenzt -- im Titel als eigenstaendiges Wort vorhanden,
+  # semantisch zudem ein starkes Signal fuer eine echte Mehrteile-Sammlung
+  # statt eines Einzelspiels.
+  "system":
+    - "konsole"
+    - "heimkonsole"
+    - "spielekonsole"
+    - "gerät"
+    - "kabel"
+    - "slim"
+    - "fat"
+    - "komplett"
+    - "memory card"
+    - "controller"
+    - "handheld"
+    - "konvolut"
 
 # Scoring: kein Hardware-Detector anwendbar (analog sata_ssd.yaml) --
 # Preis ist das mit Abstand aussagekraeftigste Signal. Ausstattung/
