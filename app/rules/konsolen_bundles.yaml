@@ -62,6 +62,14 @@ exclude_category:
   # nennt "mainboard"/"motherboard").
   - "mainboard"
   - "motherboard"
+  # FIX (Nutzer-Meldung 2026-08-15, found.json-Vollanalyse): "Panzerglas"/
+  # "Displayschutz" sind eindeutige Zubehör-Produktnamen (Schutzfolie fürs
+  # Konsolen-Display), kein Gerät. Real bestätigt: "Panzerglas Displayschutz
+  # Nintendo Switch Lite" (5€, Top-Deal). Blast Radius: 1 Treffer im
+  # gesamten Korpus (found.json + price_history.jsonl identisch), 0
+  # Kollisionen.
+  - "panzerglas"
+  - "displayschutz"
 
   # Phase 15 (kontrollierter Review, "Service/Modding-Fix"): Reparatur-/
   # Modding-DIENSTLEISTUNGS-Angebote statt Konsolenverkauf. Bewusst als
@@ -210,6 +218,45 @@ exclude_category:
 # 3 Kandidaten waren bei Prüfung selbst Fehltreffer -- ein Spiel und zwei
 # Standalone-Controller-Angebote, siehe Bericht Abschnitt 7).
 exclude_category_unless_also_contains:
+  # FIX (Nutzer-Meldung 2026-08-15, found.json-Vollanalyse): "ovp"/"bundle"/
+  # "set"/"mit spiele" sind in der require_all_of-Gruppe 2 bewusst erhaltene
+  # Positivsignale (siehe Kommentar weiter unten, "ovp bleibt Positivsignal"),
+  # reichen aber zusammen mit "spiele" fuer reine Spiele-Sammlungen OHNE jedes
+  # Geraet aus (z.B. "Nintendo Switch Spiele Bundle", "PS4 Spiele Bundle mit
+  # zwei Controllern", "FIFA & F1 Spiele Paket Bundle (7 Spiele)"). Bare
+  # "spiel" (Singular) ist bereits als unbedingter Exclude vorhanden, greift
+  # aber wegen Wortgrenzen nicht bei der Pluralform "Spiele" (identisches
+  # Muster wie ueberall in diesem Projekt: modul/module, zubehör-set/zubehör
+  # set). Systematischer Blast-Radius-Check gegen den vollen found.json+
+  # price_history.jsonl-Korpus (120 Titel mit "spiele" in dieser Kategorie):
+  # 26 Titel haben "spiele" OHNE jeden Geraete-/Modell-Marker -- ausnahmslos
+  # reine Spiele-Angebote. Die uebrigen ~94 haben JEWEILS mindestens einen
+  # echten Marker (konsole/slim/pro/500gb/1tb/xl/oled/lite/...) -- 0
+  # Kollisionen mit echten Konsole+Spiele-Bundles. Kontextliste identisch zu
+  # den group2-Geraete-/Modell-Alternativen aller Regeln dieser Datei
+  # (Switch: konsole/spielekonsole/heimkonsole/system; PS4/Xbox: slim/pro/
+  # Speichergroessen; Switch-Modellvarianten: xl/oled/lite/v1/v2).
+  spiele:
+    - "konsole"
+    - "spielkonsole"
+    - "spielekonsole"
+    - "heimkonsole"
+    - "system"
+    - "slim"
+    - "pro"
+    - "1tb"
+    - "500gb"
+    - "128gb"
+    - "64gb"
+    - "32gb"
+    - "256gb"
+    - "512gb"
+    - "2tb"
+    - "xl"
+    - "oled"
+    - "lite"
+    - "v1"
+    - "v2"
   gehäuse:
     - "vergilbt"
     - "verkratzt"

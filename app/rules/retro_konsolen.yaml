@@ -64,6 +64,14 @@ exclude_category:
   - "nur controller"
   - "controller only"
   - "emulator"         # Software-Emulation, keine echte Hardware
+  # FIX (Nutzer-Meldung 2026-08-15, found.json-Vollanalyse): "emul"
+  # (Abkuerzung von "Emulator"/"Emulation") -- real bestaetigt: "R36 Ultra X
+  # handheld Konsole, snes, nes, psp, Ps1 Spiele Emul" (55€, Guter Preis),
+  # ein moderner Android-Emulations-Handheld, keine echte Nintendo/Sony-
+  # Konsole. Bare "emulator" oben greift bei der Abkuerzung nicht. Blast
+  # Radius: 1 Treffer im gesamten Korpus (found.json + price_history.jsonl
+  # identisch), 0 Kollisionen.
+  - "emul"
   # Optimierung (Robin-Feedback: "ich bekomme Spiele und Sonstiges"):
   # die o.g. Excludes griffen nur bei exakter Wortkombination, nicht bei
   # den in der Praxis ueblichen freien Formulierungen fuer Spiel-only-
@@ -164,6 +172,58 @@ exclude_category:
 # (siehe matcher.py::_any_conditional_exclude_presence(), ausführliche
 # Begründung in handhelds.yaml).
 exclude_category_unless_also_contains:
+  # FIX (Nutzer-Meldung 2026-08-15, found.json-Vollanalyse): "komplett" ist
+  # eine group2-Geraete-Indikator-Alternative (siehe require_all_of unten),
+  # ist aber in der Praxis ein Zustandsbegriff für "vollständig/CIB", der bei
+  # EINZELSPIELEN mindestens genauso häufig vorkommt wie bei Konsolen (z.B.
+  # "Phantasy Star Online... - Nintendo GameCube - komplett", "FIFA Football
+  # 2003 – PS1 – deutsche PAL-Version – komplett", "Pokémon Stadium für
+  # Nintendo 64 - Komplett mit OVP") -- reicht daher allein NICHT als
+  # Geräte-Nachweis. Kontextliste bewusst OHNE "komplett" selbst (das wäre
+  # der ursächliche schwache Marker) -- ausschließlich die stärkeren, echten
+  # Gerätemarker aus derselben group2-Liste. Blast-Radius-Check gegen den
+  # vollen, aktuell sichtbaren found.json-Korpus: 20 Treffer ("komplett" ohne
+  # jeden stärkeren Marker), ausnahmslos reale Einzelspiel-/Zubehör-
+  # Fehltreffer (u.a. ein Nintendo-64-Expansion-Pak-Zubehörteil), 0
+  # Kollisionen mit echten Konsole-Angeboten.
+  komplett:
+    - "konsole"
+    - "heimkonsole"
+    - "spielekonsole"
+    - "gerät"
+    - "system"
+    - "kabel"
+    - "slim"
+    - "fat"
+    - "memory card"
+    - "controller"
+  # Ergänzender, engerer Schutz für den Fall, dass "spiel"/"spiele" OHNE
+  # "komplett" aber ebenfalls nur mit einem schwachen Marker auftritt --
+  # bislang kein eigener bestätigter Fall über "komplett" hinaus, aber
+  # dieselbe Kontextliste kostenlos wiederverwendet (kein neues
+  # Kollisionsrisiko, da identische, bereits verifizierte Marker).
+  spiel:
+    - "konsole"
+    - "heimkonsole"
+    - "spielekonsole"
+    - "gerät"
+    - "system"
+    - "kabel"
+    - "slim"
+    - "fat"
+    - "memory card"
+    - "controller"
+  spiele:
+    - "konsole"
+    - "heimkonsole"
+    - "spielekonsole"
+    - "gerät"
+    - "system"
+    - "kabel"
+    - "slim"
+    - "fat"
+    - "memory card"
+    - "controller"
   gehäuse:
     - "vergilbt"
     - "verkratzt"
