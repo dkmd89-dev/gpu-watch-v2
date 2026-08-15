@@ -23,22 +23,38 @@ UA = {
 def _price_to_float(text: str) -> float | None:
     """Parst Quokas Preisformat zu einem float.
 
-    Zwei beobachtete Varianten (siehe Analyse gegen echte Fixture):
-    - Normalpreis: "155 EUR" (Ganzzahl, kein Trenner)
-    - Rabatt-Preis (`.new-price`/`.old-price`): "529.0 EUR" -- hier ist der
-      Punkt ein DEZIMALTRENNER (eine Nachkommastelle), kein Tausenderpunkt.
+    Drei beobachtete Varianten (siehe Analyse gegen echte Fixture +
+    Live-Verifikation gegen quoka.de, Nutzer-Meldung 2026-08-15,
+    GPU-Preis-0€-Diagnose):
+    - Normalpreis, dreistellig oder kleiner: "155 EUR" (Ganzzahl, kein
+      Trenner).
+    - Normalpreis, ab 1000: "1 050 EUR"/"1 000 EUR"/"10 000 EUR" -- hier
+      ist LEERZEICHEN der Tausendertrenner (live bestaetigt: Suche nach
+      "RTX 4060" auf quoka.de liefert u.a. "1 000 EUR" exakt in diesem
+      Format). Bug (Root Cause der 0€-Faelle, siehe FIX-Kommentar unten):
+      diese Variante fehlte bisher komplett -- die alte Regex erkannte nur
+      "\\d+" (matcht dann faelschlich nur die letzten <=3 Ziffern nach dem
+      letzten Leerzeichen, z.B. "1 000 EUR" -> "000" -> 0.0, "1 050 EUR"
+      -> "050" -> 50.0 statt 1050.0).
+    - Rabatt-Preis (`.new-price`/`.old-price`): "529.0 EUR"/"850.000 EUR"
+      -- hier ist der Punkt je nach Nachkommastellen-Anzahl ENTWEDER
+      Dezimaltrenner (1-2 Ziffern, "529.0 EUR" = 529,0€) ODER
+      Tausendertrenner (exakt 3 Ziffern je Gruppe, deutsche Konvention,
+      "1.250 EUR"/"850.000 EUR" = 1.250€/850.000€) -- live gegen
+      quoka.de-Fahrzeuganzeigen verifiziert (beide Formate real
+      beobachtet).
 
-    Um "529.0 EUR" nicht faelschlich als 5290 zu interpretieren, wird ein
-    Tausenderpunkt nur erkannt, wenn ihm exakt drei Ziffern folgen (deutsche
-    Konvention, z.B. "1.250 EUR"); ein Punkt/Komma mit 1-2 Nachkommastellen
-    gilt als Dezimaltrenner. Ggf. angehaengter Text wie "VB"
-    (Verhandlungsbasis) wird ignoriert (re.search, kein Vollstring-Match).
+    Ggf. angehaengter Text wie "VB" (Verhandlungsbasis) wird ignoriert
+    (re.search, kein Vollstring-Match).
     """
     text = text.replace("\xa0", " ")
-    m = re.search(r"(\d{1,3}(?:\.\d{3})+|\d+)(?:[.,](\d{1,2}))?\s*EUR", text)
+    m = re.search(
+        r"(\d{1,3}(?:\.\d{3})+|\d{1,3}(?: \d{3})+|\d+)(?:[.,](\d{1,2}))?\s*EUR",
+        text,
+    )
     if not m:
         return None
-    whole = m.group(1).replace(".", "")
+    whole = m.group(1).replace(".", "").replace(" ", "")
     frac = m.group(2) or "0"
     try:
         return float(f"{whole}.{frac}")

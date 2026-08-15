@@ -1,13 +1,26 @@
 {
   "per_category": {
+    "gpu": {
+      "kategorie": "gpu",
+      "getestete_eintraege": 149,
+      "sichtbar": 149,
+      "TRUE_POSITIVE": 0,
+      "FALSE_POSITIVE": 0,
+      "UNCLEAR": 0,
+      "UNLABELED": 149,
+      "labeled_n": 0,
+      "precision": null,
+      "false_positive_rate": null,
+      "abdeckung_pct": 0.0
+    },
     "iphone": {
       "kategorie": "iphone",
-      "getestete_eintraege": 708,
-      "sichtbar": 708,
+      "getestete_eintraege": 707,
+      "sichtbar": 707,
       "TRUE_POSITIVE": 4,
       "FALSE_POSITIVE": 0,
       "UNCLEAR": 0,
-      "UNLABELED": 704,
+      "UNLABELED": 703,
       "labeled_n": 4,
       "precision": 1.0,
       "false_positive_rate": 0.0,
@@ -21,19 +34,6 @@
       "FALSE_POSITIVE": 0,
       "UNCLEAR": 0,
       "UNLABELED": 254,
-      "labeled_n": 0,
-      "precision": null,
-      "false_positive_rate": null,
-      "abdeckung_pct": 0.0
-    },
-    "gpu": {
-      "kategorie": "gpu",
-      "getestete_eintraege": 148,
-      "sichtbar": 148,
-      "TRUE_POSITIVE": 0,
-      "FALSE_POSITIVE": 0,
-      "UNCLEAR": 0,
-      "UNLABELED": 148,
       "labeled_n": 0,
       "precision": null,
       "false_positive_rate": null,
@@ -81,7 +81,7 @@
     "retro_konsolen": {
       "kategorie": "retro_konsolen",
       "getestete_eintraege": 188,
-      "sichtbar": 187,
+      "sichtbar": 181,
       "TRUE_POSITIVE": 3,
       "FALSE_POSITIVE": 0,
       "UNCLEAR": 0,
@@ -159,7 +159,7 @@
     "handhelds": {
       "kategorie": "handhelds",
       "getestete_eintraege": 21,
-      "sichtbar": 16,
+      "sichtbar": 15,
       "TRUE_POSITIVE": 0,
       "FALSE_POSITIVE": 0,
       "UNCLEAR": 0,
@@ -251,7 +251,7 @@
   "overall": {
     "kategorie": "GESAMT",
     "getestete_eintraege": 2500,
-    "sichtbar": 2474,
+    "sichtbar": 2467,
     "TRUE_POSITIVE": 14,
     "FALSE_POSITIVE": 0,
     "UNCLEAR": 0,

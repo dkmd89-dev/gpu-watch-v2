@@ -261,6 +261,38 @@ exclude_category_unless_also_contains:
     - "gebraucht"
     - "funktioniert"
     - "funktionsfähig"
+  # FIX (Nutzer-Meldung 2026-08-15, Xenoblade-Spieltitel-Problem): "[Spiel-
+  # titel] für Nintendo [New] 3DS" ist ein Software-Angebot, kein Geraet --
+  # die require_all_of-Gruppe 2 dieser Kategorie hat fuer 3DS/2DS KEIN
+  # generisches, nicht-plattformspezifisches Signalwort (anders als z.B.
+  # retro_konsolen: "konsole"/"gerät"/"system" dort UNABHAENGIG vom
+  # Plattformnamen selbst), sondern matcht bereits ueber den reinen
+  # Plattformnamen ("new 3ds"/"xl"). Real bestaetigt, aktuell live sichtbar:
+  # "Xenoblade Chronicles für Nintendo New 3DS OVP" (18€), "Super Mario 3D
+  # Land für Nintendo 3DS 3DS XL" (5€, price_history.jsonl) -- beide ohne
+  # jedes generische Spiel-Signalwort ("spiel"/"modul"), daher von den
+  # bestehenden bare Excludes nicht erfasst. Identisches Prinzip wie die
+  # "für [Plattform]"-Kontextpruefung in konsolen_bundles.yaml, hier
+  # erstmalig fuer handhelds.yaml eingefuehrt. Bewusst NUR die beiden real
+  # bestaetigten Phrasen ("für nintendo new 3ds"/"für nintendo 3ds"), NICHT
+  # strukturell auf 2DS/Steam Deck/ROG Ally/Legion Go erweitert -- fuer
+  # Steam Deck/ROG Ally/Legion Go sind alle "für [Marke]"-Treffer im
+  # Korpus bereits eindeutiges, anderweitig abgedecktes Zubehoer (Huelle/
+  # Dockingstation/Hub/Joystick-Ersatzteil), kein Spieltitel-Problem; fuer
+  # 2DS liegt kein bestaetigter Fehltreffer vor. Kontextliste bewusst OHNE
+  # "xl"/"new 3ds" (das waeren dieselben mehrdeutigen Plattform-Woerter,
+  # die das Problem erst verursachen) -- NUR echte, plattformunabhaengige
+  # Geraete-Woerter zaehlen als Ausnahme. Verifiziert: "Nintendo 2DS
+  # Handheld System Konsole für Nintendo 3DS Plattform" (74,99€, echtes
+  # Geraet) bleibt ueber "system"/"konsole" korrekt erhalten.
+  "für nintendo new 3ds":
+    - "konsole"
+    - "system"
+    - "gerät"
+  "für nintendo 3ds":
+    - "konsole"
+    - "system"
+    - "gerät"
 
 scoring_weights:
   price: 0.85

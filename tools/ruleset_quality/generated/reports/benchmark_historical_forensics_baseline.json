@@ -2,22 +2,22 @@
   "meta": {
     "baseline_id": "historical_forensics_baseline",
     "baseline_ruleset_signature": "1e7fcec77b51c375",
-    "current_ruleset_signature": "6266e4a437c1fbc4",
+    "current_ruleset_signature": "20737fe48c8f52af",
     "ruleset_unveraendert": false,
     "anzahl_eintraege": 2306,
     "severity_counts": {
       "NEUTRAL": 2090,
       "CRITICAL": 97,
-      "INFO": 47,
-      "HIGH_CANDIDATE": 72
+      "INFO": 49,
+      "HIGH_CANDIDATE": 70
     },
     "gate_label_counts": {
       "TRUE_POSITIVE -> TRUE_POSITIVE (stabil)": 2090,
       "TRUE_POSITIVE -> kein Treffer": 97,
-      "FALSE_POSITIVE -> kein Treffer": 12,
+      "FALSE_POSITIVE -> kein Treffer": 14,
       "UNCLEAR -> kein Treffer": 15,
       "UNCLEAR weiterhin unklar": 20,
-      "FALSE_POSITIVE weiterhin aktiv": 7,
+      "FALSE_POSITIVE weiterhin aktiv": 5,
       "TRUE_POSITIVE, aber anderer Matchpfad": 65
     }
   },
@@ -13860,12 +13860,12 @@
       "category": "retro_konsolen",
       "before_verdict": "FALSE_POSITIVE",
       "before_rule": "Sony Retro-Konsole (PS1/PS2) 👍 Guter Preis",
-      "after_match_state": "GLEICHE_KATEGORIE",
-      "after_category": "retro_konsolen",
-      "after_rule": "Sony Retro-Konsole (PS1/PS2) 👍 Guter Preis",
-      "severity": "HIGH_CANDIDATE",
-      "gate_label": "FALSE_POSITIVE weiterhin aktiv",
-      "explanation": "Bekannter Fehltreffer matcht weiterhin unveraendert dieselbe Kategorie/Regel -- nicht gefixt."
+      "after_match_state": "KEIN_TREFFER",
+      "after_category": null,
+      "after_rule": null,
+      "severity": "INFO",
+      "gate_label": "FALSE_POSITIVE -> kein Treffer",
+      "explanation": "Bekannter Fehltreffer matcht jetzt nicht mehr (Fix wirkt wie erwartet)."
     },
     {
       "url": "https://www.ebay.de/itm/307115714391",
@@ -15563,12 +15563,12 @@
       "category": "retro_konsolen",
       "before_verdict": "FALSE_POSITIVE",
       "before_rule": "Nintendo Retro-Konsole (N64/GameCube/DS) ★ Top-Deal",
-      "after_match_state": "GLEICHE_KATEGORIE",
-      "after_category": "retro_konsolen",
-      "after_rule": "Nintendo Retro-Konsole (N64/GameCube/DS) ★ Top-Deal",
-      "severity": "HIGH_CANDIDATE",
-      "gate_label": "FALSE_POSITIVE weiterhin aktiv",
-      "explanation": "Bekannter Fehltreffer matcht weiterhin unveraendert dieselbe Kategorie/Regel -- nicht gefixt."
+      "after_match_state": "KEIN_TREFFER",
+      "after_category": null,
+      "after_rule": null,
+      "severity": "INFO",
+      "gate_label": "FALSE_POSITIVE -> kein Treffer",
+      "explanation": "Bekannter Fehltreffer matcht jetzt nicht mehr (Fix wirkt wie erwartet)."
     },
     {
       "url": "https://www.kleinanzeigen.de/s-anzeige/hp-probook-440-g7-i5-10210u-8gb-ram-256gb-m-2-ssd-win-11/3480009939-278-1176",

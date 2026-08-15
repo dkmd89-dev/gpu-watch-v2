@@ -3,43 +3,43 @@
 > **Stand:** 2026-08-15  
 > **Repository:** `dkmd89-dev/gpu-watch-v2`  
 > **Branch:** `main`  
-> **Letzter Code-Commit auf `main` (vor dieser Doku-Aktualisierung):** `2bcc7d4` (Merge PR #39)  
+> **Letzter Code-Commit auf `main` (vor dieser Doku-Aktualisierung):** `30b72b1` (Merge PR #40)  
 > **Technische Referenz:** `TECHNISCHER_PROJEKTSTATUS.md`
 
 ## Gesamtstatus
 
-**Stabil / aktiv weiterentwickelbar.** Seit dem letzten dokumentierten Stand (`2bcc7d4`, PR #39)
-wurde die in Batch 14 bewusst zurückgestellte „pro"-Kollision in `konsolen_bundles.yaml` **gelöst**
-(Batch 15 unten) — alle 3 real bestätigten Live-Fehltreffer (Snakebyte Pro-Controller, Astro
-MixAmp, Chin Fai Vertical Stand) gefixt, ohne die zuvor befürchteten Kollisionen mit echten
-Konsole+Pro-Controller-Bundles. Die beiden anderen in Batch 14 zurückgestellten Muster
-(Spieltitel-ohne-Signalwort in `handhelds`, `netzteil`-Positivsignal in `retro_konsolen`) bleiben
-weiterhin offen.
+**Stabil / aktiv weiterentwickelbar.** Seit dem letzten dokumentierten Stand (`30b72b1`, PR #40)
+wurden alle drei verbleibenden, aus Batch 14 zurückgestellten Punkte gelöst (Batch 16 unten):
+**Xenoblade-Spieltitel-Problem** in `handhelds` (neuer „für [Plattform]"-Kontextmechanismus,
+erstmalig in dieser Datei), **`netzteil`-Positivsignal** in `retro_konsolen` (identisches Muster
+wie das bereits produktive „memory card"-Exclude in derselben Datei), und der **Quoka-Preis-
+Parsing-Defekt an der Wurzel gelöst** (nicht nur das Symptom wie in Batch 14) — Root Cause war
+ein fehlendes Leerzeichen-Tausendertrennzeichen-Format in der Scraper-Regex, live gegen
+quoka.de verifiziert.
 
 ## Verifizierter Stand
 
 ```text
-main (vor dieser Doku-Aktualisierung): 2bcc7d4 (Merge PR #39)
+main (vor dieser Doku-Aktualisierung): 30b72b1 (Merge PR #40)
 
 Vollständiger Testlauf (vom Nutzer lokal ausgeführt und verifiziert):
-pytest app/tests/ -> 1355 passed, 0 failed (85,27s)
+pytest app/tests/ -> 1358 passed, 0 failed (85,27s)
 
 Rule Analyzer:
 355 Regeln
 19 Kategorien
 0 Findings
-Ruleset-Signatur: 6266e4a437c1fbc4 (geändert gegenüber b863e724db9b393c -- YAML-Änderungen
-  in konsolen_bundles.yaml, siehe Batch 15)
+Ruleset-Signatur: 20737fe48c8f52af (geändert gegenüber 6266e4a437c1fbc4 -- YAML-Änderungen
+  in handhelds.yaml/retro_konsolen.yaml, siehe Batch 16)
 
 data/found.json: 2500 Einträge
 data/price_history.jsonl: 15.199 Datenpunkte (laufender Produktivbetrieb, nicht Teil dieses Batches)
 ```
 
-Vorheriger dokumentierter Teststand (PR #39): 1337/1337. 6 neue Tests in diesem Batch (siehe
-Batch 15 unten) — 1337+6=1343 ≠ 1355 (Differenz +12, diesmal in die andere Richtung als beim
-letzten Batch). Wie bereits dort vermerkt: STATUS.md wird nicht in jeder Session live gegen einen
-lokalen Checkout verifiziert (CLAUDE.md Abschnitt 7) — der jetzt dokumentierte Stand (1355) ist der
-frisch verifizierte.
+Vorheriger dokumentierter Teststand (PR #40): 1355/1355. 8 neue Tests in diesem Batch (siehe
+Batch 16 unten) — 1355+8=1363 ≠ 1358 (Differenz -5). Wie bereits zweimal zuvor vermerkt:
+STATUS.md wird nicht in jeder Session live gegen einen lokalen Checkout verifiziert (CLAUDE.md
+Abschnitt 7) — der jetzt dokumentierte Stand (1358) ist der frisch verifizierte.
 
 ## Zuletzt abgeschlossene Batches
 
@@ -401,6 +401,51 @@ bundle_matcht_weiterhin`/`test_pro_slim_ohne_zubehoerwort_matcht_weiterhin`). Vo
 Ruleset-Signatur geändert (`b863e724db9b393c` → `6266e4a437c1fbc4`). Reiner YAML-Fix, kein
 Rebuild nötig.
 
+### 16. Alle drei verbleibenden Batch-14-Punkte gelöst
+
+**Xenoblade-Spieltitel-Problem (`handhelds.yaml`):** die require_all_of-Gruppe 2 für 3DS/2DS hat
+kein plattformunabhängiges Signalwort (anders als `retro_konsolen`: „konsole"/„gerät"/„system"),
+sondern matcht bereits über den reinen Plattformnamen. Zusätzlich zum gemeldeten Fall gefunden:
+„Super Mario 3D Land für Nintendo 3DS 3DS XL" (5€, price_history.jsonl) — identisches Muster.
+**Fix:** neuer `exclude_category_unless_also_contains`-Eintrag für „für nintendo new 3ds"/„für
+nintendo 3ds" (Kontextliste: „konsole"/„system"/„gerät", bewusst OHNE „xl"/„new 3ds" — das wären
+dieselben mehrdeutigen Wörter, die das Problem verursachen). Erstmalige Einführung dieses bereits
+in `konsolen_bundles.yaml` etablierten Mechanismus in `handhelds.yaml`. Bewusst nicht auf 2DS/Steam
+Deck/ROG Ally/Legion Go erweitert — für Letztere sind alle „für [Marke]"-Treffer im Korpus bereits
+eindeutiges, anderweitig abgedecktes Zubehör, kein Spieltitel-Problem.
+
+**`netzteil`-Positivsignal (`retro_konsolen.yaml`):** systematischer Blast-Radius-Check ergab: von
+24 Titeln, die AUSSCHLIESSLICH über „netzteil" matchen (kein anderes Gruppe-2-Wort), hat genau 1
+(„Nintendo N64 Control Deck 2 Original Controller Netzteil Erweiterungskarte", 99€) „controller"
+im Titel — alle anderen 23 sind Standalone-Netzteil-/Ladegerät-Angebote, u.a. die beiden gemeldeten
+Fälle. **Fix:** identisches, bereits produktives Muster wie das bestehende „memory card"-Exclude
+in derselben Datei — `"netzteil": ["controller", "konsole", "ersatzkonsole"]` unter
+`exclude_category_unless_also_contains`.
+
+**Quoka-Preis-Parsing-Defekt (`scrapers/quoka.py`):** Root Cause **an der Wurzel gelöst**, nicht
+nur das Symptom (Batch 14s `price<=0`-Guard in `app.py` bleibt zusätzlich als Sicherheitsnetz
+bestehen). Live-Recherche gegen quoka.de (Suche „RTX 4060") ergab: das Normalpreisfeld
+(`span.article-price`, ohne verschachteltes `.new-price`) nutzt ab 1000€ ein **Leerzeichen als
+Tausendertrennzeichen** (z.B. „1 000 EUR", „1 050 EUR" — live auf der Seite bestätigt), das
+`_price_to_float()` bisher nicht kannte. Bei runden Tausendern (Rest nach letztem Leerzeichen =
+"000") entstand dadurch 0.0, sonst ein stiller Trunkierungsfehler (z.B. "1 050 EUR" → 50.0 statt
+1050.0). `_price_to_float()`-Regex um eine dritte Alternative (`\d{1,3}(?: \d{3})+`) ergänzt,
+gegen 17 Preisformate verifiziert (alle bisherigen Formate inkl. Rabattpreis-Punkt-Varianten
+bleiben korrekt, inkl. mehrstelliger Tausenderpunkt-Fall „850.000 EUR" = 850.000€, live gegen
+Fahrzeuganzeigen verifiziert). **Nebeneffekt:** Angebote, die zuvor durch den `price<=0`-Guard
+still verworfen wurden, erscheinen jetzt korrekt mit echtem Preis — Recall-Verbesserung, nicht
+nur Korrektheit. Wirkt nur auf künftige Scans, keine rückwirkende Korrektur bereits gespeicherter
+0€-Punkte (analog Umlaut-Fingerprint-Fix, Batch 5).
+
+8 neue Regressionstests (`test_handhelds_spieltitel_fuer_3ds_fix.py`,
+`test_retro_konsolen_netzteil_kontext_fix.py`, 2 neue Fälle in `test_scraper_quoka.py`).
+Zielgerichtete Suiten: 139 passed (`handheld`/`retro_konsolen`/`quoka`/`scraper`-Tests). Volle
+Suite **1358/1358 grün** (vom Nutzer lokal verifiziert, 85,27s). `rule_analyzer.py`: 0 Findings.
+Baseline-Regeneration bestätigt: alle 3 gemeldeten Ziel-Titel korrekt ausgeblendet.
+Ruleset-Signatur geändert (`6266e4a437c1fbc4` → `20737fe48c8f52af`). YAML-Fixes wirken ohne
+Rebuild, der Quoka-Scraper-Fix (`scrapers/quoka.py`) ist eine Python-Änderung und braucht
+`docker compose up --build -d`.
+
 ## Abgeschlossen
 
 - ursprüngliche Phasen 0–10
@@ -438,6 +483,8 @@ Rebuild nötig.
   behoben + Preis-Mindestbetrag-Guard gegen Quoka-Parsing-Defekt (Batch 14 oben)
 - „pro"-Kollision in `konsolen_bundles.yaml` gelöst, 3 weitere Live-Fehltreffer behoben (Batch 15
   oben)
+- Alle drei verbleibenden Batch-14-Punkte gelöst: Xenoblade-Spieltitel-Problem, `netzteil`-
+  Positivsignal, Quoka-Preis-Parsing-Defekt an der Wurzel (Batch 16 oben)
 
 ## Aktuelle Systemkette
 
@@ -503,29 +550,25 @@ Wichtige Architekturregeln:
     wodurch ein Fingerprint vereinzelt andere Signalwörter enthalten kann als der echte Titel
     (1 beobachteter Fall: `m2_ssd` → `sata_ssd`-Fehlklassifikation bei Fingerprint-Revalidierung).
     Nur beobachtet, nicht verallgemeinert, keine Aktion.
-16. Zwei weiterhin real bestätigte, bewusst zurückgestellte Fehltreffer-Muster (Batch 14):
-    Spieltitel ohne generisches Signalwort (`handhelds`, z.B. "Xenoblade Chronicles für Nintendo
-    New 3DS"), „netzteil" als bewusstes Positivsignal in einer für 6 `retro_konsolen`-Regeln
-    geteilten Gruppe (2 Fälle) — beide bräuchten ein Redesign geteilter Regelgruppen bzw. einen
-    neuen Matcher-Mechanismus statt eines additiven Excludes. Die dritte, ursprünglich ebenfalls
-    zurückgestellte „pro"-Kollision in `konsolen_bundles` ist **erledigt** (Batch 15) — stellte
-    sich bei tieferer Analyse als 3 unabhängige, einzeln additiv lösbare Ursachen heraus statt
-    einer strukturellen Gruppen-Kollision.
-17. Quoka-Preis-Parsing-Defekt: Symptom gefixt (Batch 14, `price<=0`-Guard in `run_scan()`),
-    HTML-seitige Ursache in `scrapers/quoka.py::_price_to_float()` **nicht** untersucht (bräuchte
-    Live-Zugriff auf die aktuelle Quoka-Seite, spekulativ ohne diesen nicht sinnvoll lösbar).
+16. Alle drei in Batch 14 zurückgestellten Punkte sind **erledigt** (Batch 15/16): „pro"-Kollision
+    in `konsolen_bundles` (Batch 15), Spieltitel-ohne-Signalwort in `handhelds` sowie „netzteil"-
+    Positivsignal in `retro_konsolen` (beide Batch 16) — alle drei stellten sich bei tieferer
+    Analyse als additiv lösbar heraus, keine davon brauchte das ursprünglich erwartete
+    Matcher-/Architektur-Redesign.
+17. Quoka-Preis-Parsing-Defekt: **an der Wurzel gelöst** (Batch 16) — `_price_to_float()` kannte
+    das Leerzeichen-Tausendertrennzeichen-Format nicht (live gegen quoka.de verifiziert). Der
+    `price<=0`-Guard aus Batch 14 bleibt zusätzlich als generisches Sicherheitsnetz bestehen.
 
 ## Nächste Prioritäten
 
 ### P0 — offene Punkte
 
-- Keine offenen P0-Punkte (alle in Batch 1–15 dokumentierten Punkte abgeschlossen und verifiziert).
-  Nächste Schritte laut Datenqualität/offene Punkte: Nr. 6 (Resale-Confidence), Nr. 16 (zwei noch
-  zurückgestellte Fehltreffer-Muster) oder Nr. 17 (Quoka-Root-Cause) — alle explizit auf
-  Nutzerentscheidung zurückgestellt, kein aktiver Blocker.
-- **Rebuild ausstehend:** Batch 14 enthält eine Python-Änderung (`app.py`, Preis-Guard) —
-  `docker compose up --build -d` nötig, bevor der Fix produktiv wirkt (alle YAML-Fixes aus
-  Batch 14 und 15 wirken bereits ohne Rebuild, volume-gemountet).
+- Keine offenen P0-Punkte (alle in Batch 1–16 dokumentierten Punkte abgeschlossen und verifiziert,
+  inkl. aller ursprünglich zurückgestellten Fehltreffer-Muster). Nächster Schritt nach freiem
+  Ermessen: Nr. 6 (Resale-Confidence) oder eine neue Nutzeranfrage.
+- **Rebuild ausstehend:** Batch 14 (`app.py`-Preisguard) UND Batch 16 (`scrapers/quoka.py`-Fix)
+  enthalten Python-Änderungen — `docker compose up --build -d` nötig, bevor beide Fixes produktiv
+  wirken (alle YAML-Fixes aus Batch 14–16 wirken bereits ohne Rebuild, volume-gemountet).
 - Beobachtung aus Batch 13 (kein Blocker): einen der nächsten 1-2 Scans gegenchecken, sobald sich
   `dedupliziert` wieder im Normalbereich (<650) einpendelt, für eine "steady state"-Bestätigung
   der Matching+Scoring-/Persistence-Werte.
