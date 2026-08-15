@@ -96,9 +96,14 @@ def test_echte_switch_lite_standalone_verkaeufe_matchen_weiterhin():
 
 
 def test_echte_bundles_mit_ovp_bleiben_erhalten():
-    # Bare "ovp" ohne Verneinung bleibt unveraendert ein gueltiges
-    # Positivsignal (Auftragsvorgabe frueherer Fixes: OVP nicht entfernen).
-    r = evaluate("Nintendo Switch mit OVP", 60.0, _rules_cfg())
+    # Bare "ovp" MIT Geräte-Marker bleibt ein gültiges Positivsignal.
+    # Hinweis (Merge-Nachtrag): seit der parallel gemergten PR #44
+    # (Nutzer-Freigabe, FALSE_POSITIVES_ANALYSE Teil 1 A) reicht bare
+    # "ovp" allein -- ganz ohne jeden Geräte-Marker -- nicht mehr aus
+    # (siehe test_konsolen_bundles_plattform_referenz_fix.py::
+    # test_bare_ovp_ohne_geraete_marker_matcht_nicht_mehr). Dieser Test
+    # prüft daher bewusst Titel MIT Marker.
+    r = evaluate("Nintendo Switch OLED 64GB mit OVP", 90.0, _rules_cfg())
     assert r.matched is True and r.category == "konsolen_bundles"
 
     r2 = evaluate("Microsoft Xbox One X 1TB Schwarz Inkl OVP", 55.0, _rules_cfg())

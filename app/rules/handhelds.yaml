@@ -261,6 +261,50 @@ exclude_category_unless_also_contains:
     - "gebraucht"
     - "funktioniert"
     - "funktionsfähig"
+  # FIX (Nutzer-Freigabe 2026-08-15, FALSE_POSITIVES_ANALYSE Teil 1 C):
+  # bare "ovp" OHNE jeden Geräte-Marker matcht PS-Vita-SPIELTITEL als
+  # Konsole (3-4 bestätigte Fehltreffer, z.B. "PS Vita uncharted ° Golden
+  # Abyss ° OVP", "Touch My Katamari PSVita Neu & OVP"). Identisches
+  # Prinzip wie der Nintendo-Switch-Fix in konsolen_bundles.yaml: "ovp"
+  # bleibt Positivsignal, blockiert aber, wenn im gesamten Titel kein
+  # Geräte-Marker vorkommt.
+  #
+  # WICHTIG, anders als bei konsolen_bundles.yaml: exclude_category_
+  # unless_also_contains wirkt KATEGORIEWEIT (matcher.py, nicht pro
+  # Regel) -- handhelds.yaml buendelt aber mehrere Geraetetypen (Steam
+  # Deck/ROG Ally/Legion Go/3DS/PS Vita) in EINER Kategorie. Ein bare
+  # "ovp"-Trigger wuerde daher auch echte Steam-Deck-/ROG-Ally-/3DS-
+  # Verkaeufe blockieren, die "ovp" OHNE PS-Vita-Bezug als eigenes
+  # Positivsignal nutzen (real bestaetigt beim ersten Versuch dieses
+  # Fixes: "New Nintendo 3DS XL OVP Schwarz", "Asus ROG Ally Z1 Extreme,
+  # 512GB, OVP", "Steam Deck + 5 Spiele OVP" wurden faelschlich
+  # mitblockiert). Deshalb stattdessen als Trigger die PS-Vita-
+  # Plattformbegriffe selbst (identisch zur require_all_of-Gruppe 1 der
+  # Vita-Regel) -- der Exclude greift dadurch NUR bei einer PS-Vita-
+  # Erwaehnung ohne Geraete-Marker, unabhaengig davon ob "ovp" oder ein
+  # anderes schwaches Wort der Grund war. Kontextliste = bestehende
+  # Gruppe-2-Alternativen ("konsole"/"bundle"/"set"/"system") ergänzt um
+  # "pch" (PS-Vita-Modellcode-Präfix, z.B. "PCH-1004", "PCH-2000") --
+  # ohne diese Ergänzung würde ein real bestätigtes echtes Gerät
+  # ("Vintage Sony PS Vita PCH-1004 Schwarz OLED Top Zustand OVP")
+  # fälschlich mitblockiert, da es keinen der anderen vier Marker enthält.
+  # Gegen found.json + price_history.jsonl verifiziert: alle 3 bestätigten
+  # FP blockiert, das PCH-1004-Gerät bleibt korrekt erhalten, 0 Kollision
+  # mit anderen Geraetetypen der Kategorie (kein Titel im Korpus erwähnt
+  # PS Vita zusammen mit Steam Deck/ROG Ally/Legion Go/3DS/Switch Lite).
+  # Bekannter Grenzfall (Analyse Teil 1, Fall #34, "nicht hundertprozentig
+  # sicher"): "Sony PlayStation Vita Kleine SAMMLUNG OVP PAL" hat ebenfalls
+  # keinen Marker und wird mitblockiert -- konsistent mit der Einordnung
+  # der Analyse (vermutlich Spielesammlung, kein Einzelgerät).
+  "ps vita":
+    &ps_vita_geraete_marker
+    - "konsole"
+    - "bundle"
+    - "set"
+    - "system"
+    - "pch"
+  "psvita": *ps_vita_geraete_marker
+  "playstation vita": *ps_vita_geraete_marker
   # FIX (Nutzer-Meldung 2026-08-15, Xenoblade-Spieltitel-Problem): "[Spiel-
   # titel] für Nintendo [New] 3DS" ist ein Software-Angebot, kein Geraet --
   # die require_all_of-Gruppe 2 dieser Kategorie hat fuer 3DS/2DS KEIN

@@ -5,17 +5,16 @@
 > Stand: **2026-08-15**
 > Repository: `dkmd89-dev/gpu-watch-v2`
 > Branch: `main`
-> **Letzter Code-Commit (vor dieser Doku-Aktualisierung):** `48b03d7` (Merge PR #41)
-> **HEAD (main, vor dieser Doku-Aktualisierung):** `48b03d7` (Merge PR #41)
-> Vorheriger dokumentierter Stand: `30b72b1` (Merge PR #40)
-> Seit `30b72b1`: PR #41 (die beiden letzten Abschnitt-3.19-Punkte gelöst — Xenoblade-
-> Spieltitel-Problem in `handhelds.yaml`, `netzteil`-Positivsignal in `retro_konsolen.yaml`,
-> Quoka-Preis-Parsing-Defekt an der Wurzel gelöst, Abschnitt 3.21) + dieser Batch: eine vom
-> Nutzer bereitgestellte, aktuellere `found.json` (2.474 Einträge, außerhalb des Repos)
-> vollständig auf Kategorie-Fehler analysiert und **36 real bestätigte Fehltreffer über
-> `konsolen_bundles`/`retro_konsolen`/`gpu` behoben** — deutlich mehr als die 3 initial
-> genannten Beispiele, die Root-Cause-Analyse deckte bei `retro_konsolen` einen viel größeren
-> Cluster auf (25 statt der ursprünglich 6 gemeldeten Fälle). Siehe Abschnitt 3.22.
+> **Letzter Code-Commit (vor dieser Doku-Aktualisierung):** `7eff392` (Merge PR #42)
+> **HEAD (main, vor dieser Doku-Aktualisierung):** `7eff392` (Merge PR #42)
+> Vorheriger dokumentierter Stand: `48b03d7` (Merge PR #41)
+> Seit `48b03d7`: PR #42 (`found.json`-Vollanalyse, 36 Fehltreffer über `konsolen_bundles`/
+> `retro_konsolen`/`gpu` behoben, Abschnitt 3.22) + dieser Batch: eine vom Nutzer selbst
+> erstellte, manuelle Fehltreffer-Analyse (`FALSE_POSITIVES_ANALYSE_2026-08-15.txt`, 40 einzeln
+> geprüfte Live-Treffer, 5 unabhängige Root Causes A–E) schrittweise mit Einzelfreigabe
+> abgearbeitet — **25 von 34 bestätigten Fehltreffern über `konsolen_bundles`/`retro_konsolen`/
+> `handhelds` behoben** (Fix A–D), 1€-Preisanomalie (Fix E) bewusst NICHT als Regeländerung
+> umgesetzt (kein isolierter Root Cause). Siehe Abschnitt 3.23.
 >
 > Diese Datei ersetzt `PROJEKTSTAND_KOMPLETT.md` (Datei mittlerweile aus dem Repository entfernt). Historische Phasenberichte bleiben als Detaildokumentation erhalten; widersprüchliche ältere Ist-Stand-Angaben gelten nicht mehr als aktuell.
 
@@ -25,7 +24,7 @@
 
 `gpu-watch-v2` ist ein modularer, YAML-gesteuerter **Hardware Deal Finder** für Second-Hand-Angebote. Das System kombiniert Scraper, kategoriebasiertes Matching, Hardware-Detektoren, Deal-Scoring, Marktpreis-/Resale-Statistik, Profit-/Flip-Bewertung, Duplicate Detection, Presence Tracking, Dashboard-KPIs und ntfy-Benachrichtigungen.
 
-Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und kontrollierter Weiterentwicklung**. Seit `d2effe7` wurden insbesondere Datenqualitäts-/Validierungslogik, Rule Analyzer/Coverage, Caching/Performance, neue Kategorien sowie ein umfangreicher False-Positive-Audit integriert. Seit 2026-08-14 ergänzt ein dediziertes, read-only **Ruleset-Qualitätssystem** (`tools/ruleset_quality/`, siehe Abschnitt 3.11) den bisherigen punktuellen Audit-Ansatz um reproduzierbare Regression-Benchmarks und Preishistorie-Simulationen. Im selben Tag (Abschnitt 3.12) wurde die 251-Listing-Stichprobe vollständig gelabelt, daraus resultierend 3 Exclude-Fixes umgesetzt (PR #31), der Umlaut-Fingerprint-Bug behoben und eine kontrollierte Preishistorie-Revalidierung v3 durchgeführt (PR #32) — mit dem wichtigen Befund, dass der Fix nicht rückwirkend auf bereits gespeicherte Daten wirkt. Direkt im Anschluss wurde Datenqualitätspunkt 14 (Abschnitt 3.13, Zubehör/Ersatzteil-vs-Gerät) mit 4 weiteren gezielten Exclude-Fixes gelöst (PR #33), gefolgt von Datenqualitätspunkt 5 (Abschnitt 3.14, `controller`/`ladekabel`-Restlücke, PR #34) und Datenqualitätspunkt 4 (Abschnitt 3.15, `RX 7600 XT`/`RX 7600`-Überlappung, PR #35) — Letzteres deckte einen strukturellen min_vram_gb-Bug auf, der zusätzlich 4 weitere GPU-Modelle betraf. Am 2026-08-15 (Abschnitt 3.16) wurde erstmals eine echte End-to-End-Scan-Performance-Messung anhand von 35 Produktiv-Scan-Läufen durchgeführt und der größte gefundene Hebel (Scraping macht 88,9% der Scanzeit aus, lief seriell) direkt umgesetzt: die drei Scraper-Quellen laufen jetzt parallel. Direkter Folgeschritt (Abschnitt 3.17): Persistence-Batching -- die ursprüngliche Analyse wurde dabei korrigiert, der dominante Kostentreiber war `seen.json` (16,7 MB), nicht primär `found.json`. Nach der Verifikation beider Performance-Fixes gegen echte Produktivdaten (Abschnitt 3.18, PR #38) wurde ein vollständiger, read-only Kategorie-Audit durchgeführt (0 Abweichungen zwischen YAML/Dashboard/found.json), gefolgt von einer Nutzer-gemeldeten Live-Fehltreffer-Analyse gegen die `tools/ruleset_quality/`-Regression-Benchmarks (Abschnitt 3.19): 5 real bestätigte Fehltreffer über `vintage_elektronik`/`handhelds`/`konsolen_bundles` behoben sowie ein Preis-Mindestbetrag-Guard gegen einen Quoka-seitigen Preis-Parsing-Defekt ergänzt, der `price_history.jsonl` mit 0€-Datenpunkten verzerrte. Direkter Folgeschritt (Abschnitt 3.20): die dort zurückgestellte „pro"-Kollision in `konsolen_bundles.yaml` wurde bei tieferer Analyse doch gelöst -- 3 unabhängige, einzeln additiv lösbare Ursachen statt einer strukturellen Gruppen-Kollision, inklusive einer expliziten Korrektur eines zunächst erwogenen, aber per Blast-Radius-Check verworfenen breiteren Fixes. Direkter Folgeschritt (Abschnitt 3.21): auch die beiden letzten Abschnitt-3.19-Punkte wurden gelöst -- das Xenoblade-Spieltitel-Problem (`handhelds.yaml`) und das `netzteil`-Positivsignal (`retro_konsolen.yaml`) erwiesen sich beide als additiv lösbar über bereits etablierte Mechanismen, und die Quoka-Preis-0€-Root-Cause wurde erstmals mit echtem Live-Zugriff auf quoka.de identifiziert und direkt im Scraper behoben. Direkter Folgeschritt (Abschnitt 3.22): eine vom Nutzer bereitgestellte, aktuellere `found.json` außerhalb des Repos wurde vollständig auf Kategorie-Fehler analysiert -- 36 real bestätigte Fehltreffer über `konsolen_bundles`/`retro_konsolen`/`gpu` behoben, wobei sich der `retro_konsolen`-Cluster bei der Root-Cause-Analyse als deutlich größer herausstellte als die ursprünglich gemeldeten Fälle ("komplett" als Zustands- statt Gerätebeweis trifft Einzelspiele mindestens so oft wie Konsolen).
+Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und kontrollierter Weiterentwicklung**. Seit `d2effe7` wurden insbesondere Datenqualitäts-/Validierungslogik, Rule Analyzer/Coverage, Caching/Performance, neue Kategorien sowie ein umfangreicher False-Positive-Audit integriert. Seit 2026-08-14 ergänzt ein dediziertes, read-only **Ruleset-Qualitätssystem** (`tools/ruleset_quality/`, siehe Abschnitt 3.11) den bisherigen punktuellen Audit-Ansatz um reproduzierbare Regression-Benchmarks und Preishistorie-Simulationen. Im selben Tag (Abschnitt 3.12) wurde die 251-Listing-Stichprobe vollständig gelabelt, daraus resultierend 3 Exclude-Fixes umgesetzt (PR #31), der Umlaut-Fingerprint-Bug behoben und eine kontrollierte Preishistorie-Revalidierung v3 durchgeführt (PR #32) — mit dem wichtigen Befund, dass der Fix nicht rückwirkend auf bereits gespeicherte Daten wirkt. Direkt im Anschluss wurde Datenqualitätspunkt 14 (Abschnitt 3.13, Zubehör/Ersatzteil-vs-Gerät) mit 4 weiteren gezielten Exclude-Fixes gelöst (PR #33), gefolgt von Datenqualitätspunkt 5 (Abschnitt 3.14, `controller`/`ladekabel`-Restlücke, PR #34) und Datenqualitätspunkt 4 (Abschnitt 3.15, `RX 7600 XT`/`RX 7600`-Überlappung, PR #35) — Letzteres deckte einen strukturellen min_vram_gb-Bug auf, der zusätzlich 4 weitere GPU-Modelle betraf. Am 2026-08-15 (Abschnitt 3.16) wurde erstmals eine echte End-to-End-Scan-Performance-Messung anhand von 35 Produktiv-Scan-Läufen durchgeführt und der größte gefundene Hebel (Scraping macht 88,9% der Scanzeit aus, lief seriell) direkt umgesetzt: die drei Scraper-Quellen laufen jetzt parallel. Direkter Folgeschritt (Abschnitt 3.17): Persistence-Batching -- die ursprüngliche Analyse wurde dabei korrigiert, der dominante Kostentreiber war `seen.json` (16,7 MB), nicht primär `found.json`. Nach der Verifikation beider Performance-Fixes gegen echte Produktivdaten (Abschnitt 3.18, PR #38) wurde ein vollständiger, read-only Kategorie-Audit durchgeführt (0 Abweichungen zwischen YAML/Dashboard/found.json), gefolgt von einer Nutzer-gemeldeten Live-Fehltreffer-Analyse gegen die `tools/ruleset_quality/`-Regression-Benchmarks (Abschnitt 3.19): 5 real bestätigte Fehltreffer über `vintage_elektronik`/`handhelds`/`konsolen_bundles` behoben sowie ein Preis-Mindestbetrag-Guard gegen einen Quoka-seitigen Preis-Parsing-Defekt ergänzt, der `price_history.jsonl` mit 0€-Datenpunkten verzerrte. Direkter Folgeschritt (Abschnitt 3.20): die dort zurückgestellte „pro"-Kollision in `konsolen_bundles.yaml` wurde bei tieferer Analyse doch gelöst -- 3 unabhängige, einzeln additiv lösbare Ursachen statt einer strukturellen Gruppen-Kollision, inklusive einer expliziten Korrektur eines zunächst erwogenen, aber per Blast-Radius-Check verworfenen breiteren Fixes. Direkter Folgeschritt (Abschnitt 3.21): auch die beiden letzten Abschnitt-3.19-Punkte wurden gelöst -- das Xenoblade-Spieltitel-Problem (`handhelds.yaml`) und das `netzteil`-Positivsignal (`retro_konsolen.yaml`) erwiesen sich beide als additiv lösbar über bereits etablierte Mechanismen, und die Quoka-Preis-0€-Root-Cause wurde erstmals mit echtem Live-Zugriff auf quoka.de identifiziert und direkt im Scraper behoben. Direkter Folgeschritt (Abschnitt 3.22): eine vom Nutzer bereitgestellte, aktuellere `found.json` außerhalb des Repos wurde vollständig auf Kategorie-Fehler analysiert -- 36 real bestätigte Fehltreffer über `konsolen_bundles`/`retro_konsolen`/`gpu` behoben, wobei sich der `retro_konsolen`-Cluster bei der Root-Cause-Analyse als deutlich größer herausstellte als die ursprünglich gemeldeten Fälle ("komplett" als Zustands- statt Gerätebeweis trifft Einzelspiele mindestens so oft wie Konsolen). Direkter Folgeschritt (Abschnitt 3.23): eine vom Nutzer selbst erstellte, manuelle Fehltreffer-Analyse (40 einzeln geprüfte Live-Treffer, 5 unabhängige Root Causes) wurde schrittweise mit Einzelfreigabe abgearbeitet -- 25 von 34 bestätigten Fehltreffern über `konsolen_bundles`/`retro_konsolen`/`handhelds` behoben, mit einer wichtigen Korrektur unterwegs: der zunächst vorgeschlagene vollständige Entfernen von "ovp" aus `require_all_of` (Nintendo Switch) wurde durch einen kontextbewussten Exclude ersetzt, nachdem sich herausstellte, dass das eine bereits bestehende, dokumentierte Auftragsvorgabe und mehrere Regressionstests gebrochen hätte; bei der PS-Vita-Variante desselben Fixes zeigte sich zusätzlich, dass `handhelds.yaml` mehrere Gerätetypen in einer Kategorie bündelt und ein kategorieweiter Trigger echte Steam-Deck-/ROG-Ally-/3DS-Verkäufe mitblockiert hätte -- durch einen plattformgebundenen Trigger statt eines bare-Signalworts gelöst. Die gemeldete 1€-Preisanomalie (Fix E) wurde bewusst NICHT als Regeländerung umgesetzt: eine Korpus-Analyse zeigte mindestens drei unabhängige Ursachen statt eines isolierten Root Cause wie beim GPU-0€-Fund.
 
 ---
 
@@ -35,20 +34,22 @@ Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und ko
 
 ```text
 Branch: main
-Letzter Code-Commit (vor dieser Doku-Aktualisierung): 48b03d7 (Merge PR #41)
-Vorheriger dokumentierter Stand: 30b72b1 (Merge PR #40)
+Letzter Code-Commit (vor dieser Doku-Aktualisierung): 7eff392 (Merge PR #42)
+Vorheriger dokumentierter Stand: 48b03d7 (Merge PR #41)
 
-30b72b1..48b03d7:
-  PR #41 (8de5d90) -- fix: Xenoblade-Spieltitel-Problem, netzteil-
-                       Positivsignal, Quoka-Root-Cause (Abschnitt 3.21)
+48b03d7..7eff392:
+  PR #42 (56665e3) -- fix: 36 Fehltreffer über konsolen_bundles/
+                       retro_konsolen/gpu behoben (Abschnitt 3.22)
 
-Dieser Batch (noch ohne PR-Nummer, siehe Abschnitt 3.22):
-  konsolen_bundles.yaml -- "spiele" (exclude_category_unless_also_contains,
-                            neu) + "panzerglas"/"displayschutz" (bare)
-  retro_konsolen.yaml   -- "komplett"/"spiel"/"spiele"
-                            (exclude_category_unless_also_contains, neu)
-                            + "emul" (bare)
-  gpu.yaml               -- "grafikkartenlüfter" (bare)
+Dieser Batch (noch ohne PR-Nummer, siehe Abschnitt 3.23):
+  konsolen_bundles.yaml -- "ovp" (exclude_category_unless_also_contains,
+                            neu, Fix A) + "microsdxc"/"interne festplatte"/
+                            "travelcase"/"tragetasche" (bare, Fix D)
+  retro_konsolen.yaml   -- "kabel" (exclude_category_unless_also_contains,
+                            neu, Fix B)
+  handhelds.yaml         -- "ps vita"/"psvita"/"playstation vita"
+                            (exclude_category_unless_also_contains, neu,
+                            Fix C)
 ```
 
 Zusätzlich, außerhalb der Commit-Historie (freigegebene Datenänderung, kein Code-Commit):
@@ -58,22 +59,25 @@ gelöscht (siehe Abschnitt 3.12).
 ### Teststand
 
 ```text
-Zuletzt vollständig lokal ausgeführt und verifiziert (vom Nutzer, nach diesem Batch):
-pytest app/tests/ -> 1372 passed, 0 failed (87,97s)
+Zielgerichteter Testlauf (diese Session, Claude-ausgeführt):
+pytest app/tests/ -k "konsolen_bundle or retro_konsolen or handheld or vita
+  or switch or ovp or kabel" -> 218 passed, 0 failed (20,85s)
 
 rule_analyzer.py:
 355 Regeln, 19 Kategorien, 0 Findings
-Ruleset-Signatur (matcher.compute_ruleset_signature()): 59f03f5a2f2c1d7c
-  -- GEÄNDERT gegenüber 20737fe48c8f52af (YAML-Änderungen in
-     konsolen_bundles.yaml/retro_konsolen.yaml/gpu.yaml, siehe Abschnitt 3.22)
+Ruleset-Signatur (matcher.compute_ruleset_signature()): f6216b45c6440ab5
+  -- GEÄNDERT gegenüber 59f03f5a2f2c1d7c (YAML-Änderungen in
+     konsolen_bundles.yaml/retro_konsolen.yaml/handhelds.yaml, siehe Abschnitt 3.23)
 ```
 
-Vorheriger dokumentierter Stand: 1358/1358 (PR #41). 9 neue Tests in diesem Batch
-(`test_konsolen_bundles_spiele_bundle_fix.py`, `test_retro_konsolen_einzelspiele_ohne_geraet_fix.py`,
-`test_gpu_grafikkartenluefter_fix.py`) — kein Test wurde gelöscht oder abgeschwächt.
-Anmerkung: 1358+9=1367 ≠ 1372 (Differenz +5) — wie zuvor mehrfach vermerkt, wird STATUS.md/diese
-Datei nicht in jeder Session live gegen einen lokalen Checkout verifiziert (siehe Fußzeile dieser
-Datei). Der jetzt dokumentierte Stand (1372) ist der aktuell verifizierte.
+**Volle Suite in dieser Session NICHT ausgeführt** (CLAUDE.md Abschnitt 3.4.4: nur nach
+expliziter Nutzer-Freigabe). Vorheriger dokumentierter Vollstand: 1372/1372 (Abschnitt 3.22). 13
+neue Tests in diesem Batch (`test_retro_konsolen_kabel_kontext_fix.py`,
+`test_handhelds_ps_vita_ovp_kontext_fix.py`, `test_konsolen_bundles_zubehoer_einzelfaelle_fix.py`),
+1 bestehender Test umgekehrt (`test_bare_ovp_ohne_zusatzangabe_matcht_weiterhin` ->
+`test_bare_ovp_ohne_geraete_marker_matcht_nicht_mehr`, Begründung siehe Abschnitt 3.23), 1
+bestehender Test aktualisiert (vormals dokumentierte Restlücke jetzt geschlossen) — kein Test
+wurde ersatzlos gelöscht oder abgeschwächt. Vollverifikation (`pytest app/tests/`) steht noch aus.
 
 ---
 
@@ -980,6 +984,111 @@ Baseline-Regeneration: sichtbare Einträge 2467 → 2430 (−37, passt zu den 36
 normalem Scan-Rauschen aus dem laufenden Produktivbetrieb). Ruleset-Signatur geändert:
 `20737fe48c8f52af` → `59f03f5a2f2c1d7c`. Reiner YAML-Fix, kein Rebuild nötig (volume-gemountet).
 
+### 3.23 Nutzer-Fehltreffer-Analyse (`FALSE_POSITIVES_ANALYSE_2026-08-15.txt`): 25 von 34 bestätigten Fehltreffern behoben, Preis-Anomalie bewusst nicht gefixt
+
+Der Nutzer erstellte eine eigene, manuelle Fehltreffer-Analyse (34 bestätigte + 6 zweifelhafte
+Fehltreffer aus einem 2.500-Einträge-Live-`found.json`-Snapshot, jeder Titel einzeln geprüft,
+methodisch getrennt von der KI-gestützten Analyse aus Abschnitt 3.22) mit 5 unabhängigen Root
+Causes (A–E) und gab die Umsetzung schrittweise frei (A zuerst einzeln, B–E danach im Batch).
+
+**A) `konsolen_bundles`, Nintendo Switch (18 Fälle) — bare „ovp" matcht Spieltitel als Konsole.**
+Die Analyse schlug zunächst vor, „ovp" vollständig aus `require_all_of` zu entfernen. Vor der
+Umsetzung geprüft: eine bereits bestehende, dokumentierte Auftragsvorgabe
+(`konsolen_bundles.yaml`, Kommentar „ovp bleibt Positivsignal") sowie mehrere Regressionstests
+(`test_konsolen_bundles_plattform_referenz_fix.py`) sichern explizit ab, dass kurze, echte
+Kurz-Verkäufe wie "Nintendo Switch OLED 64GB OVP"/"Nintendo Switch V1 HAC-001 mit OVP + Komplett"
+allein über „ovp" matchen — eine vollständige Entfernung hätte das gebrochen. **Fix:** stattdessen
+`exclude_category_unless_also_contains` für `"ovp"` nach demselben, bereits etablierten Muster wie
+`"spiele"` (Abschnitt 3.22) — „ovp" bleibt Positivsignal, blockiert aber, wenn im gesamten Titel
+kein Geräte-Marker vorkommt. Kontextliste = alle echten Geräte-/Modell-Marker plus `"bundle"`/
+`"set"`/`"mit spiele"` (die übrigen require_all_of-Gruppe-2-Alternativen, ohne diese Ergänzung
+hätten sie fälschlich mitblockiert). Verifiziert gegen `found.json`+`price_history.jsonl`: alle 16
+noch aktiven der 18 gemeldeten FP blockiert (2 waren bereits über den bestehenden
+„spiele"-Exclude abgefangen), 0 Kollisionen mit echten Switch-/Xbox-Verkäufen. **Testanpassung:**
+`test_bare_ovp_ohne_zusatzangabe_matcht_weiterhin` musste umgekehrt werden — "Nintendo Switch mit
+OVP" ist strukturell identisch mit den 18 FP-Titeln (kein Geräte-Marker), die zugrundeliegende
+Testannahme war durch die Nutzer-Freigabe explizit überholt. Ein zweiter, vormals dokumentiert
+offener Grenzfall (`test_bekannte_restluecke_spieltitel_vor_plattform_ohne_bindestrich`,
+"Donkey Kong Bananza Nintendo Switch 2 2025 OVP") wurde als Nebeneffekt mitgeschlossen. Bekannter,
+bewusst in Kauf genommener Grenzfall (Analyse Teil 2, Fall #40): "nintendo switch 1 nur getestet
+Garantie rechnung ovp +online" (150€) hat ebenfalls keinen Marker und wird mitblockiert, obwohl
+die Analyse ihn als vermutlich echten Verkauf einstuft — lexikalisch nicht von den 18 Spiele-FP
+unterscheidbar.
+
+**B) `retro_konsolen`, PS1/PS2/N64/GameCube (8 Fälle) — „kabel"/„netzteil" ohne Gerät.** „netzteil"
+hatte bereits einen kontextbewussten Exclude aus einer früheren Session (deckte 4 der 8 gemeldeten
+FP bereits ab, real bestätigt gegen `evaluate()`); „kabel" fehlte noch als eigenständiges
+Gruppe-2-Signal. **Fix:** identischer Mechanismus (`exclude_category_unless_also_contains`) für
+`"kabel"` ergänzt, Kontextliste identisch zu „netzteil" (`controller`/`konsole`/`ersatzkonsole`).
+Verifiziert: alle 4 noch aktiven Kabel-FP blockiert ("AV Kabel - Bild Kabel für N64...", "Sony
+Playstation PS1 PS2 3 Original AV TV Fernseh Chinch Anschluss Kabel Stecker", "Mad Catz Universal
+HD Component AV-Kabel(PS2&3, Wii, Xbox)", "Original Sony PlayStation AV-Kabel (PS1 / PS2 / PS3)"),
+bestehende `controller`-Kontext-Tests bleiben unverändert grün. Bewusste Restlücke (Analyse Teil 2,
+Fälle #36/#39): "Verkaufe Playstation 2 Mit Kabel und spiele" und "Nintendo 64 / N64 + Kabel" haben
+ebenfalls kein `controller`/`konsole` im Titel und werden mitblockiert, obwohl die Analyse sie
+tendenziell als echte Verkäufe einstuft — lexikalisch nicht von den 4 bestätigten FP
+unterscheidbar.
+
+**C) `handhelds`, PS Vita (3 Fälle) — bare „ovp" matcht Spieltitel als Konsole.** Strukturell
+identisches Muster wie Fix A, aber mit einer wichtigen architektonischen Abweichung: anders als
+`konsolen_bundles.yaml` bündelt `handhelds.yaml` mehrere Gerätetypen (Steam Deck/ROG Ally/Legion
+Go/3DS/PS Vita) in EINER Kategorie, und `exclude_category_unless_also_contains` wirkt
+kategorieweit (`matcher.py`), nicht pro Regel. Ein erster Versuch mit bare `"ovp"` als Trigger
+brach real drei bestehende Tests (`test_reale_true_positives_matchen_weiterhin`,
+`test_rog_ally_ovp_matcht_weiterhin`, `test_steam_deck_bundle_mit_spielen_matcht_weiterhin`) — echte
+3DS-/ROG-Ally-/Steam-Deck-Verkäufe ohne PS-Vita-Bezug wurden fälschlich kategorieweit mitblockiert.
+**Korrigierter Fix:** Trigger sind stattdessen die PS-Vita-Plattformbegriffe selbst
+(`"ps vita"`/`"psvita"`/`"playstation vita"`, identisch zur require_all_of-Gruppe-1 der Vita-Regel)
+statt „ovp" — der Exclude greift dadurch nur bei einer PS-Vita-Erwähnung ohne Geräte-Marker,
+unabhängig vom Grund. Kontextliste = bestehende Gruppe-2-Alternativen (`konsole`/`bundle`/`set`/
+`system`) ergänzt um `"pch"` (PS-Vita-Modellcode-Präfix, z.B. "PCH-1004", "PCH-2000") — ohne diese
+Ergänzung hätte ein real bestätigtes echtes Gerät ("Vintage Sony PS Vita PCH-1004 Schwarz OLED Top
+Zustand OVP") fälschlich mitgeblockt. Verifiziert gegen `found.json`+`price_history.jsonl`: 0
+Titel im Korpus erwähnen PS Vita zusammen mit einem anderen `handhelds`-Gerätetyp (kein
+Kollisionsrisiko), alle 3 bestätigten FP blockiert. Bekannter Grenzfall (Analyse Teil 1, Fall #34,
+von der Analyse selbst als "nicht hundertprozentig sicher" eingestuft): "Sony PlayStation Vita
+Kleine SAMMLUNG OVP PAL" wird mitblockiert, konsistent mit der unsicheren Einordnung der Analyse.
+
+**D) `konsolen_bundles`, 3 Zubehör-Einzelfälle.** Gezielte, bare Excludes, real bestätigt gegen
+`found.json`/`price_history.jsonl`, 0 Kollisionen im vollständigen Korpus: `"microsdxc"`
+(SD-Karten-Zubehör, "SanDisk microSDXC Extreme 512GB U3 Nintendo Switch..." matchte über „512gb",
+das als Gruppe-2-Signal bewusst erhalten bleibt), `"interne festplatte"` (PS4-Ersatzfestplatte,
+"Toshiba MQ01ABD050V... (Original PS4)" matchte über „500gb" — Blast-Radius-Check fing dabei
+zusätzlich einen zweiten, in der Analyse nicht gemeldeten identischen Fall,
+"Toshiba MQ04ABF100... (Original PS4 Pro)", matchte über „1tb"), `"travelcase"`/`"tragetasche"`
+(Switch-Tragetasche, "Nintendo Switch Deluxe System/Travelcase/Tragetasche" matchte über „system";
+das bereits vorhandene bare „tasche" greift wegen Wortgrenzen-Matching nicht beim Kompositum
+„Tragetasche", identisches Muster wie „zubehör-set"/„zubehörset" aus Abschnitt 3.20).
+
+**E) 1€-PS4-Preisanomalie — bewusst NICHT umgesetzt.** Die Analyse meldete "PlayStation 4 1TB" für
+1,00€ als vermutlichen Tausch-/Datenartefakt. Anders als beim GPU-0€-Fund (Abschnitt 3.21, ein
+isolierter, mechanistisch bestätigter Quoka-Parsing-Defekt, 7 Instanzen ausschließlich aus einer
+Quelle) zeigte eine Korpus-Analyse aller Treffer ≤3€ (34 in `found.json`, 266 in
+`price_history.jsonl`, quellen- und kategorieübergreifend) **mindestens drei unabhängige
+Ursachen**: (1) legitime Billig-Kategorie — Lego-Minifiguren-Konvolute für 1-3€ sind in dieser
+Kategorie realistisch, kein Datenfehler; (2) Tausch-/Barter-Anzeigen mit Preis-Platzhalter
+("Tausche iPhone 16 Pro Max gegen ein IPhone 17 Pro", "Ps5 mit 2 Controller gegen Gaming PC") —
+der Preis ist hier kein Verkaufspreis, sondern ein Formular-Pflichtfeld-Platzhalter; (3) der
+gemeldete Einzelfall selbst passt in keines der beiden Muster (kein Tausch-Wort im Titel, leere
+Beschreibung, keine Bilder, Quelle Kleinanzeigen statt des bekannten Quoka-Parsing-Bugs) und bleibt
+ungeklärt. Ohne einen einzelnen, isolierten Root Cause fehlt die Datenbasis für eine neue
+Preisschwelle (CLAUDE.md Abschnitt 2.4) — eine pauschale Schwelle hätte zudem die legitimen
+Lego-Billigtreffer riskiert. **Nicht umgesetzt.** Mögliche, separat zu entscheidende
+Folgeaufgabe: Tausch-/Barter-Anzeigen anhand Titel-Mustern („tausche"/„gegen") aus
+Notification/Preisstatistik ausschließen — würde Ursache (2) gezielt treffen, ohne (1) zu
+beschädigen; betrifft geschützte Kernsysteme (Notification-Gate, Price-History-Persistenz,
+Abschnitt „Grundprinzipien" unten), daher bewusst nicht implizit mitentschieden.
+
+13 neue Regressionstests (`test_retro_konsolen_kabel_kontext_fix.py` 4,
+`test_handhelds_ps_vita_ovp_kontext_fix.py` 5, `test_konsolen_bundles_zubehoer_einzelfaelle_fix.py`
+4), 1 bestehender Test umgekehrt (`test_bare_ovp_ohne_zusatzangabe_matcht_weiterhin` →
+`test_bare_ovp_ohne_geraete_marker_matcht_nicht_mehr`), 1 bestehender Test aktualisiert
+(vormals dokumentierte Restlücke jetzt geschlossen, siehe Fix A). Zielgerichtete Suite:
+`pytest app/tests/ -k "konsolen_bundle or retro_konsolen or handheld or vita or switch or ovp or
+kabel"` → 218 passed. Volle Suite in dieser Session **nicht** ausgeführt (CLAUDE.md Abschnitt
+3.4.4, ausstehende Nutzer-Freigabe). `rule_analyzer.py`: 0 Findings. Ruleset-Signatur geändert:
+`59f03f5a2f2c1d7c` → `f6216b45c6440ab5`. Reiner YAML-Fix, kein Rebuild nötig (volume-gemountet).
+
 ---
 
 ## 4. Datenqualität
@@ -1014,6 +1123,8 @@ Der anschließende PR-#6-Audit adressiert bereits mehrere konkrete False Positiv
 - „pro"-Kollision in `konsolen_bundles`: **erledigt** (Abschnitt 3.20) — 3 unabhängige, additiv lösbare Ursachen statt einer strukturellen Gruppen-Kollision (Bindestrich-Kompositum-Lücke, Markenname „MixAmp", Plattform-Kompatibilitätsliste bei „Vertical Stand")
 - `"netzteil"` als Positivsignal in `retro_konsolen`: **erledigt** (Abschnitt 3.21) — identisches Muster wie das bereits produktive „memory card"-Exclude in derselben Datei, additiv gelöst statt Architektur-Redesign
 - Quoka-Preis-Parsing-Defekt: **an der Wurzel gelöst** (Abschnitt 3.21) — fehlendes Leerzeichen-Tausendertrennzeichen-Format in `_price_to_float()`, live gegen quoka.de identifiziert. `price<=0`-Guard aus Abschnitt 3.19 bleibt zusätzlich als generisches Sicherheitsnetz bestehen
+- Nutzer-Fehltreffer-Analyse (Abschnitt 3.23): **25 von 34 bestätigten Fehltreffern erledigt** über `konsolen_bundles`-Switch-„ovp", `retro_konsolen`-„kabel", `handhelds`-PS-Vita-„ovp" (Fix A–C) sowie 3 Zubehör-Einzelfälle (Fix D). 9 Restlücken aus Analyse Teil 2 („zweifelhafte Treffer") bewusst offen — lexikalisch nicht von den behobenen Fehltreffern unterscheidbar
+- 1€-Preisanomalie (Abschnitt 3.23, Fix E): **bewusst nicht gefixt** — Korpus-Analyse (34 Treffer ≤3€ in `found.json`, 266 in `price_history.jsonl`) zeigte mindestens drei unabhängige Ursachen (legitime Billig-Kategorie/Lego, Tausch-/Barter-Platzhalter-Preise, ungeklärter Einzelfall) statt eines isolierten Root Cause wie beim Quoka-0€-Fund — keine Datenbasis für eine neue Preisschwelle. Mögliche Folgeaufgabe: Tausch-/Barter-Anzeigen-Erkennung als eigener Schritt (betrifft Notification-Gate/Price-History, nicht implizit mitentschieden)
 
 ---
 

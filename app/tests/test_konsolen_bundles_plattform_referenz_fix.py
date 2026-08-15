@@ -191,15 +191,22 @@ def test_spielkonsole_kompositum_matcht():
 
 
 # ============================================================
-# 5. Sicherheitsprüfung: bare "ovp" ohne jede Zusatzangabe bleibt
-#    weiterhin ein gültiges Positivsignal (Auftragsvorgabe: OVP NICHT
-#    entfernen).
+# 5. Sicherheitsprüfung: "ovp" bleibt ein gültiges Positivsignal, aber
+#    NUR noch zusammen mit einem Geräte-Marker (Nutzer-Freigabe
+#    2026-08-15, FALSE_POSITIVES_ANALYSE Teil 1 A). Die frühere
+#    Auftragsvorgabe "ovp bleibt Positivsignal" galt uneingeschränkt --
+#    das erwies sich als zu schwach: strukturell identische Titel wie
+#    "Nintendo Switch Pokemon Arceus OVP" (bestätigter Fehltreffer,
+#    Spieltitel statt Konsole) sind von "Nintendo Switch mit OVP" ohne
+#    weiteren Kontext nicht unterscheidbar. Die Freigabe akzeptiert
+#    diesen Trade-off explizit: bare "Nintendo Switch"+"OVP" ohne jeden
+#    Geräte-Marker matcht ab jetzt nicht mehr (siehe rules/
+#    konsolen_bundles.yaml, exclude_category_unless_also_contains: ovp).
 # ============================================================
 
-def test_bare_ovp_ohne_zusatzangabe_matcht_weiterhin():
+def test_bare_ovp_ohne_geraete_marker_matcht_nicht_mehr():
     r = evaluate("Nintendo Switch mit OVP", 0.0, _rules_cfg())
-    assert r.matched is True
-    assert r.category == "konsolen_bundles"
+    assert not (r.matched and r.category == "konsolen_bundles")
 
 
 def test_switch_oled_64gb_ovp_matcht_weiterhin():
@@ -320,14 +327,16 @@ def test_plattform_strich_mit_halbgeviertstrich_matcht_nicht():
     assert _matches_kb("Nintendo Switch – Minecraft FRA mit OVP") is False
 
 
-def test_bekannte_restluecke_spieltitel_vor_plattform_ohne_bindestrich():
-    # Dokumentierte, bewusst nicht geschlossene Grenze dieses Fixes:
-    # steht der Spieltitel VOR der Plattform OHNE einen Bindestrich nach
-    # der Plattform-Nennung, greift weder "für [Plattform]" noch
-    # "[Plattform] -" -- unveraendert wie vor diesem Schritt. Reales,
-    # in price_history.jsonl bestaetigtes Beispiel.
+def test_ehemalige_restluecke_spieltitel_vor_plattform_jetzt_ueber_ovp_fix_geschlossen():
+    # War bis Nutzer-Freigabe 2026-08-15 (FALSE_POSITIVES_ANALYSE Teil 1 A)
+    # eine dokumentierte, bewusst offene Restluecke: Spieltitel VOR der
+    # Plattform OHNE Bindestrich nach der Plattform-Nennung wird weder von
+    # "für [Plattform]" noch von "[Plattform] -" erfasst. Wird jetzt als
+    # Nebeneffekt des kontextbewussten "ovp"-Excludes mitgeschlossen --
+    # der Titel enthaelt keinen Geraete-Marker (kein konsole/slim/pro/
+    # Speichergroesse/bundle/set/oled/lite/v1/v2), matcht daher nicht mehr.
     r = evaluate("Donkey Kong Bananza Nintendo Switch 2 2025 OVP", 0.0, _rules_cfg())
-    assert r.matched is True and r.category == "konsolen_bundles"
+    assert not (r.matched and r.category == "konsolen_bundles")
 
 
 if __name__ == "__main__":

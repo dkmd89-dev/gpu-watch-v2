@@ -3,43 +3,41 @@
 > **Stand:** 2026-08-15  
 > **Repository:** `dkmd89-dev/gpu-watch-v2`  
 > **Branch:** `main`  
-> **Letzter Code-Commit auf `main` (vor dieser Doku-Aktualisierung):** `48b03d7` (Merge PR #41)  
+> **Letzter Code-Commit auf `main` (vor dieser Doku-Aktualisierung):** `7eff392` (Merge PR #42)  
 > **Technische Referenz:** `TECHNISCHER_PROJEKTSTATUS.md`
 
 ## Gesamtstatus
 
-**Stabil / aktiv weiterentwickelbar.** Seit dem letzten dokumentierten Stand (`48b03d7`, PR #41)
-wurde eine vom Nutzer bereitgestellte, aktuellere `found.json` (2.474 Einträge, außerhalb des
-Repos) auf Kategorie-Fehler vollständig analysiert und **36 real bestätigte Fehltreffer über 3
-Kategorien behoben** (Batch 17 unten) — deutlich mehr als die 3 initial genannten Beispiele:
-`konsolen_bundles` (10, „ovp"/„bundle"/„set" als zu schwache Positivsignale für reine Spiele-
-Sammlungen), `retro_konsolen` (25, „komplett" als Zustands- statt Gerätebeweis — trifft
-Einzelspiele mindestens so oft wie Konsolen) und `gpu` (1, Kompositum-Lücke
-„Grafikkartenlüfter").
+**Stabil / aktiv weiterentwickelbar.** Seit dem letzten dokumentierten Stand (`7eff392`, PR #42)
+wurde eine vom Nutzer erstellte, manuelle Fehltreffer-Analyse (`FALSE_POSITIVES_ANALYSE_2026-08-15.txt`,
+40 einzeln geprüfte Live-Treffer aus `konsolen_bundles`/`retro_konsolen`/`handhelds`) schrittweise
+mit Einzelfreigabe abgearbeitet (Batch 18 unten): **25 der 34 bestätigten Fehltreffer über 3
+Kategorien behoben** (Fix A–D), Preis-Anomalie (Fix E) bewusst **nicht** als Regeländerung
+umgesetzt (kein isolierter Root Cause, siehe Batch 18).
 
 ## Verifizierter Stand
 
 ```text
-main (vor dieser Doku-Aktualisierung): 48b03d7 (Merge PR #41)
+main (vor dieser Doku-Aktualisierung): 7eff392 (Merge PR #42)
 
-Vollständiger Testlauf (vom Nutzer lokal ausgeführt und verifiziert):
-pytest app/tests/ -> 1372 passed, 0 failed (87,97s)
+Zielgerichteter Testlauf (diese Session, Claude-ausgeführt):
+pytest app/tests/ -k "konsolen_bundle or retro_konsolen or handheld or vita or switch or ovp or kabel"
+  -> 218 passed, 0 failed (20,85s)
 
 Rule Analyzer:
 355 Regeln
 19 Kategorien
 0 Findings
-Ruleset-Signatur: 59f03f5a2f2c1d7c (geändert gegenüber 20737fe48c8f52af -- YAML-Änderungen
-  in konsolen_bundles.yaml/retro_konsolen.yaml/gpu.yaml, siehe Batch 17)
+Ruleset-Signatur: f6216b45c6440ab5 (geändert gegenüber 59f03f5a2f2c1d7c -- YAML-Änderungen
+  in konsolen_bundles.yaml/retro_konsolen.yaml/handhelds.yaml, siehe Batch 18)
 
 data/found.json: 2500 Einträge
 data/price_history.jsonl: 15.199 Datenpunkte (laufender Produktivbetrieb, nicht Teil dieses Batches)
 ```
 
-Vorheriger dokumentierter Teststand (PR #41): 1358/1358. 9 neue Tests in diesem Batch (siehe
-Batch 17 unten) — 1358+9=1367 ≠ 1372 (Differenz +5). Wie bereits mehrfach vermerkt: STATUS.md
-wird nicht in jeder Session live gegen einen lokalen Checkout verifiziert (CLAUDE.md Abschnitt 7)
-— der jetzt dokumentierte Stand (1372) ist der frisch verifizierte.
+**Volle Suite in dieser Session NICHT ausgeführt** (CLAUDE.md Abschnitt 3.4.4: nur nach expliziter
+Nutzer-Freigabe). Vorheriger dokumentierter Vollstand (Batch 17): 1372/1372. 12 neue Tests in
+diesem Batch (1 bestehender Test angepasst, siehe Batch 18) — Vollverifikation steht noch aus.
 
 ## Zuletzt abgeschlossene Batches
 
@@ -501,6 +499,64 @@ sichtbare Einträge 2467 → 2430 (−37, passt zu den 36 gefixten Fällen plus 
 Scan-Rauschen). Ruleset-Signatur geändert (`20737fe48c8f52af` → `59f03f5a2f2c1d7c`). Reiner
 YAML-Fix, kein Rebuild nötig.
 
+### 18. Nutzer-Fehltreffer-Analyse (`FALSE_POSITIVES_ANALYSE_2026-08-15.txt`): 25 von 34 bestätigten Fehltreffern über 3 Kategorien behoben, Preis-Anomalie bewusst nicht gefixt
+
+Der Nutzer öffnete eine selbst erstellte, manuelle Analyse (34 bestätigte + 6 zweifelhafte
+Fehltreffer aus einem 2.500-Einträge-Live-`found.json`-Snapshot, jeder Titel einzeln geprüft) mit
+5 unabhängigen Root Causes (A–E) und gab die Umsetzung schrittweise frei (A einzeln, dann B–E im
+Batch).
+
+**A) `konsolen_bundles`, Nintendo Switch (18 Fälle) — bare „ovp" matcht Spieltitel als Konsole.**
+Vollständige Entfernung von „ovp" aus `require_all_of` (wie in der Analyse zunächst vorgeschlagen)
+hätte eine bereits bestehende, dokumentierte Auftragsvorgabe („ovp bleibt Positivsignal") sowie
+mehrere Regressionstests gebrochen, die kurze, echte Kurz-Verkäufe wie "Nintendo Switch OLED 64GB
+OVP" absichern. **Fix:** stattdessen `exclude_category_unless_also_contains` für `"ovp"` nach
+demselben, bereits etablierten Muster wie `"spiele"` — „ovp" bleibt Positivsignal, blockiert aber,
+wenn im gesamten Titel kein Geräte-Marker vorkommt. Ein bestehender Test
+(`test_bare_ovp_ohne_zusatzangabe_matcht_weiterhin`) musste dadurch bewusst umgekehrt werden (die
+zugrundeliegende Annahme war identisch mit dem jetzt gefixten FP-Muster, lexikalisch nicht
+unterscheidbar); ein zweiter, vormals dokumentiert offener Grenzfall
+("Donkey Kong Bananza Nintendo Switch 2 2025 OVP") wurde als Nebeneffekt mitgeschlossen.
+
+**B) `retro_konsolen`, PS1/PS2/N64/GameCube (8 Fälle) — „kabel"/„netzteil" ohne Gerät.**
+„netzteil" hatte bereits einen kontextbewussten Exclude (deckte 4 der 8 Fälle bereits ab);
+„kabel" fehlte noch. **Fix:** identischer Mechanismus für `"kabel"` ergänzt (Kontextliste:
+controller/konsole/ersatzkonsole). Bewusste Restlücke: 2 Analyse-Grenzfälle (Teil 2, "eher echtes
+Gerät") werden mitblockiert, lexikalisch nicht von den bestätigten FP unterscheidbar.
+
+**C) `handhelds`, PS Vita (3 Fälle) — bare „ovp" matcht Spieltitel als Konsole.** Anders als bei A:
+ein bare „ovp"-Trigger hätte in `handhelds.yaml` **kategorieweit** gewirkt (mehrere Geräte in
+einer Datei) und echte Steam-Deck-/ROG-Ally-/3DS-Verkäufe mitblockiert — real aufgetreten und im
+ersten Testlauf korrigiert. **Fix:** stattdessen die PS-Vita-Plattformbegriffe selbst als Trigger
+(`"ps vita"`/`"psvita"`/`"playstation vita"`), Kontextliste ergänzt um `"pch"`
+(Modellcode-Präfix, rettet echte Kurz-Verkäufe wie "PS Vita PCH-1004").
+
+**D) `konsolen_bundles`, 3 Zubehör-Einzelfälle.** Gezielte Excludes für SD-Karte (`"microsdxc"`),
+PS4-Ersatzfestplatte (`"interne festplatte"`, dabei einen zweiten, in der Analyse nicht gemeldeten
+PS4-Pro-Fall zusätzlich gefangen) und Switch-Tragetasche (`"travelcase"`/`"tragetasche"` —
+Kompositum-Lücke, das bereits vorhandene bare „tasche" greift wegen Wortgrenzen-Matching nicht).
+
+**E) 1€-PS4-Preisanomalie — bewusst NICHT umgesetzt.** Anders als beim GPU-0€-Fund (Batch 16, ein
+isolierter, mechanistisch bestätigter Quoka-Parsing-Defekt) zeigte eine Korpus-Analyse aller
+Treffer ≤3€ (34 in `found.json`, 266 in `price_history.jsonl`) mindestens drei unterschiedliche
+Ursachen ohne gemeinsamen Root Cause: legitime Billig-Kategorie (Lego-Konvolute), Tausch-/
+Barter-Anzeigen mit Preis-Platzhalter ("Tausche iPhone 16 Pro Max gegen..."), sowie der gemeldete
+Einzelfall selbst (keines der beiden Muster, Quelle Kleinanzeigen, kein bekannter Parsing-Bug).
+Ohne belastbare Datenbasis für eine einzelne Schwelle (CLAUDE.md Abschnitt 2.4) nicht umgesetzt.
+Mögliche Folgeaufgabe (separat zu entscheiden): Tausch-/Barter-Anzeigen anhand Titel-Mustern
+("tausche"/"gegen") aus Notification/Preisstatistik ausschließen — nicht Teil dieses Batches.
+
+13 neue Regressionstests (`test_retro_konsolen_kabel_kontext_fix.py` 4,
+`test_handhelds_ps_vita_ovp_kontext_fix.py` 5, `test_konsolen_bundles_zubehoer_einzelfaelle_fix.py`
+4), 1 bestehender Test umgekehrt/umbenannt
+(`test_bare_ovp_ohne_zusatzangabe_matcht_weiterhin` →
+`test_bare_ovp_ohne_geraete_marker_matcht_nicht_mehr`), 1 bestehender Test aktualisiert
+(vormals dokumentierte Restlücke jetzt geschlossen). Zielgerichtete Suite: `pytest app/tests/ -k
+"konsolen_bundle or retro_konsolen or handheld or vita or switch or ovp or kabel"` → 218 passed.
+Volle Suite in dieser Session **nicht** ausgeführt (CLAUDE.md Abschnitt 3.4.4, ausstehende
+Nutzer-Freigabe). `rule_analyzer.py`: 0 Findings. Ruleset-Signatur geändert
+(`59f03f5a2f2c1d7c` → `f6216b45c6440ab5`). Reiner YAML-Fix, kein Rebuild nötig.
+
 ## Abgeschlossen
 
 - ursprüngliche Phasen 0–10
@@ -542,6 +598,9 @@ YAML-Fix, kein Rebuild nötig.
   Positivsignal, Quoka-Preis-Parsing-Defekt an der Wurzel (Batch 16 oben)
 - Vollanalyse einer extern bereitgestellten `found.json`: 36 Fehltreffer über `konsolen_bundles`/
   `retro_konsolen`/`gpu` behoben (Batch 17 oben)
+- Nutzer-Fehltreffer-Analyse: 25 von 34 bestätigten Fehltreffern über `konsolen_bundles`/
+  `retro_konsolen`/`handhelds` behoben (Fix A–D), 1€-Preisanomalie bewusst nicht als Regeländerung
+  umgesetzt, kein isolierter Root Cause (Fix E, Batch 18 oben)
 
 ## Aktuelle Systemkette
 
@@ -622,14 +681,31 @@ Wichtige Architekturregeln:
     stärkeren, echten Gerätemarkern derselben Kategorie gelöst, keine Architektur-Änderung nötig.
     Nicht Teil dieser Analyse: `iphone`/`netzteil`/übrige Kategorien wurden geprüft und als
     korrekt bestätigt (siehe Batch-17-Detailbericht).
+19. Nutzer-Fehltreffer-Analyse (Batch 18): **25 von 34 bestätigten Fehltreffern erledigt**
+    (`konsolen_bundles`-Switch-„ovp", `retro_konsolen`-„kabel", `handhelds`-PS-Vita-„ovp", 3
+    Zubehör-Einzelfälle). 9 bewusst nicht geschlossene Restlücken (Analyse Teil 2, „zweifelhafte
+    Treffer") bleiben offen — lexikalisch nicht von den behobenen Fehltreffern unterscheidbar,
+    Einzelfallprüfung ohne Volltext/Bild nicht möglich. 1€-Preisanomalie (Fix E) bewusst nicht
+    gefixt: Korpus-Analyse zeigte mind. 3 unabhängige Ursachen (legitime Billig-Kategorie,
+    Tausch-/Barter-Platzhalter-Preise, unbekannter Einzelfall) statt eines isolierten Root Cause
+    wie beim GPU-0€-Fund (Batch 16) — keine Datenbasis für eine neue Preisschwelle. Mögliche
+    Folgeaufgabe: Tausch-/Barter-Anzeigen-Erkennung als eigener, separat zu entscheidender Schritt.
 
 ## Nächste Prioritäten
 
 ### P0 — offene Punkte
 
-- Keine offenen P0-Punkte (alle in Batch 1–17 dokumentierten Punkte abgeschlossen und verifiziert,
-  inkl. aller ursprünglich zurückgestellten Fehltreffer-Muster). Nächster Schritt nach freiem
-  Ermessen: Nr. 6 (Resale-Confidence) oder eine neue Nutzeranfrage.
+- **Volle Testsuite steht nach Batch 18 noch aus** (nur zielgerichtete Suite in dieser Session
+  gelaufen, 218 passed) — vor der nächsten Behauptung über den Gesamt-Teststand `pytest
+  app/tests/` nach expliziter Freigabe tatsächlich ausführen.
+- 9 bewusst offene Restlücken aus der Batch-18-Analyse (Teil 2, „zweifelhafte Treffer") — nur bei
+  neuem, eindeutigerem Datenpunkt erneut aufgreifen.
+- Mögliche Folgeaufgabe (noch nicht freigegeben): Tausch-/Barter-Anzeigen-Erkennung
+  (Titel-Muster „tausche"/„gegen") aus Notification/Preisstatistik ausschließen — separate
+  Aufgabe, betrifft geschützte Kernsysteme (Notification-Gate, Price-History-Persistenz).
+- Ansonsten keine offenen P0-Punkte (alle in Batch 1–18 dokumentierten Punkte abgeschlossen und
+  verifiziert, inkl. aller ursprünglich zurückgestellten Fehltreffer-Muster). Nächster Schritt
+  nach freiem Ermessen: Nr. 6 (Resale-Confidence) oder eine neue Nutzeranfrage.
 - **Rebuild ausstehend:** Batch 14 (`app.py`-Preisguard) UND Batch 16 (`scrapers/quoka.py`-Fix)
   enthalten Python-Änderungen — `docker compose up --build -d` nötig, bevor beide Fixes produktiv
   wirken (alle YAML-Fixes aus Batch 14–16 wirken bereits ohne Rebuild, volume-gemountet).
