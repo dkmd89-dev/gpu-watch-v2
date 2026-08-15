@@ -3,43 +3,43 @@
 > **Stand:** 2026-08-15  
 > **Repository:** `dkmd89-dev/gpu-watch-v2`  
 > **Branch:** `main`  
-> **Letzter Code-Commit auf `main` (vor dieser Doku-Aktualisierung):** `30b72b1` (Merge PR #40)  
+> **Letzter Code-Commit auf `main` (vor dieser Doku-Aktualisierung):** `48b03d7` (Merge PR #41)  
 > **Technische Referenz:** `TECHNISCHER_PROJEKTSTATUS.md`
 
 ## Gesamtstatus
 
-**Stabil / aktiv weiterentwickelbar.** Seit dem letzten dokumentierten Stand (`30b72b1`, PR #40)
-wurden alle drei verbleibenden, aus Batch 14 zurückgestellten Punkte gelöst (Batch 16 unten):
-**Xenoblade-Spieltitel-Problem** in `handhelds` (neuer „für [Plattform]"-Kontextmechanismus,
-erstmalig in dieser Datei), **`netzteil`-Positivsignal** in `retro_konsolen` (identisches Muster
-wie das bereits produktive „memory card"-Exclude in derselben Datei), und der **Quoka-Preis-
-Parsing-Defekt an der Wurzel gelöst** (nicht nur das Symptom wie in Batch 14) — Root Cause war
-ein fehlendes Leerzeichen-Tausendertrennzeichen-Format in der Scraper-Regex, live gegen
-quoka.de verifiziert.
+**Stabil / aktiv weiterentwickelbar.** Seit dem letzten dokumentierten Stand (`48b03d7`, PR #41)
+wurde eine vom Nutzer bereitgestellte, aktuellere `found.json` (2.474 Einträge, außerhalb des
+Repos) auf Kategorie-Fehler vollständig analysiert und **36 real bestätigte Fehltreffer über 3
+Kategorien behoben** (Batch 17 unten) — deutlich mehr als die 3 initial genannten Beispiele:
+`konsolen_bundles` (10, „ovp"/„bundle"/„set" als zu schwache Positivsignale für reine Spiele-
+Sammlungen), `retro_konsolen` (25, „komplett" als Zustands- statt Gerätebeweis — trifft
+Einzelspiele mindestens so oft wie Konsolen) und `gpu` (1, Kompositum-Lücke
+„Grafikkartenlüfter").
 
 ## Verifizierter Stand
 
 ```text
-main (vor dieser Doku-Aktualisierung): 30b72b1 (Merge PR #40)
+main (vor dieser Doku-Aktualisierung): 48b03d7 (Merge PR #41)
 
 Vollständiger Testlauf (vom Nutzer lokal ausgeführt und verifiziert):
-pytest app/tests/ -> 1358 passed, 0 failed (85,27s)
+pytest app/tests/ -> 1372 passed, 0 failed (87,97s)
 
 Rule Analyzer:
 355 Regeln
 19 Kategorien
 0 Findings
-Ruleset-Signatur: 20737fe48c8f52af (geändert gegenüber 6266e4a437c1fbc4 -- YAML-Änderungen
-  in handhelds.yaml/retro_konsolen.yaml, siehe Batch 16)
+Ruleset-Signatur: 59f03f5a2f2c1d7c (geändert gegenüber 20737fe48c8f52af -- YAML-Änderungen
+  in konsolen_bundles.yaml/retro_konsolen.yaml/gpu.yaml, siehe Batch 17)
 
 data/found.json: 2500 Einträge
 data/price_history.jsonl: 15.199 Datenpunkte (laufender Produktivbetrieb, nicht Teil dieses Batches)
 ```
 
-Vorheriger dokumentierter Teststand (PR #40): 1355/1355. 8 neue Tests in diesem Batch (siehe
-Batch 16 unten) — 1355+8=1363 ≠ 1358 (Differenz -5). Wie bereits zweimal zuvor vermerkt:
-STATUS.md wird nicht in jeder Session live gegen einen lokalen Checkout verifiziert (CLAUDE.md
-Abschnitt 7) — der jetzt dokumentierte Stand (1358) ist der frisch verifizierte.
+Vorheriger dokumentierter Teststand (PR #41): 1358/1358. 9 neue Tests in diesem Batch (siehe
+Batch 17 unten) — 1358+9=1367 ≠ 1372 (Differenz +5). Wie bereits mehrfach vermerkt: STATUS.md
+wird nicht in jeder Session live gegen einen lokalen Checkout verifiziert (CLAUDE.md Abschnitt 7)
+— der jetzt dokumentierte Stand (1372) ist der frisch verifizierte.
 
 ## Zuletzt abgeschlossene Batches
 
@@ -446,6 +446,61 @@ Ruleset-Signatur geändert (`6266e4a437c1fbc4` → `20737fe48c8f52af`). YAML-Fix
 Rebuild, der Quoka-Scraper-Fix (`scrapers/quoka.py`) ist eine Python-Änderung und braucht
 `docker compose up --build -d`.
 
+### 17. `found.json`-Vollanalyse (extern bereitgestellter Snapshot): 36 Fehltreffer über 3 Kategorien behoben
+
+Der Nutzer öffnete eine aktuellere `found.json` (2.474 Einträge, `/home/robin/Downloads/`,
+außerhalb des Repos) im IDE und bat um eine vollständige Kategorie-Fehleranalyse, mit 3
+Beispielen (PS-Vita-Spiele als `handhelds`, Grafikkartenlüfter als `gpu`, Switch-Spiel als
+`konsolen_bundles`). Systematischer Scan aller 2.474 Einträge nach Kategorie (Zubehör-/Spiel-
+Rotflaggen-Heuristik, jeder Kandidat einzeln gegen `evaluate()`/`is_still_valid_category()`
+verifiziert) ergab **17 real bestätigte Live-Fehltreffer über 3 Kategorien** — bei der
+Root-Cause-Analyse während der Umsetzung stellten sich zwei der drei Cluster als deutlich größer
+heraus (**36 behoben insgesamt**):
+
+**`konsolen_bundles` (10 Fälle) — „ovp"/„bundle"/„set" als zu schwache Positivsignale.** Die
+`require_all_of`-Gruppe 2 nutzt diese Wörter als Gerätenachweis, sie tauchen aber auch in reinen
+Spiele-Sammlungen ohne Konsole auf (z.B. "Nintendo Switch Spiele Bundle", "FIFA & F1 Spiele Paket
+Bundle (7 Spiele) PlayStation 3 & 4"). **Fix:** neuer `exclude_category_unless_also_contains`-
+Eintrag für `"spiele"` mit Kontextliste = alle echten Geräte-/Modell-Marker der Kategorie
+(konsole/system/slim/pro/Speichergrößen/xl/oled/lite/...). Blast-Radius-Check gegen 120 Titel mit
+"spiele" in dieser Kategorie: 26 ohne jeden Marker (ausnahmslos reine Spiele-Angebote), die
+übrigen ~94 haben jeweils mindestens einen echten Marker — 0 Kollisionen. Zusätzlich
+`"panzerglas"`/`"displayschutz"` (bare, 1 Treffer: "Panzerglas Displayschutz Nintendo Switch
+Lite").
+
+**`retro_konsolen` (25 Fälle, ursprünglich 6 gemeldet) — „komplett" als Zustands- statt
+Gerätebeweis.** Root-Cause-Analyse der 6 gemeldeten Fälle deckte einen deutlich größeren Cluster
+auf: „komplett" (group2-Alternative) ist in der Praxis ein Vollständigkeits-/CIB-Zustandsbegriff,
+der bei EINZELSPIELEN mindestens genauso häufig vorkommt wie bei Konsolen (z.B. "Phantasy Star
+Online... - Nintendo GameCube - komplett", "FIFA Football 2003 – PS1 – deutsche PAL-Version –
+komplett" — 12 weitere Einzelspieltitel ohne das Wort „Spiel" im Titel, die daher auch von der
+Batch-16-Fix nicht erfasst wurden). **Fix:** `exclude_category_unless_also_contains` für
+`"komplett"` (Kontextliste: konsole/heimkonsole/spielekonsole/gerät/system/kabel/slim/fat/memory
+card/**controller**) sowie ergänzend `"spiel"`/`"spiele"` mit derselben Liste. „Controller" wurde
+bewusst in die Kontextliste aufgenommen, nachdem ein Testlauf eine bereits bestehende,
+absichtliche Testerwartung (`test_signal_komplett_positiv`: "Nintendo 64 / N64 + Controller +
+Spiel Tetris komplett" soll matchen) brach — Ergänzung verifiziert ohne erneute Kollision mit den
+36 bestätigten Fehltreffern. Blast-Radius-Check gegen den vollen, aktuell sichtbaren
+`found.json`-Korpus: 20 Treffer für „komplett" ohne jeden stärkeren Marker, ausnahmslos reale
+Einzelspiel-/Zubehör-Fehltreffer. Zusätzlich `"emul"` (bare, Abkürzung von „Emulator" — real
+bestätigt: "R36 Ultra X handheld Konsole... Ps1 Spiele Emul", ein moderner Android-Emulations-
+Handheld, keine echte Konsole; bestehendes `"emulator"`-Exclude griff bei der Abkürzung nicht).
+
+**`gpu` (1 Fall).** „Grafikkartenlüfter für MSI RTX 3060 TI GAMING X, RX 6700 XT GAMING-X"
+(25,95€, Top-Deal) — reines Lüfter-Zubehörteil, kein `"lüfter"`-Exclude in `gpu.yaml` vorhanden.
+**Fix:** bare `"grafikkartenlüfter"` (Kompositum, nicht bare `"lüfter"` — hätte echte Karten mit
+eigener Dual-/Custom-Lüfter-Beschreibung fälschlich blockiert, z.B. "ZOTAC ... RTX 3060 TI
+Grafikkarte Dual-Lüfter").
+
+9 neue Regressionstests (`test_konsolen_bundles_spiele_bundle_fix.py` 3,
+`test_retro_konsolen_einzelspiele_ohne_geraet_fix.py` 4,
+`test_gpu_grafikkartenluefter_fix.py` 2). Zielgerichtete Suite: `pytest app/tests/ -k
+"konsolen_bundle or retro_konsolen or gpu"` → 164 passed. Volle Suite **1372/1372 grün** (vom
+Nutzer lokal verifiziert, 87,97s). `rule_analyzer.py`: 0 Findings. Baseline-Regeneration:
+sichtbare Einträge 2467 → 2430 (−37, passt zu den 36 gefixten Fällen plus normalem
+Scan-Rauschen). Ruleset-Signatur geändert (`20737fe48c8f52af` → `59f03f5a2f2c1d7c`). Reiner
+YAML-Fix, kein Rebuild nötig.
+
 ## Abgeschlossen
 
 - ursprüngliche Phasen 0–10
@@ -485,6 +540,8 @@ Rebuild, der Quoka-Scraper-Fix (`scrapers/quoka.py`) ist eine Python-Änderung u
   oben)
 - Alle drei verbleibenden Batch-14-Punkte gelöst: Xenoblade-Spieltitel-Problem, `netzteil`-
   Positivsignal, Quoka-Preis-Parsing-Defekt an der Wurzel (Batch 16 oben)
+- Vollanalyse einer extern bereitgestellten `found.json`: 36 Fehltreffer über `konsolen_bundles`/
+  `retro_konsolen`/`gpu` behoben (Batch 17 oben)
 
 ## Aktuelle Systemkette
 
@@ -558,12 +615,19 @@ Wichtige Architekturregeln:
 17. Quoka-Preis-Parsing-Defekt: **an der Wurzel gelöst** (Batch 16) — `_price_to_float()` kannte
     das Leerzeichen-Tausendertrennzeichen-Format nicht (live gegen quoka.de verifiziert). Der
     `price<=0`-Guard aus Batch 14 bleibt zusätzlich als generisches Sicherheitsnetz bestehen.
+18. `found.json`-Vollanalyse (Batch 17): **36 Fehltreffer über `konsolen_bundles`/
+    `retro_konsolen`/`gpu` erledigt**. „ovp"/„bundle"/„set" (konsolen_bundles) und „komplett"
+    (retro_konsolen) sind group2-Positivsignale, die auf reine Spiele-/Zubehör-Angebote ohne
+    jedes Gerät zutreffen — jeweils über `exclude_category_unless_also_contains` mit den
+    stärkeren, echten Gerätemarkern derselben Kategorie gelöst, keine Architektur-Änderung nötig.
+    Nicht Teil dieser Analyse: `iphone`/`netzteil`/übrige Kategorien wurden geprüft und als
+    korrekt bestätigt (siehe Batch-17-Detailbericht).
 
 ## Nächste Prioritäten
 
 ### P0 — offene Punkte
 
-- Keine offenen P0-Punkte (alle in Batch 1–16 dokumentierten Punkte abgeschlossen und verifiziert,
+- Keine offenen P0-Punkte (alle in Batch 1–17 dokumentierten Punkte abgeschlossen und verifiziert,
   inkl. aller ursprünglich zurückgestellten Fehltreffer-Muster). Nächster Schritt nach freiem
   Ermessen: Nr. 6 (Resale-Confidence) oder eine neue Nutzeranfrage.
 - **Rebuild ausstehend:** Batch 14 (`app.py`-Preisguard) UND Batch 16 (`scrapers/quoka.py`-Fix)

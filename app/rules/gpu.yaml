@@ -169,6 +169,17 @@ exclude_category:
   - "kühlkörper"
   - "backplate"
   - "luftkühler"
+  # FIX (Nutzer-Meldung 2026-08-15, found.json-Vollanalyse): "Grafikkarten-
+  # lüfter" ist ein eindeutiges Lüfter-Zubehörteil FÜR eine Grafikkarte,
+  # keine Grafikkarte selbst -- real bestätigt: "Grafikkartenlüfter für MSI
+  # RTX 3060 TI GAMING X, RX 6700 XT GAMING-X" (25,95€, Top-Deal). Bare
+  # "lüfter" bewusst NICHT ergänzt (würde echte Karten mit eigener Dual-/
+  # Custom-Lüfter-Beschreibung wie "ZOTAC ... RTX 3060 TI Grafikkarte
+  # Dual-Lüfter" fälschlich blockieren) -- "Grafikkartenlüfter" ist dagegen
+  # ein zusammengeschriebenes Kompositum ohne diese Kollisionsgefahr
+  # (matcher.py::_contains_term()-Wortgrenzen erfassen es nicht über bare
+  # "lüfter"). Blast Radius: 1 Treffer im gesamten Korpus, 0 Kollisionen.
+  - "grafikkartenlüfter"
 
   # ZUSTAND / DEFEKTE WARE
   - "defekt"

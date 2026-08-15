@@ -2,18 +2,18 @@
   "meta": {
     "baseline_id": "historical_forensics_baseline",
     "baseline_ruleset_signature": "1e7fcec77b51c375",
-    "current_ruleset_signature": "20737fe48c8f52af",
+    "current_ruleset_signature": "59f03f5a2f2c1d7c",
     "ruleset_unveraendert": false,
     "anzahl_eintraege": 2306,
     "severity_counts": {
-      "NEUTRAL": 2090,
-      "CRITICAL": 97,
+      "NEUTRAL": 2088,
+      "CRITICAL": 99,
       "INFO": 49,
       "HIGH_CANDIDATE": 70
     },
     "gate_label_counts": {
-      "TRUE_POSITIVE -> TRUE_POSITIVE (stabil)": 2090,
-      "TRUE_POSITIVE -> kein Treffer": 97,
+      "TRUE_POSITIVE -> TRUE_POSITIVE (stabil)": 2088,
+      "TRUE_POSITIVE -> kein Treffer": 99,
       "FALSE_POSITIVE -> kein Treffer": 14,
       "UNCLEAR -> kein Treffer": 15,
       "UNCLEAR weiterhin unklar": 20,
@@ -54,12 +54,12 @@
       "category": "retro_konsolen",
       "before_verdict": "TRUE_POSITIVE",
       "before_rule": "Sony Retro-Konsole (PS1/PS2) ★ Top-Deal",
-      "after_match_state": "GLEICHE_KATEGORIE",
-      "after_category": "retro_konsolen",
-      "after_rule": "Sony Retro-Konsole (PS1/PS2) ★ Top-Deal",
-      "severity": "NEUTRAL",
-      "gate_label": "TRUE_POSITIVE -> TRUE_POSITIVE (stabil)",
-      "explanation": "Unveraendert."
+      "after_match_state": "KEIN_TREFFER",
+      "after_category": null,
+      "after_rule": null,
+      "severity": "CRITICAL",
+      "gate_label": "TRUE_POSITIVE -> kein Treffer",
+      "explanation": "Ein zuvor menschlich bestaetigter echter Treffer matcht jetzt gar nicht mehr."
     },
     {
       "url": "https://www.kleinanzeigen.de/s-anzeige/ps2-slim-silber/3480883218-279-1979",
@@ -80,12 +80,12 @@
       "category": "retro_konsolen",
       "before_verdict": "TRUE_POSITIVE",
       "before_rule": "Sony Retro-Konsole (PS1/PS2) ★ Top-Deal",
-      "after_match_state": "GLEICHE_KATEGORIE",
-      "after_category": "retro_konsolen",
-      "after_rule": "Sony Retro-Konsole (PS1/PS2) ★ Top-Deal",
-      "severity": "NEUTRAL",
-      "gate_label": "TRUE_POSITIVE -> TRUE_POSITIVE (stabil)",
-      "explanation": "Unveraendert."
+      "after_match_state": "KEIN_TREFFER",
+      "after_category": null,
+      "after_rule": null,
+      "severity": "CRITICAL",
+      "gate_label": "TRUE_POSITIVE -> kein Treffer",
+      "explanation": "Ein zuvor menschlich bestaetigter echter Treffer matcht jetzt gar nicht mehr."
     },
     {
       "url": "https://www.kleinanzeigen.de/s-anzeige/iphone-16-pro-256-gb-top-zustand/3480904359-173-18880",

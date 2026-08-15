@@ -3,8 +3,8 @@
     "retro_konsolen": {
       "kategorie": "retro_konsolen",
       "getestete_eintraege": 144,
-      "tp_stabil": 138,
-      "tp_kritisch_kein_treffer": 1,
+      "tp_stabil": 136,
+      "tp_kritisch_kein_treffer": 3,
       "tp_anderer_matchpfad": 0,
       "fp_gefixt": 3,
       "fp_weiterhin_aktiv": 1,
@@ -12,8 +12,8 @@
       "unclear_weiterhin": 1,
       "kategoriewechsel": 0,
       "gewonnene_true_positive": 3,
-      "verlorene_true_positive": 1,
-      "regressionen_gesamt": 1
+      "verlorene_true_positive": 3,
+      "regressionen_gesamt": 3
     },
     "iphone": {
       "kategorie": "iphone",
