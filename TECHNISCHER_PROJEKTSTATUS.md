@@ -5,18 +5,16 @@
 > Stand: **2026-08-15**
 > Repository: `dkmd89-dev/gpu-watch-v2`
 > Branch: `main`
-> **Letzter Code-Commit (vor dieser Doku-Aktualisierung):** `a3e5060` (Merge PR #38)
-> **HEAD (main, vor dieser Doku-Aktualisierung):** `a3e5060` (Merge PR #38)
-> Vorheriger dokumentierter Stand: `374fc16` (Merge PR #37)
-> Seit `374fc16`: PR #38 (reale Wirkung von Scraping-Parallelisierung + Persistence-Batching
-> gegen Produktivdaten verifiziert, `1edcb3e`, reiner Doku-Commit) + dieser Batch: read-only
-> Kategorie-Audit (0 Abweichungen) + 5 Live-Fehltreffer-Fixes über `vintage_elektronik`
-> (kontextbewusstes „fernbedienung"-Exclude)/`handhelds` („module"-Plural)/`konsolen_bundles`
-> („zubehör set"-Leerzeichen-Variante + „mainboard"/„motherboard") + Preis-Mindestbetrag-Guard
-> in `app.py` gegen einen Quoka-seitigen Preis-Parsing-Defekt (0€-Treffer verzerrten
-> `price_history.jsonl`) — **siehe Abschnitt 3.19**. Drei weitere real gefundene, strukturell
-> risikoreichere Fehltreffer-Muster bewusst zurückgestellt (Abschnitt 3.19, „Bewusst nicht
-> gefixt").
+> **Letzter Code-Commit (vor dieser Doku-Aktualisierung):** `2bcc7d4` (Merge PR #39)
+> **HEAD (main, vor dieser Doku-Aktualisierung):** `2bcc7d4` (Merge PR #39)
+> Vorheriger dokumentierter Stand: `a3e5060` (Merge PR #38)
+> Seit `a3e5060`: PR #39 (read-only Kategorie-Audit + 5 Live-Fehltreffer-Fixes über
+> `vintage_elektronik`/`handhelds`/`konsolen_bundles` + Preis-Mindestbetrag-Guard, Abschnitt 3.19)
+> + dieser Batch: die in Abschnitt 3.19 zurückgestellte „pro"-Kollision in
+> `konsolen_bundles.yaml` **gelöst** — siehe Abschnitt 3.20. Stellte sich bei tieferer Analyse als
+> 3 unabhängige, einzeln additiv lösbare Ursachen heraus (Bindestrich-Kompositum-Lücke bei „pro
+> controller", eindeutiger Markenname „MixAmp", Plattform-Kompatibilitätsliste bei „Vertical
+> Stand") statt einer strukturellen Gruppen-Kollision.
 >
 > Diese Datei ersetzt `PROJEKTSTAND_KOMPLETT.md` (Datei mittlerweile aus dem Repository entfernt). Historische Phasenberichte bleiben als Detaildokumentation erhalten; widersprüchliche ältere Ist-Stand-Angaben gelten nicht mehr als aktuell.
 
@@ -26,7 +24,7 @@
 
 `gpu-watch-v2` ist ein modularer, YAML-gesteuerter **Hardware Deal Finder** für Second-Hand-Angebote. Das System kombiniert Scraper, kategoriebasiertes Matching, Hardware-Detektoren, Deal-Scoring, Marktpreis-/Resale-Statistik, Profit-/Flip-Bewertung, Duplicate Detection, Presence Tracking, Dashboard-KPIs und ntfy-Benachrichtigungen.
 
-Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und kontrollierter Weiterentwicklung**. Seit `d2effe7` wurden insbesondere Datenqualitäts-/Validierungslogik, Rule Analyzer/Coverage, Caching/Performance, neue Kategorien sowie ein umfangreicher False-Positive-Audit integriert. Seit 2026-08-14 ergänzt ein dediziertes, read-only **Ruleset-Qualitätssystem** (`tools/ruleset_quality/`, siehe Abschnitt 3.11) den bisherigen punktuellen Audit-Ansatz um reproduzierbare Regression-Benchmarks und Preishistorie-Simulationen. Im selben Tag (Abschnitt 3.12) wurde die 251-Listing-Stichprobe vollständig gelabelt, daraus resultierend 3 Exclude-Fixes umgesetzt (PR #31), der Umlaut-Fingerprint-Bug behoben und eine kontrollierte Preishistorie-Revalidierung v3 durchgeführt (PR #32) — mit dem wichtigen Befund, dass der Fix nicht rückwirkend auf bereits gespeicherte Daten wirkt. Direkt im Anschluss wurde Datenqualitätspunkt 14 (Abschnitt 3.13, Zubehör/Ersatzteil-vs-Gerät) mit 4 weiteren gezielten Exclude-Fixes gelöst (PR #33), gefolgt von Datenqualitätspunkt 5 (Abschnitt 3.14, `controller`/`ladekabel`-Restlücke, PR #34) und Datenqualitätspunkt 4 (Abschnitt 3.15, `RX 7600 XT`/`RX 7600`-Überlappung, PR #35) — Letzteres deckte einen strukturellen min_vram_gb-Bug auf, der zusätzlich 4 weitere GPU-Modelle betraf. Am 2026-08-15 (Abschnitt 3.16) wurde erstmals eine echte End-to-End-Scan-Performance-Messung anhand von 35 Produktiv-Scan-Läufen durchgeführt und der größte gefundene Hebel (Scraping macht 88,9% der Scanzeit aus, lief seriell) direkt umgesetzt: die drei Scraper-Quellen laufen jetzt parallel. Direkter Folgeschritt (Abschnitt 3.17): Persistence-Batching -- die ursprüngliche Analyse wurde dabei korrigiert, der dominante Kostentreiber war `seen.json` (16,7 MB), nicht primär `found.json`. Nach der Verifikation beider Performance-Fixes gegen echte Produktivdaten (Abschnitt 3.18, PR #38) wurde ein vollständiger, read-only Kategorie-Audit durchgeführt (0 Abweichungen zwischen YAML/Dashboard/found.json), gefolgt von einer Nutzer-gemeldeten Live-Fehltreffer-Analyse gegen die `tools/ruleset_quality/`-Regression-Benchmarks (Abschnitt 3.19): 5 real bestätigte Fehltreffer über `vintage_elektronik`/`handhelds`/`konsolen_bundles` behoben sowie ein Preis-Mindestbetrag-Guard gegen einen Quoka-seitigen Preis-Parsing-Defekt ergänzt, der `price_history.jsonl` mit 0€-Datenpunkten verzerrte.
+Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und kontrollierter Weiterentwicklung**. Seit `d2effe7` wurden insbesondere Datenqualitäts-/Validierungslogik, Rule Analyzer/Coverage, Caching/Performance, neue Kategorien sowie ein umfangreicher False-Positive-Audit integriert. Seit 2026-08-14 ergänzt ein dediziertes, read-only **Ruleset-Qualitätssystem** (`tools/ruleset_quality/`, siehe Abschnitt 3.11) den bisherigen punktuellen Audit-Ansatz um reproduzierbare Regression-Benchmarks und Preishistorie-Simulationen. Im selben Tag (Abschnitt 3.12) wurde die 251-Listing-Stichprobe vollständig gelabelt, daraus resultierend 3 Exclude-Fixes umgesetzt (PR #31), der Umlaut-Fingerprint-Bug behoben und eine kontrollierte Preishistorie-Revalidierung v3 durchgeführt (PR #32) — mit dem wichtigen Befund, dass der Fix nicht rückwirkend auf bereits gespeicherte Daten wirkt. Direkt im Anschluss wurde Datenqualitätspunkt 14 (Abschnitt 3.13, Zubehör/Ersatzteil-vs-Gerät) mit 4 weiteren gezielten Exclude-Fixes gelöst (PR #33), gefolgt von Datenqualitätspunkt 5 (Abschnitt 3.14, `controller`/`ladekabel`-Restlücke, PR #34) und Datenqualitätspunkt 4 (Abschnitt 3.15, `RX 7600 XT`/`RX 7600`-Überlappung, PR #35) — Letzteres deckte einen strukturellen min_vram_gb-Bug auf, der zusätzlich 4 weitere GPU-Modelle betraf. Am 2026-08-15 (Abschnitt 3.16) wurde erstmals eine echte End-to-End-Scan-Performance-Messung anhand von 35 Produktiv-Scan-Läufen durchgeführt und der größte gefundene Hebel (Scraping macht 88,9% der Scanzeit aus, lief seriell) direkt umgesetzt: die drei Scraper-Quellen laufen jetzt parallel. Direkter Folgeschritt (Abschnitt 3.17): Persistence-Batching -- die ursprüngliche Analyse wurde dabei korrigiert, der dominante Kostentreiber war `seen.json` (16,7 MB), nicht primär `found.json`. Nach der Verifikation beider Performance-Fixes gegen echte Produktivdaten (Abschnitt 3.18, PR #38) wurde ein vollständiger, read-only Kategorie-Audit durchgeführt (0 Abweichungen zwischen YAML/Dashboard/found.json), gefolgt von einer Nutzer-gemeldeten Live-Fehltreffer-Analyse gegen die `tools/ruleset_quality/`-Regression-Benchmarks (Abschnitt 3.19): 5 real bestätigte Fehltreffer über `vintage_elektronik`/`handhelds`/`konsolen_bundles` behoben sowie ein Preis-Mindestbetrag-Guard gegen einen Quoka-seitigen Preis-Parsing-Defekt ergänzt, der `price_history.jsonl` mit 0€-Datenpunkten verzerrte. Direkter Folgeschritt (Abschnitt 3.20): die dort zurückgestellte „pro"-Kollision in `konsolen_bundles.yaml` wurde bei tieferer Analyse doch gelöst -- 3 unabhängige, einzeln additiv lösbare Ursachen statt einer strukturellen Gruppen-Kollision, inklusive einer expliziten Korrektur eines zunächst erwogenen, aber per Blast-Radius-Check verworfenen breiteren Fixes.
 
 ---
 
@@ -36,21 +34,18 @@ Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und ko
 
 ```text
 Branch: main
-Letzter Code-Commit (vor dieser Doku-Aktualisierung): a3e5060 (Merge PR #38)
-Vorheriger dokumentierter Stand: 374fc16 (Merge PR #37)
+Letzter Code-Commit (vor dieser Doku-Aktualisierung): 2bcc7d4 (Merge PR #39)
+Vorheriger dokumentierter Stand: a3e5060 (Merge PR #38)
 
-374fc16..a3e5060:
-  PR #38 (1edcb3e) -- docs: reale Wirkung von Scraping-Parallelisierung +
-                       Persistence-Batching gegen Produktivdaten verifiziert
-                       (reiner Doku-Commit, siehe Abschnitt 3.18)
+a3e5060..2bcc7d4:
+  PR #39 (7879997) -- fix: 5 Live-Fehltreffer über 3 Kategorien +
+                       Preis-Mindestbetrag-Guard (siehe Abschnitt 3.19)
 
-Dieser Batch (noch ohne PR-Nummer, siehe Abschnitt 3.19):
-  Kategorie-Audit (read-only, 0 Abweichungen) + 5 Live-Fehltreffer-Fixes:
-    vintage_elektronik.yaml -- "fernbedienung" kontextbewusst statt bare
-    handhelds.yaml           -- "module" (Plural von "modul") ergänzt
-    konsolen_bundles.yaml    -- "zubehör set" (Leerzeichen) +
-                                 "mainboard"/"motherboard" ergänzt
-    app.py                   -- price<=0-Guard (Quoka-Preis-Parsing-Defekt)
+Dieser Batch (noch ohne PR-Nummer, siehe Abschnitt 3.20):
+  konsolen_bundles.yaml -- "pro"-Kollision gelöst:
+    "pro-controller" (Bindestrich-Geschwister zu bestehendem "pro controller")
+    "mixamp" (bare Exclude)
+    "vertical stand" (exclude_category_unless_also_contains)
 ```
 
 Zusätzlich, außerhalb der Commit-Historie (freigegebene Datenänderung, kein Code-Commit):
@@ -61,25 +56,21 @@ gelöscht (siehe Abschnitt 3.12).
 
 ```text
 Zuletzt vollständig lokal ausgeführt und verifiziert (vom Nutzer, nach diesem Batch):
-pytest app/tests/ -> 1337 passed, 0 failed (80,33s)
+pytest app/tests/ -> 1355 passed, 0 failed (85,27s)
 
 rule_analyzer.py:
 355 Regeln, 19 Kategorien, 0 Findings
-Ruleset-Signatur (matcher.compute_ruleset_signature()): b863e724db9b393c
-  -- GEÄNDERT gegenüber 133dcd1a9f614e7e (YAML-Änderungen in
-     vintage_elektronik.yaml/handhelds.yaml/konsolen_bundles.yaml,
-     siehe Abschnitt 3.19)
+Ruleset-Signatur (matcher.compute_ruleset_signature()): 6266e4a437c1fbc4
+  -- GEÄNDERT gegenüber b863e724db9b393c (YAML-Änderung in
+     konsolen_bundles.yaml, siehe Abschnitt 3.20)
 ```
 
-Vorheriger dokumentierter Stand: 1334/1334 (PR #37/#38). 15 neue Tests in diesem Batch
-(`test_vintage_elektronik_fernbedienung_kontext_fix.py`,
-`test_handhelds_module_plural_fix.py`,
-`test_konsolen_bundles_zubehoer_set_mainboard_fix.py`, `test_app_zero_price_skip.py`) — kein
-Test wurde gelöscht oder abgeschwächt. Anmerkung: 1334+15=1349 ≠ 1337 (Differenz 12) — der
-zuvor dokumentierte „1334"-Stand konnte gegen diesen frisch verifizierten Lauf nicht exakt
-rekonstruiert werden (bekannte Einschränkung, siehe Fußzeile dieser Datei zu nicht in jeder
-Session live gegengeprüften Ständen). Der jetzt dokumentierte Stand (1337) ist der aktuell
-verifizierte.
+Vorheriger dokumentierter Stand: 1337/1337 (PR #39). 6 neue Tests in diesem Batch
+(`test_konsolen_bundles_pro_kollision_fix.py`) — kein Test wurde gelöscht oder abgeschwächt.
+Anmerkung: 1337+6=1343 ≠ 1355 (Differenz +12, diesmal in die andere Richtung als beim letzten
+Batch) — wie dort bereits vermerkt, wird STATUS.md/diese Datei nicht in jeder Session live gegen
+einen lokalen Checkout verifiziert (siehe Fußzeile dieser Datei). Der jetzt dokumentierte Stand
+(1355) ist der aktuell verifizierte.
 
 ---
 
@@ -783,6 +774,72 @@ Ruleset-Signatur geändert: `133dcd1a9f614e7e` → `b863e724db9b393c`.
 
 ---
 
+### 3.20 „pro"-Kollision in `konsolen_bundles.yaml` gelöst (zuvor in Abschnitt 3.19 zurückgestellt)
+
+Vertiefte Root-Cause-Analyse der drei in Abschnitt 3.19 zurückgestellten Live-Fehltreffer.
+**Korrektur der dortigen Einschätzung:** die betroffenen `require_all_of`-Gruppen werden von
+**2** Regeln geteilt (`"PS4 Slim / Pro Bundle ★ Top-Deal"`/`"👍 Guter Preis"`,
+`price_history_model: "konsole_ps4_bundle"`), nicht wie zunächst vermutet 6 — verifiziert über
+`grep -n "konsole_ps4_bundle" app/rules/konsolen_bundles.yaml`. Wichtiger: alle drei Fälle hatten
+**unabhängige, einzeln additiv lösbare Ursachen**, keine gemeinsame strukturelle Kollision:
+
+1. **„Snakebyte PS4 Wireless Pro-Controller PC Bayern München"** (52€, Top-Deal): es existierte
+   bereits ein produktiver `exclude_category_unless_preceded_by`-Eintrag für `"pro controller"`
+   (Leerzeichen, Konnektor-Anker `*bundle_konnektoren`, laut Kommentar in `konsolen_bundles.yaml`
+   "0 Kollisionen im vollständigen 195-Titel-Test" einer früheren Session, Zeile 340-356). Er
+   greift aber NICHT bei der Bindestrich-Schreibweise `"Pro-Controller"` — verifiziert direkt über
+   `matcher._contains_term()`: `_contains_term(title, "pro controller")` → `False`,
+   `_contains_term(title, "pro-controller")` → `True`. Identisches Kompositum-/Schreibweisen-
+   Problem wie `"zubehör-set"`/`"zubehörset"`/`"zubehör set"` (Abschnitt 3.19). **Fix:**
+   `"pro-controller"` als Geschwister-Eintrag mit demselben Anker `*bundle_konnektoren` ergänzt —
+   erbt strukturell dieselbe 0-Kollisionen-Eigenschaft, da ausschließlich die zusätzliche
+   Bindestrich-Schreibweise erfasst wird, das bestehende `"pro controller"` (Leerzeichen)
+   unverändert bleibt.
+2. **„Astro MixAmp Pro TR Gen 4 für PS4/PC – Audio-Verstärker"** (50€, Top-Deal): enthält
+   `"controller"` gar nicht, ist ein Audio-Verstärker-Produktname (Astro MixAmp, bekannte
+   Gaming-Headset-Verstärkerlinie). **Fix:** bare `"mixamp"`-Exclude in `exclude_category`
+   (analog zu `"modchip"`/`"scuff"` — eindeutiger Markenname, kein Bundle-Kollisionsrisiko;
+   Blast Radius: 3 Treffer in `found.json`+`price_history.jsonl`, alle eindeutig Zubehör).
+3. **„Chin Fai „The Shark" Vertical Stand für PS4 / PS4 Slim / PS4 Pro"** (15€, Top-Deal):
+   matcht über `"slim"`+`"pro"` als reine Plattform-Kompatibilitätsangaben (Konsolenständer,
+   kompatibel mit mehreren PS4-Varianten, keine davon wird verkauft). **Fix:** neuer
+   `exclude_category_unless_also_contains`-Eintrag für `"vertical stand"` mit den Bundle-
+   Konnektoren (`"mit"`/`"inkl."`/`"inkl"`/`"+"`/`"und"`/`"sowie"`) als erlaubte Kontextliste.
+   Bewusst **nicht** über `exclude_category_unless_preceded_by` (Adjazenz-Check): der einzige
+   real bestätigte Bundle-Kollisionsfall in `price_history.jsonl` — "PS4 Slim inkl 1 Controller
+   Vertical Stand und Lampe" (80€) — hat den Konnektor `"inkl"` NICHT unmittelbar vor
+   `"Vertical Stand"` stehen (dazwischen "1 Controller"); ein Adjazenz-Check hätte diesen echten
+   Treffer fälschlich blockiert. Die titelweite Präsenzprüfung (`_any_conditional_exclude_
+   presence()`, bereits produktiv für `"gehäuse"`/`"joy-con"` in dieser Datei) erhält ihn korrekt,
+   da der Titel `"inkl"` UND `"und"` irgendwo enthält.
+
+**Wichtige Korrektur eines zunächst erwogenen, breiteren Fixes:** vor der finalen Lösung wurde ein
+generischerer Ansatz erwogen (bare `"pro controller"`/`"pro-controller"`-Exclude ohne
+Konnektor-Bedingung, um das Problem "an der Wurzel" zu lösen). Ein systematischer Blast-Radius-
+Check gegen den **vollen** `price_history.jsonl`-Korpus (27 Fundstellen mit `category:
+"konsolen_bundles"` und `"pro controller"`/`"pro-controller"` im Fingerprint, nicht nur die
+zuvor referenzierten 195 Titel) zeigte **~5-7 reale Kollisionen** mit echten Konsole+Pro-
+Controller-Bundles, die informell OHNE direkt vorangestellten Konnektor formuliert sind (z.B.
+"Nintendo Switch 2 Konsole 7 Spiele Pro Controller", "Sony PS4 Konsole 500GB/1TB/2TB Slim Pro
+Controller PlayStation 4" — Komma-/Aufzählungsstil statt "mit"/"inkl."). Dieser breitere Fix
+wurde **verworfen** — der tatsächlich umgesetzte, engere Fix (nur die fehlende Bindestrich-
+Schreibweise ergänzen, bestehenden Konnektor-Mechanismus unverändert lassen) hat dieses
+Kollisionsrisiko nicht, weil er ausschließlich die bereits durch den Konnektor-Mechanismus
+geschützte Menge um eine Schreibweisen-Variante erweitert, ohne die Schutzbedingung selbst zu
+lockern.
+
+6 neue Regressionstests (`test_konsolen_bundles_pro_kollision_fix.py`), inkl. expliziter
+Kollisionsschutz-Tests für die beiden zunächst gefährdeten echten Bundles ("Nintendo Switch
+Konsole mit Pro Controller & 5 Spielen", "PS4 Slim inkl 1 Controller Vertical Stand und Lampe").
+Zielgerichtete Suite: `pytest app/tests/ -k "konsolen_bundle"` → 67 passed (inkl. der zuvor
+kritischen, bereits bestehenden `test_pro_controller_im_echten_bundle_matcht_weiterhin`/
+`test_pro_slim_ohne_zubehoerwort_matcht_weiterhin`/`test_pro_controller_bundle_mit_plus_bleibt_
+unveraendert`). Volle Suite **1355/1355 grün** (vom Nutzer lokal verifiziert, 85,27s).
+`rule_analyzer.py`: 0 Findings. Ruleset-Signatur geändert: `b863e724db9b393c` →
+`6266e4a437c1fbc4`. Reiner YAML-Fix, kein Rebuild nötig (volume-gemountet).
+
+---
+
 ## 4. Datenqualität
 
 Der aktuelle Datenqualitätsstand ist technisch deutlich ausgebaut, aber noch nicht vollständig abgeschlossen.
@@ -812,7 +869,7 @@ Der anschließende PR-#6-Audit adressiert bereits mehrere konkrete False Positiv
 - Umlaut-Fingerprint-Problem: **Code behoben, aber nicht rückwirkend** (Abschnitt 3.12, Punkt 4/6) — dauerhafte, dokumentierte Einschränkung für historische Daten in 4 Kategorien
 - Regel „Switch Pro Controller“ hat nur zwei statt drei Preisstufen — explizit auf Nutzerentscheidung **nicht** erweitert (keine belastbare Datenbasis)
 - `normalize_title()` entfernt Satzzeichen (z.B. "M.2" → "m 2"), 1 beobachteter Fehlklassifikationsfall (`m2_ssd`→`sata_ssd`) — nur beobachtet, nicht verallgemeinert
-- „pro"-Kollision in einer für 6 `konsolen_bundles`-Regeln geteilten `require_all_of`-Gruppe (Abschnitt 3.19, 3 bestätigte Live-Fälle) — Restrukturierung berührt bestehende, eingespielte Tests, zurückgestellt
+- „pro"-Kollision in `konsolen_bundles`: **erledigt** (Abschnitt 3.20) — 3 unabhängige, additiv lösbare Ursachen statt einer strukturellen Gruppen-Kollision (Bindestrich-Kompositum-Lücke, Markenname „MixAmp", Plattform-Kompatibilitätsliste bei „Vertical Stand")
 - `"netzteil"` als bewusstes Positivsignal in einer für 6 `retro_konsolen`-Regeln geteilten Gruppe (Abschnitt 3.19, 2 bestätigte Live-Fälle) — Architektur-Redesign nötig, kein additiver Fix, zurückgestellt
 - Quoka-Preis-Parsing-Defekt (`scrapers/quoka.py::_price_to_float()` liefert vereinzelt `0.0` statt `None`): Symptom gefixt (Abschnitt 3.19, `price<=0`-Guard), HTML-seitige Ursache nicht untersucht
 
@@ -892,13 +949,18 @@ Folgende Punkte sind **nicht** durch die Konsolidierung als abgeschlossen zu bet
     1-2 Scans für eine "steady state"-Bestätigung gegenchecken (dieser erste Scan hatte einen
     ungewöhnlich hohen `dedupliziert`-Wert durch die Ruleset-Signatur-Änderungen dieser Session).
 15. Kategorie-Audit + Live-Fehltreffer-Fixes (Abschnitt 3.19): **erledigt** — 5 Fixes über
-    `vintage_elektronik`/`handhelds`/`konsolen_bundles` + Preis-Guard in `app.py`. Drei weitere
-    real bestätigte Fehltreffer-Muster bewusst **zurückgestellt** (Xenoblade-Spieltitel-Problem in
-    `handhelds`, „pro"-Kollision in `konsolen_bundles`, `netzteil`-Positivsignal in
-    `retro_konsolen`) — alle drei bräuchten Änderungen an geteilten Regelgruppen oder an
-    `matcher.py` selbst, kein additiver Exclude-Fix. Quoka-Preis-Parsing-Root-Cause weiterhin
-    ungeklärt (Symptom gefixt, HTML-Ursache nicht untersucht). **Rebuild ausstehend**
-    (`docker compose up --build -d`) für den `app.py`-Preis-Guard.
+    `vintage_elektronik`/`handhelds`/`konsolen_bundles` + Preis-Guard in `app.py`. Zwei der drei
+    zunächst zurückgestellten Muster bleiben offen (Xenoblade-Spieltitel-Problem in `handhelds`,
+    `netzteil`-Positivsignal in `retro_konsolen`) — beide bräuchten Änderungen an geteilten
+    Regelgruppen oder an `matcher.py` selbst, kein additiver Exclude-Fix. Quoka-Preis-Parsing-
+    Root-Cause weiterhin ungeklärt (Symptom gefixt, HTML-Ursache nicht untersucht). **Rebuild
+    ausstehend** (`docker compose up --build -d`) für den `app.py`-Preis-Guard.
+16. „pro"-Kollision in `konsolen_bundles.yaml` (Abschnitt 3.20): **erledigt** — die dritte,
+    ursprünglich in Abschnitt 3.19 zurückgestellte Fehltreffer-Gruppe stellte sich bei tieferer
+    Analyse als 3 unabhängige, additiv lösbare Ursachen heraus statt einer strukturellen
+    Gruppen-Kollision. Ein zunächst erwogener, breiterer Fix wurde nach Blast-Radius-Check
+    verworfen (~5-7 reale Kollisionen mit informell formulierten echten Bundles). Reiner
+    YAML-Fix, kein Rebuild nötig.
 
 ---
 
@@ -920,10 +982,11 @@ Orphan-Modelle, RX-7600-Überlappung, controller/ladekabel) sind **alle abgeschl
 (Abschnitt 3.12–3.15), ebenso die Scan-Performance-Messung + beide identifizierten Hebel
 **inklusive Verifikation gegen echte Produktivdaten** (Abschnitt 3.16–3.18:
 Scraping-Parallelisierung + Persistence-Batching, -56,4% Gesamtdauer / -89% Persistence), sowie
-der vollständige Kategorie-Audit + 5 Live-Fehltreffer-Fixes + Preis-Guard (Abschnitt 3.19). Keine
-offene, konkret benannte P0 mehr — nächster Schritt nach freiem Ermessen aus P1/P2, den drei in
-Abschnitt 3.19 zurückgestellten Fehltreffer-Mustern, oder einer neuen Nutzeranfrage. **Rebuild
-ausstehend** für den `app.py`-Preis-Guard aus Abschnitt 3.19.
+der vollständige Kategorie-Audit + 5 Live-Fehltreffer-Fixes + Preis-Guard (Abschnitt 3.19), sowie
+die dort zurückgestellte „pro"-Kollision in `konsolen_bundles` (Abschnitt 3.20, erledigt). Keine
+offene, konkret benannte P0 mehr — nächster Schritt nach freiem Ermessen aus P1/P2, den zwei
+verbleibenden zurückgestellten Fehltreffer-Mustern (Abschnitt 3.19), oder einer neuen
+Nutzeranfrage. **Rebuild ausstehend** für den `app.py`-Preis-Guard aus Abschnitt 3.19.
 
 Stand 2026-08-14: die vorherige P0 (Stichproben-Worksheet labeln + kontrollierte
 Preishistorie-Revalidierung + Orphan-Modell-Freigabe + Zubehör/Ersatzteil-vs-Gerät-

@@ -127,6 +127,16 @@ exclude_category:
   - "modchip"
   - "scuff"
   - "racing wheel"
+  # FIX (Nutzer-Meldung 2026-08-15, Live-Fehltreffer "pro"-Kollision):
+  # "MixAmp" (Astro) ist ein spezifischer, eindeutiger Audio-Verstärker-
+  # Produktname für Gaming-Headsets, kein Konsolen-Bundle -- real bestätigt:
+  # "Astro MixAmp Pro TR Gen 4 für PS4/PC – Audio-Verstärker" (50€,
+  # Top-Deal, matchte bisher fälschlich über das bare "pro" in der
+  # require_all_of-Gruppe 2 der PS4-Regeln). Bare Exclude (kein Konnektor-
+  # Mechanismus nötig): eindeutiger Markenname ohne Bundle-Kollisionsrisiko,
+  # 0 Treffer im übrigen Korpus außer den 3 real bestätigten MixAmp-Titeln
+  # (alle Zubehör, kein Konsolen-Bundle).
+  - "mixamp"
   - "zubehör-set"
   - "zubehörset"
   # FIX (Nutzer-Meldung 2026-08-15): "zubehör set" (zwei Woerter, mit
@@ -326,6 +336,32 @@ exclude_category_unless_also_contains:
   "xbox one s –": *plattform_geraete_marker
   "xbox one x -": *plattform_geraete_marker
   "xbox one x –": *plattform_geraete_marker
+  # FIX (Nutzer-Meldung 2026-08-15, Live-Fehltreffer "pro"-Kollision):
+  # "Vertical Stand" ist ein spezifischer Zubehör-Produktname (Konsolen-
+  # ständer), der als Standalone-Angebot fälschlich matcht, wenn er
+  # zusammen mit mehreren Plattform-/Modell-Kompatibilitätsangaben
+  # auftaucht -- real bestätigt: "Chin Fai „The Shark" Vertical Stand für
+  # PS4 / PS4 Slim / PS4 Pro" (15€, Top-Deal, matchte über "slim"+"pro" in
+  # der require_all_of-Gruppe 2, obwohl der Titel gar kein Gerät verkauft).
+  # Bewusst NICHT exclude_category_unless_preceded_by (Adjazenz-Check):
+  # der einzige echte Bundle-Kollisionsfall "PS4 Slim inkl 1 Controller
+  # Vertical Stand und Lampe" (80€, price_history.jsonl) hat "inkl" NICHT
+  # unmittelbar vor "Vertical Stand" stehen (dazwischen "1 Controller") --
+  # ein Adjazenz-Check würde diesen echten Bundle-Treffer fälschlich
+  # ebenfalls blockieren. Stattdessen titelweite Praesenzpruefung auf
+  # dieselben Bundle-Konnektoren wie bei "pro controller"/"pro-controller"
+  # unten (kein neuer Anker moeglich, da exclude_category_unless_
+  # preceded_by mit *bundle_konnektoren erst weiter unten im Dokument
+  # definiert wird -- YAML-Anker muessen vor ihrer ersten Verwendung
+  # stehen). Verifiziert: 0 Kollisionen (der Bundle-Fall enthaelt "inkl"
+  # UND "und" irgendwo im Titel, der Fehltreffer-Fall keins der beiden).
+  "vertical stand":
+    - "inkl."
+    - "inkl"
+    - "mit"
+    - "+"
+    - "und"
+    - "sowie"
 
 # FIX (kontrollierter Review, "Plattformbegriff ist kein Hardware-Beweis",
 # Variante C, KONSOLEN_BUNDLES_REVIEW.md Abschnitt 8): "Pro Controller"
@@ -352,6 +388,19 @@ exclude_category_unless_preceded_by:
     - "+"
     - "und"
     - "sowie"
+  # FIX (Nutzer-Meldung 2026-08-15, Live-Fehltreffer "pro"-Kollision):
+  # Bindestrich-Variante von "pro controller" oben -- identisches
+  # Kompositum-/Schreibweisen-Problem wie bei "zubehör-set"/"zubehörset"/
+  # "zubehör set" oben: _contains_term() prüft "pro controller" (Leerzeichen)
+  # als eigene Phrase, "Pro-Controller" (Bindestrich) enthält diese Phrase
+  # NICHT. Real bestätigt: "Snakebyte PS4 Wireless Pro-Controller PC Bayern
+  # München" (52€, Top-Deal) matchte bisher trotz des bestehenden
+  # Konnektor-Mechanismus. Selber Konnektor-Anker (*bundle_konnektoren) --
+  # erbt dieselbe, bereits gegen den vollständigen Korpus verifizierte
+  # 0-Kollisionen-Eigenschaft (kein neues Kollisionsrisiko, da nur die
+  # Bindestrich-Schreibweise zusätzlich erfasst wird, "pro controller" mit
+  # Leerzeichen bleibt unverändert).
+  "pro-controller": *bundle_konnektoren
   # FIX (Nachtrag, Dashboard-Match-Validierung Variante C, Session
   # 2026-08-10): identisches Muster wie "Pro Controller" oben --
   # "GameCube Controller" ist ebenfalls ein spezifischer, feststehender

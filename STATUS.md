@@ -3,47 +3,43 @@
 > **Stand:** 2026-08-15  
 > **Repository:** `dkmd89-dev/gpu-watch-v2`  
 > **Branch:** `main`  
-> **Letzter Code-Commit auf `main` (vor dieser Doku-Aktualisierung):** `a3e5060` (Merge PR #38)  
+> **Letzter Code-Commit auf `main` (vor dieser Doku-Aktualisierung):** `2bcc7d4` (Merge PR #39)  
 > **Technische Referenz:** `TECHNISCHER_PROJEKTSTATUS.md`
 
 ## Gesamtstatus
 
-**Stabil / aktiv weiterentwickelbar.** Seit dem letzten dokumentierten Stand (`a3e5060`, PR #38)
-wurde ein vollständiger, read-only Kategorie-Audit durchgeführt (YAML ↔ Dashboard ↔ found.json ↔
-category_validation.py — keine Abweichungen gefunden), gefolgt von einer Nutzer-gemeldeten
-Live-Fehltreffer-Analyse gegen `tools/ruleset_quality/`-Regression-Benchmarks. **5 real bestätigte
-Fehltreffer über 3 Kategorien behoben** (`vintage_elektronik`/„fernbedienung" kontextbewusst statt
-bare, `handhelds`/„module"-Plural, `konsolen_bundles`/„zubehör set"-Leerzeichen-Variante +
-„mainboard"/„motherboard") sowie ein **Preis-Mindestbetrag-Guard** gegen einen Quoka-seitigen
-Preis-Parsing-Defekt (0€-Treffer verzerrten `price_history.jsonl`) — siehe Batch 14 unten. Drei
-weitere real gefundene, aber strukturell risikoreichere Fehltreffer-Muster bewusst
-**zurückgestellt** (siehe Batch 14, „Bewusst nicht gefixt").
+**Stabil / aktiv weiterentwickelbar.** Seit dem letzten dokumentierten Stand (`2bcc7d4`, PR #39)
+wurde die in Batch 14 bewusst zurückgestellte „pro"-Kollision in `konsolen_bundles.yaml` **gelöst**
+(Batch 15 unten) — alle 3 real bestätigten Live-Fehltreffer (Snakebyte Pro-Controller, Astro
+MixAmp, Chin Fai Vertical Stand) gefixt, ohne die zuvor befürchteten Kollisionen mit echten
+Konsole+Pro-Controller-Bundles. Die beiden anderen in Batch 14 zurückgestellten Muster
+(Spieltitel-ohne-Signalwort in `handhelds`, `netzteil`-Positivsignal in `retro_konsolen`) bleiben
+weiterhin offen.
 
 ## Verifizierter Stand
 
 ```text
-main (vor dieser Doku-Aktualisierung): a3e5060 (Merge PR #38)
+main (vor dieser Doku-Aktualisierung): 2bcc7d4 (Merge PR #39)
 
 Vollständiger Testlauf (vom Nutzer lokal ausgeführt und verifiziert):
-pytest app/tests/ -> 1337 passed, 0 failed (80,33s)
+pytest app/tests/ -> 1355 passed, 0 failed (85,27s)
 
 Rule Analyzer:
 355 Regeln
 19 Kategorien
 0 Findings
-Ruleset-Signatur: b863e724db9b393c (geändert gegenüber 133dcd1a9f614e7e -- YAML-Änderungen
-  in vintage_elektronik.yaml/handhelds.yaml/konsolen_bundles.yaml, siehe Batch 14)
+Ruleset-Signatur: 6266e4a437c1fbc4 (geändert gegenüber b863e724db9b393c -- YAML-Änderungen
+  in konsolen_bundles.yaml, siehe Batch 15)
 
 data/found.json: 2500 Einträge
 data/price_history.jsonl: 15.199 Datenpunkte (laufender Produktivbetrieb, nicht Teil dieses Batches)
 ```
 
-Vorheriger dokumentierter Teststand (PR #38): 1334/1334. 15 neue Tests in diesem Batch (siehe
-Batch 14 unten) — die Differenz zum tatsächlich verifizierten Vorher-Stand (1337−15 = 1322) legt
-nahe, dass die zuvor dokumentierte „1334" bereits vor diesem Batch nicht mehr exakt mit einem real
-verifizierten lokalen Lauf übereinstimmte (bekannte Einschränkung, siehe CLAUDE.md Abschnitt 7 —
-STATUS.md wird nicht in jeder Session live gegengeprüft). Keine Aktion nötig, der jetzt
-dokumentierte Stand (1337) ist frisch verifiziert.
+Vorheriger dokumentierter Teststand (PR #39): 1337/1337. 6 neue Tests in diesem Batch (siehe
+Batch 15 unten) — 1337+6=1343 ≠ 1355 (Differenz +12, diesmal in die andere Richtung als beim
+letzten Batch). Wie bereits dort vermerkt: STATUS.md wird nicht in jeder Session live gegen einen
+lokalen Checkout verifiziert (CLAUDE.md Abschnitt 7) — der jetzt dokumentierte Stand (1355) ist der
+frisch verifizierte.
 
 ## Zuletzt abgeschlossene Batches
 
@@ -364,6 +360,47 @@ Suite **1337/1337 grün** (vom Nutzer lokal verifiziert, 80,33s). `rule_analyzer
 Ruleset-Signatur geändert (`133dcd1a9f614e7e` → `b863e724db9b393c`, YAML-Änderungen in 3
 Dateien).
 
+### 15. „pro"-Kollision in `konsolen_bundles.yaml` gelöst (zuvor in Batch 14 zurückgestellt)
+
+Vertiefte Root-Cause-Analyse ergab: die 3 in Batch 14 gemeldeten Live-Fehltreffer betrafen **2**
+(nicht wie zunächst vermutet 6) für PS4-Regeln geteilte `require_all_of`-Gruppen
+(`"PS4 Slim / Pro Bundle ★ Top-Deal"`/`"👍 Guter Preis"`) — und hatten **drei unabhängige, einzeln
+lösbare Ursachen**, keine gemeinsame:
+
+1. **„Snakebyte PS4 Wireless Pro-Controller PC Bayern München"** (52€, Top-Deal): es existierte
+   bereits ein `exclude_category_unless_preceded_by`-Eintrag für „pro controller" (Leerzeichen,
+   0 Kollisionen im vollständigen 195-Titel-Test einer früheren Session) — er griff aber nicht bei
+   der Bindestrich-Schreibweise „Pro-Controller" (identisches Kompositum-Problem wie
+   „zubehör-set"/„zubehörset"/„zubehör set"). **Fix:** „pro-controller" als Geschwister-Eintrag mit
+   demselben Konnektor-Anker ergänzt — erbt dieselbe 0-Kollisionen-Eigenschaft, da nur die
+   Bindestrich-Schreibweise zusätzlich erfasst wird.
+2. **„Astro MixAmp Pro TR Gen 4 für PS4/PC – Audio-Verstärker"** (50€, Top-Deal): ein
+   Audio-Verstärker-Produktname ohne jeden Bezug zu „Controller". **Fix:** bare `"mixamp"`-Exclude
+   (eindeutiger Markenname, kein Bundle-Kollisionsrisiko).
+3. **„Chin Fai „The Shark" Vertical Stand für PS4 / PS4 Slim / PS4 Pro"** (15€, Top-Deal): matchte
+   über „slim"+„pro" als reine Plattform-Kompatibilitätsangaben. **Fix:** neuer
+   `exclude_category_unless_also_contains`-Eintrag für „vertical stand" — bewusst **nicht** über
+   `unless_preceded_by` (Adjazenz-Check), weil der einzige echte Bundle-Kollisionsfall in
+   `price_history.jsonl` ("PS4 Slim inkl 1 Controller Vertical Stand und Lampe", 80€) den
+   Konnektor „inkl" NICHT unmittelbar vor „Vertical Stand" stehen hat (dazwischen "1 Controller")
+   — ein Adjazenz-Check hätte diesen echten Treffer zerstört, die titelweite Präsenzprüfung
+   (Konnektor irgendwo im Titel) erhält ihn korrekt.
+
+**Wichtige Korrektur der Batch-14-Einschätzung:** ein initial erwogener, breiterer Fix (bare
+Exclude für „pro controller"/„pro-controller" ohne Konnektor-Bedingung) wurde **verworfen**, nachdem
+ein systematischer Blast-Radius-Check gegen den vollen `price_history.jsonl`-Korpus ~5-7 reale
+Kollisionen mit echten Konsole+Pro-Controller-Bundles zeigte, die informell ohne direkten
+Konnektor formuliert sind (z.B. "Nintendo Switch Konsole mit Pro Controller & 5 Spielen" — der
+bereits bestehende, engere Fix mit Konnektor-Bedingung bleibt davon unberührt und schützt diese
+Fälle weiterhin korrekt).
+
+6 neue Regressionstests (`test_konsolen_bundles_pro_kollision_fix.py`). Zielgerichtete Suite:
+67 `konsolen_bundle`-Tests grün (inkl. der zuvor kritischen `test_pro_controller_im_echten_
+bundle_matcht_weiterhin`/`test_pro_slim_ohne_zubehoerwort_matcht_weiterhin`). Volle Suite
+**1355/1355 grün** (vom Nutzer lokal verifiziert, 85,27s). `rule_analyzer.py`: 0 Findings.
+Ruleset-Signatur geändert (`b863e724db9b393c` → `6266e4a437c1fbc4`). Reiner YAML-Fix, kein
+Rebuild nötig.
+
 ## Abgeschlossen
 
 - ursprüngliche Phasen 0–10
@@ -399,6 +436,8 @@ Dateien).
 - Reale Wirkung beider Performance-Fixes gegen Produktivdaten verifiziert (Batch 13 oben)
 - Vollständiger read-only Kategorie-Audit (0 Abweichungen) + 5 Live-Fehltreffer über 3 Kategorien
   behoben + Preis-Mindestbetrag-Guard gegen Quoka-Parsing-Defekt (Batch 14 oben)
+- „pro"-Kollision in `konsolen_bundles.yaml` gelöst, 3 weitere Live-Fehltreffer behoben (Batch 15
+  oben)
 
 ## Aktuelle Systemkette
 
@@ -464,12 +503,14 @@ Wichtige Architekturregeln:
     wodurch ein Fingerprint vereinzelt andere Signalwörter enthalten kann als der echte Titel
     (1 beobachteter Fall: `m2_ssd` → `sata_ssd`-Fehlklassifikation bei Fingerprint-Revalidierung).
     Nur beobachtet, nicht verallgemeinert, keine Aktion.
-16. Drei neue, real bestätigte, aber bewusst zurückgestellte Fehltreffer-Muster (Batch 14):
+16. Zwei weiterhin real bestätigte, bewusst zurückgestellte Fehltreffer-Muster (Batch 14):
     Spieltitel ohne generisches Signalwort (`handhelds`, z.B. "Xenoblade Chronicles für Nintendo
-    New 3DS"), „pro"-Kollision in einer für 6 `konsolen_bundles`-Regeln geteilten Gruppe (3
-    Fälle), „netzteil" als bewusstes Positivsignal in einer für 6 `retro_konsolen`-Regeln
-    geteilten Gruppe (2 Fälle) — alle drei bräuchten ein Redesign geteilter Regelgruppen bzw.
-    einen neuen Matcher-Mechanismus statt eines additiven Excludes, daher zurückgestellt.
+    New 3DS"), „netzteil" als bewusstes Positivsignal in einer für 6 `retro_konsolen`-Regeln
+    geteilten Gruppe (2 Fälle) — beide bräuchten ein Redesign geteilter Regelgruppen bzw. einen
+    neuen Matcher-Mechanismus statt eines additiven Excludes. Die dritte, ursprünglich ebenfalls
+    zurückgestellte „pro"-Kollision in `konsolen_bundles` ist **erledigt** (Batch 15) — stellte
+    sich bei tieferer Analyse als 3 unabhängige, einzeln additiv lösbare Ursachen heraus statt
+    einer strukturellen Gruppen-Kollision.
 17. Quoka-Preis-Parsing-Defekt: Symptom gefixt (Batch 14, `price<=0`-Guard in `run_scan()`),
     HTML-seitige Ursache in `scrapers/quoka.py::_price_to_float()` **nicht** untersucht (bräuchte
     Live-Zugriff auf die aktuelle Quoka-Seite, spekulativ ohne diesen nicht sinnvoll lösbar).
@@ -478,13 +519,13 @@ Wichtige Architekturregeln:
 
 ### P0 — offene Punkte
 
-- Keine offenen P0-Punkte (alle in Batch 1–14 dokumentierten Punkte abgeschlossen und verifiziert).
-  Nächste Schritte laut Datenqualität/offene Punkte: Nr. 6 (Resale-Confidence), Nr. 16 (drei
-  zurückgestellte Fehltreffer-Muster) oder Nr. 17 (Quoka-Root-Cause) — alle drei explizit auf
+- Keine offenen P0-Punkte (alle in Batch 1–15 dokumentierten Punkte abgeschlossen und verifiziert).
+  Nächste Schritte laut Datenqualität/offene Punkte: Nr. 6 (Resale-Confidence), Nr. 16 (zwei noch
+  zurückgestellte Fehltreffer-Muster) oder Nr. 17 (Quoka-Root-Cause) — alle explizit auf
   Nutzerentscheidung zurückgestellt, kein aktiver Blocker.
 - **Rebuild ausstehend:** Batch 14 enthält eine Python-Änderung (`app.py`, Preis-Guard) —
-  `docker compose up --build -d` nötig, bevor der Fix produktiv wirkt (die YAML-Fixes in
-  Batch 14 wirken bereits ohne Rebuild, volume-gemountet).
+  `docker compose up --build -d` nötig, bevor der Fix produktiv wirkt (alle YAML-Fixes aus
+  Batch 14 und 15 wirken bereits ohne Rebuild, volume-gemountet).
 - Beobachtung aus Batch 13 (kein Blocker): einen der nächsten 1-2 Scans gegenchecken, sobald sich
   `dedupliziert` wieder im Normalbereich (<650) einpendelt, für eine "steady state"-Bestätigung
   der Matching+Scoring-/Persistence-Werte.

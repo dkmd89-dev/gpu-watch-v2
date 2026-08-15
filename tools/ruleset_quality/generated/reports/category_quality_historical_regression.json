@@ -33,8 +33,8 @@
     "konsolen_bundles": {
       "kategorie": "konsolen_bundles",
       "getestete_eintraege": 235,
-      "tp_stabil": 192,
-      "tp_kritisch_kein_treffer": 3,
+      "tp_stabil": 191,
+      "tp_kritisch_kein_treffer": 4,
       "tp_anderer_matchpfad": 0,
       "fp_gefixt": 3,
       "fp_weiterhin_aktiv": 3,
@@ -42,8 +42,8 @@
       "unclear_weiterhin": 19,
       "kategoriewechsel": 0,
       "gewonnene_true_positive": 3,
-      "verlorene_true_positive": 3,
-      "regressionen_gesamt": 3
+      "verlorene_true_positive": 4,
+      "regressionen_gesamt": 4
     },
     "ram": {
       "kategorie": "ram",

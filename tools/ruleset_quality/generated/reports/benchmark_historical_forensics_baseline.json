@@ -2,18 +2,18 @@
   "meta": {
     "baseline_id": "historical_forensics_baseline",
     "baseline_ruleset_signature": "1e7fcec77b51c375",
-    "current_ruleset_signature": "b863e724db9b393c",
+    "current_ruleset_signature": "6266e4a437c1fbc4",
     "ruleset_unveraendert": false,
     "anzahl_eintraege": 2306,
     "severity_counts": {
-      "NEUTRAL": 2091,
-      "CRITICAL": 96,
+      "NEUTRAL": 2090,
+      "CRITICAL": 97,
       "INFO": 47,
       "HIGH_CANDIDATE": 72
     },
     "gate_label_counts": {
-      "TRUE_POSITIVE -> TRUE_POSITIVE (stabil)": 2091,
-      "TRUE_POSITIVE -> kein Treffer": 96,
+      "TRUE_POSITIVE -> TRUE_POSITIVE (stabil)": 2090,
+      "TRUE_POSITIVE -> kein Treffer": 97,
       "FALSE_POSITIVE -> kein Treffer": 12,
       "UNCLEAR -> kein Treffer": 15,
       "UNCLEAR weiterhin unklar": 20,
@@ -9102,12 +9102,12 @@
       "category": "konsolen_bundles",
       "before_verdict": "TRUE_POSITIVE",
       "before_rule": "PS4 Slim / Pro Bundle ★ Top-Deal",
-      "after_match_state": "GLEICHE_KATEGORIE",
-      "after_category": "konsolen_bundles",
-      "after_rule": "PS4 Slim / Pro Bundle ★ Top-Deal",
-      "severity": "NEUTRAL",
-      "gate_label": "TRUE_POSITIVE -> TRUE_POSITIVE (stabil)",
-      "explanation": "Unveraendert."
+      "after_match_state": "KEIN_TREFFER",
+      "after_category": null,
+      "after_rule": null,
+      "severity": "CRITICAL",
+      "gate_label": "TRUE_POSITIVE -> kein Treffer",
+      "explanation": "Ein zuvor menschlich bestaetigter echter Treffer matcht jetzt gar nicht mehr."
     },
     {
       "url": "https://www.kleinanzeigen.de/s-anzeige/ps4-slim-original-controller-topp-zustand-1tb/3480486054-279-5513",
