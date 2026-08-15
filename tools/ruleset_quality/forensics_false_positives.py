@@ -176,6 +176,7 @@ ASSESSMENT_MANUAL_REVIEW = "MANUAL_REVIEW"
 ASSESSMENT_GROUND_TRUTH_CONFLICT = "GROUND_TRUTH_CONFLICT"
 
 QUEUE_CATEGORY_ACTIVE_ROUTING_FP = "ACTIVE_ROUTING_FP"
+QUEUE_CATEGORY_CATEGORY_CHANGED = "CATEGORY_CHANGED"
 QUEUE_CATEGORY_GROUND_TRUTH_CONFLICT = "GROUND_TRUTH_CONFLICT"
 QUEUE_CATEGORY_MANUAL_REVIEW = "MANUAL_REVIEW"
 QUEUE_CATEGORY_ALREADY_FIXED = "ALREADY_FIXED"
@@ -304,6 +305,12 @@ class FixQueueEntry:
     # historische FP ein aktuell zu fixender Fall ist. Nur
     # ACTIVE_ROUTING_FP-Eintraege bekommen eine P0-P3-Prioritaet.
     queue_category: str = QUEUE_CATEGORY_MANUAL_REVIEW
+    # VOLLSTAENDIGE Liste aller listing_ids in diesem Bucket (nicht nur die
+    # ersten 3 wie representative_listings) -- Auftrag "Datenintegritaet":
+    # stabile Case-IDs statt Titel-String-Matching, ermoeglicht eine echte
+    # 1:1-Konsistenzpruefung gegen die Assessment-Cases (siehe
+    # validate_queue_consistency()).
+    case_listing_ids: list[str] = field(default_factory=list)
 
 
 def _match_path(category: str | None, rule: str | None) -> str:
@@ -549,63 +556,61 @@ def _priority_tier(score: int) -> str:
     return "P3"
 
 
-# Praezedenz, wenn ein Bucket (Kategorie+Regel+root_cause) Faelle mit
-# unterschiedlichem assessment_status mischt (in der aktuellen Datenlage
-# nicht der Fall, aber nicht ausgeschlossen): der "dringendste" Status
-# bestimmt die queue_category des gesamten Buckets.
+# STRIKTE 1:1-Zuordnung (Auftrag "false_positive_fix_queue.json an
+# Ground-Truth-Routing-Assessment koppeln", Abschnitt "HAUPTREGEL"): die
+# Queue-Kategorie wird AUSSCHLIESSLICH aus assessment.status abgeleitet,
+# nie umgekehrt und nie ueber still_active_count. KEINE Praezedenz-Logik
+# mehr noetig, da build_fix_queue() den Bucket-Schluessel um
+# assessment_status erweitert (siehe unten) -- ein Bucket kann dadurch
+# nie mehr mehrere assessment_status-Werte mischen.
 _ASSESSMENT_TO_QUEUE_CATEGORY = {
-    ASSESSMENT_STILL_ACTIVE: QUEUE_CATEGORY_ACTIVE_ROUTING_FP,
-    ASSESSMENT_CATEGORY_CHANGED: QUEUE_CATEGORY_ACTIVE_ROUTING_FP,
-    ASSESSMENT_MANUAL_REVIEW: QUEUE_CATEGORY_MANUAL_REVIEW,
-    ASSESSMENT_GROUND_TRUTH_CONFLICT: QUEUE_CATEGORY_GROUND_TRUTH_CONFLICT,
     ASSESSMENT_FIXED: QUEUE_CATEGORY_ALREADY_FIXED,
+    ASSESSMENT_STILL_ACTIVE: QUEUE_CATEGORY_ACTIVE_ROUTING_FP,
+    ASSESSMENT_CATEGORY_CHANGED: QUEUE_CATEGORY_CATEGORY_CHANGED,
+    ASSESSMENT_GROUND_TRUTH_CONFLICT: QUEUE_CATEGORY_GROUND_TRUTH_CONFLICT,
+    ASSESSMENT_MANUAL_REVIEW: QUEUE_CATEGORY_MANUAL_REVIEW,
 }
-_QUEUE_CATEGORY_PRECEDENCE = [
-    QUEUE_CATEGORY_ACTIVE_ROUTING_FP,
-    QUEUE_CATEGORY_MANUAL_REVIEW,
-    QUEUE_CATEGORY_GROUND_TRUTH_CONFLICT,
-    QUEUE_CATEGORY_ALREADY_FIXED,
-]
-
-
-def _bucket_queue_category(bucket_cases: list[FalsePositiveCase]) -> str:
-    present = {
-        _ASSESSMENT_TO_QUEUE_CATEGORY[c.assessment_status] for c in bucket_cases
-    }
-    for qc in _QUEUE_CATEGORY_PRECEDENCE:
-        if qc in present:
-            return qc
-    return QUEUE_CATEGORY_MANUAL_REVIEW  # pragma: no cover -- defensiver Fallback
 
 
 def build_fix_queue(cases: list[FalsePositiveCase]) -> list[FixQueueEntry]:
     """Baut die priorisierte Fix-Queue (Auftrag Funktion 6/7). Ein Bucket =
-    eine Kategorie + eine Regel + eine root_cause, da eine YAML-Aenderung
-    typischerweise genau eine Regel adressiert. Aendert NIE selbst YAML.
+    Kategorie + Regel + root_cause + assessment_status (die vier zusammen
+    identifizieren eindeutig, ob eine YAML-Aenderung ueberhaupt in Frage
+    kommt -- eine Regel kann z.B. sowohl laengst gefixte als auch noch
+    aktive Faelle enthalten, die NICHT im selben Bucket landen duerfen).
+    Aendert NIE selbst YAML.
 
-    WICHTIG (Auftrag "Fix-Queue-Anpassung"): ein historischer FP impliziert
-    NICHT mehr automatisch einen aktuell zu fixenden Fall. Nur Buckets mit
-    queue_category=ACTIVE_ROUTING_FP bekommen eine P0-P3-Prioritaet;
-    GROUND_TRUTH_CONFLICT/MANUAL_REVIEW/ALREADY_FIXED-Buckets werden nie
-    als aktiver YAML-Fix priorisiert (priority="N/A")."""
-    buckets: dict[tuple[str, str, str], list[FalsePositiveCase]] = defaultdict(list)
+    WICHTIG (Auftrag "Hauptregel"): die queue_category wird AUSSCHLIESSLICH
+    aus assessment.status abgeleitet (_ASSESSMENT_TO_QUEUE_CATEGORY), NICHT
+    aus still_active_count -- das bleibt eine reine Evidenz-/Metrik-Spalte.
+    Nur ACTIVE_ROUTING_FP (== assessment.status STILL_ACTIVE) bekommt eine
+    P0-P3-Prioritaet und gilt als unmittelbarer YAML-Fix-Kandidat.
+    CATEGORY_CHANGED/GROUND_TRUTH_CONFLICT/MANUAL_REVIEW/ALREADY_FIXED
+    werden NIE als aktiver YAML-Fix priorisiert (priority="N/A")."""
+    buckets: dict[tuple[str, str, str, str], list[FalsePositiveCase]] = defaultdict(
+        list
+    )
     for c in cases:
-        buckets[(c.stored_category, c.stored_rule, c.root_cause)].append(c)
+        buckets[
+            (c.stored_category, c.stored_rule, c.root_cause, c.assessment_status)
+        ].append(c)
 
     entries: list[FixQueueEntry] = []
-    for (category, rule, root_cause), bucket_cases in buckets.items():
-        queue_category = _bucket_queue_category(bucket_cases)
+    for (category, rule, root_cause, assessment_status), bucket_cases in buckets.items():
+        queue_category = _ASSESSMENT_TO_QUEUE_CATEGORY[assessment_status]
         if queue_category == QUEUE_CATEGORY_ACTIVE_ROUTING_FP:
             score = _priority_score(bucket_cases)
             priority = _priority_tier(score)
         else:
             score = 0
             priority = "N/A"
+        # Reine Evidenz-/Metrik-Spalte (Auftrag: "darf nur noch eine
+        # Evidenz-/Metrik-Spalte sein, aber NICHT die primaere semantische
+        # Entscheidung treffen") -- da der Bucket jetzt nach
+        # assessment_status homogen ist, ist dieser Wert entweder 0
+        # (Bucket=FIXED) oder gleich der Bucket-Groesse.
         still_active = sum(
-            1
-            for c in bucket_cases
-            if c.assessment_status
-            in (ASSESSMENT_STILL_ACTIVE, ASSESSMENT_CATEGORY_CHANGED)
+            1 for c in bucket_cases if c.assessment_status != ASSESSMENT_FIXED
         )
         affected_categories = sorted(
             {category}
@@ -664,14 +669,16 @@ def build_fix_queue(cases: list[FalsePositiveCase]) -> list[FixQueueEntry]:
                 still_active_count=still_active,
                 priority_score=score,
                 queue_category=queue_category,
+                case_listing_ids=[c.listing_id for c in bucket_cases],
             )
         )
 
     _queue_category_order = {
         QUEUE_CATEGORY_ACTIVE_ROUTING_FP: 0,
-        QUEUE_CATEGORY_MANUAL_REVIEW: 1,
-        QUEUE_CATEGORY_GROUND_TRUTH_CONFLICT: 2,
-        QUEUE_CATEGORY_ALREADY_FIXED: 3,
+        QUEUE_CATEGORY_CATEGORY_CHANGED: 1,
+        QUEUE_CATEGORY_MANUAL_REVIEW: 2,
+        QUEUE_CATEGORY_GROUND_TRUTH_CONFLICT: 3,
+        QUEUE_CATEGORY_ALREADY_FIXED: 4,
     }
     entries.sort(
         key=lambda e: (
@@ -682,6 +689,86 @@ def build_fix_queue(cases: list[FalsePositiveCase]) -> list[FixQueueEntry]:
         )
     )
     return entries
+
+
+def validate_queue_consistency(
+    cases: list[FalsePositiveCase], fix_queue: list[FixQueueEntry]
+) -> dict:
+    """Konsistenzpruefung zwischen den Assessment-Cases (assessment.status,
+    siehe build_case()) und der daraus abgeleiteten Fix-Queue
+    (queue_category, siehe build_fix_queue()). Reine Pruefung -- aendert
+    nichts, entscheidet nichts neu, fasst keine Faelle zusammen, die nicht
+    schon in `cases`/`fix_queue` stehen.
+
+    Prueft ueber stabile Case-IDs (listing_id/URL, siehe Auftrag
+    "Datenintegritaet"), NICHT ueber Titel-String oder Kategorie allein:
+
+      - missing_in_queue: Case-ID aus `cases`, die in KEINEM
+        fix_queue-Eintrag als case_listing_ids auftaucht
+      - missing_in_assessment: case_listing_id aus der Fix-Queue, die zu
+        keinem uebergebenen `cases`-Eintrag gehoert
+      - duplicate_case_ids: eine Case-ID taucht in MEHR als einem
+        fix_queue-Eintrag auf (Bucket-Ueberlappung, sollte durch die
+        eindeutige Bucket-Schluesselung in build_fix_queue() strukturell
+        nicht vorkommen -- wird hier trotzdem defensiv geprueft)
+      - status_mismatches: der queue_category-Wert des Buckets stimmt
+        nicht mit _ASSESSMENT_TO_QUEUE_CATEGORY[case.assessment_status]
+        ueberein (z.B. assessment=MANUAL_REVIEW, aber
+        queue_category=ALREADY_FIXED -> Fehler)
+    """
+    case_by_id = {c.listing_id: c for c in cases}
+
+    queue_id_to_categories: dict[str, list[str]] = defaultdict(list)
+    for entry in fix_queue:
+        for listing_id in entry.case_listing_ids:
+            queue_id_to_categories[listing_id].append(entry.queue_category)
+
+    missing_in_queue = sorted(set(case_by_id) - set(queue_id_to_categories))
+    missing_in_assessment = sorted(set(queue_id_to_categories) - set(case_by_id))
+    duplicate_case_ids = sorted(
+        listing_id
+        for listing_id, cats in queue_id_to_categories.items()
+        if len(cats) > 1
+    )
+
+    status_mismatches: list[dict] = []
+    for listing_id, cats in queue_id_to_categories.items():
+        case = case_by_id.get(listing_id)
+        if case is None or len(cats) != 1:
+            # kein eindeutiger Fall -- bereits als missing_in_assessment
+            # bzw. duplicate_case_ids erfasst, hier kein zusaetzlicher
+            # Status-Vergleich moeglich/sinnvoll.
+            continue
+        expected = _ASSESSMENT_TO_QUEUE_CATEGORY[case.assessment_status]
+        actual = cats[0]
+        if actual != expected:
+            status_mismatches.append(
+                {
+                    "listing_id": listing_id,
+                    "assessment_status": case.assessment_status,
+                    "expected_queue_category": expected,
+                    "actual_queue_category": actual,
+                }
+            )
+
+    total_cases = len(cases)
+    matched_cases = total_cases - len(missing_in_queue)
+    consistency_ok = not (
+        missing_in_queue
+        or missing_in_assessment
+        or duplicate_case_ids
+        or status_mismatches
+    )
+
+    return {
+        "total_cases": total_cases,
+        "matched_cases": matched_cases,
+        "missing_in_queue": missing_in_queue,
+        "missing_in_assessment": missing_in_assessment,
+        "duplicate_case_ids": duplicate_case_ids,
+        "status_mismatches": status_mismatches,
+        "consistency_ok": consistency_ok,
+    }
 
 
 def build_report(
@@ -717,6 +804,7 @@ def build_report(
     # Moduldocstring) -- --category/--only-fp filtern nur die Anzeige.
     confirmed_all, candidates_all = extract_cases(entries, rules_cfg, category=None)
     fix_queue_canonical = build_fix_queue(confirmed_all)
+    queue_consistency = validate_queue_consistency(confirmed_all, fix_queue_canonical)
 
     confirmed_view, candidates_view = extract_cases(
         entries, rules_cfg, category=category
@@ -751,6 +839,7 @@ def build_report(
         "candidates_by_category": candidates_by_category,
         "fix_queue_view": fix_queue_view,
         "fix_queue_canonical": fix_queue_canonical,
+        "queue_consistency": queue_consistency,
     }
 
 
@@ -766,6 +855,7 @@ def _serialize(report: dict) -> dict:
             for k, v in report["candidates_by_category"].items()
         },
         "fix_queue": [asdict(e) for e in report["fix_queue_view"]],
+        "queue_consistency": report["queue_consistency"],
     }
 
 
@@ -859,6 +949,7 @@ def render_text_report(report: dict) -> str:
     lines.append("")
     for qc in (
         QUEUE_CATEGORY_ACTIVE_ROUTING_FP,
+        QUEUE_CATEGORY_CATEGORY_CHANGED,
         QUEUE_CATEGORY_MANUAL_REVIEW,
         QUEUE_CATEGORY_GROUND_TRUTH_CONFLICT,
         QUEUE_CATEGORY_ALREADY_FIXED,
@@ -892,6 +983,7 @@ def render_fix_queue_markdown(fix_queue: list[FixQueueEntry]) -> str:
     ]
     for qc in (
         QUEUE_CATEGORY_ACTIVE_ROUTING_FP,
+        QUEUE_CATEGORY_CATEGORY_CHANGED,
         QUEUE_CATEGORY_MANUAL_REVIEW,
         QUEUE_CATEGORY_GROUND_TRUTH_CONFLICT,
         QUEUE_CATEGORY_ALREADY_FIXED,
@@ -1033,6 +1125,36 @@ def main(argv=None) -> int:
     written = write_outputs(report, args.output)
     for label, path in written.items():
         print(f"geschrieben ({label}): {path}")
+
+    qc = report["queue_consistency"]
+    print()
+    print("QUEUE CONSISTENCY (assessment.status <-> fix_queue.queue_category)")
+    print("=" * 68)
+    print(f"total_cases: {qc['total_cases']}")
+    print(f"matched_cases: {qc['matched_cases']}")
+    print(f"missing_in_queue: {len(qc['missing_in_queue'])}")
+    print(f"missing_in_assessment: {len(qc['missing_in_assessment'])}")
+    print(f"duplicate_case_ids: {len(qc['duplicate_case_ids'])}")
+    print(f"status_mismatches: {len(qc['status_mismatches'])}")
+    print(f"consistency_ok: {qc['consistency_ok']}")
+
+    if not qc["consistency_ok"]:
+        print()
+        print("ERROR: Assessment<->Fix-Queue-Konsistenz verletzt.")
+        for listing_id in qc["missing_in_queue"]:
+            print(f"  ERROR missing_in_queue: {listing_id}")
+        for listing_id in qc["missing_in_assessment"]:
+            print(f"  ERROR missing_in_assessment: {listing_id}")
+        for listing_id in qc["duplicate_case_ids"]:
+            print(f"  ERROR duplicate_case_ids: {listing_id}")
+        for mismatch in qc["status_mismatches"]:
+            print(
+                f"  ERROR status_mismatch: {mismatch['listing_id']} -- "
+                f"assessment.status={mismatch['assessment_status']} erwartet "
+                f"queue_category={mismatch['expected_queue_category']}, "
+                f"tatsaechlich={mismatch['actual_queue_category']}"
+            )
+        return 1
 
     return 0
 

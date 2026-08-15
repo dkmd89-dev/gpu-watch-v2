@@ -1300,9 +1300,12 @@
         "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)",
         "KEINE automatische YAML-Aenderung -- Status bleibt unsicher, erfordert zusaetzliche Evidenz (z.B. Beschreibungstext/Bildmaterial) vor einer Entscheidung."
       ],
-      "still_active_count": 0,
+      "still_active_count": 1,
       "priority_score": 0,
-      "queue_category": "MANUAL_REVIEW"
+      "queue_category": "MANUAL_REVIEW",
+      "case_listing_ids": [
+        "https://www.ebay.de/itm/398266334210"
+      ]
     },
     {
       "priority": "N/A",
@@ -1329,9 +1332,12 @@
         "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)",
         "KEINE YAML-Aenderung geplant -- historisches FALSE_POSITIVE-Label gilt als vermutlich fehlerhaft, aktuelles Matcher-Verhalten wird als korrekt eingestuft."
       ],
-      "still_active_count": 0,
+      "still_active_count": 1,
       "priority_score": 0,
-      "queue_category": "GROUND_TRUTH_CONFLICT"
+      "queue_category": "GROUND_TRUTH_CONFLICT",
+      "case_listing_ids": [
+        "https://www.ebay.de/itm/137602406753"
+      ]
     },
     {
       "priority": "N/A",
@@ -1358,9 +1364,12 @@
         "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)",
         "KEINE YAML-Aenderung geplant -- historisches FALSE_POSITIVE-Label gilt als vermutlich fehlerhaft, aktuelles Matcher-Verhalten wird als korrekt eingestuft."
       ],
-      "still_active_count": 0,
+      "still_active_count": 1,
       "priority_score": 0,
-      "queue_category": "GROUND_TRUTH_CONFLICT"
+      "queue_category": "GROUND_TRUTH_CONFLICT",
+      "case_listing_ids": [
+        "https://www.kleinanzeigen.de/s-anzeige/xbox-one-s-1tb-mit-spiele/3479889108-279-4400"
+      ]
     },
     {
       "priority": "N/A",
@@ -1388,7 +1397,10 @@
       ],
       "still_active_count": 0,
       "priority_score": 0,
-      "queue_category": "ALREADY_FIXED"
+      "queue_category": "ALREADY_FIXED",
+      "case_listing_ids": [
+        "https://www.kleinanzeigen.de/s-anzeige/mainboard-set-h310m-d2p-i5-9500-gtx-1050ti-nwme-16gb-ddr4-/3480520958-225-8182"
+      ]
     },
     {
       "priority": "N/A",
@@ -1416,7 +1428,10 @@
       ],
       "still_active_count": 0,
       "priority_score": 0,
-      "queue_category": "ALREADY_FIXED"
+      "queue_category": "ALREADY_FIXED",
+      "case_listing_ids": [
+        "https://www.ebay.de/itm/307112118573"
+      ]
     },
     {
       "priority": "N/A",
@@ -1454,7 +1469,12 @@
       ],
       "still_active_count": 0,
       "priority_score": 0,
-      "queue_category": "ALREADY_FIXED"
+      "queue_category": "ALREADY_FIXED",
+      "case_listing_ids": [
+        "https://www.ebay.de/itm/255925725429",
+        "https://www.ebay.de/itm/304780620667",
+        "https://www.ebay.de/itm/205573628921"
+      ]
     },
     {
       "priority": "N/A",
@@ -1482,7 +1502,10 @@
       ],
       "still_active_count": 0,
       "priority_score": 0,
-      "queue_category": "ALREADY_FIXED"
+      "queue_category": "ALREADY_FIXED",
+      "case_listing_ids": [
+        "https://www.ebay.de/itm/236995682525"
+      ]
     },
     {
       "priority": "N/A",
@@ -1520,7 +1543,12 @@
       ],
       "still_active_count": 0,
       "priority_score": 0,
-      "queue_category": "ALREADY_FIXED"
+      "queue_category": "ALREADY_FIXED",
+      "case_listing_ids": [
+        "https://www.kleinanzeigen.de/s-anzeige/luigi-s-mansion-2-hd-fuer-nintendo-switch-neu-ovp/3480890852-227-23706",
+        "https://www.ebay.de/itm/257670779909",
+        "https://www.kleinanzeigen.de/s-anzeige/nba-2k26-fuer-nintendo-switch-2-ovp-schneller-versand/3479886837-227-7978"
+      ]
     },
     {
       "priority": "N/A",
@@ -1548,7 +1576,10 @@
       ],
       "still_active_count": 0,
       "priority_score": 0,
-      "queue_category": "ALREADY_FIXED"
+      "queue_category": "ALREADY_FIXED",
+      "case_listing_ids": [
+        "https://www.kleinanzeigen.de/s-anzeige/playstation-5-ps4-ps5-slim-hdmi-port-nintendo-reparatur-usb-pro/3431533294-226-3438"
+      ]
     },
     {
       "priority": "N/A",
@@ -1576,7 +1607,10 @@
       ],
       "still_active_count": 0,
       "priority_score": 0,
-      "queue_category": "ALREADY_FIXED"
+      "queue_category": "ALREADY_FIXED",
+      "case_listing_ids": [
+        "https://www.ebay.de/itm/357718779954"
+      ]
     },
     {
       "priority": "N/A",
@@ -1609,7 +1643,11 @@
       ],
       "still_active_count": 0,
       "priority_score": 0,
-      "queue_category": "ALREADY_FIXED"
+      "queue_category": "ALREADY_FIXED",
+      "case_listing_ids": [
+        "https://www.kleinanzeigen.de/s-anzeige/intel-core-i5-8500-mainboard-bundle-16gb-ddr4-ram-netzteil/3480038290-225-13379",
+        "https://www.ebay.de/itm/356717584177"
+      ]
     },
     {
       "priority": "N/A",
@@ -1642,7 +1680,11 @@
       ],
       "still_active_count": 0,
       "priority_score": 0,
-      "queue_category": "ALREADY_FIXED"
+      "queue_category": "ALREADY_FIXED",
+      "case_listing_ids": [
+        "https://www.ebay.de/itm/227468195928",
+        "https://www.ebay.de/itm/307106426592"
+      ]
     },
     {
       "priority": "N/A",
@@ -1670,7 +1712,19 @@
       ],
       "still_active_count": 0,
       "priority_score": 0,
-      "queue_category": "ALREADY_FIXED"
+      "queue_category": "ALREADY_FIXED",
+      "case_listing_ids": [
+        "https://www.kleinanzeigen.de/s-anzeige/sony-playstation-2-original-netzteil-videokabel-memorycard/3480159305-279-756"
+      ]
     }
-  ]
+  ],
+  "queue_consistency": {
+    "total_cases": 19,
+    "matched_cases": 19,
+    "missing_in_queue": [],
+    "missing_in_assessment": [],
+    "duplicate_case_ids": [],
+    "status_mismatches": [],
+    "consistency_ok": true
+  }
 }

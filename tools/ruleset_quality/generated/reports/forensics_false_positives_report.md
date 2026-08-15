@@ -442,11 +442,11 @@ FIX QUEUE
 Gruppiert nach queue_category -- nur ACTIVE_ROUTING_FP hat eine P0-P3-Prioritaet, die anderen Kategorien implizieren KEINEN offenen YAML-Fix-Bedarf.
 
 MANUAL_REVIEW:
-  [retro_konsolen] Regel 'Nintendo Retro-Konsole (N64/GameCube/DS) ⚠️ Okay' -- root_cause=weak_signal (confidence=confirmed), 1 Fall/Faelle (0 weiterhin aktiv) -- fix=strengthen_positive_signal, risk=HIGH
+  [retro_konsolen] Regel 'Nintendo Retro-Konsole (N64/GameCube/DS) ⚠️ Okay' -- root_cause=weak_signal (confidence=confirmed), 1 Fall/Faelle (1 weiterhin aktiv) -- fix=strengthen_positive_signal, risk=HIGH
 
 GROUND_TRUTH_CONFLICT:
-  [konsolen_bundles] Regel 'Nintendo Switch (V1/V2/OLED) 👍 Guter Preis' -- root_cause=weak_signal (confidence=confirmed), 1 Fall/Faelle (0 weiterhin aktiv) -- fix=strengthen_positive_signal, risk=HIGH
-  [konsolen_bundles] Regel 'Xbox One S / One X 👍 Guter Preis' -- root_cause=weak_signal (confidence=confirmed), 1 Fall/Faelle (0 weiterhin aktiv) -- fix=strengthen_positive_signal, risk=HIGH
+  [konsolen_bundles] Regel 'Nintendo Switch (V1/V2/OLED) 👍 Guter Preis' -- root_cause=weak_signal (confidence=confirmed), 1 Fall/Faelle (1 weiterhin aktiv) -- fix=strengthen_positive_signal, risk=HIGH
+  [konsolen_bundles] Regel 'Xbox One S / One X 👍 Guter Preis' -- root_cause=weak_signal (confidence=confirmed), 1 Fall/Faelle (1 weiterhin aktiv) -- fix=strengthen_positive_signal, risk=HIGH
 
 ALREADY_FIXED:
   [gaming_pc] Regel 'Gaming-PC (Mindestanforderung erfüllt)' -- root_cause=replacement_part_false_positive (confidence=confirmed), 1 Fall/Faelle (0 weiterhin aktiv) -- fix=add_replacement_part_guard, risk=LOW

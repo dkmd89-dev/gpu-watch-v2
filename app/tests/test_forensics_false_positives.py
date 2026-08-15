@@ -431,3 +431,206 @@ class TestZweiEbenenAssessment:
         queue = build_fix_queue([case])
         assert queue[0].queue_category == ffp.QUEUE_CATEGORY_ALREADY_FIXED
         assert queue[0].priority == "N/A"
+
+
+class TestQueueCategoryMapping:
+    """Auftrag "false_positive_fix_queue.json an Ground-Truth-Routing-
+    Assessment koppeln": strikte 1:1-Ableitung assessment.status ->
+    queue_category, NIEMALS ueber still_active_count. Deckt alle 10 im
+    Auftrag geforderten Mapping-Faelle ab (1-2/4 bereits oben abgedeckt,
+    hier die restlichen + die expliziten Negativ-Pruefungen)."""
+
+    def test_3_category_changed_ergibt_queue_category_category_changed(self, monkeypatch):
+        monkeypatch.setattr(
+            ffp, "evaluate",
+            lambda title, price, cfg: _FakeResult(matched=True, category="notebook_resell", rule_label="Y"),
+        )
+        case = build_case(_entry(url="mapping-3", category="office_pc"), rules_cfg={})
+        assert case.assessment_status == ffp.ASSESSMENT_CATEGORY_CHANGED
+        queue = build_fix_queue([case])
+        assert queue[0].queue_category == ffp.QUEUE_CATEGORY_CATEGORY_CHANGED
+        assert queue[0].priority == "N/A"
+
+    def test_5_manual_review_ergibt_queue_category_manual_review(self, monkeypatch):
+        monkeypatch.setattr(
+            ffp, "evaluate",
+            lambda title, price, cfg: _FakeResult(matched=True, category="handhelds", rule_label="Andere Regel"),
+        )
+        case = build_case(
+            _entry(url="mapping-5", category="handhelds", stored_rule_label="Steam Deck"), rules_cfg={}
+        )
+        assert case.assessment_status == ffp.ASSESSMENT_MANUAL_REVIEW
+        queue = build_fix_queue([case])
+        assert queue[0].queue_category == ffp.QUEUE_CATEGORY_MANUAL_REVIEW
+
+    def test_6_manual_review_ist_niemals_already_fixed(self, monkeypatch):
+        monkeypatch.setattr(
+            ffp, "evaluate",
+            lambda title, price, cfg: _FakeResult(matched=True, category="handhelds", rule_label="Andere Regel"),
+        )
+        case = build_case(
+            _entry(url="mapping-6", category="handhelds", stored_rule_label="Steam Deck"), rules_cfg={}
+        )
+        queue = build_fix_queue([case])
+        assert queue[0].queue_category != ffp.QUEUE_CATEGORY_ALREADY_FIXED
+
+    def test_7_ground_truth_conflict_ist_niemals_already_fixed(self, monkeypatch):
+        monkeypatch.setattr(
+            ffp, "evaluate",
+            lambda title, price, cfg: _FakeResult(matched=True, category="handhelds", rule_label="Steam Deck"),
+        )
+        monkeypatch.setitem(
+            ffp._MANUAL_ASSESSMENT_OVERRIDES,
+            "mapping-7",
+            (ffp.ASSESSMENT_GROUND_TRUTH_CONFLICT, ffp.CONFIDENCE_HIGH, ["Testevidenz"]),
+        )
+        case = build_case(
+            _entry(url="mapping-7", category="handhelds", stored_rule_label="Steam Deck"), rules_cfg={}
+        )
+        queue = build_fix_queue([case])
+        assert queue[0].queue_category != ffp.QUEUE_CATEGORY_ALREADY_FIXED
+        assert queue[0].queue_category == ffp.QUEUE_CATEGORY_GROUND_TRUTH_CONFLICT
+
+    def test_8_category_changed_ist_weder_fixed_noch_already_fixed(self, monkeypatch):
+        monkeypatch.setattr(
+            ffp, "evaluate",
+            lambda title, price, cfg: _FakeResult(matched=True, category="notebook_resell", rule_label="Y"),
+        )
+        case = build_case(_entry(url="mapping-8", category="office_pc"), rules_cfg={})
+        queue = build_fix_queue([case])
+        assert case.assessment_status != ffp.ASSESSMENT_FIXED
+        assert queue[0].queue_category != ffp.QUEUE_CATEGORY_ALREADY_FIXED
+
+    def test_9_still_active_count_null_erzeugt_nicht_automatisch_already_fixed(self, monkeypatch):
+        # DAS konkrete Regressionsbeispiel aus dem Auftrag ("Ein Fall kann
+        # aktuell KEIN_TREFFER sein, aber trotzdem MANUAL_REVIEW
+        # benoetigen"): routing_status=KEIN_TREFFER wuerde OHNE Override
+        # zu FIXED/still_active_count=0 fuehren -- der dokumentierte
+        # Override zeigt, dass MANUAL_REVIEW trotzdem Vorrang hat und
+        # sich NICHT von still_active_count=0 in ALREADY_FIXED verwandelt.
+        monkeypatch.setattr(ffp, "evaluate", lambda title, price, cfg: _FakeResult(matched=False))
+        monkeypatch.setitem(
+            ffp._MANUAL_ASSESSMENT_OVERRIDES,
+            "mapping-9",
+            (ffp.ASSESSMENT_MANUAL_REVIEW, ffp.CONFIDENCE_LOW, ["Trotz KEIN_TREFFER weiterhin unsicher."]),
+        )
+        case = build_case(_entry(url="mapping-9"), rules_cfg={})
+        assert case.routing_status == ffp.ROUTING_STATUS_NO_MATCH
+        assert case.assessment_status == ffp.ASSESSMENT_MANUAL_REVIEW
+
+        queue = build_fix_queue([case])
+        assert queue[0].still_active_count == 1  # Metrik-Spalte, NICHT die Entscheidung
+        assert queue[0].queue_category == ffp.QUEUE_CATEGORY_MANUAL_REVIEW
+        assert queue[0].queue_category != ffp.QUEUE_CATEGORY_ALREADY_FIXED
+
+    def test_10_ground_truth_bleibt_unveraendert_auch_bei_conflict(self, monkeypatch, tmp_path):
+        monkeypatch.setattr(
+            ffp, "evaluate",
+            lambda title, price, cfg: _FakeResult(matched=True, category="handhelds", rule_label="Steam Deck"),
+        )
+        monkeypatch.setitem(
+            ffp._MANUAL_ASSESSMENT_OVERRIDES,
+            "mapping-10",
+            (ffp.ASSESSMENT_GROUND_TRUTH_CONFLICT, ffp.CONFIDENCE_HIGH, ["Testevidenz"]),
+        )
+        import json
+
+        data_path = tmp_path / "forensics.json"
+        original_content = json.dumps({"entries": [_entry(url="mapping-10", category="handhelds")]})
+        data_path.write_text(original_content, encoding="utf-8")
+
+        build_report(input_path=data_path, rules_cfg={})
+
+        assert data_path.read_text(encoding="utf-8") == original_content
+
+
+class TestValidateQueueConsistency:
+    """Auftrag "NEUER VALIDIERUNGSSCHRITT": prueft assessment.status <->
+    queue_category ueber stabile Case-IDs (listing_id), nicht ueber
+    Titel-String oder Kategorie."""
+
+    def test_konsistenter_fall_ist_ok(self, monkeypatch):
+        monkeypatch.setattr(ffp, "evaluate", lambda title, price, cfg: _FakeResult(matched=False))
+        case = build_case(_entry(url="consistency-ok"), rules_cfg={})
+        queue = build_fix_queue([case])
+        result = ffp.validate_queue_consistency([case], queue)
+        assert result["consistency_ok"] is True
+        assert result["total_cases"] == 1
+        assert result["matched_cases"] == 1
+        assert result["missing_in_queue"] == []
+        assert result["missing_in_assessment"] == []
+        assert result["duplicate_case_ids"] == []
+        assert result["status_mismatches"] == []
+
+    def test_fehlender_fall_in_queue_wird_gemeldet(self, monkeypatch):
+        monkeypatch.setattr(ffp, "evaluate", lambda title, price, cfg: _FakeResult(matched=False))
+        case = build_case(_entry(url="consistency-missing"), rules_cfg={})
+        result = ffp.validate_queue_consistency([case], [])  # leere Queue
+        assert result["consistency_ok"] is False
+        assert result["missing_in_queue"] == ["consistency-missing"]
+
+    def test_status_mismatch_manual_review_als_already_fixed_ist_error(self):
+        # Auftrags-Beispiel: assessment=MANUAL_REVIEW, queue=ALREADY_FIXED -> ERROR
+        case = ffp.FalsePositiveCase(
+            listing_id="mismatch-1", title="X", price=1.0, stored_category="handhelds",
+            ground_truth_verdict="FALSE_POSITIVE", stored_rule="R", current_category="KEIN_TREFFER",
+            current_rule="KEIN_TREFFER", match_path_before="x", match_path_after="x",
+            match_state="KEIN_TREFFER", routing_status=ffp.ROUTING_STATUS_NO_MATCH,
+            already_resolved=True, root_cause="ambiguous", root_cause_confidence="manual_review",
+            root_cause_evidence=[], recommended_fix_type="manual_review", regression_risk="MEDIUM",
+            assessment_status=ffp.ASSESSMENT_MANUAL_REVIEW, assessment_confidence="low", assessment_evidence=[],
+        )
+        broken_entry = ffp.FixQueueEntry(
+            priority="N/A", category="handhelds", affected_count=1,
+            queue_category=ffp.QUEUE_CATEGORY_ALREADY_FIXED,  # bewusst falsch
+            case_listing_ids=["mismatch-1"],
+        )
+        result = ffp.validate_queue_consistency([case], [broken_entry])
+        assert result["consistency_ok"] is False
+        assert len(result["status_mismatches"]) == 1
+        assert result["status_mismatches"][0]["assessment_status"] == ffp.ASSESSMENT_MANUAL_REVIEW
+        assert result["status_mismatches"][0]["actual_queue_category"] == ffp.QUEUE_CATEGORY_ALREADY_FIXED
+
+    def test_status_mismatch_ground_truth_conflict_als_already_fixed_ist_error(self):
+        # Auftrags-Beispiel: assessment=GROUND_TRUTH_CONFLICT, queue=ALREADY_FIXED -> ERROR
+        case = ffp.FalsePositiveCase(
+            listing_id="mismatch-2", title="X", price=1.0, stored_category="handhelds",
+            ground_truth_verdict="FALSE_POSITIVE", stored_rule="R", current_category="handhelds",
+            current_rule="R", match_path_before="x", match_path_after="x",
+            match_state="GLEICHE_KATEGORIE", routing_status=ffp.ROUTING_STATUS_SAME_CATEGORY,
+            already_resolved=False, root_cause="weak_signal", root_cause_confidence="confirmed",
+            root_cause_evidence=[], recommended_fix_type="strengthen_positive_signal", regression_risk="HIGH",
+            assessment_status=ffp.ASSESSMENT_GROUND_TRUTH_CONFLICT, assessment_confidence="high", assessment_evidence=[],
+        )
+        broken_entry = ffp.FixQueueEntry(
+            priority="N/A", category="handhelds", affected_count=1,
+            queue_category=ffp.QUEUE_CATEGORY_ALREADY_FIXED,  # bewusst falsch
+            case_listing_ids=["mismatch-2"],
+        )
+        result = ffp.validate_queue_consistency([case], [broken_entry])
+        assert result["consistency_ok"] is False
+        assert len(result["status_mismatches"]) == 1
+
+    def test_fixed_als_already_fixed_ist_ok(self, monkeypatch):
+        # Auftrags-Beispiel: assessment=FIXED, queue=ALREADY_FIXED -> OK
+        monkeypatch.setattr(ffp, "evaluate", lambda title, price, cfg: _FakeResult(matched=False))
+        case = build_case(_entry(url="mismatch-3"), rules_cfg={})
+        assert case.assessment_status == ffp.ASSESSMENT_FIXED
+        queue = build_fix_queue([case])
+        result = ffp.validate_queue_consistency([case], queue)
+        assert result["consistency_ok"] is True
+
+    def test_duplicate_case_id_wird_gemeldet(self, monkeypatch):
+        monkeypatch.setattr(ffp, "evaluate", lambda title, price, cfg: _FakeResult(matched=False))
+        case = build_case(_entry(url="dup-1"), rules_cfg={})
+        entry_a = ffp.FixQueueEntry(
+            priority="N/A", category="handhelds", affected_count=1,
+            queue_category=ffp.QUEUE_CATEGORY_ALREADY_FIXED, case_listing_ids=["dup-1"],
+        )
+        entry_b = ffp.FixQueueEntry(
+            priority="N/A", category="handhelds", affected_count=1,
+            queue_category=ffp.QUEUE_CATEGORY_MANUAL_REVIEW, case_listing_ids=["dup-1"],
+        )
+        result = ffp.validate_queue_consistency([case], [entry_a, entry_b])
+        assert result["consistency_ok"] is False
+        assert result["duplicate_case_ids"] == ["dup-1"]
