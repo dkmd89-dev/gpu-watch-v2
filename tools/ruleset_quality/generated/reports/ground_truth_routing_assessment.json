@@ -1,0 +1,2085 @@
+{
+  "metadata": {
+    "generated_at": "2026-08-15T21:32:11.661565+00:00",
+    "ruleset_signature": "f8e07b8b8d97d61a",
+    "source_ground_truth": "/mnt/128ssd/claude/docs/DASHBOARD_MATCH_FORENSICS.json",
+    "ground_truth_counts": {
+      "TRUE_POSITIVE": 2252,
+      "FALSE_POSITIVE": 19,
+      "UNCLEAR": 35
+    }
+  },
+  "summary": {
+    "historical_tp": 2252,
+    "historical_fp": 19,
+    "historical_unclear": 35,
+    "current_fixed_fp": 16,
+    "current_active_fp": 0,
+    "category_changed_fp": 0,
+    "manual_review": 1,
+    "ground_truth_conflict": 2
+  },
+  "categories": {
+    "gaming_pc": {
+      "historical_fp": 1,
+      "fixed": 1,
+      "still_active": 0,
+      "category_changed": 0,
+      "manual_review": 0,
+      "ground_truth_conflict": 0
+    },
+    "handhelds": {
+      "historical_fp": 4,
+      "fixed": 4,
+      "still_active": 0,
+      "category_changed": 0,
+      "manual_review": 0,
+      "ground_truth_conflict": 0
+    },
+    "iphone": {
+      "historical_fp": 1,
+      "fixed": 1,
+      "still_active": 0,
+      "category_changed": 0,
+      "manual_review": 0,
+      "ground_truth_conflict": 0
+    },
+    "konsolen_bundles": {
+      "historical_fp": 6,
+      "fixed": 4,
+      "still_active": 0,
+      "category_changed": 0,
+      "manual_review": 0,
+      "ground_truth_conflict": 2
+    },
+    "notebook_resell": {
+      "historical_fp": 1,
+      "fixed": 1,
+      "still_active": 0,
+      "category_changed": 0,
+      "manual_review": 0,
+      "ground_truth_conflict": 0
+    },
+    "office_pc": {
+      "historical_fp": 2,
+      "fixed": 2,
+      "still_active": 0,
+      "category_changed": 0,
+      "manual_review": 0,
+      "ground_truth_conflict": 0
+    },
+    "retro_konsolen": {
+      "historical_fp": 4,
+      "fixed": 3,
+      "still_active": 0,
+      "category_changed": 0,
+      "manual_review": 1,
+      "ground_truth_conflict": 0
+    }
+  },
+  "cases": [
+    {
+      "case_type": "confirmed_false_positive",
+      "listing_id": "https://www.kleinanzeigen.de/s-anzeige/mainboard-set-h310m-d2p-i5-9500-gtx-1050ti-nwme-16gb-ddr4-/3480520958-225-8182",
+      "title": "MAINBOARD SET H310M D2P. i5-9500. GTX 1050TI. NWMe. 16GB DDR4.",
+      "price": 90.0,
+      "historical_ground_truth": {
+        "verdict": "FALSE_POSITIVE",
+        "category": "gaming_pc",
+        "rule": "Gaming-PC (Mindestanforderung erfüllt)"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "FIXED",
+        "confidence": "confirmed",
+        "evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
+      },
+      "root_cause": "replacement_part_false_positive",
+      "root_cause_confidence": "confirmed",
+      "root_cause_evidence": [
+        "Forensik-Snapshot root_cause: \"Ersatzteil statt Hauptprodukt\"",
+        "Forensik-Snapshot reason: \"Titel enthaelt 'Mainboard'/'Motherboard' -- eindeutiges Einzelteil-Signal, unabhaengig von sonst erfuellten require_all_of-Gruppen (z.B. RAM-Groesse des verbauten Speichers auf dem Board selbst)\"",
+        "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+      ],
+      "recommended_fix_type": "add_replacement_part_guard",
+      "regression_risk": "LOW"
+    },
+    {
+      "case_type": "confirmed_false_positive",
+      "listing_id": "https://www.ebay.de/itm/307112118573",
+      "title": "JSAUX Slim-Reisetasche Für Lenovo Legion Go/Go S/Go 2, Hartschalenbeutel | Schla",
+      "price": 41.48,
+      "historical_ground_truth": {
+        "verdict": "FALSE_POSITIVE",
+        "category": "handhelds",
+        "rule": "Asus ROG Ally / Lenovo Legion Go ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "FIXED",
+        "confidence": "confirmed",
+        "evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
+      },
+      "root_cause": "missing_exclude",
+      "root_cause_confidence": "confirmed",
+      "root_cause_evidence": [
+        "Forensik-Snapshot root_cause: \"fehlendes Exclude\"",
+        "Forensik-Snapshot reason: \"Nur 1 unabhaengige(s) Positiv-Kriterium, Zubehoer-/Ersatzteil-Begriff(e) ohne jeden Exclude-Schutz: ['reisetasche']\"",
+        "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+      ],
+      "recommended_fix_type": "add_exclude",
+      "regression_risk": "LOW"
+    },
+    {
+      "case_type": "confirmed_false_positive",
+      "listing_id": "https://www.ebay.de/itm/304780620667",
+      "title": "Steam Deck Skin Faceplate Schutz Klebefolie Design Vinyl Aufkleber Skins OLED",
+      "price": 19.95,
+      "historical_ground_truth": {
+        "verdict": "FALSE_POSITIVE",
+        "category": "handhelds",
+        "rule": "Valve Steam Deck ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "FIXED",
+        "confidence": "confirmed",
+        "evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
+      },
+      "root_cause": "missing_exclude",
+      "root_cause_confidence": "confirmed",
+      "root_cause_evidence": [
+        "Forensik-Snapshot root_cause: \"fehlendes Exclude\"",
+        "Forensik-Snapshot reason: \"Nur 1 unabhaengige(s) Positiv-Kriterium, Zubehoer-/Ersatzteil-Begriff(e) ohne jeden Exclude-Schutz: ['skin', 'faceplate', 'klebefolie', 'aufkleber']\"",
+        "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+      ],
+      "recommended_fix_type": "add_exclude",
+      "regression_risk": "LOW"
+    },
+    {
+      "case_type": "confirmed_false_positive",
+      "listing_id": "https://www.ebay.de/itm/255925725429",
+      "title": "USB-C HUB für Steam Deck HDMI 4k 60Hz USB 3.0 PD",
+      "price": 41.99,
+      "historical_ground_truth": {
+        "verdict": "FALSE_POSITIVE",
+        "category": "handhelds",
+        "rule": "Valve Steam Deck ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "FIXED",
+        "confidence": "confirmed",
+        "evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
+      },
+      "root_cause": "missing_exclude",
+      "root_cause_confidence": "confirmed",
+      "root_cause_evidence": [
+        "Forensik-Snapshot root_cause: \"fehlendes Exclude\"",
+        "Forensik-Snapshot reason: \"Nur 1 unabhaengige(s) Positiv-Kriterium, Zubehoer-/Ersatzteil-Begriff(e) ohne jeden Exclude-Schutz: ['hub']\"",
+        "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+      ],
+      "recommended_fix_type": "add_exclude",
+      "regression_risk": "LOW"
+    },
+    {
+      "case_type": "confirmed_false_positive",
+      "listing_id": "https://www.ebay.de/itm/205573628921",
+      "title": "VITURE USB-C an Brille, Ladeadapter, Laden und Spielen für Switch, Steam Deck",
+      "price": 49.0,
+      "historical_ground_truth": {
+        "verdict": "FALSE_POSITIVE",
+        "category": "handhelds",
+        "rule": "Valve Steam Deck ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "FIXED",
+        "confidence": "confirmed",
+        "evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
+      },
+      "root_cause": "missing_exclude",
+      "root_cause_confidence": "confirmed",
+      "root_cause_evidence": [
+        "Forensik-Snapshot root_cause: \"fehlendes Exclude\"",
+        "Forensik-Snapshot reason: \"Nur 1 unabhaengige(s) Positiv-Kriterium, Zubehoer-/Ersatzteil-Begriff(e) ohne jeden Exclude-Schutz: ['ladeadapter']\"",
+        "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+      ],
+      "recommended_fix_type": "add_exclude",
+      "regression_risk": "LOW"
+    },
+    {
+      "case_type": "confirmed_false_positive",
+      "listing_id": "https://www.ebay.de/itm/236995682525",
+      "title": "Apple iPhone 15 Pro Max 512GB Mainboard Platine mit FaceID und Kameramodul ",
+      "price": 400.0,
+      "historical_ground_truth": {
+        "verdict": "FALSE_POSITIVE",
+        "category": "iphone",
+        "rule": "iPhone 15 Pro Max (≥512GB) 👍 Guter Preis"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "FIXED",
+        "confidence": "confirmed",
+        "evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
+      },
+      "root_cause": "replacement_part_false_positive",
+      "root_cause_confidence": "confirmed",
+      "root_cause_evidence": [
+        "Forensik-Snapshot root_cause: \"Ersatzteil statt Hauptprodukt\"",
+        "Forensik-Snapshot reason: \"Titel enthaelt 'Mainboard'/'Motherboard' -- eindeutiges Einzelteil-Signal, unabhaengig von sonst erfuellten require_all_of-Gruppen (z.B. RAM-Groesse des verbauten Speichers auf dem Board selbst)\"",
+        "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+      ],
+      "recommended_fix_type": "add_replacement_part_guard",
+      "regression_risk": "LOW"
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.kleinanzeigen.de/s-anzeige/2x-nintendo-switch-2-pro-controller-neu-ovp/3480514740-279-924",
+      "title": "2x Nintendo Switch 2 Pro Controller NEU OVP",
+      "price": 130.0,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.ebay.de/itm/137596202274",
+      "title": "Bayonetta & Vanquish 10th Anniversary Bundle - PlayStation 4 - Neu & OVP",
+      "price": 19.0,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "PS4 Slim / Pro Bundle ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.ebay.de/itm/298569642364",
+      "title": "HORI Split Pad Pro Nintendo Switch Controller Schwarz mit OVP",
+      "price": 26.99,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+        "match_state": "GLEICHE_KATEGORIE",
+        "routing_status": "A_SAME_WRONG_CATEGORY"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "confirmed_false_positive",
+      "listing_id": "https://www.kleinanzeigen.de/s-anzeige/luigi-s-mansion-2-hd-fuer-nintendo-switch-neu-ovp/3480890852-227-23706",
+      "title": "Luigi's Mansion 2 HD für Nintendo Switch - NEU & OVP",
+      "price": 35.0,
+      "historical_ground_truth": {
+        "verdict": "FALSE_POSITIVE",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "FIXED",
+        "confidence": "confirmed",
+        "evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
+      },
+      "root_cause": "weak_signal",
+      "root_cause_confidence": "confirmed",
+      "root_cause_evidence": [
+        "Forensik-Snapshot root_cause: \"falsches Positivsignal\"",
+        "Forensik-Snapshot reason: \"Ein require_all_of-Kriterium wurde AUSSCHLIESSLICH ueber generisches Signal ['ovp'] erfuellt (kein staerkeres Alternativwort im selben Treffer), Titel enthaelt zusaetzlich Zubehoer-/Ersatzteil-/Spiel-Indikatoren ([])\"",
+        "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+      ],
+      "recommended_fix_type": "strengthen_positive_signal",
+      "regression_risk": "HIGH"
+    },
+    {
+      "case_type": "confirmed_false_positive",
+      "listing_id": "https://www.ebay.de/itm/257670779909",
+      "title": "Mario Kart World für Nintendo Switch 2 – NEU  und OVP",
+      "price": 54.99,
+      "historical_ground_truth": {
+        "verdict": "FALSE_POSITIVE",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "FIXED",
+        "confidence": "confirmed",
+        "evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
+      },
+      "root_cause": "weak_signal",
+      "root_cause_confidence": "confirmed",
+      "root_cause_evidence": [
+        "Forensik-Snapshot root_cause: \"falsches Positivsignal\"",
+        "Forensik-Snapshot reason: \"Ein require_all_of-Kriterium wurde AUSSCHLIESSLICH ueber generisches Signal ['ovp'] erfuellt (kein staerkeres Alternativwort im selben Treffer), Titel enthaelt zusaetzlich Zubehoer-/Ersatzteil-/Spiel-Indikatoren ([])\"",
+        "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+      ],
+      "recommended_fix_type": "strengthen_positive_signal",
+      "regression_risk": "HIGH"
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.ebay.de/itm/278262114576",
+      "title": "Metroid Prime Remastered Nintendo Switch 2023 Gebraucht In OVP  guter Zustand ",
+      "price": 35.0,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.ebay.de/itm/366595666798",
+      "title": "Microsoft Xbox One X 1TB Schwarz Inkl OVP Ohne Controller",
+      "price": 85.0,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Xbox One S / One X 👍 Guter Preis"
+      },
+      "current_routing_assessment": {
+        "category": "konsolen_bundles",
+        "rule": "Xbox One S / One X 👍 Guter Preis",
+        "match_state": "GLEICHE_KATEGORIE",
+        "routing_status": "A_SAME_WRONG_CATEGORY"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "confirmed_false_positive",
+      "listing_id": "https://www.kleinanzeigen.de/s-anzeige/nba-2k26-fuer-nintendo-switch-2-ovp-schneller-versand/3479886837-227-7978",
+      "title": "NBA 2K26 für Nintendo Switch 2 - OVP Schneller Versand",
+      "price": 14.0,
+      "historical_ground_truth": {
+        "verdict": "FALSE_POSITIVE",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "FIXED",
+        "confidence": "confirmed",
+        "evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
+      },
+      "root_cause": "weak_signal",
+      "root_cause_confidence": "confirmed",
+      "root_cause_evidence": [
+        "Forensik-Snapshot root_cause: \"falsches Positivsignal\"",
+        "Forensik-Snapshot reason: \"Ein require_all_of-Kriterium wurde AUSSCHLIESSLICH ueber generisches Signal ['ovp'] erfuellt (kein staerkeres Alternativwort im selben Treffer), Titel enthaelt zusaetzlich Zubehoer-/Ersatzteil-/Spiel-Indikatoren ([])\"",
+        "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+      ],
+      "recommended_fix_type": "strengthen_positive_signal",
+      "regression_risk": "HIGH"
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.ebay.de/itm/398090521820",
+      "title": "NEU - OVP! Nintendo Switch Pro Controller - Monster Hunter Rise Sunbreak Edition",
+      "price": 75.0,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.ebay.de/itm/407131833744",
+      "title": "Nintendo Pokémon Purpur Nintendo Switch neu/sealed in OVP",
+      "price": 40.0,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.ebay.de/itm/267751986716",
+      "title": "Nintendo Switch - Controller Joy-Con Neon-Grün / Neon-Pink 2er - NEU OVP",
+      "price": 59.99,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.ebay.de/itm/800482418310",
+      "title": "Nintendo Switch - Minecraft FRA mit OVP",
+      "price": 19.89,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.ebay.de/itm/287514519935",
+      "title": "Nintendo Switch 1. Generation – Neon Blau/Rot – OVP  + Kaufbeleg",
+      "price": 125.0,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.ebay.de/itm/407120679305",
+      "title": "Nintendo Switch 2 - Pro Controller NSWITCH 2 Neu & OVP",
+      "price": 79.99,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-2-gamecube-controller-ovp-neu/3480875199-227-2761",
+      "title": "Nintendo Switch 2 GameCube Controller | OVP | NEU",
+      "price": 85.0,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.ebay.de/itm/407132075434",
+      "title": "Nintendo Switch 2 GameCube Controller – Nintendo Classics – OVP – NEU",
+      "price": 85.0,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "confirmed_false_positive",
+      "listing_id": "https://www.ebay.de/itm/137602406753",
+      "title": "Nintendo Switch 32GB Mario Kart 8 Deluxe Bundle Neon Blau/Rot mit Dock",
+      "price": 135.0,
+      "historical_ground_truth": {
+        "verdict": "FALSE_POSITIVE",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis"
+      },
+      "current_routing_assessment": {
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "match_state": "GLEICHE_KATEGORIE",
+        "routing_status": "A_SAME_WRONG_CATEGORY"
+      },
+      "assessment": {
+        "status": "GROUND_TRUTH_CONFLICT",
+        "confidence": "high",
+        "evidence": [
+          "Titel enthaelt echten Speichergroessen-Marker '32GB' (Basis-Switch-Modell) sowie ein Spiel (Mario Kart 8 Deluxe) und Zubehoer (Dock) -- liest sich als vollstaendiger Konsolenverkauf, nicht als Zubehoer-/Spiele-Angebot.",
+          "Vom Nutzer am 2026-08-15 nach Vorlage der Matchpfad-Analyse explizit als korrekt gematchter TRUE_POSITIVE bestaetigt (siehe active_fp_fix_progress.md).",
+          "Keine YAML-Aenderung vorgenommen -- das FALSE_POSITIVE-Label im historischen Forensik-Snapshot (Commit 01afd5b, 2026-08-10) ist vermutlich selbst fehlerhaft."
+        ]
+      },
+      "root_cause": "weak_signal",
+      "root_cause_confidence": "confirmed",
+      "root_cause_evidence": [
+        "Forensik-Snapshot root_cause: \"falsches Positivsignal\"",
+        "Forensik-Snapshot reason: \"Ein require_all_of-Kriterium wurde AUSSCHLIESSLICH ueber generisches Signal ['bundle'] erfuellt (kein staerkeres Alternativwort im selben Treffer), Titel enthaelt zusaetzlich Zubehoer-/Ersatzteil-/Spiel-Indikatoren (['dock'])\"",
+        "aktueller Match-Zustand: GLEICHE_KATEGORIE (routing_status=A_SAME_WRONG_CATEGORY)"
+      ],
+      "recommended_fix_type": "strengthen_positive_signal",
+      "regression_risk": "HIGH"
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.ebay.de/itm/267751985916",
+      "title": "Nintendo Switch Controller - Joy-Con 2er-Set Neon-Rot/Neon-Blau -NEU",
+      "price": 59.99,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-grau-bundle-neue-sticks-kein-drift-extras-/3480736743-279-9668",
+      "title": "Nintendo Switch Grau Bundle  Neue Sticks (Kein Drift) + Extras!",
+      "price": 120.0,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis"
+      },
+      "current_routing_assessment": {
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "match_state": "GLEICHE_KATEGORIE",
+        "routing_status": "A_SAME_WRONG_CATEGORY"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.ebay.de/itm/188766880820",
+      "title": "Nintendo Switch HAC-001(-01) Joy-Controller Bundle 32GB Handheld-Spielekonsole -",
+      "price": 116.92,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis"
+      },
+      "current_routing_assessment": {
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "match_state": "GLEICHE_KATEGORIE",
+        "routing_status": "A_SAME_WRONG_CATEGORY"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.ebay.de/itm/298572812276",
+      "title": "Nintendo Switch Komplett Set OVP",
+      "price": 129.0,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis"
+      },
+      "current_routing_assessment": {
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "match_state": "GLEICHE_KATEGORIE",
+        "routing_status": "A_SAME_WRONG_CATEGORY"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-neon-bundle-neue-sticks-kein-drift-extras/3480680031-279-9668",
+      "title": "Nintendo Switch Neon Bundle  Neue Sticks (Kein Drift!) + Extras",
+      "price": 145.0,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis"
+      },
+      "current_routing_assessment": {
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "match_state": "GLEICHE_KATEGORIE",
+        "routing_status": "A_SAME_WRONG_CATEGORY"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.ebay.de/itm/128017856305",
+      "title": "Nintendo Switch OLED Joy-Con Set - Pokemon Scarlet & Violet mit Handschlaufaufen",
+      "price": 119.0,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis"
+      },
+      "current_routing_assessment": {
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "match_state": "GLEICHE_KATEGORIE",
+        "routing_status": "A_SAME_WRONG_CATEGORY"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-oled-modell-weiss-komplett-mit-ovp/3480437137-279-8400",
+      "title": "Nintendo Switch OLED Modell - Weiß - Komplett mit OVP",
+      "price": 150.0,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis"
+      },
+      "current_routing_assessment": {
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "match_state": "GLEICHE_KATEGORIE",
+        "routing_status": "A_SAME_WRONG_CATEGORY"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.ebay.de/itm/336734053355",
+      "title": "Nintendo Switch Pro Controller - Schwarz mit OVP kaum genutzt",
+      "price": 39.0,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.ebay.de/itm/318646020850",
+      "title": "Nintendo Switch Pro Controller Original | OVP | TOP Zustand",
+      "price": 39.99,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-pro-controller-in-ovp/3480100632-279-1186",
+      "title": "Nintendo Switch Pro Controller in OVP",
+      "price": 50.0,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.ebay.de/itm/286899614096",
+      "title": "Nintendo Switch Pro Controller, TOP Zustand mit OVP",
+      "price": 45.0,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.ebay.de/itm/188763698665",
+      "title": "Nintendo Switch Spielkonsole mit Set - Guter Zustand",
+      "price": 116.49,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis"
+      },
+      "current_routing_assessment": {
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "match_state": "GLEICHE_KATEGORIE",
+        "routing_status": "A_SAME_WRONG_CATEGORY"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.ebay.de/itm/188763696701",
+      "title": "Nintendo Switch Spielkonsole mit Set - Top Zustand",
+      "price": 127.49,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis"
+      },
+      "current_routing_assessment": {
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "match_state": "GLEICHE_KATEGORIE",
+        "routing_status": "A_SAME_WRONG_CATEGORY"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-sports-inkl-12-in-1-zubehoer-set/3480799134-227-2661",
+      "title": "Nintendo Switch Sports inkl. 12-in-1 Zubehör Set",
+      "price": 30.0,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.ebay.de/itm/298572811262",
+      "title": "Nintendo Switch V1 HAC-001 mit OVP + Komplett | BLITZVERSAND⚡️",
+      "price": 140.0,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis"
+      },
+      "current_routing_assessment": {
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+        "match_state": "GLEICHE_KATEGORIE",
+        "routing_status": "A_SAME_WRONG_CATEGORY"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "confirmed_false_positive",
+      "listing_id": "https://www.kleinanzeigen.de/s-anzeige/playstation-5-ps4-ps5-slim-hdmi-port-nintendo-reparatur-usb-pro/3431533294-226-3438",
+      "title": "Playstation 5 PS4 PS5 Slim HDMI Port Nintendo Reparatur USB PRO",
+      "price": 50.0,
+      "historical_ground_truth": {
+        "verdict": "FALSE_POSITIVE",
+        "category": "konsolen_bundles",
+        "rule": "PS4 Slim / Pro Bundle ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "FIXED",
+        "confidence": "confirmed",
+        "evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
+      },
+      "root_cause": "ambiguous",
+      "root_cause_confidence": "manual_review",
+      "root_cause_evidence": [
+        "Forensik-Snapshot root_cause: \"sonstiges\"",
+        "Forensik-Snapshot reason: \"Reparatur-/Service-Dienstleistungs-Indikator im Titel: ['reparatur']\"",
+        "Kein bekannter Uebersetzungseintrag fuer diesen Forensik-root_cause-Wert -- keine automatische Taxonomie-Zuordnung ohne Beleg.",
+        "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+      ],
+      "recommended_fix_type": "manual_review",
+      "regression_risk": "MEDIUM"
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.kleinanzeigen.de/s-anzeige/pok-mon-let-s-go-evoli-nintendo-switch-ovp-komplett/3480723859-227-3213",
+      "title": "Pokémon Let’s Go Evoli! Nintendo Switch – OVP komplett",
+      "price": 39.0,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.ebay.de/itm/327297670888",
+      "title": "Read Dead Redemption 1+2 PlayStation 4 PS4 Steelbook Bundle NEU OVP",
+      "price": 100.0,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "PS4 Slim / Pro Bundle 👍 Guter Preis"
+      },
+      "current_routing_assessment": {
+        "category": "konsolen_bundles",
+        "rule": "PS4 Slim / Pro Bundle 👍 Guter Preis",
+        "match_state": "GLEICHE_KATEGORIE",
+        "routing_status": "A_SAME_WRONG_CATEGORY"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.ebay.de/itm/298566727139",
+      "title": "STAR FOX - Nintendo Switch 2 - NEU-OVP - Händler YAPIDO",
+      "price": 47.9,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.ebay.de/itm/227468705699",
+      "title": "Star Fox \"NEU & OVP\" (Nintendo Switch 2)",
+      "price": 49.99,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.ebay.de/itm/800481313890",
+      "title": "Super Smash Bros. Ultimate (Nintendo Switch) (Inklusive OVP)",
+      "price": 38.79,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.ebay.de/itm/377405800415",
+      "title": "Xbox One S 1 TB + 1 Controller - Weiß - OVP - Top Zustand",
+      "price": 80.0,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "konsolen_bundles",
+        "rule": "Xbox One S / One X 👍 Guter Preis"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: KEIN_TREFFER"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "confirmed_false_positive",
+      "listing_id": "https://www.kleinanzeigen.de/s-anzeige/xbox-one-s-1tb-mit-spiele/3479889108-279-4400",
+      "title": "Xbox One S 1TB mit Spiele",
+      "price": 80.0,
+      "historical_ground_truth": {
+        "verdict": "FALSE_POSITIVE",
+        "category": "konsolen_bundles",
+        "rule": "Xbox One S / One X 👍 Guter Preis"
+      },
+      "current_routing_assessment": {
+        "category": "konsolen_bundles",
+        "rule": "Xbox One S / One X 👍 Guter Preis",
+        "match_state": "GLEICHE_KATEGORIE",
+        "routing_status": "A_SAME_WRONG_CATEGORY"
+      },
+      "assessment": {
+        "status": "GROUND_TRUTH_CONFLICT",
+        "confidence": "high",
+        "evidence": [
+          "Titel enthaelt echten Speichergroessen-Marker '1TB' (Xbox One S 1TB-Variante), keine Zubehoer-/Ersatzteil-Indikatoren.",
+          "Vom Nutzer am 2026-08-15 nach Vorlage der Matchpfad-Analyse explizit als korrekt gematchter TRUE_POSITIVE bestaetigt (siehe active_fp_fix_progress.md).",
+          "Keine YAML-Aenderung vorgenommen -- das FALSE_POSITIVE-Label im historischen Forensik-Snapshot ist vermutlich selbst fehlerhaft."
+        ]
+      },
+      "root_cause": "weak_signal",
+      "root_cause_confidence": "confirmed",
+      "root_cause_evidence": [
+        "Forensik-Snapshot root_cause: \"falsches Positivsignal\"",
+        "Forensik-Snapshot reason: \"Ein require_all_of-Kriterium wurde AUSSCHLIESSLICH ueber generisches Signal ['mit spiele'] erfuellt (kein staerkeres Alternativwort im selben Treffer), Titel enthaelt zusaetzlich Zubehoer-/Ersatzteil-/Spiel-Indikatoren ([])\"",
+        "aktueller Match-Zustand: GLEICHE_KATEGORIE (routing_status=A_SAME_WRONG_CATEGORY)"
+      ],
+      "recommended_fix_type": "strengthen_positive_signal",
+      "regression_risk": "HIGH"
+    },
+    {
+      "case_type": "confirmed_false_positive",
+      "listing_id": "https://www.ebay.de/itm/357718779954",
+      "title": "Lenovo ThinkPad X390 Mainboard Intel Core i5-8365U 8GB RAM NM-B891",
+      "price": 49.0,
+      "historical_ground_truth": {
+        "verdict": "FALSE_POSITIVE",
+        "category": "notebook_resell",
+        "rule": "ThinkPad T14/X13 (Ryzen/Modern) ★ Resell-Top"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "FIXED",
+        "confidence": "confirmed",
+        "evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
+      },
+      "root_cause": "replacement_part_false_positive",
+      "root_cause_confidence": "confirmed",
+      "root_cause_evidence": [
+        "Forensik-Snapshot root_cause: \"Ersatzteil statt Hauptprodukt\"",
+        "Forensik-Snapshot reason: \"Titel enthaelt 'Mainboard'/'Motherboard' -- eindeutiges Einzelteil-Signal, unabhaengig von sonst erfuellten require_all_of-Gruppen (z.B. RAM-Groesse des verbauten Speichers auf dem Board selbst)\"",
+        "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+      ],
+      "recommended_fix_type": "add_replacement_part_guard",
+      "regression_risk": "LOW"
+    },
+    {
+      "case_type": "confirmed_false_positive",
+      "listing_id": "https://www.kleinanzeigen.de/s-anzeige/intel-core-i5-8500-mainboard-bundle-16gb-ddr4-ram-netzteil/3480038290-225-13379",
+      "title": "Intel Core i5-8500 Mainboard Bundle 16GB DDR4 RAM Netzteil",
+      "price": 160.0,
+      "historical_ground_truth": {
+        "verdict": "FALSE_POSITIVE",
+        "category": "office_pc",
+        "rule": "Office-PC (Mindestanforderung erfüllt)"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "FIXED",
+        "confidence": "confirmed",
+        "evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
+      },
+      "root_cause": "replacement_part_false_positive",
+      "root_cause_confidence": "confirmed",
+      "root_cause_evidence": [
+        "Forensik-Snapshot root_cause: \"Ersatzteil statt Hauptprodukt\"",
+        "Forensik-Snapshot reason: \"Titel enthaelt 'Mainboard'/'Motherboard' -- eindeutiges Einzelteil-Signal, unabhaengig von sonst erfuellten require_all_of-Gruppen (z.B. RAM-Groesse des verbauten Speichers auf dem Board selbst)\"",
+        "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+      ],
+      "recommended_fix_type": "add_replacement_part_guard",
+      "regression_risk": "LOW"
+    },
+    {
+      "case_type": "confirmed_false_positive",
+      "listing_id": "https://www.ebay.de/itm/356717584177",
+      "title": "Lenovo ThinkPad T490s Mainboard nm-b891 Intel i5-8365U / i5-8265U 8GB RAM",
+      "price": 69.0,
+      "historical_ground_truth": {
+        "verdict": "FALSE_POSITIVE",
+        "category": "office_pc",
+        "rule": "Office-PC (Mindestanforderung erfüllt)"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "FIXED",
+        "confidence": "confirmed",
+        "evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
+      },
+      "root_cause": "replacement_part_false_positive",
+      "root_cause_confidence": "confirmed",
+      "root_cause_evidence": [
+        "Forensik-Snapshot root_cause: \"Ersatzteil statt Hauptprodukt\"",
+        "Forensik-Snapshot reason: \"Titel enthaelt 'Mainboard'/'Motherboard' -- eindeutiges Einzelteil-Signal, unabhaengig von sonst erfuellten require_all_of-Gruppen (z.B. RAM-Groesse des verbauten Speichers auf dem Board selbst)\"",
+        "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+      ],
+      "recommended_fix_type": "add_replacement_part_guard",
+      "regression_risk": "LOW"
+    },
+    {
+      "case_type": "confirmed_false_positive",
+      "listing_id": "https://www.ebay.de/itm/307106426592",
+      "title": "N64 USB-C Netzteil für Nintendo 64 Ersatznetzteil",
+      "price": 30.0,
+      "historical_ground_truth": {
+        "verdict": "FALSE_POSITIVE",
+        "category": "retro_konsolen",
+        "rule": "Nintendo Retro-Konsole (N64/GameCube/DS) ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "FIXED",
+        "confidence": "confirmed",
+        "evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
+      },
+      "root_cause": "weak_signal",
+      "root_cause_confidence": "confirmed",
+      "root_cause_evidence": [
+        "Forensik-Snapshot root_cause: \"falsches Positivsignal\"",
+        "Forensik-Snapshot reason: \"Ein require_all_of-Kriterium wurde AUSSCHLIESSLICH durch Zubehoer-Begriff(e) erfuellt (kein staerkeres Alternativwort im selben Treffer): ['netzteil']\"",
+        "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+      ],
+      "recommended_fix_type": "strengthen_positive_signal",
+      "regression_risk": "HIGH"
+    },
+    {
+      "case_type": "confirmed_false_positive",
+      "listing_id": "https://www.ebay.de/itm/398266334210",
+      "title": "Nintendo DS Lite Handheld-System Weiß Touchscreen inkl. 4 Spiele",
+      "price": 80.0,
+      "historical_ground_truth": {
+        "verdict": "FALSE_POSITIVE",
+        "category": "retro_konsolen",
+        "rule": "Nintendo Retro-Konsole (N64/GameCube/DS) ⚠️ Okay"
+      },
+      "current_routing_assessment": {
+        "category": "retro_konsolen",
+        "rule": "Nintendo Retro-Konsole (N64/GameCube/DS) ⚠️ Okay",
+        "match_state": "GLEICHE_KATEGORIE",
+        "routing_status": "A_SAME_WRONG_CATEGORY"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "low",
+        "evidence": [
+          "3 weitere, lexikalisch identisch formulierte 'Handheld-System'-Titel im aktuellen Korpus/Preishistorie gefunden, davon 1 selbst als UNCLEAR (nicht FALSE_POSITIVE) gelabelt -- kein lexikalisches Unterscheidungsmerkmal zwischen dem bestaetigten FP und den mutmasslich echten Treffern gefunden.",
+          "Nutzerentscheidung 2026-08-15 nach Rueckfrage: nicht fixen, aber auch nicht als Ground-Truth-Konflikt einstufen -- Status bleibt unsicher (siehe active_fp_fix_progress.md)."
+        ]
+      },
+      "root_cause": "weak_signal",
+      "root_cause_confidence": "confirmed",
+      "root_cause_evidence": [
+        "Forensik-Snapshot root_cause: \"falsches Positivsignal\"",
+        "Forensik-Snapshot reason: \"Ein require_all_of-Kriterium wurde AUSSCHLIESSLICH ueber generisches Signal ['system'] erfuellt (kein staerkeres Alternativwort im selben Treffer), Titel enthaelt zusaetzlich Zubehoer-/Ersatzteil-/Spiel-Indikatoren ([])\"",
+        "aktueller Match-Zustand: GLEICHE_KATEGORIE (routing_status=A_SAME_WRONG_CATEGORY)"
+      ],
+      "recommended_fix_type": "strengthen_positive_signal",
+      "regression_risk": "HIGH"
+    },
+    {
+      "case_type": "unclear_candidate",
+      "listing_id": "https://www.ebay.de/itm/318701631164",
+      "title": "Nintendo DS Lite Handheld-System hellblau Touchscreen",
+      "price": 50.0,
+      "historical_ground_truth": {
+        "verdict": "UNCLEAR",
+        "category": "retro_konsolen",
+        "rule": "Nintendo Retro-Konsole (N64/GameCube/DS) 👍 Guter Preis"
+      },
+      "current_routing_assessment": {
+        "category": "retro_konsolen",
+        "rule": "Nintendo Retro-Konsole (N64/GameCube/DS) 👍 Guter Preis",
+        "match_state": "GLEICHE_KATEGORIE",
+        "routing_status": "A_SAME_WRONG_CATEGORY"
+      },
+      "assessment": {
+        "status": "MANUAL_REVIEW",
+        "confidence": "manual_review",
+        "evidence": [
+          "historischer Ground-Truth-Verdict ist UNCLEAR, nicht FALSE_POSITIVE -- wird gemaess Auftrag ('Fall E') niemals automatisch zu FALSE_POSITIVE oder TRUE_POSITIVE aufgeloest.",
+          "aktueller Match-Zustand: GLEICHE_KATEGORIE"
+        ]
+      },
+      "note": "FP-Kandidat (Ground-Truth-Verdict UNCLEAR) -- kein bestaetigter Fehltreffer, daher KEINE Root-Cause-Klassifikation ohne Beleg."
+    },
+    {
+      "case_type": "confirmed_false_positive",
+      "listing_id": "https://www.ebay.de/itm/227468195928",
+      "title": "Nintendo Gamecube Netzteil - original DOL-002 (EUR) - 12V / 3.25A",
+      "price": 12.0,
+      "historical_ground_truth": {
+        "verdict": "FALSE_POSITIVE",
+        "category": "retro_konsolen",
+        "rule": "Nintendo Retro-Konsole (N64/GameCube/DS) ★ Top-Deal"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "FIXED",
+        "confidence": "confirmed",
+        "evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
+      },
+      "root_cause": "weak_signal",
+      "root_cause_confidence": "confirmed",
+      "root_cause_evidence": [
+        "Forensik-Snapshot root_cause: \"falsches Positivsignal\"",
+        "Forensik-Snapshot reason: \"Ein require_all_of-Kriterium wurde AUSSCHLIESSLICH durch Zubehoer-Begriff(e) erfuellt (kein staerkeres Alternativwort im selben Treffer): ['netzteil']\"",
+        "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+      ],
+      "recommended_fix_type": "strengthen_positive_signal",
+      "regression_risk": "HIGH"
+    },
+    {
+      "case_type": "confirmed_false_positive",
+      "listing_id": "https://www.kleinanzeigen.de/s-anzeige/sony-playstation-2-original-netzteil-videokabel-memorycard/3480159305-279-756",
+      "title": "Sony PlayStation 2 + Original Netzteil, Videokabel, MemoryCard",
+      "price": 50.0,
+      "historical_ground_truth": {
+        "verdict": "FALSE_POSITIVE",
+        "category": "retro_konsolen",
+        "rule": "Sony Retro-Konsole (PS1/PS2) 👍 Guter Preis"
+      },
+      "current_routing_assessment": {
+        "category": "KEIN_TREFFER",
+        "rule": "KEIN_TREFFER",
+        "match_state": "KEIN_TREFFER",
+        "routing_status": "C_NO_LONGER_MATCHES"
+      },
+      "assessment": {
+        "status": "FIXED",
+        "confidence": "confirmed",
+        "evidence": [
+          "aktueller Match-Zustand: KEIN_TREFFER -- objektiv ueber evaluate() bestaetigt."
+        ]
+      },
+      "root_cause": "weak_signal",
+      "root_cause_confidence": "confirmed",
+      "root_cause_evidence": [
+        "Forensik-Snapshot root_cause: \"falsches Positivsignal\"",
+        "Forensik-Snapshot reason: \"Ein require_all_of-Kriterium wurde AUSSCHLIESSLICH durch Zubehoer-Begriff(e) erfuellt (kein staerkeres Alternativwort im selben Treffer): ['netzteil']\"",
+        "aktueller Match-Zustand: KEIN_TREFFER (routing_status=C_NO_LONGER_MATCHES)"
+      ],
+      "recommended_fix_type": "strengthen_positive_signal",
+      "regression_risk": "HIGH"
+    }
+  ],
+  "fix_queue": [
+    {
+      "priority": "N/A",
+      "category": "retro_konsolen",
+      "affected_count": 1,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.ebay.de/itm/398266334210",
+          "title": "Nintendo DS Lite Handheld-System Weiß Touchscreen inkl. 4 Spiele",
+          "price": 80.0
+        }
+      ],
+      "root_cause": "weak_signal",
+      "confidence": "confirmed",
+      "current_rule": "Nintendo Retro-Konsole (N64/GameCube/DS) ⚠️ Okay",
+      "recommended_fix_type": "strengthen_positive_signal",
+      "regression_risk": "HIGH",
+      "affected_categories": [
+        "retro_konsolen"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Nintendo Retro-Konsole (N64/GameCube/DS) ⚠️ Okay' in Kategorie 'retro_konsolen' (z.B. app/tests/test_retro_konsolen.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)",
+        "KEINE automatische YAML-Aenderung -- Status bleibt unsicher, erfordert zusaetzliche Evidenz (z.B. Beschreibungstext/Bildmaterial) vor einer Entscheidung."
+      ],
+      "still_active_count": 1,
+      "priority_score": 0,
+      "queue_category": "MANUAL_REVIEW",
+      "case_listing_ids": [
+        "https://www.ebay.de/itm/398266334210"
+      ]
+    },
+    {
+      "priority": "N/A",
+      "category": "konsolen_bundles",
+      "affected_count": 1,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.ebay.de/itm/137602406753",
+          "title": "Nintendo Switch 32GB Mario Kart 8 Deluxe Bundle Neon Blau/Rot mit Dock",
+          "price": 135.0
+        }
+      ],
+      "root_cause": "weak_signal",
+      "confidence": "confirmed",
+      "current_rule": "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis",
+      "recommended_fix_type": "strengthen_positive_signal",
+      "regression_risk": "HIGH",
+      "affected_categories": [
+        "konsolen_bundles"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Nintendo Switch (V1/V2/OLED) 👍 Guter Preis' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)",
+        "KEINE YAML-Aenderung geplant -- historisches FALSE_POSITIVE-Label gilt als vermutlich fehlerhaft, aktuelles Matcher-Verhalten wird als korrekt eingestuft."
+      ],
+      "still_active_count": 1,
+      "priority_score": 0,
+      "queue_category": "GROUND_TRUTH_CONFLICT",
+      "case_listing_ids": [
+        "https://www.ebay.de/itm/137602406753"
+      ]
+    },
+    {
+      "priority": "N/A",
+      "category": "konsolen_bundles",
+      "affected_count": 1,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.kleinanzeigen.de/s-anzeige/xbox-one-s-1tb-mit-spiele/3479889108-279-4400",
+          "title": "Xbox One S 1TB mit Spiele",
+          "price": 80.0
+        }
+      ],
+      "root_cause": "weak_signal",
+      "confidence": "confirmed",
+      "current_rule": "Xbox One S / One X 👍 Guter Preis",
+      "recommended_fix_type": "strengthen_positive_signal",
+      "regression_risk": "HIGH",
+      "affected_categories": [
+        "konsolen_bundles"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Xbox One S / One X 👍 Guter Preis' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)",
+        "KEINE YAML-Aenderung geplant -- historisches FALSE_POSITIVE-Label gilt als vermutlich fehlerhaft, aktuelles Matcher-Verhalten wird als korrekt eingestuft."
+      ],
+      "still_active_count": 1,
+      "priority_score": 0,
+      "queue_category": "GROUND_TRUTH_CONFLICT",
+      "case_listing_ids": [
+        "https://www.kleinanzeigen.de/s-anzeige/xbox-one-s-1tb-mit-spiele/3479889108-279-4400"
+      ]
+    },
+    {
+      "priority": "N/A",
+      "category": "gaming_pc",
+      "affected_count": 1,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.kleinanzeigen.de/s-anzeige/mainboard-set-h310m-d2p-i5-9500-gtx-1050ti-nwme-16gb-ddr4-/3480520958-225-8182",
+          "title": "MAINBOARD SET H310M D2P. i5-9500. GTX 1050TI. NWMe. 16GB DDR4.",
+          "price": 90.0
+        }
+      ],
+      "root_cause": "replacement_part_false_positive",
+      "confidence": "confirmed",
+      "current_rule": "Gaming-PC (Mindestanforderung erfüllt)",
+      "recommended_fix_type": "add_replacement_part_guard",
+      "regression_risk": "LOW",
+      "affected_categories": [
+        "gaming_pc"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Gaming-PC (Mindestanforderung erfüllt)' in Kategorie 'gaming_pc' (z.B. app/tests/test_gaming_pc.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      ],
+      "still_active_count": 0,
+      "priority_score": 0,
+      "queue_category": "ALREADY_FIXED",
+      "case_listing_ids": [
+        "https://www.kleinanzeigen.de/s-anzeige/mainboard-set-h310m-d2p-i5-9500-gtx-1050ti-nwme-16gb-ddr4-/3480520958-225-8182"
+      ]
+    },
+    {
+      "priority": "N/A",
+      "category": "handhelds",
+      "affected_count": 1,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.ebay.de/itm/307112118573",
+          "title": "JSAUX Slim-Reisetasche Für Lenovo Legion Go/Go S/Go 2, Hartschalenbeutel | Schla",
+          "price": 41.48
+        }
+      ],
+      "root_cause": "missing_exclude",
+      "confidence": "confirmed",
+      "current_rule": "Asus ROG Ally / Lenovo Legion Go ★ Top-Deal",
+      "recommended_fix_type": "add_exclude",
+      "regression_risk": "LOW",
+      "affected_categories": [
+        "handhelds"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Asus ROG Ally / Lenovo Legion Go ★ Top-Deal' in Kategorie 'handhelds' (z.B. app/tests/test_handhelds.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      ],
+      "still_active_count": 0,
+      "priority_score": 0,
+      "queue_category": "ALREADY_FIXED",
+      "case_listing_ids": [
+        "https://www.ebay.de/itm/307112118573"
+      ]
+    },
+    {
+      "priority": "N/A",
+      "category": "handhelds",
+      "affected_count": 3,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.ebay.de/itm/255925725429",
+          "title": "USB-C HUB für Steam Deck HDMI 4k 60Hz USB 3.0 PD",
+          "price": 41.99
+        },
+        {
+          "listing_id": "https://www.ebay.de/itm/304780620667",
+          "title": "Steam Deck Skin Faceplate Schutz Klebefolie Design Vinyl Aufkleber Skins OLED",
+          "price": 19.95
+        },
+        {
+          "listing_id": "https://www.ebay.de/itm/205573628921",
+          "title": "VITURE USB-C an Brille, Ladeadapter, Laden und Spielen für Switch, Steam Deck",
+          "price": 49.0
+        }
+      ],
+      "root_cause": "missing_exclude",
+      "confidence": "confirmed",
+      "current_rule": "Valve Steam Deck ★ Top-Deal",
+      "recommended_fix_type": "add_exclude",
+      "regression_risk": "LOW",
+      "affected_categories": [
+        "handhelds"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Valve Steam Deck ★ Top-Deal' in Kategorie 'handhelds' (z.B. app/tests/test_handhelds.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 3 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      ],
+      "still_active_count": 0,
+      "priority_score": 0,
+      "queue_category": "ALREADY_FIXED",
+      "case_listing_ids": [
+        "https://www.ebay.de/itm/255925725429",
+        "https://www.ebay.de/itm/304780620667",
+        "https://www.ebay.de/itm/205573628921"
+      ]
+    },
+    {
+      "priority": "N/A",
+      "category": "iphone",
+      "affected_count": 1,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.ebay.de/itm/236995682525",
+          "title": "Apple iPhone 15 Pro Max 512GB Mainboard Platine mit FaceID und Kameramodul ",
+          "price": 400.0
+        }
+      ],
+      "root_cause": "replacement_part_false_positive",
+      "confidence": "confirmed",
+      "current_rule": "iPhone 15 Pro Max (≥512GB) 👍 Guter Preis",
+      "recommended_fix_type": "add_replacement_part_guard",
+      "regression_risk": "LOW",
+      "affected_categories": [
+        "iphone"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'iPhone 15 Pro Max (≥512GB) 👍 Guter Preis' in Kategorie 'iphone' (z.B. app/tests/test_iphone.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      ],
+      "still_active_count": 0,
+      "priority_score": 0,
+      "queue_category": "ALREADY_FIXED",
+      "case_listing_ids": [
+        "https://www.ebay.de/itm/236995682525"
+      ]
+    },
+    {
+      "priority": "N/A",
+      "category": "konsolen_bundles",
+      "affected_count": 3,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.kleinanzeigen.de/s-anzeige/luigi-s-mansion-2-hd-fuer-nintendo-switch-neu-ovp/3480890852-227-23706",
+          "title": "Luigi's Mansion 2 HD für Nintendo Switch - NEU & OVP",
+          "price": 35.0
+        },
+        {
+          "listing_id": "https://www.ebay.de/itm/257670779909",
+          "title": "Mario Kart World für Nintendo Switch 2 – NEU  und OVP",
+          "price": 54.99
+        },
+        {
+          "listing_id": "https://www.kleinanzeigen.de/s-anzeige/nba-2k26-fuer-nintendo-switch-2-ovp-schneller-versand/3479886837-227-7978",
+          "title": "NBA 2K26 für Nintendo Switch 2 - OVP Schneller Versand",
+          "price": 14.0
+        }
+      ],
+      "root_cause": "weak_signal",
+      "confidence": "confirmed",
+      "current_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+      "recommended_fix_type": "strengthen_positive_signal",
+      "regression_risk": "HIGH",
+      "affected_categories": [
+        "konsolen_bundles"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Nintendo Switch (V1/V2/OLED) ★ Top-Deal' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 3 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      ],
+      "still_active_count": 0,
+      "priority_score": 0,
+      "queue_category": "ALREADY_FIXED",
+      "case_listing_ids": [
+        "https://www.kleinanzeigen.de/s-anzeige/luigi-s-mansion-2-hd-fuer-nintendo-switch-neu-ovp/3480890852-227-23706",
+        "https://www.ebay.de/itm/257670779909",
+        "https://www.kleinanzeigen.de/s-anzeige/nba-2k26-fuer-nintendo-switch-2-ovp-schneller-versand/3479886837-227-7978"
+      ]
+    },
+    {
+      "priority": "N/A",
+      "category": "konsolen_bundles",
+      "affected_count": 1,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.kleinanzeigen.de/s-anzeige/playstation-5-ps4-ps5-slim-hdmi-port-nintendo-reparatur-usb-pro/3431533294-226-3438",
+          "title": "Playstation 5 PS4 PS5 Slim HDMI Port Nintendo Reparatur USB PRO",
+          "price": 50.0
+        }
+      ],
+      "root_cause": "ambiguous",
+      "confidence": "manual_review",
+      "current_rule": "PS4 Slim / Pro Bundle ★ Top-Deal",
+      "recommended_fix_type": "manual_review",
+      "regression_risk": "MEDIUM",
+      "affected_categories": [
+        "konsolen_bundles"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'PS4 Slim / Pro Bundle ★ Top-Deal' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      ],
+      "still_active_count": 0,
+      "priority_score": 0,
+      "queue_category": "ALREADY_FIXED",
+      "case_listing_ids": [
+        "https://www.kleinanzeigen.de/s-anzeige/playstation-5-ps4-ps5-slim-hdmi-port-nintendo-reparatur-usb-pro/3431533294-226-3438"
+      ]
+    },
+    {
+      "priority": "N/A",
+      "category": "notebook_resell",
+      "affected_count": 1,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.ebay.de/itm/357718779954",
+          "title": "Lenovo ThinkPad X390 Mainboard Intel Core i5-8365U 8GB RAM NM-B891",
+          "price": 49.0
+        }
+      ],
+      "root_cause": "replacement_part_false_positive",
+      "confidence": "confirmed",
+      "current_rule": "ThinkPad T14/X13 (Ryzen/Modern) ★ Resell-Top",
+      "recommended_fix_type": "add_replacement_part_guard",
+      "regression_risk": "LOW",
+      "affected_categories": [
+        "notebook_resell"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'ThinkPad T14/X13 (Ryzen/Modern) ★ Resell-Top' in Kategorie 'notebook_resell' (z.B. app/tests/test_notebook_resell.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      ],
+      "still_active_count": 0,
+      "priority_score": 0,
+      "queue_category": "ALREADY_FIXED",
+      "case_listing_ids": [
+        "https://www.ebay.de/itm/357718779954"
+      ]
+    },
+    {
+      "priority": "N/A",
+      "category": "office_pc",
+      "affected_count": 2,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.kleinanzeigen.de/s-anzeige/intel-core-i5-8500-mainboard-bundle-16gb-ddr4-ram-netzteil/3480038290-225-13379",
+          "title": "Intel Core i5-8500 Mainboard Bundle 16GB DDR4 RAM Netzteil",
+          "price": 160.0
+        },
+        {
+          "listing_id": "https://www.ebay.de/itm/356717584177",
+          "title": "Lenovo ThinkPad T490s Mainboard nm-b891 Intel i5-8365U / i5-8265U 8GB RAM",
+          "price": 69.0
+        }
+      ],
+      "root_cause": "replacement_part_false_positive",
+      "confidence": "confirmed",
+      "current_rule": "Office-PC (Mindestanforderung erfüllt)",
+      "recommended_fix_type": "add_replacement_part_guard",
+      "regression_risk": "LOW",
+      "affected_categories": [
+        "office_pc"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Office-PC (Mindestanforderung erfüllt)' in Kategorie 'office_pc' (z.B. app/tests/test_office_pc.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 2 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      ],
+      "still_active_count": 0,
+      "priority_score": 0,
+      "queue_category": "ALREADY_FIXED",
+      "case_listing_ids": [
+        "https://www.kleinanzeigen.de/s-anzeige/intel-core-i5-8500-mainboard-bundle-16gb-ddr4-ram-netzteil/3480038290-225-13379",
+        "https://www.ebay.de/itm/356717584177"
+      ]
+    },
+    {
+      "priority": "N/A",
+      "category": "retro_konsolen",
+      "affected_count": 2,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.ebay.de/itm/227468195928",
+          "title": "Nintendo Gamecube Netzteil - original DOL-002 (EUR) - 12V / 3.25A",
+          "price": 12.0
+        },
+        {
+          "listing_id": "https://www.ebay.de/itm/307106426592",
+          "title": "N64 USB-C Netzteil für Nintendo 64 Ersatznetzteil",
+          "price": 30.0
+        }
+      ],
+      "root_cause": "weak_signal",
+      "confidence": "confirmed",
+      "current_rule": "Nintendo Retro-Konsole (N64/GameCube/DS) ★ Top-Deal",
+      "recommended_fix_type": "strengthen_positive_signal",
+      "regression_risk": "HIGH",
+      "affected_categories": [
+        "retro_konsolen"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Nintendo Retro-Konsole (N64/GameCube/DS) ★ Top-Deal' in Kategorie 'retro_konsolen' (z.B. app/tests/test_retro_konsolen.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 2 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      ],
+      "still_active_count": 0,
+      "priority_score": 0,
+      "queue_category": "ALREADY_FIXED",
+      "case_listing_ids": [
+        "https://www.ebay.de/itm/227468195928",
+        "https://www.ebay.de/itm/307106426592"
+      ]
+    },
+    {
+      "priority": "N/A",
+      "category": "retro_konsolen",
+      "affected_count": 1,
+      "representative_listings": [
+        {
+          "listing_id": "https://www.kleinanzeigen.de/s-anzeige/sony-playstation-2-original-netzteil-videokabel-memorycard/3480159305-279-756",
+          "title": "Sony PlayStation 2 + Original Netzteil, Videokabel, MemoryCard",
+          "price": 50.0
+        }
+      ],
+      "root_cause": "weak_signal",
+      "confidence": "confirmed",
+      "current_rule": "Sony Retro-Konsole (PS1/PS2) 👍 Guter Preis",
+      "recommended_fix_type": "strengthen_positive_signal",
+      "regression_risk": "HIGH",
+      "affected_categories": [
+        "retro_konsolen"
+      ],
+      "test_requirements": [
+        "bestehende TRUE_POSITIVE-Tests fuer Regel 'Sony Retro-Konsole (PS1/PS2) 👍 Guter Preis' in Kategorie 'retro_konsolen' (z.B. app/tests/test_retro_konsolen.py, falls vorhanden) muessen weiterhin gruen bleiben",
+        "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+        "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+      ],
+      "still_active_count": 0,
+      "priority_score": 0,
+      "queue_category": "ALREADY_FIXED",
+      "case_listing_ids": [
+        "https://www.kleinanzeigen.de/s-anzeige/sony-playstation-2-original-netzteil-videokabel-memorycard/3480159305-279-756"
+      ]
+    }
+  ],
+  "queue_category_counts": {
+    "ALREADY_FIXED": 16,
+    "ACTIVE_ROUTING_FP": 0,
+    "CATEGORY_CHANGED": 0,
+    "GROUND_TRUTH_CONFLICT": 2,
+    "MANUAL_REVIEW": 1
+  },
+  "queue_consistency": {
+    "total_cases": 19,
+    "matched_cases": 19,
+    "missing_in_queue": [],
+    "missing_in_assessment": [],
+    "duplicate_case_ids": [],
+    "status_mismatches": [],
+    "consistency_ok": true
+  }
+}
