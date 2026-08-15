@@ -61,6 +61,15 @@ category_report.py          kombiniert aktuellen Korpus + historischen
    │                        Regressionsvergleich pro Kategorie
    │                       → generated/reports/category_quality_current.{json,md}
    │                       → generated/reports/category_quality_historical_regression.json
+   ▼
+forensics_false_positives.py   docs/DASHBOARD_MATCH_FORENSICS.json
+   │                           (nur bestätigte FALSE_POSITIVE-Fälle, wiederverwendet
+   │                           benchmark._after_match_state() + common.evaluate())
+   │                       → generated/reports/forensics_false_positives_report.{json,md}
+   │                         (FP je Kategorie gruppiert, Root-Cause-Klassifikation,
+   │                         Cross-Category-Routing-Status A/B/C/D)
+   │                       → generated/false_positive_fix_queue.{json,md}
+   │                         (priorisierte, NICHT automatisch angewendete Fix-Queue)
 
 price_history_revalidation.py   data/price_history.jsonl (nur lesend)
                                 → generated/reports/price_history_revalidation_simulation.json
@@ -118,6 +127,38 @@ Kategorie. Beide Kennzahlen werden **nur über die gelabelte Teilmenge** berechn
 (`labeled_n` wird explizit ausgewiesen, `UNCLEAR`/`UNLABELED` fließen nicht in den Nenner
 ein).
 
+### `forensics_false_positives.py` — Category-False-Positive-Forensics + Fix-Queue
+
+Extrahiert ausschließlich bestätigte `FALSE_POSITIVE`-Fälle aus `docs/DASHBOARD_MATCH_FORENSICS.json`
+(19 Fälle, siehe `label_store.py`), gruppiert sie nach der gespeicherten Kategorie und ermittelt den
+aktuellen Match-Zustand über den echten Produktionspfad (`common.evaluate()`). Wiederverwendet
+`benchmark._after_match_state()` — **keine zweite Matching-/Bewertungslogik**. `UNCLEAR`-Fälle werden
+strikt getrennt als "FP-Kandidaten" geführt, nie mit bestätigten FP vermischt (Auftrags-Grundregel:
+kein neues TP/FP-Urteil wird erfunden).
+
+**Root-Cause-Klassifikation:** übersetzt das im Forensik-Snapshot bereits vorhandene, aus der echten
+Match-Instrumentierung abgeleitete `root_cause`/`reason`-Feld in eine feste Taxonomie
+(`missing_exclude`, `weak_signal`, `replacement_part_false_positive`, `accessory_false_positive`,
+`wrong_category`, `cross_category_collision`, `rule_collision`, `missing_context`, `ambiguous`,
+`unknown`) mit `confidence` (`confirmed`/`high`/`medium`/`low`/`manual_review`) und belegter
+`evidence`-Liste. Werte ohne bekannten Übersetzungseintrag (z. B. "sonstiges") werden bewusst als
+`ambiguous`/`manual_review` ausgewiesen, nie geraten.
+
+**Cross-Category-Routing-Status** (A/B/C/D, siehe Modul-Docstring): nur `C_NO_LONGER_MATCHES`
+("FALSE_POSITIVE → kein Treffer") gilt als tatsächlich behoben. `B_CATEGORY_CHANGED`
+("FALSE_POSITIVE → andere Kategorie") zählt ausdrücklich **nicht** automatisch als Fix.
+
+**Fix-Queue:** priorisiert (P0–P3) nach Anzahl weiterhin aktiver Fälle, Root-Cause-Confidence und
+Cross-Category-Blast-Radius — ändert **niemals** selbst `app/rules/*.yaml`. Die Queue ist ein
+kanonisches Artefakt (immer aus dem vollständigen, ungefilterten FP-Datensatz gebaut), unabhängig von
+`--category`/`--only-fp`, die nur die Text-/JSON-Report-Ansicht filtern.
+
+```bash
+python -m tools.ruleset_quality.forensics_false_positives --verbose
+python -m tools.ruleset_quality.forensics_false_positives --only-fp
+python -m tools.ruleset_quality.forensics_false_positives --category handhelds
+```
+
 ### `price_history_revalidation.py` — Preishistorie-Revalidierung (Simulation)
 
 Baut auf `app/rule_coverage.py` (`compute_rule_coverage()`) auf und ergänzt eine
@@ -156,10 +197,13 @@ python -m tools.ruleset_quality.category_report
 
 # 6. Preishistorie-Revalidierung simulieren
 python -m tools.ruleset_quality.price_history_revalidation
+
+# 7. Category-False-Positive-Forensics + Fix-Queue
+python -m tools.ruleset_quality.forensics_false_positives --verbose
 ```
 
 Empfohlene Reihenfolge bei einem kompletten Lauf: 1 → 2 → 3 → 4 (für beide Baselines)
-→ 5 → 6.
+→ 5 → 6 → 7.
 
 ## Erzeugte Artefakte (`generated/`)
 
@@ -174,7 +218,10 @@ generated/
     ├── category_quality_current.{json,md}     Precision/FP-Rate pro Kategorie (category_report.py)
     ├── category_quality_historical_regression.json
     ├── price_history_revalidation_simulation.json
+    ├── forensics_false_positives_report.{json,md}   FP je Kategorie (forensics_false_positives.py)
     └── ABSCHLUSSBERICHT.md                    zusammenfassender Bericht Phase 19.1–19.5
+
+false_positive_fix_queue.{json,md}             priorisierte Fix-Queue (forensics_false_positives.py)
 ```
 
 Alle Artefakte sind Diagnoseausgaben (JSON/Markdown), keine Konfigurationsdateien — sie
@@ -184,11 +231,13 @@ werden von der Produktionskette nicht gelesen.
 
 `app/tests/test_ruleset_quality_tooling.py` (20 Tests) deckt die reinen
 Klassifikations-/Parsing-Bausteine ab, die keine eigene Matching-Entscheidung treffen
-(`_after_match_state()`, `classify_gate()`, `parse_forensics()`). Läuft als Teil der
-normalen Testsuite:
+(`_after_match_state()`, `classify_gate()`, `parse_forensics()`). `app/tests/test_forensics_false_positives.py`
+(24 Tests) deckt zusätzlich `forensics_false_positives.py` ab: FP/Kandidaten-Trennung, Routing-Status
+A/B/C/D, Root-Cause-Übersetzung ohne Erfindung unbelegter Werte, fehlende Forensik-Felder →
+`NOT_AVAILABLE` statt Exception. Läuft als Teil der normalen Testsuite:
 
 ```bash
-pytest app/tests/test_ruleset_quality_tooling.py -v
+pytest app/tests/test_ruleset_quality_tooling.py app/tests/test_forensics_false_positives.py -v
 ```
 
 ## Bekannte methodische Einschränkungen

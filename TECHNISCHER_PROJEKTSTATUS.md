@@ -5,16 +5,17 @@
 > Stand: **2026-08-15**
 > Repository: `dkmd89-dev/gpu-watch-v2`
 > Branch: `main`
-> **Letzter Code-Commit (vor dieser Doku-Aktualisierung):** `7eff392` (Merge PR #42)
-> **HEAD (main, vor dieser Doku-Aktualisierung):** `7eff392` (Merge PR #42)
+> **Letzter Code-Commit (vor dieser Doku-Aktualisierung):** `9ec8f86` (Merge PR #44)
+> **HEAD (main, vor dieser Doku-Aktualisierung):** `9ec8f86` (Merge PR #44)
 > Vorheriger dokumentierter Stand: `48b03d7` (Merge PR #41)
 > Seit `48b03d7`: PR #42 (`found.json`-Vollanalyse, 36 Fehltreffer über `konsolen_bundles`/
-> `retro_konsolen`/`gpu` behoben, Abschnitt 3.22) + dieser Batch: eine vom Nutzer selbst
-> erstellte, manuelle Fehltreffer-Analyse (`FALSE_POSITIVES_ANALYSE_2026-08-15.txt`, 40 einzeln
-> geprüfte Live-Treffer, 5 unabhängige Root Causes A–E) schrittweise mit Einzelfreigabe
-> abgearbeitet — **25 von 34 bestätigten Fehltreffern über `konsolen_bundles`/`retro_konsolen`/
-> `handhelds` behoben** (Fix A–D), 1€-Preisanomalie (Fix E) bewusst NICHT als Regeländerung
-> umgesetzt (kein isolierter Root Cause). Siehe Abschnitt 3.23.
+> `retro_konsolen`/`gpu` behoben, Abschnitt 3.22), PR #44 (manuelle Fehltreffer-Analyse, 25 von 34
+> bestätigten Fehltreffern behoben, Abschnitt 3.23) + PR #45 (`8008414`): neues read-only
+> Category-False-Positive-Forensics-Tool (`tools/ruleset_quality/forensics_false_positives.py`) +
+> priorisierte Fix-Queue, keine YAML-Änderung. Dieser Batch (noch ohne PR-Nummer): reine
+> Korrektur — eine bereits vor dieser Session im Working Tree versehentlich gelöschte,
+> aktive Produktionsregel (`app/rules/konsolen_bundles.yaml`) wiederhergestellt. Siehe
+> Abschnitt 3.24.
 >
 > Diese Datei ersetzt `PROJEKTSTAND_KOMPLETT.md` (Datei mittlerweile aus dem Repository entfernt). Historische Phasenberichte bleiben als Detaildokumentation erhalten; widersprüchliche ältere Ist-Stand-Angaben gelten nicht mehr als aktuell.
 
@@ -24,7 +25,7 @@
 
 `gpu-watch-v2` ist ein modularer, YAML-gesteuerter **Hardware Deal Finder** für Second-Hand-Angebote. Das System kombiniert Scraper, kategoriebasiertes Matching, Hardware-Detektoren, Deal-Scoring, Marktpreis-/Resale-Statistik, Profit-/Flip-Bewertung, Duplicate Detection, Presence Tracking, Dashboard-KPIs und ntfy-Benachrichtigungen.
 
-Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und kontrollierter Weiterentwicklung**. Seit `d2effe7` wurden insbesondere Datenqualitäts-/Validierungslogik, Rule Analyzer/Coverage, Caching/Performance, neue Kategorien sowie ein umfangreicher False-Positive-Audit integriert. Seit 2026-08-14 ergänzt ein dediziertes, read-only **Ruleset-Qualitätssystem** (`tools/ruleset_quality/`, siehe Abschnitt 3.11) den bisherigen punktuellen Audit-Ansatz um reproduzierbare Regression-Benchmarks und Preishistorie-Simulationen. Im selben Tag (Abschnitt 3.12) wurde die 251-Listing-Stichprobe vollständig gelabelt, daraus resultierend 3 Exclude-Fixes umgesetzt (PR #31), der Umlaut-Fingerprint-Bug behoben und eine kontrollierte Preishistorie-Revalidierung v3 durchgeführt (PR #32) — mit dem wichtigen Befund, dass der Fix nicht rückwirkend auf bereits gespeicherte Daten wirkt. Direkt im Anschluss wurde Datenqualitätspunkt 14 (Abschnitt 3.13, Zubehör/Ersatzteil-vs-Gerät) mit 4 weiteren gezielten Exclude-Fixes gelöst (PR #33), gefolgt von Datenqualitätspunkt 5 (Abschnitt 3.14, `controller`/`ladekabel`-Restlücke, PR #34) und Datenqualitätspunkt 4 (Abschnitt 3.15, `RX 7600 XT`/`RX 7600`-Überlappung, PR #35) — Letzteres deckte einen strukturellen min_vram_gb-Bug auf, der zusätzlich 4 weitere GPU-Modelle betraf. Am 2026-08-15 (Abschnitt 3.16) wurde erstmals eine echte End-to-End-Scan-Performance-Messung anhand von 35 Produktiv-Scan-Läufen durchgeführt und der größte gefundene Hebel (Scraping macht 88,9% der Scanzeit aus, lief seriell) direkt umgesetzt: die drei Scraper-Quellen laufen jetzt parallel. Direkter Folgeschritt (Abschnitt 3.17): Persistence-Batching -- die ursprüngliche Analyse wurde dabei korrigiert, der dominante Kostentreiber war `seen.json` (16,7 MB), nicht primär `found.json`. Nach der Verifikation beider Performance-Fixes gegen echte Produktivdaten (Abschnitt 3.18, PR #38) wurde ein vollständiger, read-only Kategorie-Audit durchgeführt (0 Abweichungen zwischen YAML/Dashboard/found.json), gefolgt von einer Nutzer-gemeldeten Live-Fehltreffer-Analyse gegen die `tools/ruleset_quality/`-Regression-Benchmarks (Abschnitt 3.19): 5 real bestätigte Fehltreffer über `vintage_elektronik`/`handhelds`/`konsolen_bundles` behoben sowie ein Preis-Mindestbetrag-Guard gegen einen Quoka-seitigen Preis-Parsing-Defekt ergänzt, der `price_history.jsonl` mit 0€-Datenpunkten verzerrte. Direkter Folgeschritt (Abschnitt 3.20): die dort zurückgestellte „pro"-Kollision in `konsolen_bundles.yaml` wurde bei tieferer Analyse doch gelöst -- 3 unabhängige, einzeln additiv lösbare Ursachen statt einer strukturellen Gruppen-Kollision, inklusive einer expliziten Korrektur eines zunächst erwogenen, aber per Blast-Radius-Check verworfenen breiteren Fixes. Direkter Folgeschritt (Abschnitt 3.21): auch die beiden letzten Abschnitt-3.19-Punkte wurden gelöst -- das Xenoblade-Spieltitel-Problem (`handhelds.yaml`) und das `netzteil`-Positivsignal (`retro_konsolen.yaml`) erwiesen sich beide als additiv lösbar über bereits etablierte Mechanismen, und die Quoka-Preis-0€-Root-Cause wurde erstmals mit echtem Live-Zugriff auf quoka.de identifiziert und direkt im Scraper behoben. Direkter Folgeschritt (Abschnitt 3.22): eine vom Nutzer bereitgestellte, aktuellere `found.json` außerhalb des Repos wurde vollständig auf Kategorie-Fehler analysiert -- 36 real bestätigte Fehltreffer über `konsolen_bundles`/`retro_konsolen`/`gpu` behoben, wobei sich der `retro_konsolen`-Cluster bei der Root-Cause-Analyse als deutlich größer herausstellte als die ursprünglich gemeldeten Fälle ("komplett" als Zustands- statt Gerätebeweis trifft Einzelspiele mindestens so oft wie Konsolen). Direkter Folgeschritt (Abschnitt 3.23): eine vom Nutzer selbst erstellte, manuelle Fehltreffer-Analyse (40 einzeln geprüfte Live-Treffer, 5 unabhängige Root Causes) wurde schrittweise mit Einzelfreigabe abgearbeitet -- 25 von 34 bestätigten Fehltreffern über `konsolen_bundles`/`retro_konsolen`/`handhelds` behoben, mit einer wichtigen Korrektur unterwegs: der zunächst vorgeschlagene vollständige Entfernen von "ovp" aus `require_all_of` (Nintendo Switch) wurde durch einen kontextbewussten Exclude ersetzt, nachdem sich herausstellte, dass das eine bereits bestehende, dokumentierte Auftragsvorgabe und mehrere Regressionstests gebrochen hätte; bei der PS-Vita-Variante desselben Fixes zeigte sich zusätzlich, dass `handhelds.yaml` mehrere Gerätetypen in einer Kategorie bündelt und ein kategorieweiter Trigger echte Steam-Deck-/ROG-Ally-/3DS-Verkäufe mitblockiert hätte -- durch einen plattformgebundenen Trigger statt eines bare-Signalworts gelöst. Die gemeldete 1€-Preisanomalie (Fix E) wurde bewusst NICHT als Regeländerung umgesetzt: eine Korpus-Analyse zeigte mindestens drei unabhängige Ursachen statt eines isolierten Root Cause wie beim GPU-0€-Fund.
+Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und kontrollierter Weiterentwicklung**. Seit `d2effe7` wurden insbesondere Datenqualitäts-/Validierungslogik, Rule Analyzer/Coverage, Caching/Performance, neue Kategorien sowie ein umfangreicher False-Positive-Audit integriert. Seit 2026-08-14 ergänzt ein dediziertes, read-only **Ruleset-Qualitätssystem** (`tools/ruleset_quality/`, siehe Abschnitt 3.11) den bisherigen punktuellen Audit-Ansatz um reproduzierbare Regression-Benchmarks und Preishistorie-Simulationen. Im selben Tag (Abschnitt 3.12) wurde die 251-Listing-Stichprobe vollständig gelabelt, daraus resultierend 3 Exclude-Fixes umgesetzt (PR #31), der Umlaut-Fingerprint-Bug behoben und eine kontrollierte Preishistorie-Revalidierung v3 durchgeführt (PR #32) — mit dem wichtigen Befund, dass der Fix nicht rückwirkend auf bereits gespeicherte Daten wirkt. Direkt im Anschluss wurde Datenqualitätspunkt 14 (Abschnitt 3.13, Zubehör/Ersatzteil-vs-Gerät) mit 4 weiteren gezielten Exclude-Fixes gelöst (PR #33), gefolgt von Datenqualitätspunkt 5 (Abschnitt 3.14, `controller`/`ladekabel`-Restlücke, PR #34) und Datenqualitätspunkt 4 (Abschnitt 3.15, `RX 7600 XT`/`RX 7600`-Überlappung, PR #35) — Letzteres deckte einen strukturellen min_vram_gb-Bug auf, der zusätzlich 4 weitere GPU-Modelle betraf. Am 2026-08-15 (Abschnitt 3.16) wurde erstmals eine echte End-to-End-Scan-Performance-Messung anhand von 35 Produktiv-Scan-Läufen durchgeführt und der größte gefundene Hebel (Scraping macht 88,9% der Scanzeit aus, lief seriell) direkt umgesetzt: die drei Scraper-Quellen laufen jetzt parallel. Direkter Folgeschritt (Abschnitt 3.17): Persistence-Batching -- die ursprüngliche Analyse wurde dabei korrigiert, der dominante Kostentreiber war `seen.json` (16,7 MB), nicht primär `found.json`. Nach der Verifikation beider Performance-Fixes gegen echte Produktivdaten (Abschnitt 3.18, PR #38) wurde ein vollständiger, read-only Kategorie-Audit durchgeführt (0 Abweichungen zwischen YAML/Dashboard/found.json), gefolgt von einer Nutzer-gemeldeten Live-Fehltreffer-Analyse gegen die `tools/ruleset_quality/`-Regression-Benchmarks (Abschnitt 3.19): 5 real bestätigte Fehltreffer über `vintage_elektronik`/`handhelds`/`konsolen_bundles` behoben sowie ein Preis-Mindestbetrag-Guard gegen einen Quoka-seitigen Preis-Parsing-Defekt ergänzt, der `price_history.jsonl` mit 0€-Datenpunkten verzerrte. Direkter Folgeschritt (Abschnitt 3.20): die dort zurückgestellte „pro"-Kollision in `konsolen_bundles.yaml` wurde bei tieferer Analyse doch gelöst -- 3 unabhängige, einzeln additiv lösbare Ursachen statt einer strukturellen Gruppen-Kollision, inklusive einer expliziten Korrektur eines zunächst erwogenen, aber per Blast-Radius-Check verworfenen breiteren Fixes. Direkter Folgeschritt (Abschnitt 3.21): auch die beiden letzten Abschnitt-3.19-Punkte wurden gelöst -- das Xenoblade-Spieltitel-Problem (`handhelds.yaml`) und das `netzteil`-Positivsignal (`retro_konsolen.yaml`) erwiesen sich beide als additiv lösbar über bereits etablierte Mechanismen, und die Quoka-Preis-0€-Root-Cause wurde erstmals mit echtem Live-Zugriff auf quoka.de identifiziert und direkt im Scraper behoben. Direkter Folgeschritt (Abschnitt 3.22): eine vom Nutzer bereitgestellte, aktuellere `found.json` außerhalb des Repos wurde vollständig auf Kategorie-Fehler analysiert -- 36 real bestätigte Fehltreffer über `konsolen_bundles`/`retro_konsolen`/`gpu` behoben, wobei sich der `retro_konsolen`-Cluster bei der Root-Cause-Analyse als deutlich größer herausstellte als die ursprünglich gemeldeten Fälle ("komplett" als Zustands- statt Gerätebeweis trifft Einzelspiele mindestens so oft wie Konsolen). Direkter Folgeschritt (Abschnitt 3.23): eine vom Nutzer selbst erstellte, manuelle Fehltreffer-Analyse (40 einzeln geprüfte Live-Treffer, 5 unabhängige Root Causes) wurde schrittweise mit Einzelfreigabe abgearbeitet -- 25 von 34 bestätigten Fehltreffern über `konsolen_bundles`/`retro_konsolen`/`handhelds` behoben, mit einer wichtigen Korrektur unterwegs: der zunächst vorgeschlagene vollständige Entfernen von "ovp" aus `require_all_of` (Nintendo Switch) wurde durch einen kontextbewussten Exclude ersetzt, nachdem sich herausstellte, dass das eine bereits bestehende, dokumentierte Auftragsvorgabe und mehrere Regressionstests gebrochen hätte; bei der PS-Vita-Variante desselben Fixes zeigte sich zusätzlich, dass `handhelds.yaml` mehrere Gerätetypen in einer Kategorie bündelt und ein kategorieweiter Trigger echte Steam-Deck-/ROG-Ally-/3DS-Verkäufe mitblockiert hätte -- durch einen plattformgebundenen Trigger statt eines bare-Signalworts gelöst. Die gemeldete 1€-Preisanomalie (Fix E) wurde bewusst NICHT als Regeländerung umgesetzt: eine Korpus-Analyse zeigte mindestens drei unabhängige Ursachen statt eines isolierten Root Cause wie beim GPU-0€-Fund. Direkter Folgeschritt (Abschnitt 3.24, PR #45): ein neues read-only **Category-False-Positive-Forensics-Tool** (`tools/ruleset_quality/forensics_false_positives.py`) setzt den Auftrag „Category False-Positive Forensics + gezielte Fix-Queue" um — extrahiert die 19 bestätigten `FALSE_POSITIVE`-Fälle aus `docs/DASHBOARD_MATCH_FORENSICS.json`, gruppiert sie nach Kategorie, ermittelt den aktuellen Match-Zustand über den echten Produktionspfad und leitet eine priorisierte Fix-Queue ab (P0–P3), ohne selbst eine YAML-Regel zu ändern. Baut ausschließlich auf der bestehenden `tools/ruleset_quality/`-Toolchain auf (`benchmark._after_match_state()`, `label_store.py`), keine zweite Bewertungslogik. Ergebnis: 17 der 19 historischen Fehltreffer bereits durch spätere Batches verschwunden, 2 weiterhin aktiv (`iphone` P0, `retro_konsolen` P1). Bei der routinemäßigen Testverifikation danach fielen 4 zuvor unauffällige Tests aus — Ursache war eine bereits **vor** dieser Session im Working Tree unbestätigt gelöschte, aktive Produktionsregel (`app/rules/konsolen_bundles.yaml`, kein Commit, keine Migration), die als reine Restauration (kein Inhalt geändert) wiederhergestellt wurde; bewusst nicht angefasst wurden gleichzeitig sichtbare Diffs in `data/found.json`/`price_history.jsonl`/`time_to_sell.jsonl`, da diese vom aktiv laufenden Produktions-Scanner erzeugter Live-Laufzeitzustand sind, kein Fehler.
 
 ---
 
@@ -34,22 +35,25 @@ Der aktuelle technische Schwerpunkt liegt auf **Precision, Datenqualität und ko
 
 ```text
 Branch: main
-Letzter Code-Commit (vor dieser Doku-Aktualisierung): 7eff392 (Merge PR #42)
+Letzter Code-Commit (vor dieser Doku-Aktualisierung): 9ec8f86 (Merge PR #44)
 Vorheriger dokumentierter Stand: 48b03d7 (Merge PR #41)
 
-48b03d7..7eff392:
+48b03d7..9ec8f86:
   PR #42 (56665e3) -- fix: 36 Fehltreffer über konsolen_bundles/
                        retro_konsolen/gpu behoben (Abschnitt 3.22)
+  PR #44 (25a063b) -- fix: 25 von 34 Nutzer-gemeldeten Fehltreffern über
+                       3 Kategorien behoben (Abschnitt 3.23)
 
-Dieser Batch (noch ohne PR-Nummer, siehe Abschnitt 3.23):
-  konsolen_bundles.yaml -- "ovp" (exclude_category_unless_also_contains,
-                            neu, Fix A) + "microsdxc"/"interne festplatte"/
-                            "travelcase"/"tragetasche" (bare, Fix D)
-  retro_konsolen.yaml   -- "kabel" (exclude_category_unless_also_contains,
-                            neu, Fix B)
-  handhelds.yaml         -- "ps vita"/"psvita"/"playstation vita"
-                            (exclude_category_unless_also_contains, neu,
-                            Fix C)
+9ec8f86..8008414:
+  PR #45 (f090ec3) -- feat: Category-False-Positive-Forensics-Tool +
+                       Fix-Queue (Abschnitt 3.24), rein additiv, keine
+                       app/rules/*.yaml-Änderung
+
+Dieser Batch (noch ohne PR-Nummer, siehe Abschnitt 3.24):
+  app/rules/konsolen_bundles.yaml -- Restauration einer bereits vor dieser
+                                      Session im Working Tree versehentlich
+                                      gelöschten Datei (git checkout HEAD,
+                                      keine inhaltliche Änderung)
 ```
 
 Zusätzlich, außerhalb der Commit-Historie (freigegebene Datenänderung, kein Code-Commit):
@@ -59,25 +63,35 @@ gelöscht (siehe Abschnitt 3.12).
 ### Teststand
 
 ```text
-Zielgerichteter Testlauf (diese Session, Claude-ausgeführt):
-pytest app/tests/ -k "konsolen_bundle or retro_konsolen or handheld or vita
-  or switch or ovp or kabel" -> 218 passed, 0 failed (20,85s)
+Batch 18 (PR #44): pytest app/tests/ -k "konsolen_bundle or retro_konsolen or handheld
+  or vita or switch or ovp or kabel" -> 218 passed, 0 failed (20,85s)
+
+Batch 19a (PR #45): pytest app/tests/test_forensics_false_positives.py -v
+  -> 24 passed, 0 failed
+  pytest app/tests/ -k "ruleset_quality or forensics" -v -> 63 passed, 0 failed
+
+Batch 19b (diese Doku-Aktualisierung): pytest app/tests/ -k "matcher or
+  category_validation or ruleset" -v -> 373 passed, 0 failed
+  (zuvor 4 failed, verursacht durch die in Abschnitt 3.24 beschriebene
+  vorbestehende Loeschung von konsolen_bundles.yaml)
 
 rule_analyzer.py:
 355 Regeln, 19 Kategorien, 0 Findings
 Ruleset-Signatur (matcher.compute_ruleset_signature()): f6216b45c6440ab5
-  -- GEÄNDERT gegenüber 59f03f5a2f2c1d7c (YAML-Änderungen in
-     konsolen_bundles.yaml/retro_konsolen.yaml/handhelds.yaml, siehe Abschnitt 3.23)
+  -- UNVERÄNDERT seit Abschnitt 3.23 (Batch 19a/19b enthalten keine
+     inhaltliche YAML-Änderung, nur eine Restauration)
 ```
 
 **Volle Suite in dieser Session NICHT ausgeführt** (CLAUDE.md Abschnitt 3.4.4: nur nach
 expliziter Nutzer-Freigabe). Vorheriger dokumentierter Vollstand: 1372/1372 (Abschnitt 3.22). 13
-neue Tests in diesem Batch (`test_retro_konsolen_kabel_kontext_fix.py`,
+neue Tests in Batch 18 (`test_retro_konsolen_kabel_kontext_fix.py`,
 `test_handhelds_ps_vita_ovp_kontext_fix.py`, `test_konsolen_bundles_zubehoer_einzelfaelle_fix.py`),
 1 bestehender Test umgekehrt (`test_bare_ovp_ohne_zusatzangabe_matcht_weiterhin` ->
 `test_bare_ovp_ohne_geraete_marker_matcht_nicht_mehr`, Begründung siehe Abschnitt 3.23), 1
-bestehender Test aktualisiert (vormals dokumentierte Restlücke jetzt geschlossen) — kein Test
-wurde ersatzlos gelöscht oder abgeschwächt. Vollverifikation (`pytest app/tests/`) steht noch aus.
+bestehender Test aktualisiert (vormals dokumentierte Restlücke jetzt geschlossen). 24 neue Tests
+in Batch 19a (`test_forensics_false_positives.py`). Batch 19b: keine neuen Tests (reine
+Restauration). Kein Test wurde in einem der Batches ersatzlos gelöscht oder abgeschwächt.
+Vollverifikation (`pytest app/tests/`) steht weiterhin aus.
 
 ---
 
@@ -1089,6 +1103,96 @@ kabel"` → 218 passed. Volle Suite in dieser Session **nicht** ausgeführt (CLA
 3.4.4, ausstehende Nutzer-Freigabe). `rule_analyzer.py`: 0 Findings. Ruleset-Signatur geändert:
 `59f03f5a2f2c1d7c` → `f6216b45c6440ab5`. Reiner YAML-Fix, kein Rebuild nötig (volume-gemountet).
 
+### 3.24 Category-False-Positive-Forensics-Tool + Fix-Queue (PR #45, `f090ec3`/`8008414`) + Korrektur: versehentlich gelöschte `konsolen_bundles.yaml` wiederhergestellt
+
+**Auftrag:** „Category False-Positive Forensics + gezielte Fix-Queue" — Kategorie- und
+Routing-Fehler systematisch identifizieren und gezielt beheben, ausgehend von
+`docs/DASHBOARD_MATCH_FORENSICS.json`, mit einer forensischen (nicht nur globalen) Sicht: FP nach
+Kategorie gruppiert, Root Cause, Fix-Queue, Regression gegen bestehende TP/FP/UNCLEAR-Fälle.
+
+**Repo-Analyse vor Implementierung (Auftragsvorgabe):** vollständige Prüfung der bestehenden
+`tools/ruleset_quality/`-Toolchain (`baseline.py`, `historical_baseline.py`, `benchmark.py`,
+`detailed_transition.py`, `category_report.py`, `cross_category_routing.py`, `label_store.py`,
+`common.py`) sowie `app/category_validation.py`/`app/rule_analyzer.py`/`app/rule_coverage.py`.
+Befund: eine bereits sehr ausgereifte Toolchain existiert (Phase 19.1–19.5, siehe Abschnitt 3.11),
+aber **kein** Baustein, der (a) ausschließlich bestätigte FP kategorienweise gruppiert, (b) eine
+belegte Root-Cause-Taxonomie mit Confidence-Stufen führt, oder (c) eine priorisierte Fix-Queue
+erzeugt. Neues Tool (`tools/ruleset_quality/forensics_false_positives.py`) baut daher additiv
+darauf auf, statt etwas zu duplizieren.
+
+**Implementierung** — wiederverwendet ausschließlich vorhandene Bausteine:
+
+```text
+benchmark._after_match_state()   objektiver Match-Zustand "nachher" (wiederverwendet, nicht neu)
+label_store.FORENSICS_SOURCE      Pfad zu docs/DASHBOARD_MATCH_FORENSICS.json
+common.evaluate()/load_current_rules()   echter Produktionspfad
+```
+
+Extrahiert die 19 bestätigten `FALSE_POSITIVE`-Fälle (nie `UNCLEAR` — die 35 `UNCLEAR`-Fälle
+werden strikt getrennt als "FP-Kandidaten" geführt, um kein neues TP/FP-Urteil aus einer
+Heuristik zu erfinden, zentrale Auftragsvorgabe). Root-Cause-Klassifikation **übersetzt** das im
+Forensik-Snapshot bereits vorhandene, aus der echten Match-Instrumentierung
+(`require_all_of_detail`, `*_excludes_checked`) abgeleitete `root_cause`/`reason`-Feld in eine
+feste Taxonomie (`missing_exclude`, `weak_signal`, `replacement_part_false_positive`,
+`accessory_false_positive`, `wrong_category`, `cross_category_collision`, `rule_collision`,
+`missing_context`, `ambiguous`, `unknown`) mit `confidence` (`confirmed`/`high`/`medium`/`low`/
+`manual_review`) und belegter `evidence`-Liste — bewertet nichts neu. Werte ohne bekannten
+Übersetzungseintrag (z. B. "sonstiges", betrifft alle 35 `UNCLEAR`-Fälle sowie 1 der 19 FP) werden
+als `ambiguous`/`manual_review` ausgewiesen, nie geraten. Cross-Category-Routing-Status A/B/C/D:
+nur `C_NO_LONGER_MATCHES` (FALSE_POSITIVE → kein Treffer) gilt als tatsächlich behoben,
+`B_CATEGORY_CHANGED` (FALSE_POSITIVE → andere Kategorie) zählt ausdrücklich **nicht** automatisch
+als Fix (Auftrags-Regressionsgate). Fix-Queue priorisiert P0–P3 nach Anzahl weiterhin aktiver
+Fälle, Root-Cause-Confidence und Cross-Category-Blast-Radius, ist ein kanonisches Artefakt
+(immer aus dem vollständigen ungefilterten FP-Datensatz gebaut, unabhängig von `--category`/
+`--only-fp`) und **ändert nie selbst `app/rules/*.yaml`**.
+
+**Ergebnis (Lauf gegen den echten Datensatz):** 19 bestätigte FP, Konsistenz mit dem bekannten
+Referenzstand (TP 2252/FP 19/UNCLEAR 35, siehe Abschnitt 3.11) bestätigt. **17 von 19 bereits
+durch spätere Batches (3.19–3.23) verschwunden** (`KEIN_TREFFER`), **2 weiterhin aktiv:**
+
+- `iphone`, P0, `replacement_part_false_positive` (confirmed): "Apple iPhone 15 Pro Max 512GB
+  Mainboard Platine …" matcht weiterhin `iPhone 15 Pro Max (≥512GB) 👍 Guter Preis` — empfohlener
+  Fix: `add_replacement_part_guard`, Regression-Risiko LOW.
+- `retro_konsolen`, P1, `weak_signal` (confirmed): ein Nintendo-DS-Lite-Fall, Signal "system"
+  ohne stärkeres Alternativwort — empfohlener Fix: `strengthen_positive_signal`, Regression-Risiko
+  HIGH (Auftrags-Vorgabe: `--only-fp`/Priorisierung berücksichtigt Regression-Risiko, keine
+  automatische YAML-Änderung).
+
+Vollständige Fix-Queue: `tools/ruleset_quality/generated/false_positive_fix_queue.{json,md}`.
+**Kein YAML-Fix in diesem Batch umgesetzt** (Auftragsvorgabe: erst Forensik/Fix-Queue
+reproduzierbar implementieren, YAML-Änderung erfordert eigene Freigabe).
+
+24 neue Tests (`app/tests/test_forensics_false_positives.py`) decken u. a. ab: FP/Kandidaten-
+Trennung, Routing-Status A/B/C/D, `FALSE_POSITIVE → andere Kategorie` zählt nicht als Fix,
+Root-Cause-Übersetzung erfindet nichts, fehlende Forensik-Felder → `NOT_AVAILABLE` statt Exception,
+Mehrfachkategorie-Gruppierung. Zielgerichtete Suite `pytest app/tests/ -k "ruleset_quality or
+forensics"` → 63 passed, 0 failed, keine Seiteneffekte auf die bestehende Toolchain. Rein additiv
+unter `tools/ruleset_quality/` + `tools/ruleset_quality/generated/` — keine `app/rules/*.yaml`-,
+`matcher.py`- oder `data/*`-Änderung.
+
+**Korrektur (Batch 19b, diese Doku-Aktualisierung, noch ohne PR-Nummer):** bei der anschließenden
+gestuften Testverifikation (`pytest app/tests/ -k "matcher or category_validation or ruleset"`)
+fielen 4 zuvor unauffällige Tests aus (u. a. `test_matcher_handheld_false_positives.py` — "Nintendo
+Switch Lite" matcht nicht mehr). Untersuchung ergab: `app/rules/konsolen_bundles.yaml` war bereits
+**vor** dieser Session im Working Tree gelöscht — unbestätigt, kein Commit, keine dokumentierte
+Migration (verifiziert per `grep`: kein `konsolen_bundles`-Inhalt in einer anderen YAML
+aufgegangen; `konsolen_bundles` ist weiterhin eine aktive, produktive Kategorie, 28-fach in
+`STATUS.md` referenziert). Ausgeschlossen als Ursache: der aktiv laufende Produktions-Scanner
+(`python app.py`, verifiziert per `ps`, seit 05:41 Uhr durchgehend aktiv) liest `app/rules/*.yaml`
+nur lesend. Datei wiederhergestellt via `git checkout HEAD -- app/rules/konsolen_bundles.yaml`
+(reine Restauration bereits committeten Inhalts, keine inhaltliche Änderung, Ruleset-Signatur
+unverändert). Verifiziert: `pytest app/tests/ -k "matcher or category_validation or ruleset"` →
+373 passed, 0 failed (zuvor 4 failed).
+
+**Bewusst nicht angefasst:** zeitgleich sichtbare, große Diffs in `data/found.json`/
+`price_history.jsonl`/`time_to_sell.jsonl` (sowie neue, untracked `data/seen.json`/
+`gpu_watch.log`) sind **kein Fehler**, sondern Live-Laufzeitzustand des aktiv laufenden
+Produktions-Scanners — ein Zurücksetzen hätte reale, über Stunden gesammelte Scan-Ergebnisse
+gelöscht und mit dem parallel schreibenden Prozess kollidieren können. Ebenfalls bewusst nicht
+angefasst: mehrere gelöschte, durch neuere Zeitstempel-Versionen ersetzte Diagnose-Reports unter
+`tools/ruleset_quality/generated/` (reine Diagnoseartefakte, keine Produktionsauswirkung) — auf
+Nutzerentscheidung als beabsichtigtes Aufräumen aus einer früheren Session belassen.
+
 ---
 
 ## 4. Datenqualität
@@ -1125,6 +1229,7 @@ Der anschließende PR-#6-Audit adressiert bereits mehrere konkrete False Positiv
 - Quoka-Preis-Parsing-Defekt: **an der Wurzel gelöst** (Abschnitt 3.21) — fehlendes Leerzeichen-Tausendertrennzeichen-Format in `_price_to_float()`, live gegen quoka.de identifiziert. `price<=0`-Guard aus Abschnitt 3.19 bleibt zusätzlich als generisches Sicherheitsnetz bestehen
 - Nutzer-Fehltreffer-Analyse (Abschnitt 3.23): **25 von 34 bestätigten Fehltreffern erledigt** über `konsolen_bundles`-Switch-„ovp", `retro_konsolen`-„kabel", `handhelds`-PS-Vita-„ovp" (Fix A–C) sowie 3 Zubehör-Einzelfälle (Fix D). 9 Restlücken aus Analyse Teil 2 („zweifelhafte Treffer") bewusst offen — lexikalisch nicht von den behobenen Fehltreffern unterscheidbar
 - 1€-Preisanomalie (Abschnitt 3.23, Fix E): **bewusst nicht gefixt** — Korpus-Analyse (34 Treffer ≤3€ in `found.json`, 266 in `price_history.jsonl`) zeigte mindestens drei unabhängige Ursachen (legitime Billig-Kategorie/Lego, Tausch-/Barter-Platzhalter-Preise, ungeklärter Einzelfall) statt eines isolierten Root Cause wie beim Quoka-0€-Fund — keine Datenbasis für eine neue Preisschwelle. Mögliche Folgeaufgabe: Tausch-/Barter-Anzeigen-Erkennung als eigener Schritt (betrifft Notification-Gate/Price-History, nicht implizit mitentschieden)
+- Category-False-Positive-Forensics-Tool (Abschnitt 3.24): **2 der 19 bekannten historischen FP weiterhin aktiv** — `iphone` (P0, `replacement_part_false_positive`, "Mainboard Platine" matcht weiterhin `iPhone 15 Pro Max (≥512GB)`) und `retro_konsolen` (P1, `weak_signal`). Konkrete, evidenzbasierte Fix-Vorschläge liegen vor (`tools/ruleset_quality/generated/false_positive_fix_queue.md`), **noch nicht umgesetzt** — YAML-Änderung erfordert eigene Freigabe (CLAUDE.md Abschnitt 2.3/2.4)
 
 ---
 
@@ -1231,6 +1336,15 @@ Folgende Punkte sind **nicht** durch die Konsolidierung als abgeschlossen zu bet
     Zubehör-Angebote ohne Gerät zutreffen — additiv über `exclude_category_unless_also_contains`
     mit den jeweils stärkeren, echten Gerätemarkern gelöst, kein Architektur-Redesign nötig.
     Reiner YAML-Fix, kein Rebuild nötig.
+19. Category-False-Positive-Forensics-Tool (Abschnitt 3.24): **Tool erledigt** (read-only,
+    reproduzierbar, 24 Tests grün), aber die daraus abgeleitete Fix-Queue ist **nicht**
+    automatisch umgesetzt — 2 weiterhin aktive historische FP (`iphone` P0, `retro_konsolen` P1)
+    warten auf eine separate YAML-Fix-Freigabe. Nicht mit dem Tool selbst verwechseln: das Tool
+    ist fertig, der daraus resultierende Fix ist es nicht.
+20. Versehentliche Löschung von `app/rules/konsolen_bundles.yaml` (Abschnitt 3.24, Batch 19b):
+    **erledigt** — reine Restauration, keine inhaltliche Änderung. Ursache der Löschung selbst
+    bleibt ungeklärt (kein Commit, keine Migration, kein verantwortlicher laufender Prozess
+    identifiziert) — falls sich das Muster wiederholt, genauer untersuchen.
 
 ---
 
@@ -1296,5 +1410,9 @@ ABSCHLUSSBERICHT.md`, `FINALE_REVALIDIERUNG_ABSCHLUSSBERICHT.md`,
 `ENTSCHEIDUNGEN_TECHNISCHE_VORBEREITUNG_BERICHT.md`, `WORKSHEET_LABELING_BERICHT_2026-08-14.md`,
 `HUMAN_VERIFIED_LABELING_ABSCHLUSSBERICHT_2026-08-14.md`,
 `PREISHISTORIE_REVALIDIERUNG_V3_BERICHT_2026-08-14.md` (Abschnitt 3.12).
+
+Zusätzlich, für das Category-False-Positive-Forensics-Tool (Abschnitt 3.24):
+`tools/ruleset_quality/generated/reports/forensics_false_positives_report.{json,md}`,
+`tools/ruleset_quality/generated/false_positive_fix_queue.{json,md}`.
 
 Diese Dokumente liefern historische Details. Für den **aktuellen technischen Code-Stand** ist der Code-Commit `00a4053` maßgeblich; für die technische Projektreferenz ist diese Datei maßgeblich. Zusätzlich: `docs/SCAN_PERFORMANCE_MESSUNG_2026-08-15.md` (Abschnitt 3.16–3.17).
