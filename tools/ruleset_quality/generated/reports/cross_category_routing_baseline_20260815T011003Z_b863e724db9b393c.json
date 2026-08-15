@@ -1,0 +1,353 @@
+{
+  "meta": {
+    "anzahl_untersuchter_listings": 2500,
+    "anzahl_kategorien_getestet": 19,
+    "listings_mit_mehreren_moeglichen_kategorien": 22
+  },
+  "konflikt_uebersicht": [
+    {
+      "gewinner_kategorie": "gaming_pc",
+      "ueberschattete_kategorie": "office_pc",
+      "anzahl": 20,
+      "beispiele": [
+        {
+          "title": "PC | Ryzen 5 3400G | 16GB DDR4 | GTX 1660 6GB GDDR5 | 512GB SSD|",
+          "price": 300.0,
+          "shadowed_rule": "Office-PC (Mindestanforderung erfüllt)"
+        },
+        {
+          "title": "PC | Ryzen 5 3400G | 16GB DDR4 | GTX 1660 6GB GDDR5",
+          "price": 300.0,
+          "shadowed_rule": "Office-PC (Mindestanforderung erfüllt)"
+        },
+        {
+          "title": "Gaming PC AMD Ryzen 5 5500, RX 6500 xt. 8gb DDR4. SSD 250GB.",
+          "price": 300.0,
+          "shadowed_rule": "Office-PC (Mindestanforderung erfüllt)"
+        },
+        {
+          "title": "HP Prodesk 600 G4 MT (i7-8700, GTX 1650, 16GB DDR4)",
+          "price": 190.0,
+          "shadowed_rule": "Office-PC (Mindestanforderung erfüllt)"
+        },
+        {
+          "title": "Gaming PC mit GTX 1070, Ryzen 5 3400G, 16GB DDR4 RAM und NVME",
+          "price": 295.0,
+          "shadowed_rule": "Office-PC (Mindestanforderung erfüllt)"
+        }
+      ]
+    },
+    {
+      "gewinner_kategorie": "controller",
+      "ueberschattete_kategorie": "handhelds",
+      "anzahl": 1,
+      "beispiele": [
+        {
+          "title": "Steam Deck Oled gegen ps5 Standard Edition ohne controller",
+          "price": 1.0,
+          "shadowed_rule": "Valve Steam Deck ★ Top-Deal"
+        }
+      ]
+    },
+    {
+      "gewinner_kategorie": "m2_ssd",
+      "ueberschattete_kategorie": "sata_ssd",
+      "anzahl": 1,
+      "beispiele": [
+        {
+          "title": "MSI Gaming M.2 SSD 1 TB mit Intel SSD Inside Sticker",
+          "price": 30.0,
+          "shadowed_rule": "~1TB SATA SSD ★ Top-Deal"
+        }
+      ]
+    }
+  ],
+  "listings_mit_mehreren_moeglichen_kategorien": [
+    {
+      "url": "https://www.kleinanzeigen.de/s-anzeige/pc-ryzen-5-3400g-16gb-ddr4-gtx-1660-6gb-gddr5-512gb-ssd-/3484814544-228-2007",
+      "title": "PC | Ryzen 5 3400G | 16GB DDR4 | GTX 1660 6GB GDDR5 | 512GB SSD|",
+      "price": 300.0,
+      "winner_category": "gaming_pc",
+      "winner_rule": "Gaming-PC (Top-Deal, bevorzugte GPU)",
+      "also_matching_categories": [
+        {
+          "category": "office_pc",
+          "rule_label": "Office-PC (Mindestanforderung erfüllt)"
+        }
+      ]
+    },
+    {
+      "url": "https://www.kleinanzeigen.de/s-anzeige/pc-ryzen-5-3400g-16gb-ddr4-gtx-1660-6gb-gddr5/3484814544-228-2007",
+      "title": "PC | Ryzen 5 3400G | 16GB DDR4 | GTX 1660 6GB GDDR5",
+      "price": 300.0,
+      "winner_category": "gaming_pc",
+      "winner_rule": "Gaming-PC (Top-Deal, bevorzugte GPU)",
+      "also_matching_categories": [
+        {
+          "category": "office_pc",
+          "rule_label": "Office-PC (Mindestanforderung erfüllt)"
+        }
+      ]
+    },
+    {
+      "url": "https://www.kleinanzeigen.de/s-anzeige/gaming-pc-amd-ryzen-5-5500-rx-6500-xt-8gb-ddr4-ssd-250gb-/3484355733-228-1699",
+      "title": "Gaming PC AMD Ryzen 5 5500, RX 6500 xt. 8gb DDR4. SSD 250GB.",
+      "price": 300.0,
+      "winner_category": "gaming_pc",
+      "winner_rule": "Gaming-PC (Mindestanforderung erfüllt)",
+      "also_matching_categories": [
+        {
+          "category": "office_pc",
+          "rule_label": "Office-PC (Mindestanforderung erfüllt)"
+        }
+      ]
+    },
+    {
+      "url": "https://www.kleinanzeigen.de/s-anzeige/hp-prodesk-600-g4-mt-i7-8700-gtx-1650-16gb-ddr4-/3484350531-228-7854",
+      "title": "HP Prodesk 600 G4 MT (i7-8700, GTX 1650, 16GB DDR4)",
+      "price": 190.0,
+      "winner_category": "gaming_pc",
+      "winner_rule": "Gaming-PC (Mindestanforderung erfüllt)",
+      "also_matching_categories": [
+        {
+          "category": "office_pc",
+          "rule_label": "Office-PC (Mindestanforderung erfüllt)"
+        }
+      ]
+    },
+    {
+      "url": "https://www.kleinanzeigen.de/s-anzeige/gaming-pc-mit-gtx-1070-ryzen-5-3400g-16gb-ddr4-ram-und-nvme/3484335997-228-7622",
+      "title": "Gaming PC mit GTX 1070, Ryzen 5 3400G, 16GB DDR4 RAM und NVME",
+      "price": 295.0,
+      "winner_category": "gaming_pc",
+      "winner_rule": "Gaming-PC (Top-Deal, bevorzugte GPU)",
+      "also_matching_categories": [
+        {
+          "category": "office_pc",
+          "rule_label": "Office-PC (Mindestanforderung erfüllt)"
+        }
+      ]
+    },
+    {
+      "url": "https://www.kleinanzeigen.de/s-anzeige/gaming-pc-amd-ryzen-5-2600-gtx-1060-16gb-ram-ssd/3484317703-228-1934",
+      "title": "Gaming pc amd ryzen 5 2600 /gtx 1060 /16gb RAM /ssd",
+      "price": 170.0,
+      "winner_category": "gaming_pc",
+      "winner_rule": "Gaming-PC (Top-Deal, bevorzugte GPU)",
+      "also_matching_categories": [
+        {
+          "category": "office_pc",
+          "rule_label": "Office-PC (Mindestanforderung erfüllt)"
+        }
+      ]
+    },
+    {
+      "url": "https://www.kleinanzeigen.de/s-anzeige/pc-gtx-980-amd-ryzen-5-5600-16gb-ddr4/3484264203-228-1032",
+      "title": "PC: GTX 980, AMD Ryzen 5 5600 16GB DDR4",
+      "price": 320.0,
+      "winner_category": "gaming_pc",
+      "winner_rule": "Gaming-PC (Mindestanforderung erfüllt)",
+      "also_matching_categories": [
+        {
+          "category": "office_pc",
+          "rule_label": "Office-PC (Mindestanforderung erfüllt)"
+        }
+      ]
+    },
+    {
+      "url": "https://www.kleinanzeigen.de/s-anzeige/tausche-gaming-core-i5-9400f-16gb-ddr4-750gb-gtx-1070-8gb-win-11/3484095258-228-6862",
+      "title": "Tausche/Gaming:Core i5 9400F 16Gb DDR4 750Gb GTX 1070 8Gb Win 11",
+      "price": 250.0,
+      "winner_category": "gaming_pc",
+      "winner_rule": "Gaming-PC (Top-Deal, bevorzugte GPU)",
+      "also_matching_categories": [
+        {
+          "category": "office_pc",
+          "rule_label": "Office-PC (Mindestanforderung erfüllt)"
+        }
+      ]
+    },
+    {
+      "url": "https://www.ebay.de/itm/287523760936",
+      "title": "FUJITSU P758 BUDGET GAMING PC i5 9400F 16GB DDR4 256GB SSD + 500GB HDD GTX1050",
+      "price": 199.99,
+      "winner_category": "gaming_pc",
+      "winner_rule": "Gaming-PC (Mindestanforderung erfüllt)",
+      "also_matching_categories": [
+        {
+          "category": "office_pc",
+          "rule_label": "Office-PC (Mindestanforderung erfüllt)"
+        }
+      ]
+    },
+    {
+      "url": "https://www.kleinanzeigen.de/s-anzeige/pc-i5-8400-gtx-1660-6gb-16gb-ram-1tb-ssd-1tb-hdd/3484050406-228-4506",
+      "title": "PC i5-8400 | GTX 1660 6GB | 16GB RAM | 1TB SSD + 1TB HDD",
+      "price": 300.0,
+      "winner_category": "gaming_pc",
+      "winner_rule": "Gaming-PC (Top-Deal, bevorzugte GPU)",
+      "also_matching_categories": [
+        {
+          "category": "office_pc",
+          "rule_label": "Office-PC (Mindestanforderung erfüllt)"
+        }
+      ]
+    },
+    {
+      "url": "https://www.kleinanzeigen.de/s-anzeige/pc-i7-11700f-gtx-1060-6gb-16gb-ddr4-3000mhz-256gb-nvme-m-2-ssd/3483935760-228-1907",
+      "title": "pc i7 11700f GTX 1060 6GB 16GB DDR4 3000mhz 256GB Nvme M.2 SSD",
+      "price": 270.0,
+      "winner_category": "gaming_pc",
+      "winner_rule": "Gaming-PC (Top-Deal, bevorzugte GPU)",
+      "also_matching_categories": [
+        {
+          "category": "office_pc",
+          "rule_label": "Office-PC (Mindestanforderung erfüllt)"
+        }
+      ]
+    },
+    {
+      "url": "https://www.kleinanzeigen.de/s-anzeige/acer-nitro-5-15-6-amd-ryzen-5-4600h-nvidia-gtx-1650-8-gb-ram-512-gb-m-2-ssd-akku-96-/3483927475-278-1007",
+      "title": "Acer Nitro 5 | 15,6\"  | AMD Ryzen 5 4600H | NVIDIA GTX 1650 | 8 GB RAM | 512 GB M.2 SSD | Akku 96 %",
+      "price": 329.0,
+      "winner_category": "gaming_pc",
+      "winner_rule": "Gaming-PC (Mindestanforderung erfüllt)",
+      "also_matching_categories": [
+        {
+          "category": "office_pc",
+          "rule_label": "Office-PC (Mindestanforderung erfüllt)"
+        }
+      ]
+    },
+    {
+      "url": "https://www.kleinanzeigen.de/s-anzeige/asus-rog-strix-g531gv-core-i5-9300h-32gb-ram-rtx-2060/3483864349-278-3445",
+      "title": "Asus ROG Strix G531GV Core i5-9300H, 32Gb RAM, RTX 2060",
+      "price": 260.0,
+      "winner_category": "gaming_pc",
+      "winner_rule": "Gaming-PC (Top-Deal, bevorzugte GPU)",
+      "also_matching_categories": [
+        {
+          "category": "office_pc",
+          "rule_label": "Office-PC (Mindestanforderung erfüllt)"
+        }
+      ]
+    },
+    {
+      "url": "https://www.kleinanzeigen.de/s-anzeige/steam-deck-oled-gegen-ps5-standard-edition-ohne-controller/3483877013-279-29314",
+      "title": "Steam Deck Oled gegen ps5 Standard Edition ohne controller",
+      "price": 1.0,
+      "winner_category": "controller",
+      "winner_rule": "PS5 DualSense Controller ★ Top-Deal",
+      "also_matching_categories": [
+        {
+          "category": "handhelds",
+          "rule_label": "Valve Steam Deck ★ Top-Deal"
+        }
+      ]
+    },
+    {
+      "url": "https://www.kleinanzeigen.de/s-anzeige/gaming-pc-i5-13600kf-rx-7900-xt-nitro-32gb-ram-1-6tb-ssd/3483811533-228-8527",
+      "title": "Gaming PC i5-13600KF, RX 7900 XT Nitro, 32GB RAM, 1.6TB SSD",
+      "price": 1.0,
+      "winner_category": "gaming_pc",
+      "winner_rule": "Gaming-PC (Mindestanforderung erfüllt)",
+      "also_matching_categories": [
+        {
+          "category": "office_pc",
+          "rule_label": "Office-PC (Mindestanforderung erfüllt)"
+        }
+      ]
+    },
+    {
+      "url": "https://www.kleinanzeigen.de/s-anzeige/msi-gaming-m-2-ssd-1-tb-mit-intel-ssd-inside-sticker/3483595889-225-418",
+      "title": "MSI Gaming M.2 SSD 1 TB mit Intel SSD Inside Sticker",
+      "price": 30.0,
+      "winner_category": "m2_ssd",
+      "winner_rule": "1TB M.2 NVMe SSD ★ Top-Deal",
+      "also_matching_categories": [
+        {
+          "category": "sata_ssd",
+          "rule_label": "~1TB SATA SSD ★ Top-Deal"
+        }
+      ]
+    },
+    {
+      "url": "https://www.kleinanzeigen.de/s-anzeige/gtx1070-gaming-pc-ryzen-5-2400g-16gb-ddr4-ram/3483433723-228-9134",
+      "title": "GTX1070 Gaming PC - Ryzen 5 2400G, 16GB Ddr4 Ram",
+      "price": 265.0,
+      "winner_category": "gaming_pc",
+      "winner_rule": "Gaming-PC (Top-Deal, bevorzugte GPU)",
+      "also_matching_categories": [
+        {
+          "category": "office_pc",
+          "rule_label": "Office-PC (Mindestanforderung erfüllt)"
+        }
+      ]
+    },
+    {
+      "url": "https://www.kleinanzeigen.de/s-anzeige/pc-intel-i5-8600k-16gb-ram-1tb-festplatte-nvidia-geforce-gtx-1060/3483395726-228-16913",
+      "title": "PC Intel i5-8600k 16GB Ram 1TB Festplatte Nvidia GeForce GTX 1060",
+      "price": 220.0,
+      "winner_category": "gaming_pc",
+      "winner_rule": "Gaming-PC (Top-Deal, bevorzugte GPU)",
+      "also_matching_categories": [
+        {
+          "category": "office_pc",
+          "rule_label": "Office-PC (Mindestanforderung erfüllt)"
+        }
+      ]
+    },
+    {
+      "url": "https://www.kleinanzeigen.de/s-anzeige/gaming-pc-ryzen-7-5700x-rtx-4060-8gb-16gb-ram-1tb-ssd/3483336929-228-8700",
+      "title": "Gaming PC – Ryzen 7 5700X | RTX 4060 8GB | 16GB RAM | 1TB SSD",
+      "price": 1.0,
+      "winner_category": "gaming_pc",
+      "winner_rule": "Gaming-PC (Mindestanforderung erfüllt)",
+      "also_matching_categories": [
+        {
+          "category": "office_pc",
+          "rule_label": "Office-PC (Mindestanforderung erfüllt)"
+        }
+      ]
+    },
+    {
+      "url": "https://www.kleinanzeigen.de/s-anzeige/gaming-pc-ryzen-5-2600-16gb-ddr4-256gb-ssd-gtx-1070-8gb/3483318233-228-18843",
+      "title": "Gaming PC Ryzen 5 2600 | 16GB DDR4 | 256GB SSD | GTX 1070 8GB",
+      "price": 300.0,
+      "winner_category": "gaming_pc",
+      "winner_rule": "Gaming-PC (Top-Deal, bevorzugte GPU)",
+      "also_matching_categories": [
+        {
+          "category": "office_pc",
+          "rule_label": "Office-PC (Mindestanforderung erfüllt)"
+        }
+      ]
+    },
+    {
+      "url": "https://www.kleinanzeigen.de/s-anzeige/gaming-pc-set-ryzen-5-3400g-16gb-ddr4-400gb-ssd-gtx-1650-win-11/3483225437-228-1106",
+      "title": "Gaming PC Set- Ryzen 5 3400G/16GB DDR4/400GB SSD/GTX 1650/ Win 11",
+      "price": 240.0,
+      "winner_category": "gaming_pc",
+      "winner_rule": "Gaming-PC (Mindestanforderung erfüllt)",
+      "also_matching_categories": [
+        {
+          "category": "office_pc",
+          "rule_label": "Office-PC (Mindestanforderung erfüllt)"
+        }
+      ]
+    },
+    {
+      "url": "https://www.kleinanzeigen.de/s-anzeige/gaming-pc-ryzen-5-3400g-16gb-ddr4-400gb-ssd-gtx-1650/3483227576-228-1106",
+      "title": "Gaming PC- Ryzen 5 3400G/16GB DDR4/400GB SSD/ GTX 1650",
+      "price": 200.0,
+      "winner_category": "gaming_pc",
+      "winner_rule": "Gaming-PC (Mindestanforderung erfüllt)",
+      "also_matching_categories": [
+        {
+          "category": "office_pc",
+          "rule_label": "Office-PC (Mindestanforderung erfüllt)"
+        }
+      ]
+    }
+  ]
+}
