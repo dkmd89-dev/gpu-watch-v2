@@ -200,6 +200,25 @@ exclude_category_unless_also_contains:
     - "controller"
     - "konsole"
     - "ersatzkonsole"
+  # FIX (Nutzer-Meldung 2026-08-15, Live-Fehltreffer-Report): identisches
+  # Problem wie "memory card" oben -- "netzteil" ist als Gruppe-2-Geräte-
+  # Signal bewusst erhalten (rettet reale Bundles wie "Nintendo N64
+  # Control Deck 2 Original Controller Netzteil Erweiterungskarte", die
+  # sonst über kein anderes Gruppe-2-Wort verfügen), reicht aber bislang
+  # auch für Standalone-Netzteil-/Ladegerät-Angebote OHNE jedes Gerät aus
+  # (real bestätigt: "⚡ PS2 Netzteil Original Playstation 2 Slim 8,5V
+  # Stromkabel Netzkabel Getestet⚡" 17,95€ Top-Deal, "Nintendo 64
+  # Netzteil" 30€ Top-Deal, beide live sichtbar). Systematischer
+  # Blast-Radius-Check: von 24 Titeln, die AUSSCHLIESSLICH über
+  # "netzteil" matchen (kein anderes Gruppe-2-Wort), hat genau 1
+  # (der Control-Deck-Fall oben) "controller" im Titel -- alle anderen 23
+  # sind eindeutige Standalone-Netzteil-/Ladegerät-/Adapter-Angebote.
+  # Identischer Mechanismus wie "memory card": blockiert "netzteil" nur,
+  # wenn im GESAMTEN Titel kein Geräte-Kontextbegriff vorkommt.
+  "netzteil":
+    - "controller"
+    - "konsole"
+    - "ersatzkonsole"
 
 # Scoring: kein Hardware-Detector anwendbar (analog sata_ssd.yaml) --
 # Preis ist das mit Abstand aussagekraeftigste Signal. Ausstattung/

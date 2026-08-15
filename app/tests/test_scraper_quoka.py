@@ -27,6 +27,28 @@ def test_price_to_float_mit_tausenderpunkt():
     assert _price_to_float("1.250 EUR") == 1250.0
 
 
+def test_price_to_float_mit_tausenderpunkt_mehrstellig():
+    # Live gegen quoka.de verifiziert (Fahrzeuganzeigen, Rabatt-Preisfeld):
+    # dieselbe Punkt-als-Tausendertrenner-Konvention gilt auch bei mehr als
+    # einer Dreiergruppe.
+    assert _price_to_float("850.000 EUR") == 850000.0
+
+
+def test_price_to_float_mit_leerzeichen_tausendertrenner():
+    # FIX (Nutzer-Meldung 2026-08-15, GPU-Preis-0€-Diagnose): Root Cause der
+    # 0€-Fehltreffer. Quokas Normalpreisfeld (span.article-price, OHNE
+    # verschachteltes .new-price) nutzt ab 1000 ein Leerzeichen als
+    # Tausendertrenner -- live gegen quoka.de verifiziert ("RTX 4060"-Suche
+    # liefert u.a. "1 000 EUR" exakt in diesem Format). Ohne diesen Fix
+    # erkennt die Regex nur die letzten <=3 Ziffern nach dem letzten
+    # Leerzeichen: "1 000 EUR" -> "000" -> 0.0 (!), "1 050 EUR" -> "050"
+    # -> 50.0 statt 1050.0.
+    assert _price_to_float("1 000 EUR") == 1000.0
+    assert _price_to_float("1 050 EUR") == 1050.0
+    assert _price_to_float("2 000 EUR") == 2000.0
+    assert _price_to_float("10 000 EUR") == 10000.0
+
+
 def test_price_to_float_dezimalpunkt_wird_nicht_als_tausenderpunkt_missverstanden():
     # Realer Fall aus der Fixture (Rabatt-Preisfeld ".new-price"): "529.0 EUR"
     # bedeutet 529 Euro, NICHT 5290 -- der Punkt hat hier nur eine
