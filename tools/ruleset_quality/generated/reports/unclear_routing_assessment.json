@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "generated_at": "2026-08-15T22:15:11.929740+00:00",
+    "generated_at": "2026-08-15T23:08:22.128064+00:00",
     "ruleset_signature": "4f53cda18c2baa0c",
-    "source_ground_truth": "/tmp/pytest-of-robin/pytest-47/test_write_outputs_schreibt_nu1/forensics.json"
+    "source_ground_truth": "/tmp/pytest-of-robin/pytest-49/test_write_outputs_schreibt_nu1/forensics.json"
   },
   "summary": {
     "total_unclear": 1,
