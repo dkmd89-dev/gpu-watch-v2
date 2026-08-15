@@ -35,6 +35,18 @@ exclude_category:
   - "spielesammlung"
   - "spiele sammlung"
   - "modul"
+  # FIX (Nutzer-Meldung 2026-08-15): "module" (Plural) fehlte -- bare
+  # "modul" (Singular, siehe oben) greift wegen fehlender Wortgrenze nicht
+  # bei "Module" (identisches Kompositum-/Flexionsmuster wie "aufsatz"/
+  # "lötaufsatz" andernorts). Bewusst NICHT "spiele" (Plural von "spiel")
+  # ergaenzt: Blast-Radius-Check gegen found.json zeigt 5 echte Konsole-
+  # +Spiele-Bundles ("Nintendo 3DS XL ... mit Spielen", "... SPIELE
+  # ZUSÄTZLICH"), die dadurch faelschlich ausgeschlossen wuerden -- "modul"/
+  # "module" hat dieses Kollisionsrisiko nicht (0 Treffer unter den echten
+  # Bundle-Titeln), da ein Modul-/Cartridge-Konvolut (z.B. "Nintendo DS und
+  # 3DS Spiele (AUSWAHL) Module - Sammlung Konvolut - 2DS DSi XL") anders
+  # als "mit Spielen" kein Geraet beschreibt.
+  - "module"
   - "cartridge"
   # Phase 14 (Data-Quality-Fix): bisher fehlende Zubehoer-/Ersatzteil-
   # Begriffe. Grund: Steam Deck / ROG Ally / Lenovo Legion Go sind -- anders

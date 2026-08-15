@@ -52,6 +52,16 @@ exclude_category:
   - "kabel"
   - "ladegerät"
   - "anleitung"
+  # FIX (Nutzer-Meldung 2026-08-15): "mainboard"/"motherboard" (bare) --
+  # identisches, bereits in office_pc.yaml/gaming_pc.yaml/notebook_resell.
+  # yaml etabliertes Muster ("ein blosses Mainboard-Ersatzteil ist kein
+  # komplettes System"). Real bestaetigt: "Sony Playstation 4 Pro & PS4
+  # Mainboard Pin Buchse / Stecker abgerissen Reparatur" (39€, Top-Deal) --
+  # ein defektes Ersatzteil, keine funktionsfaehige Konsole. Blast Radius:
+  # 1 Treffer in found.json, 0 Kollisionen (kein echter Bundle-Titel
+  # nennt "mainboard"/"motherboard").
+  - "mainboard"
+  - "motherboard"
 
   # Phase 15 (kontrollierter Review, "Service/Modding-Fix"): Reparatur-/
   # Modding-DIENSTLEISTUNGS-Angebote statt Konsolenverkauf. Bewusst als
@@ -119,6 +129,14 @@ exclude_category:
   - "racing wheel"
   - "zubehör-set"
   - "zubehörset"
+  # FIX (Nutzer-Meldung 2026-08-15): "zubehör set" (zwei Woerter, mit
+  # Leerzeichen) fehlte -- weder "zubehör-set" (Bindestrich) noch
+  # "zubehörset" (zusammengeschrieben) greifen bei getrennter Schreibung
+  # ("12-in-1 Sport Zubehör Set für Nintendo Switch / OLED"), da
+  # _contains_term() jede Variante als eigene Phrase prueft. Blast Radius:
+  # 2 Treffer in found.json, beide echte Standalone-Zubehoer-Sets ohne
+  # Konsole.
+  - "zubehör set"
   # Nachtrag (kontrollierter Review, found.json-Realdatenabgleich gegen
   # den bereits als Gruppe-2-Zielkategorie dokumentierten Kommentar
   # "Controller/Headset/Lenkrad/Modchip/Schutzhülle" oben): die

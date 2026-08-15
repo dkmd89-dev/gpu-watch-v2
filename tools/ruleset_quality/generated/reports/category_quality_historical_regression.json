@@ -18,8 +18,8 @@
     "iphone": {
       "kategorie": "iphone",
       "getestete_eintraege": 479,
-      "tp_stabil": 458,
-      "tp_kritisch_kein_treffer": 0,
+      "tp_stabil": 457,
+      "tp_kritisch_kein_treffer": 1,
       "tp_anderer_matchpfad": 20,
       "fp_gefixt": 0,
       "fp_weiterhin_aktiv": 1,
@@ -27,8 +27,8 @@
       "unclear_weiterhin": 0,
       "kategoriewechsel": 0,
       "gewonnene_true_positive": 0,
-      "verlorene_true_positive": 0,
-      "regressionen_gesamt": 0
+      "verlorene_true_positive": 1,
+      "regressionen_gesamt": 1
     },
     "konsolen_bundles": {
       "kategorie": "konsolen_bundles",
@@ -38,8 +38,8 @@
       "tp_anderer_matchpfad": 0,
       "fp_gefixt": 3,
       "fp_weiterhin_aktiv": 3,
-      "unclear_kein_treffer": 13,
-      "unclear_weiterhin": 21,
+      "unclear_kein_treffer": 15,
+      "unclear_weiterhin": 19,
       "kategoriewechsel": 0,
       "gewonnene_true_positive": 3,
       "verlorene_true_positive": 3,
@@ -108,8 +108,8 @@
     "controller": {
       "kategorie": "controller",
       "getestete_eintraege": 122,
-      "tp_stabil": 117,
-      "tp_kritisch_kein_treffer": 5,
+      "tp_stabil": 116,
+      "tp_kritisch_kein_treffer": 6,
       "tp_anderer_matchpfad": 0,
       "fp_gefixt": 0,
       "fp_weiterhin_aktiv": 0,
@@ -117,8 +117,8 @@
       "unclear_weiterhin": 0,
       "kategoriewechsel": 0,
       "gewonnene_true_positive": 0,
-      "verlorene_true_positive": 5,
-      "regressionen_gesamt": 5
+      "verlorene_true_positive": 6,
+      "regressionen_gesamt": 6
     },
     "sata_ssd": {
       "kategorie": "sata_ssd",
@@ -138,8 +138,8 @@
     "vintage_elektronik": {
       "kategorie": "vintage_elektronik",
       "getestete_eintraege": 110,
-      "tp_stabil": 108,
-      "tp_kritisch_kein_treffer": 2,
+      "tp_stabil": 109,
+      "tp_kritisch_kein_treffer": 1,
       "tp_anderer_matchpfad": 0,
       "fp_gefixt": 0,
       "fp_weiterhin_aktiv": 0,
@@ -147,8 +147,8 @@
       "unclear_weiterhin": 0,
       "kategoriewechsel": 0,
       "gewonnene_true_positive": 0,
-      "verlorene_true_positive": 2,
-      "regressionen_gesamt": 2
+      "verlorene_true_positive": 1,
+      "regressionen_gesamt": 1
     },
     "gaming_pc": {
       "kategorie": "gaming_pc",
@@ -228,8 +228,8 @@
     "office_pc": {
       "kategorie": "office_pc",
       "getestete_eintraege": 96,
-      "tp_stabil": 33,
-      "tp_kritisch_kein_treffer": 61,
+      "tp_stabil": 30,
+      "tp_kritisch_kein_treffer": 64,
       "tp_anderer_matchpfad": 0,
       "fp_gefixt": 2,
       "fp_weiterhin_aktiv": 0,
@@ -237,8 +237,8 @@
       "unclear_weiterhin": 0,
       "kategoriewechsel": 0,
       "gewonnene_true_positive": 2,
-      "verlorene_true_positive": 61,
-      "regressionen_gesamt": 61
+      "verlorene_true_positive": 64,
+      "regressionen_gesamt": 64
     },
     "autoradio_opel_corsa": {
       "kategorie": "autoradio_opel_corsa",
@@ -258,8 +258,8 @@
     "handhelds": {
       "kategorie": "handhelds",
       "getestete_eintraege": 26,
-      "tp_stabil": 17,
-      "tp_kritisch_kein_treffer": 5,
+      "tp_stabil": 16,
+      "tp_kritisch_kein_treffer": 6,
       "tp_anderer_matchpfad": 0,
       "fp_gefixt": 4,
       "fp_weiterhin_aktiv": 0,
@@ -267,8 +267,8 @@
       "unclear_weiterhin": 0,
       "kategoriewechsel": 0,
       "gewonnene_true_positive": 4,
-      "verlorene_true_positive": 5,
-      "regressionen_gesamt": 5
+      "verlorene_true_positive": 6,
+      "regressionen_gesamt": 6
     },
     "m2_ssd": {
       "kategorie": "m2_ssd",

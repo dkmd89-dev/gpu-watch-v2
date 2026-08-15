@@ -2,21 +2,21 @@
   "meta": {
     "baseline_id": "historical_forensics_baseline",
     "baseline_ruleset_signature": "1e7fcec77b51c375",
-    "current_ruleset_signature": "acd510eb61845cb5",
+    "current_ruleset_signature": "b863e724db9b393c",
     "ruleset_unveraendert": false,
     "anzahl_eintraege": 2306,
     "severity_counts": {
-      "NEUTRAL": 2096,
-      "CRITICAL": 91,
+      "NEUTRAL": 2091,
+      "CRITICAL": 96,
       "INFO": 47,
       "HIGH_CANDIDATE": 72
     },
     "gate_label_counts": {
-      "TRUE_POSITIVE -> TRUE_POSITIVE (stabil)": 2096,
-      "TRUE_POSITIVE -> kein Treffer": 91,
+      "TRUE_POSITIVE -> TRUE_POSITIVE (stabil)": 2091,
+      "TRUE_POSITIVE -> kein Treffer": 96,
       "FALSE_POSITIVE -> kein Treffer": 12,
-      "UNCLEAR -> kein Treffer": 13,
-      "UNCLEAR weiterhin unklar": 22,
+      "UNCLEAR -> kein Treffer": 15,
+      "UNCLEAR weiterhin unklar": 20,
       "FALSE_POSITIVE weiterhin aktiv": 7,
       "TRUE_POSITIVE, aber anderer Matchpfad": 65
     }
@@ -184,12 +184,12 @@
       "category": "iphone",
       "before_verdict": "TRUE_POSITIVE",
       "before_rule": "iPhone 11 (≤256GB) 👍 Guter Preis",
-      "after_match_state": "GLEICHE_KATEGORIE",
-      "after_category": "iphone",
-      "after_rule": "iPhone 11 (≤256GB) 👍 Guter Preis",
-      "severity": "NEUTRAL",
-      "gate_label": "TRUE_POSITIVE -> TRUE_POSITIVE (stabil)",
-      "explanation": "Unveraendert."
+      "after_match_state": "KEIN_TREFFER",
+      "after_category": null,
+      "after_rule": null,
+      "severity": "CRITICAL",
+      "gate_label": "TRUE_POSITIVE -> kein Treffer",
+      "explanation": "Ein zuvor menschlich bestaetigter echter Treffer matcht jetzt gar nicht mehr."
     },
     {
       "url": "https://www.kleinanzeigen.de/s-anzeige/playstation-4-pro-mit-2-controller/3480903658-279-3423",
@@ -3447,12 +3447,12 @@
       "category": "konsolen_bundles",
       "before_verdict": "UNCLEAR",
       "before_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
-      "after_match_state": "GLEICHE_KATEGORIE",
-      "after_category": "konsolen_bundles",
-      "after_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+      "after_match_state": "KEIN_TREFFER",
+      "after_category": null,
+      "after_rule": null,
       "severity": "INFO",
-      "gate_label": "UNCLEAR weiterhin unklar",
-      "explanation": "Weiterhin kein automatisches Urteil moeglich -- menschliche Bewertung noetig."
+      "gate_label": "UNCLEAR -> kein Treffer",
+      "explanation": "Ehemals unklarer Fall matcht jetzt nicht mehr."
     },
     {
       "url": "https://www.ebay.de/itm/195073911135",
@@ -6216,12 +6216,12 @@
       "category": "office_pc",
       "before_verdict": "TRUE_POSITIVE",
       "before_rule": "Office-PC (Mindestanforderung erfüllt)",
-      "after_match_state": "GLEICHE_KATEGORIE",
-      "after_category": "office_pc",
-      "after_rule": "Office-PC (Mindestanforderung erfüllt)",
-      "severity": "NEUTRAL",
-      "gate_label": "TRUE_POSITIVE -> TRUE_POSITIVE (stabil)",
-      "explanation": "Unveraendert."
+      "after_match_state": "KEIN_TREFFER",
+      "after_category": null,
+      "after_rule": null,
+      "severity": "CRITICAL",
+      "gate_label": "TRUE_POSITIVE -> kein Treffer",
+      "explanation": "Ein zuvor menschlich bestaetigter echter Treffer matcht jetzt gar nicht mehr."
     },
     {
       "url": "https://www.kleinanzeigen.de/s-anzeige/samsung-curved-monitor-27-zoll-s27c366eau/3480647177-225-6640",
@@ -7581,12 +7581,12 @@
       "category": "konsolen_bundles",
       "before_verdict": "UNCLEAR",
       "before_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
-      "after_match_state": "GLEICHE_KATEGORIE",
-      "after_category": "konsolen_bundles",
-      "after_rule": "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+      "after_match_state": "KEIN_TREFFER",
+      "after_category": null,
+      "after_rule": null,
       "severity": "INFO",
-      "gate_label": "UNCLEAR weiterhin unklar",
-      "explanation": "Weiterhin kein automatisches Urteil moeglich -- menschliche Bewertung noetig."
+      "gate_label": "UNCLEAR -> kein Treffer",
+      "explanation": "Ehemals unklarer Fall matcht jetzt nicht mehr."
     },
     {
       "url": "https://www.ebay.de/itm/267751986716",
@@ -12040,12 +12040,12 @@
       "category": "office_pc",
       "before_verdict": "TRUE_POSITIVE",
       "before_rule": "Office-PC (Mindestanforderung erfüllt)",
-      "after_match_state": "GLEICHE_KATEGORIE",
-      "after_category": "office_pc",
-      "after_rule": "Office-PC (Mindestanforderung erfüllt)",
-      "severity": "NEUTRAL",
-      "gate_label": "TRUE_POSITIVE -> TRUE_POSITIVE (stabil)",
-      "explanation": "Unveraendert."
+      "after_match_state": "KEIN_TREFFER",
+      "after_category": null,
+      "after_rule": null,
+      "severity": "CRITICAL",
+      "gate_label": "TRUE_POSITIVE -> kein Treffer",
+      "explanation": "Ein zuvor menschlich bestaetigter echter Treffer matcht jetzt gar nicht mehr."
     },
     {
       "url": "https://www.kleinanzeigen.de/s-anzeige/lenovo-laptop-l480-core-i5-8250u-8gb-ddr4-256-gb-nvme-win/3480254382-278-23791",
@@ -16278,12 +16278,12 @@
       "category": "controller",
       "before_verdict": "TRUE_POSITIVE",
       "before_rule": "PS5 DualSense Controller ★ Top-Deal",
-      "after_match_state": "GLEICHE_KATEGORIE",
-      "after_category": "controller",
-      "after_rule": "PS5 DualSense Controller ★ Top-Deal",
-      "severity": "NEUTRAL",
-      "gate_label": "TRUE_POSITIVE -> TRUE_POSITIVE (stabil)",
-      "explanation": "Unveraendert."
+      "after_match_state": "KEIN_TREFFER",
+      "after_category": null,
+      "after_rule": null,
+      "severity": "CRITICAL",
+      "gate_label": "TRUE_POSITIVE -> kein Treffer",
+      "explanation": "Ein zuvor menschlich bestaetigter echter Treffer matcht jetzt gar nicht mehr."
     },
     {
       "url": "https://www.kleinanzeigen.de/s-anzeige/xbox-one-mit-controller-funktionsfaehig/3480029645-279-9179",
@@ -19450,12 +19450,12 @@
       "category": "handhelds",
       "before_verdict": "TRUE_POSITIVE",
       "before_rule": "Valve Steam Deck ★ Top-Deal",
-      "after_match_state": "GLEICHE_KATEGORIE",
-      "after_category": "handhelds",
-      "after_rule": "Valve Steam Deck ★ Top-Deal",
-      "severity": "NEUTRAL",
-      "gate_label": "TRUE_POSITIVE -> TRUE_POSITIVE (stabil)",
-      "explanation": "Unveraendert."
+      "after_match_state": "KEIN_TREFFER",
+      "after_category": null,
+      "after_rule": null,
+      "severity": "CRITICAL",
+      "gate_label": "TRUE_POSITIVE -> kein Treffer",
+      "explanation": "Ein zuvor menschlich bestaetigter echter Treffer matcht jetzt gar nicht mehr."
     },
     {
       "url": "https://www.ebay.de/itm/366594257599",
@@ -27068,12 +27068,12 @@
       "category": "vintage_elektronik",
       "before_verdict": "TRUE_POSITIVE",
       "before_rule": "Vintage-HiFi-Verstärker (Markenware) ★ Top-Deal",
-      "after_match_state": "KEIN_TREFFER",
-      "after_category": null,
-      "after_rule": null,
-      "severity": "CRITICAL",
-      "gate_label": "TRUE_POSITIVE -> kein Treffer",
-      "explanation": "Ein zuvor menschlich bestaetigter echter Treffer matcht jetzt gar nicht mehr."
+      "after_match_state": "GLEICHE_KATEGORIE",
+      "after_category": "vintage_elektronik",
+      "after_rule": "Vintage-HiFi-Verstärker (Markenware) ★ Top-Deal",
+      "severity": "NEUTRAL",
+      "gate_label": "TRUE_POSITIVE -> TRUE_POSITIVE (stabil)",
+      "explanation": "Unveraendert."
     },
     {
       "url": "https://www.ebay.de/itm/267751047310",
@@ -28940,12 +28940,12 @@
       "category": "office_pc",
       "before_verdict": "TRUE_POSITIVE",
       "before_rule": "Office-PC (Mindestanforderung erfüllt)",
-      "after_match_state": "GLEICHE_KATEGORIE",
-      "after_category": "office_pc",
-      "after_rule": "Office-PC (Mindestanforderung erfüllt)",
-      "severity": "NEUTRAL",
-      "gate_label": "TRUE_POSITIVE -> TRUE_POSITIVE (stabil)",
-      "explanation": "Unveraendert."
+      "after_match_state": "KEIN_TREFFER",
+      "after_category": null,
+      "after_rule": null,
+      "severity": "CRITICAL",
+      "gate_label": "TRUE_POSITIVE -> kein Treffer",
+      "explanation": "Ein zuvor menschlich bestaetigter echter Treffer matcht jetzt gar nicht mehr."
     },
     {
       "url": "https://www.ebay.de/itm/157988120929",

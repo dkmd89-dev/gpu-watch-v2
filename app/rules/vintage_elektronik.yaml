@@ -79,7 +79,25 @@ exclude_category:
   #    "ersatzfernbedienung" zusaetzlich noetig (zusammengeschriebenes
   #    Wort, "fernbedienung" allein wuerde wegen fehlender Wortgrenze
   #    zwischen "Ersatz" und "fernbedienung" NICHT greifen).
-  - "fernbedienung"
+  #
+  # FIX (Ruleset-Qualitaetssystem, Regression-Benchmark gegen historischen
+  # Vor-Audit-Snapshot, 2026-08-15): bare "fernbedienung" oben war -- anders
+  # als "netzkabel für" im selben Block (siehe dortiger Kommentar: "nicht
+  # bare 'netzkabel' -- ein echtes Komplettgeraet koennte 'inkl. Netzkabel'
+  # bewerben") -- NICHT kontextbewusst und blockierte dadurch echte
+  # Markenverstaerker-Angebote, die ihre Fernbedienung als Ausstattungs-
+  # merkmal nennen ("Pioneer Stereo Verstärker mit Fernbedienung",
+  # "Onkyo A-9155 Stereo Verstärker mit Fernbedienung", "Marantz PM 66SE
+  # ... Verstärker mit Fernbedienung", "Grundig Röhrenfernseher inkl
+  # Fernbedienung", u.a. -- mind. 8 betroffene Titel in price_history.jsonl).
+  # Identisches Bundle-vs-Standalone-Problem wie "ladekabel" in
+  # controller.yaml, daher hierher verschoben (nicht mehr bare Exclude) --
+  # bei erlaubtem Bundle-Konnektor unmittelbar davor ("mit"/"inkl."/...)
+  # matcht die Regel weiterhin, ein Standalone-Zubehoer-Angebot ("Sony
+  # Trinitron RM 694 Fernbedienung", "Sony PVM Monitor Fernbedienung
+  # RM668") bleibt weiterhin ausgeschlossen (kein Konnektor davor).
+  # "ersatzfernbedienung" bleibt unveraendert bare (zusammengeschriebenes
+  # Wort, kein legitimer Bundle-Fall bekannt).
   - "ersatzfernbedienung"
 
   # 3. Subwoofer-ZUBEHOER fuer ein Geraet (nicht bare "subwoofer" --
@@ -112,6 +130,21 @@ exclude_category:
   - "werbekoffer"
   - "vertreterkoffer"
   - "cinch adapter"
+
+# Kontextbewusster Gegenpart zu "fernbedienung" (siehe Begruendung im
+# exclude_category-Block oben, Abschnitt 2): identisches Prinzip wie
+# controller.yaml::exclude_category_unless_preceded_by (Konnektorliste
+# 1:1 uebernommen, keine zweite Kontextlogik erfunden). Blockiert
+# "fernbedienung" nur als Standalone-Zubehoerangebot, nicht wenn ein
+# Bundle-Konnektor unmittelbar davorsteht.
+exclude_category_unless_preceded_by:
+  fernbedienung:
+    - "inkl."
+    - "inkl"
+    - "mit"
+    - "+"
+    - "und"
+    - "sowie"
 
 scoring_weights:
   price: 0.85
@@ -194,6 +227,12 @@ rules:
     # Geraete -- bestaetigt durch echte Preishistorie-Daten (guenstigste
     # Datenpunkte waren Widerstands-Set, Bedienungsanleitung,
     # Fernbedienung, Netzschalter, siehe PRICE_CALIBRATION_REVIEW.md).
+    # "fernbedienung" (Stand 2026-08-15): aus diesem bare Exclude entfernt
+    # und durch den kategorie-weiten, kontextbewussten
+    # exclude_category_unless_preceded_by-Eintrag ersetzt (siehe
+    # exclude_category-Block oben) -- identisches Standalone-Zubehoer-
+    # Ausschlussverhalten, aber ohne echte "Röhrenfernseher inkl.
+    # Fernbedienung"-Angebote faelschlich mit zu blockieren.
     exclude:
       - "pvm"
       - "bvm"
@@ -202,7 +241,6 @@ rules:
       - "anleitung"
       - "bedienungsanleitung"
       - "schaltplan"
-      - "fernbedienung"
       - "netzschalter"
       - "widerstand"
     price_history_model: "roehrenfernseher"
@@ -215,6 +253,7 @@ rules:
       - "crt fernseher"
       - "röhren tv"
     # MATCHING-FIX (Phase 12, Schritt 3): siehe Top-Deal-Regel oben.
+    # "fernbedienung": siehe Kommentar bei "Röhrenfernseher ★ Top-Deal" oben.
     exclude:
       - "pvm"
       - "bvm"
@@ -223,7 +262,6 @@ rules:
       - "anleitung"
       - "bedienungsanleitung"
       - "schaltplan"
-      - "fernbedienung"
       - "netzschalter"
       - "widerstand"
     price_history_model: "roehrenfernseher"
@@ -236,6 +274,7 @@ rules:
       - "crt fernseher"
       - "röhren tv"
     # MATCHING-FIX (Phase 12, Schritt 3): siehe Top-Deal-Regel oben.
+    # "fernbedienung": siehe Kommentar bei "Röhrenfernseher ★ Top-Deal" oben.
     exclude:
       - "pvm"
       - "bvm"
@@ -244,7 +283,6 @@ rules:
       - "anleitung"
       - "bedienungsanleitung"
       - "schaltplan"
-      - "fernbedienung"
       - "netzschalter"
       - "widerstand"
     price_history_model: "roehrenfernseher"

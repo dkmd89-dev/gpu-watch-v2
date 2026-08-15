@@ -602,7 +602,18 @@ def run_scan():
             with _status_lock:
                 _scan_status["scan_progress_current"] = idx
 
-            if item["price"] is None:
+            # FIX (Nutzer-Meldung 2026-08-15, GPU-Preis-Diagnose): Quoka
+            # liefert vereinzelt einen geparsten Preis von exakt 0.0 statt
+            # None (bestaetigt: 5 Punkte in price_history.jsonl, 2 aktuelle
+            # found.json-Eintraege, ausschliesslich source="Quoka" -- RTX
+            # 4060/MacBook Pro M4/iPhone 16 Pro Max fuer 0€ sind offensichtlich
+            # kein echtes Angebot, sondern ein Scraper-seitiger Preis-
+            # Parsing-Defekt). Ohne diese Sperre wird price_history.jsonl mit
+            # 0€-Datenpunkten verzerrt (Market-Price-/Resale-Statistik) und
+            # der Deal-Score/Discount-% faelschlich maximal (100% Rabatt).
+            # 0 statt None als Skip-Schwelle: einziger belegter Fehlerwert,
+            # keine erfundene Mindestpreis-Grenze ohne Datenbasis (Regel 4).
+            if item["price"] is None or item["price"] <= 0:
                 continue
             uid = item["url"]
 
