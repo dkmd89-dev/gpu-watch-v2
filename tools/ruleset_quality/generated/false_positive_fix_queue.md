@@ -2,21 +2,6 @@
 
 Automatisch generiert von `tools/ruleset_quality/forensics_false_positives.py`. Aendert KEINE YAML-Regeln -- die Entscheidung liegt beim Entwickler.
 
-## P0
-
-### iphone :: iPhone 15 Pro Max (≥512GB) 👍 Guter Preis
-
-- **Problem**: 1 bestaetigte(r) Fehltreffer, root_cause=`replacement_part_false_positive` (confidence=confirmed), 1 davon weiterhin aktiv.
-- **Vorschlag**: `add_replacement_part_guard`
-- **Regression-Risiko**: LOW
-- **Betroffene Kategorien**: iphone
-- **Regressionstests**:
-  - bestehende TRUE_POSITIVE-Tests fuer Regel 'iPhone 15 Pro Max (≥512GB) 👍 Guter Preis' in Kategorie 'iphone' (z.B. app/tests/test_iphone.py, falls vorhanden) muessen weiterhin gruen bleiben
-  - Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)
-  - tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)
-- **Beispiel-Listings**:
-  - Apple iPhone 15 Pro Max 512GB Mainboard Platine mit FaceID und Kameramodul  (https://www.ebay.de/itm/236995682525)
-
 ## P1
 
 ### konsolen_bundles :: Nintendo Switch (V1/V2/OLED) 👍 Guter Preis
@@ -98,6 +83,19 @@ Automatisch generiert von `tools/ruleset_quality/forensics_false_positives.py`. 
   - USB-C HUB für Steam Deck HDMI 4k 60Hz USB 3.0 PD (https://www.ebay.de/itm/255925725429)
   - Steam Deck Skin Faceplate Schutz Klebefolie Design Vinyl Aufkleber Skins OLED (https://www.ebay.de/itm/304780620667)
   - VITURE USB-C an Brille, Ladeadapter, Laden und Spielen für Switch, Steam Deck (https://www.ebay.de/itm/205573628921)
+
+### iphone :: iPhone 15 Pro Max (≥512GB) 👍 Guter Preis
+
+- **Problem**: 1 bestaetigte(r) Fehltreffer, root_cause=`replacement_part_false_positive` (confidence=confirmed), 0 davon weiterhin aktiv.
+- **Vorschlag**: `add_replacement_part_guard`
+- **Regression-Risiko**: LOW
+- **Betroffene Kategorien**: iphone
+- **Regressionstests**:
+  - bestehende TRUE_POSITIVE-Tests fuer Regel 'iPhone 15 Pro Max (≥512GB) 👍 Guter Preis' in Kategorie 'iphone' (z.B. app/tests/test_iphone.py, falls vorhanden) muessen weiterhin gruen bleiben
+  - Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)
+  - tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)
+- **Beispiel-Listings**:
+  - Apple iPhone 15 Pro Max 512GB Mainboard Platine mit FaceID und Kameramodul  (https://www.ebay.de/itm/236995682525)
 
 ### konsolen_bundles :: PS4 Slim / Pro Bundle ★ Top-Deal
 
