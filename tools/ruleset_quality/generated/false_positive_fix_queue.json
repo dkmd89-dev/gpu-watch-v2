@@ -200,33 +200,6 @@
   },
   {
     "priority": "P1",
-    "category": "konsolen_bundles",
-    "affected_count": 1,
-    "representative_listings": [
-      {
-        "listing_id": "https://www.kleinanzeigen.de/s-anzeige/playstation-5-ps4-ps5-slim-hdmi-port-nintendo-reparatur-usb-pro/3431533294-226-3438",
-        "title": "Playstation 5 PS4 PS5 Slim HDMI Port Nintendo Reparatur USB PRO",
-        "price": 50.0
-      }
-    ],
-    "root_cause": "ambiguous",
-    "confidence": "manual_review",
-    "current_rule": "PS4 Slim / Pro Bundle ★ Top-Deal",
-    "recommended_fix_type": "manual_review",
-    "regression_risk": "MEDIUM",
-    "affected_categories": [
-      "konsolen_bundles"
-    ],
-    "test_requirements": [
-      "bestehende TRUE_POSITIVE-Tests fuer Regel 'PS4 Slim / Pro Bundle ★ Top-Deal' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
-      "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
-      "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
-    ],
-    "still_active_count": 1,
-    "priority_score": 2
-  },
-  {
-    "priority": "P1",
     "category": "notebook_resell",
     "affected_count": 1,
     "representative_listings": [
@@ -379,5 +352,32 @@
     ],
     "still_active_count": 0,
     "priority_score": 1
+  },
+  {
+    "priority": "P3",
+    "category": "konsolen_bundles",
+    "affected_count": 1,
+    "representative_listings": [
+      {
+        "listing_id": "https://www.kleinanzeigen.de/s-anzeige/playstation-5-ps4-ps5-slim-hdmi-port-nintendo-reparatur-usb-pro/3431533294-226-3438",
+        "title": "Playstation 5 PS4 PS5 Slim HDMI Port Nintendo Reparatur USB PRO",
+        "price": 50.0
+      }
+    ],
+    "root_cause": "ambiguous",
+    "confidence": "manual_review",
+    "current_rule": "PS4 Slim / Pro Bundle ★ Top-Deal",
+    "recommended_fix_type": "manual_review",
+    "regression_risk": "MEDIUM",
+    "affected_categories": [
+      "konsolen_bundles"
+    ],
+    "test_requirements": [
+      "bestehende TRUE_POSITIVE-Tests fuer Regel 'PS4 Slim / Pro Bundle ★ Top-Deal' in Kategorie 'konsolen_bundles' (z.B. app/tests/test_konsolen_bundles.py, falls vorhanden) muessen weiterhin gruen bleiben",
+      "Regression gegen alle 1 bekannten FP-Faelle dieser Gruppe (siehe representative_listings)",
+      "tools/ruleset_quality/benchmark.py + detailed_transition.py erneut laufen lassen (Regression-Gate)"
+    ],
+    "still_active_count": 0,
+    "priority_score": 0
   }
 ]
