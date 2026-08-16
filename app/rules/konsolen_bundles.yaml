@@ -39,6 +39,30 @@ exclude_category:
   - "spiel"
   - "spielesammlung"
   - "spiele sammlung"
+  # FIX (Profit-Matching-Root-Cause-Audit 2026-08-16, Cluster A): "PS4
+  # Spiele 10€ pro Stück" matchte fälschlich die PS4-Bundle-Regeln. Root
+  # Cause: "pro" ist in der require_all_of-Gruppe 2 dieser Regeln UND in
+  # der Verstärkungsliste des exclude_category_unless_also_contains-Guards
+  # für den Key "spiele" enthalten (gedacht für "PS4 Pro" als
+  # Konsolenvariante) -- hier wird "pro" aber als deutsche Praeposition
+  # ("je Stück") verwendet, nicht als Modellbezeichnung. Bewusst NICHT das
+  # geteilte Wort "pro" aus require_all_of oder der Verstaerkungsliste
+  # entfernen (globaler Eingriff, unklares Risiko fuer echte "PS4 Pro"-
+  # Konsolenangebote ausserhalb der geprueften Stichprobe) -- stattdessen
+  # eine spezifische, eindeutige Phrase: "pro Stück" (= "je Stück") kommt in
+  # keinem bekannten Konsolen-Bundle-Titel vor, ausschliesslich bei
+  # Stueckverkauf von Einzelartikeln (Spielen). Bekannter Ground-Truth-
+  # Konflikt (nicht die Ground-Truth-Datei aendern, siehe
+  # docs/DASHBOARD_MATCH_FORENSICS.json): 2 dort als TRUE_POSITIVE
+  # gelabelte Faelle ("Ps4 Spiele Einzelverkauf 7€ pro Stück.", "Ps4 Spiele
+  # gebraucht 10€ pro Stück") sind inhaltlich eindeutig Spiele-
+  # Einzelverkaeufe, keine Konsolenangebote -- vermutlich Label-Fehler,
+  # analog zum bereits dokumentierten Switch/Xbox-Ground-Truth-Artefakt aus
+  # Batch 20b. Blast Radius (Vollkorpus: docs/DASHBOARD_MATCH_FORENSICS.json
+  # + data/found.json + data/price_history.jsonl, 21331 Titel geprueft):
+  # genau 3 Treffer fuer "pro stück" in konsolen_bundles, alle drei Spiele-
+  # Stueckverkaeufe, 0 Treffer mit einem echten Konsolen-/Geraete-Marker.
+  - "pro stück"
   - "nur controller"
   - "station"
   - "lüfter"
