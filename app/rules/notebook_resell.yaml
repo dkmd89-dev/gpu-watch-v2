@@ -127,8 +127,28 @@ rules:
     # oben), 4 Treffer fuer l480/l590/e15 (alle TRUE_POSITIVE, 0
     # FALSE_POSITIVE/UNCLEAR). Alle 10 Preise (110-275€) liegen innerhalb
     # der bestehenden Preisgrenzen -- keine Preisgrenzenaenderung noetig.
+    # FIX (L480/L590 Marken-Gate Erweiterung, Variante A, 2026-08-16):
+    # trotz obiger Modellcode-Ergaenzung blieben "Lenovo Laptop L480..."
+    # und "Notebook Lenovo L590..." unmatched -- Root Cause war NICHT die
+    # Modellcode-Gruppe (Gruppe 2, bereits erfuellt), sondern die
+    # Marken-Gate-Gruppe (Gruppe 1): beide Titel enthalten "ThinkPad"
+    # nicht woertlich. "l480"/"l590" hier zusaetzlich als Marken-
+    # Alternative ergaenzt (additiv, kein neuer Regel-Typ, keine neue
+    # Architektur -- siehe Analysebericht "L480/L590 Marken-Gate Impact
+    # Analysis"). Gegen Variante B (separate "Lenovo"+Modellcode-Regel)
+    # abgewogen und bevorzugt: bleibt konsistent mit der bestehenden
+    # Ein-Regel-Struktur und deckt zusaetzlich reale Titel wie "ThinkPad
+    # L480 ..." (ohne das Wort "Lenovo") ab, waehrend Variante B das
+    # verfehlt haette. Blast Radius (2306 Eintraege, "l480"/"l590" als
+    # eigenstaendiges Wort): je 1 Treffer GESAMT im Korpus (die beiden
+    # bekannten TRUE_POSITIVE-Zielfaelle selbst), 0 Zubehoer-/Mainboard-/
+    # Akku-/Display-/Tastatur-/Docking-Kollisionen. Adversarial-Test (16
+    # synthetische, nicht persistierte Faelle): 0 Fehlklassifikationen --
+    # alle Zubehoer-/Ersatzteil-Varianten werden bereits durch die
+    # bestehende Groessen-Gruppe (Gruppe 3) bzw. den bare
+    # "mainboard"-Exclude blockiert.
     require_all_of:
-      - ["thinkpad", "think pad"]
+      - ["thinkpad", "think pad", "l480", "l590"]
       - ["t14", "t14s", "t490", "t490s", "x13", "x390", "l14", "l480", "l590", "e15"]
       - ["4gb", "8gb", "16gb", "32gb", "64gb", "128gb", "256gb", "512gb", "1tb", "2tb", "ssd", "nvme"]
     exclude:
@@ -147,8 +167,11 @@ rules:
     # FIX (Notebook-Recall-Optimierung, Cluster A1+A2, 2026-08-16): siehe
     # ausfuehrliche Begruendung in der Resell-Top-Regel oben (identische
     # Modellcode-Gruppe, identischer Blast Radius).
+    # FIX (L480/L590 Marken-Gate Erweiterung, Variante A, 2026-08-16):
+    # siehe ausfuehrliche Begruendung in der Resell-Top-Regel oben
+    # (identische Marken-Gate-Erweiterung, identischer Blast Radius).
     require_all_of:
-      - ["thinkpad", "think pad"]
+      - ["thinkpad", "think pad", "l480", "l590"]
       - ["t14", "t14s", "t490", "t490s", "x13", "x390", "l14", "l480", "l590", "e15"]
       - ["4gb", "8gb", "16gb", "32gb", "64gb", "128gb", "256gb", "512gb", "1tb", "2tb", "ssd", "nvme"]
     exclude:
@@ -241,11 +264,30 @@ rules:
   # "GTX 1650 Ti"/"RTX 2060"/"RTX 4070" bewusst NICHT ergaenzt: je nur 1
   # bekannter GT-Fall pro Variante (395€/375€/400€) -- keine belastbare
   # Preisverteilung, siehe PROPOSED_PRICE_CALIBRATION im Analysebericht.
+  # FIX (IdeaPad Gaming 3 – C1 Minimal Recall Fix, 2026-08-16): "Lenovo
+  # IdeaPad Gaming 3...GTX 1650..." (339€, TRUE_POSITIVE) erfuellte die
+  # GPU-Gruppe bereits vollstaendig, scheiterte aber am Geraetewort-Gate
+  # -- der Titel enthaelt "gaming" (bewusst nicht als Ersatz akzeptiert,
+  # siehe RTX3060-Regel-Kommentar), aber nicht "laptop"/"notebook". Das
+  # eng gefasste Zwei-Wort-Signal "ideapad gaming" als zusaetzliche
+  # OR-Alternative ergaenzt -- KEINE generische "ideapad"- oder
+  # "gaming"-Lockerung. Bewusst als Erweiterung DIESER Regel statt einer
+  # separaten "ideapad"-Marken-Regel: eine neue, generischere IdeaPad-
+  # Regel haette (je nach Ladereihenfolge) das Risiko geborgen, GPU-
+  # Faelle mit der falschen, nicht GPU-kalibrierten Preisbasis zu
+  # erfassen (siehe Analysebericht "IdeaPad / IdeaPad Gaming Recall
+  # Impact Analysis"). Blast Radius (docs/DASHBOARD_MATCH_FORENSICS.json,
+  # 2306 Eintraege, "ideapad gaming" als Wortfolge): 1 Treffer GESAMT im
+  # Korpus (der Zielfall selbst), 0 Kollisionen. Adversarial-Test (12
+  # synthetische, nicht persistierte Faelle inkl. Desktop-Gaming-PC mit
+  # identischer GPU): 0 Fehlklassifikationen -- das GPU-Gate ("gtx 1650")
+  # bleibt zwingend, schuetzt zuverlaessig vor allen Zubehoer-/
+  # Desktop-Faellen.
   - label: "Gaming Laptop (GTX 1650)"
     price_history_model: "gaming_laptop_gtx1650"
     require_all_of:
       - ["gtx 1650"]
-      - ["laptop", "notebook"]
+      - ["laptop", "notebook", "ideapad gaming"]
     exclude:
       - "gtx 1650 ti"
       - "1650 ti"
@@ -269,11 +311,26 @@ rules:
   # "latiitude" als eigenstaendiges Wort): 5 Treffer GESAMT im Korpus,
   # alle TRUE_POSITIVE, 0 FALSE_POSITIVE/UNCLEAR, keine bekannte
   # Latitude-Gaming-/Workstation-Sublinie die kollidieren koennte.
+  # FIX (Latitude Recall-Gap, Variante B, 2026-08-16, siehe
+  # tools/ruleset_quality/generated/reports/latitude_recall_gap_simulation.{json,md}):
+  # Geraete-Gruppe um die 5 im Korpus tatsaechlich beobachteten Latitude-
+  # Modellcodes ("5300","5401","5500","5501","7400") als zusaetzliche
+  # OR-Alternativen zu "laptop"/"notebook" ergaenzt -- behebt 3 TRUE_POSITIVE-
+  # Recall-Gaps (5501/5500/7400), deren Titel kein Geraetewort enthalten.
+  # BEWUSST KEINE globale 5xxx/7xxx- oder generische Zahlenerkennung
+  # (Variante A) und KEINE "Zahl direkt nach Latitude"-Positionslogik
+  # (Variante C): beide bestanden im Simulationsbericht den synthetischen
+  # Adversarial-Test nicht (Zubehoer-/Ladegeraet-Bundles mit unrelated
+  # 4-stelligen Zahlen wuerden faelschlich matchen). Nur Variante B (feste,
+  # geschlossene Codeliste) bestand sowohl den vollstaendigen 2306-Eintrag-
+  # Korpus-Test (3/3 Gaps behoben, 0 Regressionen, 0 neue FP, 0 UNCLEAR-
+  # Aenderungen) als auch beide Adversarial-Faelle. Liste NICHT erweiterbar
+  # ohne erneuten Korpus-Beleg -- kein Modellcode wurde spekulativ ergaenzt.
   - label: "Dell Latitude ★ Resell-Top"
     price_history_model: "dell_latitude"
     require_all_of:
       - ["latitude", "latiitude"]
-      - ["laptop", "notebook"]
+      - ["laptop", "notebook", "5300", "5401", "5500", "5501", "7400"]
       - ["4gb", "8gb", "16gb", "32gb", "64gb", "128gb", "256gb", "512gb", "1tb", "2tb", "ssd", "nvme"]
     min_vram_gb: 0
     max_price: 180
@@ -283,7 +340,7 @@ rules:
     price_history_model: "dell_latitude"
     require_all_of:
       - ["latitude", "latiitude"]
-      - ["laptop", "notebook"]
+      - ["laptop", "notebook", "5300", "5401", "5500", "5501", "7400"]
       - ["4gb", "8gb", "16gb", "32gb", "64gb", "128gb", "256gb", "512gb", "1tb", "2tb", "ssd", "nvme"]
     min_vram_gb: 0
     max_price: 330
