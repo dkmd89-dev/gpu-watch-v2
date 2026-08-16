@@ -109,9 +109,27 @@ rules:
     # bewusst KEIN bare "gb"/"ram" als eigener Begriff (wuerde an der
     # Wortgrenzen-Logik ohnehin nicht an Zahlen andocken, siehe
     # matcher.py::_contains_term()-Docstring).
+    #
+    # FIX (Notebook-Recall-Optimierung, Cluster A1+A2, 2026-08-16):
+    # "t490s"/"t14s" ergaenzt -- KEIN neues Modell, sondern derselbe
+    # Kompositum-/Wortgrenzen-Bug wie bereits mehrfach im Projekt
+    # dokumentiert (z.B. teildefekt/defekt, ps4slim/ps4):
+    # matcher.py::_contains_term() prueft `(?<!\w)term(?!\w)` -- das
+    # angehaengte "s" direkt nach "t490"/"t14" verhindert den
+    # Wortgrenzen-Treffer des bare-Begriffs, obwohl "T490s"/"T14s" reale
+    # ThinkPad-Modelle derselben Baureihe sind. "l480"/"l590"/"e15"
+    # ergaenzt als echte zusaetzliche ThinkPad-Serien (A2, kein
+    # Wortgrenzen-Bug, echte Whitelist-Erweiterung). Blast Radius
+    # (docs/DASHBOARD_MATCH_FORENSICS.json, 2306 Eintraege): 7 Treffer
+    # fuer t490s/t14s (6 TRUE_POSITIVE, 1 FALSE_POSITIVE -- "ThinkPad
+    # T490s Mainboard nm-b891..." bleibt durch den bereits bestehenden
+    # bare "mainboard"-Exclude weiterhin geblockt, siehe exclude_category
+    # oben), 4 Treffer fuer l480/l590/e15 (alle TRUE_POSITIVE, 0
+    # FALSE_POSITIVE/UNCLEAR). Alle 10 Preise (110-275€) liegen innerhalb
+    # der bestehenden Preisgrenzen -- keine Preisgrenzenaenderung noetig.
     require_all_of:
       - ["thinkpad", "think pad"]
-      - ["t14", "t490", "x13", "x390", "l14"]
+      - ["t14", "t14s", "t490", "t490s", "x13", "x390", "l14", "l480", "l590", "e15"]
       - ["4gb", "8gb", "16gb", "32gb", "64gb", "128gb", "256gb", "512gb", "1tb", "2tb", "ssd", "nvme"]
     exclude:
       - "t420"
@@ -126,9 +144,12 @@ rules:
   - label: "ThinkPad T14/X13 (Ryzen/Modern)"
     price_history_model: "thinkpad_modern"
     # MATCHING-FIX (Phase 12, Schritt 3): siehe Resell-Top-Regel oben.
+    # FIX (Notebook-Recall-Optimierung, Cluster A1+A2, 2026-08-16): siehe
+    # ausfuehrliche Begruendung in der Resell-Top-Regel oben (identische
+    # Modellcode-Gruppe, identischer Blast Radius).
     require_all_of:
       - ["thinkpad", "think pad"]
-      - ["t14", "t490", "x13", "x390", "l14"]
+      - ["t14", "t14s", "t490", "t490s", "x13", "x390", "l14", "l480", "l590", "e15"]
       - ["4gb", "8gb", "16gb", "32gb", "64gb", "128gb", "256gb", "512gb", "1tb", "2tb", "ssd", "nvme"]
     exclude:
       - "t420"
@@ -137,7 +158,22 @@ rules:
       - "t450"
       - "t460"
     min_vram_gb: 0
-    max_price: 240
+    # KALIBRIERT (Notebook-Recall-Optimierung, Cluster B, 2026-08-16):
+    # ehemals 240€ blockierte 11 real bestaetigte TRUE_POSITIVE-ThinkPads
+    # (T14/X13/X390/L14 Gen 1, Preis 249-329€) trotz vollstaendig erfuellter
+    # require_all_of-Signale (reines Preisgrenzen-Problem, kein Signal-Gap
+    # -- verifiziert per evaluate() bei 1€ Testpreis fuer alle 11 Faelle).
+    # Neue Grenze = hoechster real bestaetigter Preis (329,00€) aufgerundet
+    # auf 330€, analog Projektmuster (z.B. monitor_curved.yaml "69,59€ ->
+    # 70€"). Keine price_history.jsonl-Datenpunkte fuer thinkpad_modern
+    # vorhanden (Regel hat vor diesem Fix nie im relevanten Preisbereich
+    # gematcht) -- Kalibrierungsbasis sind daher die 11 GT-Faelle direkt.
+    # Blast Radius (docs/DASHBOARD_MATCH_FORENSICS.json, 2306 Eintraege,
+    # ThinkPad-Signal + Preis 240-400€ durchsucht): exakt diese 11 Faelle,
+    # 0 zusaetzliche Kandidaten (weder TRUE_POSITIVE noch FALSE_POSITIVE
+    # noch UNCLEAR) im gesamten Bereich 240-400€ -- die neue Grenze laedt
+    # keine unbekannten Faelle ein. Ehemaliger Wert: 240.
+    max_price: 330
     deal_rating: "Guter Preis"
 
   # FIX (kontrollierter Review, found.json-Audit): Gruppe 2 enthielt bisher
@@ -178,3 +214,121 @@ rules:
     max_price: 550
     deal_rating: "Top-Deal"
     negotiation_tolerance_pct: 12.0
+
+  # FIX (Notebook-Recall-Optimierung, Cluster A8, 2026-08-16): "GTX 1650"
+  # (ohne "Ti") war bisher durch keine require_all_of-GPU-Gruppe in dieser
+  # Kategorie abgedeckt -- 3 real bestaetigte TRUE_POSITIVE-Gaming-Laptops
+  # (285-349€) blieben unmatched. Datenbasis bewusst duenner als bei der
+  # RTX-3060/4060-Kalibrierung: nur 3 GT-Faelle, 0 price_history.jsonl-
+  # Datenpunkte (Regel existierte vorher nicht) -- deshalb NUR EINE
+  # Preisstufe (kein "★ Resell-Top" analog RTX3060/4060: keine Datenbasis
+  # fuer eine sinnvolle zweite, niedrigere Schwelle). max_price = hoechster
+  # bekannter TRUE_POSITIVE-Preis (349,00€) aufgerundet auf 350€, identische
+  # Kalibrierungsmethodik wie Cluster B (siehe ThinkPad-Regel oben).
+  # Blast Radius (docs/DASHBOARD_MATCH_FORENSICS.json, 2306 Eintraege,
+  # "gtx 1650" OHNE "ti" + laptop/notebook-Wort + Preis<=350€): exakt 2
+  # Kandidaten matchen tatsaechlich (beide TRUE_POSITIVE, 0 Kollisionen) --
+  # der dritte bekannte GT-Fall ("Lenovo IdeaPad Gaming 3...GTX 1650",
+  # 339€) bleibt trotz dieser Erweiterung unmatched, da der Titel KEIN
+  # "laptop"/"notebook"-Wort enthaelt (identisches Gerätewort-Problem wie
+  # bei "L480"/"L590" oben -- bewusst NICHT durch Lockerung der
+  # Geraete-Gruppe geloest, siehe Analysebericht "Notebook Recall
+  # Optimization"). Bare "gtx 1650"-Wortgrenzen-Pruefung (_contains_term)
+  # matcht NICHT gegen "GTX 1650 Ti" (kein Wortgrenzen-Treffer nach "1650"
+  # wegen direkt folgendem " Ti" -- doch analog zu Cluster A1 zusaetzlich
+  # per Regex explizit gegen "GTX 1650 Ti"-Titel abgesichert, da dort
+  # trotzdem KEINE Preisbasis vorhanden ist, siehe naechster Absatz).
+  # "GTX 1650 Ti"/"RTX 2060"/"RTX 4070" bewusst NICHT ergaenzt: je nur 1
+  # bekannter GT-Fall pro Variante (395€/375€/400€) -- keine belastbare
+  # Preisverteilung, siehe PROPOSED_PRICE_CALIBRATION im Analysebericht.
+  - label: "Gaming Laptop (GTX 1650)"
+    price_history_model: "gaming_laptop_gtx1650"
+    require_all_of:
+      - ["gtx 1650"]
+      - ["laptop", "notebook"]
+    exclude:
+      - "gtx 1650 ti"
+      - "1650 ti"
+      - "1650ti"
+    min_vram_gb: 0
+    max_price: 350
+    deal_rating: "Guter Preis"
+
+  # FIX (Notebook-Recall-Optimierung, A3-A7 Option D, Gerätewort-Fälle,
+  # 2026-08-16): "Dell Latitude" (Business-Notebook-Linie, analog Lenovo
+  # ThinkPad) hatte keine eigene require_all_of-Struktur. Nur die 2 der 5
+  # bekannten GT-Latitude-Faelle mit explizitem "laptop"/"notebook"-Wort
+  # im Titel geloest (150€/250€) -- die 3 uebrigen ("Dell Latitude 5501/
+  # 5500/7400...") bleiben bewusst unmatched, da ihnen das Geraetewort
+  # fehlt (siehe Analysebericht "A3-A7 Option D" -- Erweiterung der
+  # Geraete-Gruppe ausserhalb des Scopes dieser Phase). Preisgrenzen
+  # bewusst NICHT neu erfunden, sondern die bereits in Cluster B
+  # belastbar kalibrierten ThinkPad-Grenzen (180€/330€) wiederverwendet --
+  # beide bekannten Faelle liegen komfortabel darunter. Blast Radius
+  # (docs/DASHBOARD_MATCH_FORENSICS.json, 2306 Eintraege, "latitude"/
+  # "latiitude" als eigenstaendiges Wort): 5 Treffer GESAMT im Korpus,
+  # alle TRUE_POSITIVE, 0 FALSE_POSITIVE/UNCLEAR, keine bekannte
+  # Latitude-Gaming-/Workstation-Sublinie die kollidieren koennte.
+  - label: "Dell Latitude ★ Resell-Top"
+    price_history_model: "dell_latitude"
+    require_all_of:
+      - ["latitude", "latiitude"]
+      - ["laptop", "notebook"]
+      - ["4gb", "8gb", "16gb", "32gb", "64gb", "128gb", "256gb", "512gb", "1tb", "2tb", "ssd", "nvme"]
+    min_vram_gb: 0
+    max_price: 180
+    deal_rating: "Top-Deal"
+
+  - label: "Dell Latitude"
+    price_history_model: "dell_latitude"
+    require_all_of:
+      - ["latitude", "latiitude"]
+      - ["laptop", "notebook"]
+      - ["4gb", "8gb", "16gb", "32gb", "64gb", "128gb", "256gb", "512gb", "1tb", "2tb", "ssd", "nvme"]
+    min_vram_gb: 0
+    max_price: 330
+    deal_rating: "Guter Preis"
+
+  # FIX (Notebook-Recall-Optimierung, A3-A7 Option D, Gerätewort-Fälle,
+  # 2026-08-16): "ACEMAGIC" (chinesische Mini-Notebook-/Mini-PC-Marke)
+  # hatte keine eigene require_all_of-Struktur. 2 bekannte GT-Faelle
+  # (beide 289€, beide mit "Laptop" im Titel) geloest. Preisgrenze
+  # wiederverwendet (330€, siehe Begruendung ThinkPad/Latitude oben,
+  # keine neue Zahl erfunden). Blast Radius (2306 Eintraege, "acemagic"
+  # als eigenstaendiges Wort): 2 Treffer GESAMT im Korpus, beide
+  # TRUE_POSITIVE, 0 Kollisionen -- keine bekannte ACEMAGIC-Desktop-/
+  # Zubehoer-Linie im Korpus vertreten.
+  - label: "ACEMAGIC Laptop"
+    price_history_model: "acemagic_laptop"
+    require_all_of:
+      - ["acemagic"]
+      - ["laptop", "notebook"]
+      - ["4gb", "8gb", "16gb", "32gb", "64gb", "128gb", "256gb", "512gb", "1tb", "2tb", "ssd", "nvme"]
+    min_vram_gb: 0
+    max_price: 330
+    deal_rating: "Guter Preis"
+
+  # FIX (Notebook-Recall-Optimierung, A3-A7 Option D, Gerätewort-Fälle,
+  # 2026-08-16): "Lenovo V330" (Consumer-/Business-Modellreihe) hatte
+  # keine eigene require_all_of-Struktur. 1 bekannter GT-Fall (149,95€,
+  # "Laptop" im Titel) geloest. "v330" bewusst NICHT als alleinstehendes
+  # Signal verwendet (kurzer alphanumerischer Code, abstrakt hoeheres
+  # Kollisionsrisiko mit branchenfremden Bedeutungen als bei "latitude"/
+  # "acemagic") -- zusaetzlich "lenovo" als Pflicht-Gruppe ergaenzt,
+  # analog zur bestehenden ThinkPad-Struktur (Marke UND Modellcode).
+  # Preisgrenze wiederverwendet (180€ Top-Deal, da der einzige bekannte
+  # Fall darunter liegt -- keine neue Zahl erfunden, keine "Guter
+  # Preis"-Stufe ergaenzt, da dafuer keine Datenbasis existiert). Blast
+  # Radius (2306 Eintraege, "v330" als eigenstaendiges Wort): 1 Treffer
+  # GESAMT im Korpus (der bekannte Fall selbst), TRUE_POSITIVE, 0
+  # Kollisionen.
+  - label: "Lenovo V330 ★ Resell-Top"
+    price_history_model: "lenovo_v330"
+    require_all_of:
+      - ["lenovo"]
+      - ["v330"]
+      - ["laptop", "notebook"]
+      - ["4gb", "8gb", "16gb", "32gb", "64gb", "128gb", "256gb", "512gb", "1tb", "2tb", "ssd", "nvme"]
+    min_vram_gb: 0
+    max_price: 180
+    deal_rating: "Top-Deal"
