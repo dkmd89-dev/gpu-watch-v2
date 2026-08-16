@@ -897,3 +897,98 @@ geschütztes Kernsystem, eigene Freigabe nötig, nicht Teil dieser Analyse. HP Z
 behandelt (TRUE_POSITIVE im GT-JSON, aber Definitionsfrage, ob eine Workstation-Sublinie unter
 `notebook_resell` fallen soll), `NEEDS_DEFINITION`. Keine Datei geändert, kein Commit — alle vier
 Analysen ausschließlich im Chat-Verlauf dokumentiert.
+
+### 26. Category Recall Maximal Absichern — vollständiges Recall-Gate + OVP-Kontext-Guard-Fix (PR #56, `62fd678`/`75e0b82`)
+
+Mehrstufiger, strukturierter Workflow mit dem expliziten Ziel, den Category Recall (Anteil der
+`TRUE_POSITIVE`-Fälle, die tatsächlich matchen) maximal abzusichern, **bevor** irgendeine Preis-
+oder Profitvalidierung beginnt. Startpunkt: Repo-Zustand frisch verifiziert (HEAD `75e0b82`
+Vorstand, 360 Regeln, 0 Findings), bestätigt dass Latitude/L480/L590/IdeaPad-Gaming-3 bereits
+implementiert sind und Fujitsu/Alienware/HP bereits vollständig (aber ohne Implementierung)
+analysiert waren — beide Cluster-Gruppen NICHT erneut vollständig analysiert.
+
+**Phase 1 — Open Category Recall Map:** systematische Auswertung aller 69 unmatched
+TRUE_POSITIVE- und 24 unmatched UNCLEAR-Fälle im vollständigen 2306-Eintrag-Korpus, geclustert
+nach Kategorie/Marke/Produktfamilie.
+
+**Phase 2 — Cluster-Prüfungen (chronologisch, mit Selbstkorrektur):**
+
+1. **office_pc „Aufrüstkit"/„Aufrüstbundle" (28 Fälle)** — als erstes geprüft, sofort als
+   Ground-Truth-vs-Design-Konflikt erkannt: der `office_pc.yaml`-Exclude war eine bereits bewusst
+   freigegebene Precision-Entscheidung („Aufrüstkit … bezeichnet nie ein komplettes System"). Auf
+   Nutzerentscheidung zurückgestellt, nicht weiter vertieft.
+2. **konsolen_bundles Controller/Zubehör/Software (4 von 6 Fällen: Mixamp, Nacon Revolution Pro
+   Controller 3, Nintendo Switch Pro Controller Schwarz, Super Mario 3D All-Stars)** — volle
+   Phase-4-Analyse durchgeführt, dabei eine bereits bestehende, unabhängige First-Match-Wins-
+   Precision-Lücke entdeckt (ein Nacon-Controller matcht bereits heute fälschlich als „PS4 Slim/
+   Pro Bundle" über zufällige Wort-Kollision „ps4"+„pro" — dokumentiert, nicht gefixt). Ergebnis:
+   GT-Konflikt, kein Recall-Gap — auf Nutzerentscheidung (Option C) verworfen.
+3. **retro_konsolen Spieltitel/Zubehör (3 Fälle: Dragon Quest PS2, Dino Crisis 2 PS1, GameCube-
+   Zubehör-Set)** — GT-Konflikt, diesmal mit explizit nutzerbestätigtem Präzedenzfall im YAML-
+   Kommentar selbst („Robin-Feedback: ich bekomme Spiele und Sonstiges"); der GameCube-Fall trifft
+   sogar exakt einen bereits real-korpus-verifizierten Exclude (`"zubehör-set"`).
+4. **controller Zubehör/Ersatzteile (6 Fälle)** — 5/6 GT-Konflikt (Lötspitze, Ersatz-Akku,
+   USB-Adapter, Ersatz-Sticks, „Akku Pad"), 1/6 (VOYEE-Drittanbieter-Controller) ein technisch
+   nachvollziehbarer False Negative, aber nur 1 Datenpunkt ohne belastbare Preisbasis (Drittanbieter
+   vs. Original-Nintendo-Preiskalibrierung) — keine Aktion.
+5. **konsolen_bundles UNCLEAR-Pool, LIKELY_TRUE_POSITIVE (11 Fälle aus dem in dieser Session
+   zuvor reparierten `unclear_routing_assessment.json`)** — 9 von 11 bereits durch frühere Batches
+   gelöst, 2 tatsächlich unmatched: „Nintendo Switch 1. Generation … OVP + Kaufbeleg" (125€) und
+   „Xbox One S 1 TB + 1 Controller … OVP" (80€). **Einziger echter, technisch klarer Recall-Gap
+   dieser Session** — siehe unten.
+6. **handhelds (6), lego_minifiguren (2), autoradio_opel_corsa (2), 6 Einzelfälle (iPhone,
+   netzteil, sata_ssd, vintage_elektronik, ram, monitor_curved)** — systematisch nachgeprüft, um
+   die vollständige Landkarte zu schließen: alle 6 handhelds-Fälle (leere Box, externe SSD,
+   Touchpen/Stylus ×2, Legion-Go-Controller, „Spiele für") treffen bereits explizit dokumentierte
+   Excludes (`"leere box"`, `"ssd"`, `"stylus"`/`"touchpen"`/`"ersatzstift"`, `"controller
+   rechts"`, `"spiele für"`); beide Lego-Fälle treffen `"ohne figuren"`; beide Autoradio-Fälle
+   treffen `"steuergerät"` — der YAML-Kommentar nennt dort sogar exakt diese beiden Titel als
+   bereits bekannt; der iPhone-Fall trifft den globalen `"defektes"`-Exclude; der RAM-Fall
+   („Samsung 8GB DDR4 RAM Riegel für Laptops") trifft den `"laptop"`/`"laptops"`-Exclude — auch
+   hier nennt der YAML-Kommentar exakt diesen Titel als bereits bekannten SODIMM-vs-DIMM-Fall. Die
+   verbleibenden 4 Einzelfälle (netzteil→Audio-Verstärker, sata_ssd→externe USB-SSD,
+   vintage_elektronik→Foto, monitor_curved→Heimtrainer) sind reine GT-Kategorie-Fehlzuordnungen
+   ohne jeden Matcher-Bezug.
+
+**Phase 3 — Fix (konsolen_bundles OVP-Kontext-Guard-Lücke):** Root Cause 1 (Nintendo Switch): der
+`exclude_category_unless_also_contains["ovp"]`-Kontext-Guard akzeptierte „1./2. Generation" nicht
+als Geräte-Marker, obwohl derselbe Begriff bei den `"joy-con"`/`"für nintendo switch"`-Keys
+**derselben Kategorie** bereits als gültiger Kontext geführt wurde (Inkonsistenz). Root Cause 2
+(Xbox One S): „1 TB" (mit Leerzeichen) wird von der Wortgrenzen-Prüfung nicht als „1tb" erkannt
+(Formatproblem, strukturell identisch zur HP-Analyse „8 GB" vs. „8gb"). Erster Fixversuch (bare
+„1./2. generation"/„1 tb"/„2 tb" als Kontext ergänzt) deckte im Adversarial-Test 2 echte
+Kollisionen auf: ein Joy-Con-Zubehörtitel mit „2. Generation" als Produktbezeichnung matchte
+fälschlich; ein Xbox-Headset-Titel matchte ebenfalls fälschlich — Letzteres stellte sich als
+bereits im Produktivregelwerk bestehende, vom Fix unabhängige Precision-Lücke heraus (über den
+bereits vorhandenen `"bundle"`-Marker), dokumentiert aber nicht mitgelöst. Finale Variante:
+markengebundene Phrasen (`"nintendo switch 1./2. generation"`, `"xbox one s/x 1/2 tb"`) statt bare
+Begriffe — übersteht alle 15 Adversarial-Fälle. Wichtige methodische Korrektur während der
+Umsetzung: `exclude_category_unless_also_contains` ist strukturell ein **einziger, kategorieweiter
+Block** (nicht pro Regel), die erste Simulation mit künstlich pro-Regel getrennten Objektkopien
+bildete das nicht korrekt ab — nach Korrektur (ein gemeinsamer Block, wie im echten YAML) bleibt
+das Ergebnis unverändert (2 reale Änderungen, 0 Kollateralschäden), bestätigt gegen den echten
+`git diff`, nicht nur Simulation.
+
+**Nebenbefund (separater Commit, vor dem Fix):** `tools/ruleset_quality/generated/reports/
+ground_truth_routing_assessment.json` und `unclear_routing_assessment.json` waren durch einen
+früheren pytest-Testlauf versehentlich mit einer synthetischen 1-Case-Fixture überschrieben
+worden (`source_ground_truth` zeigte auf einen `/tmp/pytest-.../forensics.json`-Pfad). Neu
+generiert via `python -m tools.ruleset_quality.<modul>` — Ergebnis deckt sich exakt mit den in
+STATUS.md dokumentierten Zahlen (19 historische FP/16 gelöst/2 GT-Konflikt/1 Manual-Review; 35
+UNCLEAR/11 TP/23 FP/1 Manual-Review). Betrifft ausschließlich read-only Tooling, kein
+Produktionsimport — separat committet, bevor der eigentliche Recall-Cluster-Workflow begann.
+
+**Ergebnis:** 2 UNCLEAR-Fälle recovered (125€, 80€), 0 TP-Regressionen, 0 neue FP, 0 unerwartete
+UNCLEAR-Änderungen, 84/84 kategoriebezogene Tests grün (`pytest app/tests/ -k konsolen_bundles`),
+Rule Analyzer 0 Findings. Alle 69 unmatched TRUE_POSITIVE-Fälle klassifiziert: 54 GT-Konflikt
+(bereits bewusste Excludes), 3 Design-Entscheidung offen (HP generic/ZBook), 2 `BLOCKED`
+(Alienware/Fujitsu), 6 fehlende Datenbasis (GPU-Tier/IdeaPad5/VOYEE), 4 GT-Kategorie-
+Fehlzuordnung. **Status: `CATEGORY_RECALL_MAXIMALLY_SECURED`.** Workflow-konform: Feature-Branch
+→ Push → PR #56 → Merge (durch Nutzer, da Auto-Mode-Klassifikator Merges blockiert — beim
+vorherigen PR #55 blockiert, bei PR #56 nicht, Verhalten des Klassifikators nicht vorhersagbar).
+
+**Stand nach Batch 26 (verifiziert):** 360 Regeln, 19 Kategorien, 0 Findings, Signatur
+`0a9c9f4bb3590872` → `09d66cde97932a9f`. TP 2252/2183 matched, FP 19/3, UNCLEAR 35/13 (vorher 11).
+Zielgerichtete Tests grün (84 kategoriebezogen); volle Suite zuletzt vollständig verifiziert in
+Batch 23 (1509/1509), seither nicht erneut ohne explizite Freigabe ausgeführt. Nächster
+Haupt-Workstream laut Nutzeranweisung: Price Validation / Profit Validation.
