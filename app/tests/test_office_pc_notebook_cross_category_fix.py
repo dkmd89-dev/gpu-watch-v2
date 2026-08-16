@@ -16,9 +16,20 @@ gaming_pc-Excludes (PR #24) neu entstanden.
 Root Cause identisch zum bereits in gaming_pc.yaml gefixten Muster
 (dort: "Diese Kategorie WILL komplette PC-Systeme", identische
 Begründung). Alternative "notebook_resell.yaml-Preisdeckel anheben"
-explizit gegen den vollen 97-Titel-ThinkPad-Realkorpus geprüft und
-verworfen (89% der realen Angebote liegen bereits innerhalb der
+damals explizit gegen den vollen 97-Titel-ThinkPad-Realkorpus geprüft
+und verworfen (89% der realen Angebote liegen bereits innerhalb der
 bestehenden 180/240€-Grenzen) -- siehe Audit-Doku Abschnitt 9.1.
+
+UPDATE (Notebook-Recall-Optimierung, Cluster B, 2026-08-16): die
+99-TRUE_POSITIVE-Recall-Forensics fand 11 real bestätigte ThinkPads
+(249-329€), die WEDER office_pc NOCH notebook_resell matchten -- ein
+inzwischen mit eigener Datenbasis (11 GT-Faelle, siehe
+notebook_resell.yaml-Kommentar) geschlossener Recall-Gap. Die
+240€-Grenze aus notebook_resell.yaml wurde auf 330€ angehoben. Der
+damals bewusst dokumentierte "kein Match irgendwo"-Grenzfall unten
+(`test_ueber_240_euro...`) ist dadurch überholt und entsprechend
+aktualisiert -- die office_pc-Exclude-Aussage selbst (Kern dieses
+Tests) bleibt unverändert gültig.
 
 Fix: `exclude_category` um `laptop`, `notebook`, `thinkpad`, `macbook`,
 `ideapad`, `alienware`, `lifebook` erweitert (bare Markenbegriffe statt
@@ -127,18 +138,21 @@ def test_reale_desktop_true_positives_matchen_weiterhin():
 # 3. Grenzfälle.
 # ============================================================
 
-def test_ueber_240_euro_thinkpad_landet_unmatched_nicht_in_notebook_resell():
-    # Grenzfall: ein ThinkPad ueber dem notebook_resell-Preisdeckel
-    # (240€) matcht nach diesem Fix WEDER office_pc NOCH notebook_resell
-    # -- das ist die bewusste, im Audit dokumentierte Konsequenz (siehe
-    # Abschnitt 9.1: Preisdeckel-Anhebung explizit verworfen, keine
-    # Datenbasis). Kein neues Fehlrouting, sondern korrektes "kein Deal".
+def test_thinkpad_matcht_weder_office_pc_noch_ausserhalb_notebook_grenze():
+    # Grenzfall: ein ThinkPad ueber der (ehemaligen) 240€-Grenze matcht
+    # office_pc weiterhin NICHT (Kern dieses Testmoduls). Der Preis
+    # (279€) liegt seit dem Cluster-B-Fix (notebook_resell.yaml, siehe
+    # Kommentar dort) innerhalb der neuen 330€-Grenze -- der Titel landet
+    # daher korrekt in notebook_resell statt "kein Match irgendwo"
+    # (ehemaliges, jetzt ueberholtes Testverhalten, siehe Moduldocstring
+    # UPDATE-Absatz).
     r = evaluate(
         "Lenovo ThinkPad L14 G1 Core i5 10310U 16 GB RAM 240 GB M.2 nVME SSD Webcam",
         279.0,
         _rules_cfg(),
     )
-    assert r.matched is False
+    assert not (r.matched and r.category == "office_pc")
+    assert r.matched is True and r.category == "notebook_resell"
 
 
 def test_thinkpad_innerhalb_preisdeckel_matcht_weiterhin_notebook_resell():
