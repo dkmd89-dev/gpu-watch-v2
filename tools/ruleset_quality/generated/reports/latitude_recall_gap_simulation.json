@@ -1,0 +1,384 @@
+{
+  "meta": {
+    "title": "Latitude Recall-Gap – Simulation und Full-Korpus-Validierung",
+    "date": "2026-08-16",
+    "repository": "dkmd89-dev/gpu-watch-v2",
+    "source_report": "7 Recall Gaps – No Device Word Forensics",
+    "corpus_file": "docs/DASHBOARD_MATCH_FORENSICS.json",
+    "corpus_total_entries": 2306,
+    "mode": "SIMULATION ONLY -- keine YAML-Aenderung, kein Commit, kein Push"
+  },
+  "target_cases": [
+    {
+      "title": "Dell Latitude 5501 15,6\" FHD | i5-9400H | 8GB RAM | 250GB SSD",
+      "price": 229.0,
+      "historical_verdict": "TRUE_POSITIVE",
+      "historical_category": "office_pc",
+      "historical_rule": "Office-PC (Mindestanforderung erfüllt)",
+      "current_matched": false,
+      "current_category": null
+    },
+    {
+      "title": "Dell Latitude 5500  i5-8365U 8GB Ram 250 GB SSD",
+      "price": 145.0,
+      "historical_verdict": "TRUE_POSITIVE",
+      "historical_category": "office_pc",
+      "historical_rule": "Office-PC (Mindestanforderung erfüllt)",
+      "current_matched": false,
+      "current_category": null
+    },
+    {
+      "title": "Dell Latitude 7400 14\" FHD i7-8665U 16GB DDR4 512GB SSD Win11 Pro FP ohne Füße",
+      "price": 169.9,
+      "historical_verdict": "TRUE_POSITIVE",
+      "historical_category": "office_pc",
+      "historical_rule": "Office-PC (Mindestanforderung erfüllt)",
+      "current_matched": false,
+      "current_category": null
+    }
+  ],
+  "existing_rule_analysis": {
+    "file": "app/rules/notebook_resell.yaml",
+    "rules": [
+      "Dell Latitude ★ Resell-Top",
+      "Dell Latitude"
+    ],
+    "require_all_of_group_1_brand": [
+      "latitude",
+      "latiitude"
+    ],
+    "require_all_of_group_2_device_word": [
+      "laptop",
+      "notebook"
+    ],
+    "require_all_of_group_3_size": [
+      "4gb",
+      "8gb",
+      "16gb",
+      "32gb",
+      "64gb",
+      "128gb",
+      "256gb",
+      "512gb",
+      "1tb",
+      "2tb",
+      "ssd",
+      "nvme"
+    ],
+    "rule_level_excludes": [],
+    "category_level_excludes": [
+      "für teile",
+      "displayschaden",
+      "not tested",
+      "nur netzteil",
+      "nur ladekabel",
+      "nur tasche",
+      "nur hülle",
+      "mainboard",
+      "motherboard",
+      "i3",
+      "celeron",
+      "pentium",
+      "atom",
+      "core 2 duo",
+      "amd a4",
+      "amd a6",
+      "amd a8",
+      "ohne ssd/ram"
+    ],
+    "max_price_top_deal": 180,
+    "max_price_guter_preis": 330,
+    "negotiation_tolerance": "keine (weder Top-Deal- noch Guter-Preis-Regel definiert negotiation_tolerance_pct)",
+    "scan_priority_notebook_resell": 6,
+    "routing_order_note": "evaluate() iteriert alle Regeln kategorieuebergreifend in Ladereihenfolge (First-Match-Wins); scan_priority betrifft NICHT die Match-Evaluationsreihenfolge. Da Gate 1 ('latitude'/'latiitude') in allen Varianten unveraendert bleibt, ist der Blast Radius mathematisch auf die 5 im Korpus vorhandenen 'latitude'-Titel begrenzt."
+  },
+  "model_code_analysis": [
+    {
+      "model_code": "5501",
+      "title": "Dell Latitude 5501 15,6\" FHD | i5-9400H | 8GB RAM | 250GB SSD",
+      "price": 229.0,
+      "verdict": "TRUE_POSITIVE",
+      "current_category": null,
+      "current_matched": false
+    },
+    {
+      "model_code": "5401",
+      "title": "Notebook Dell Latiitude 5401 i5 9400H 16GB DDR4 256GB  SSD",
+      "price": 150.0,
+      "verdict": "TRUE_POSITIVE",
+      "current_category": "notebook_resell",
+      "current_matched": true
+    },
+    {
+      "model_code": "5500",
+      "title": "Dell Latitude 5500  i5-8365U 8GB Ram 250 GB SSD",
+      "price": 145.0,
+      "verdict": "TRUE_POSITIVE",
+      "current_category": null,
+      "current_matched": false
+    },
+    {
+      "model_code": "5300",
+      "title": "Dell Latitude 5300 Notebook 13“ i5-8265U 8GB RAM 250GB SSD W11",
+      "price": 250.0,
+      "verdict": "TRUE_POSITIVE",
+      "current_category": "notebook_resell",
+      "current_matched": true
+    },
+    {
+      "model_code": "7400",
+      "title": "Dell Latitude 7400 14\" FHD i7-8665U 16GB DDR4 512GB SSD Win11 Pro FP ohne Füße",
+      "price": 169.9,
+      "verdict": "TRUE_POSITIVE",
+      "current_category": null,
+      "current_matched": false
+    }
+  ],
+  "candidate_variants": {
+    "A_global_5xxx_7xxx": {
+      "description": "latitude + beliebige 4-stellige Zahl beginnend mit 5 oder 7, IRGENDWO im Titel",
+      "pattern": "\\b[57]\\d{3}\\b (Regex, ausserhalb der require_all_of-Wortgrenzenlogik)",
+      "implementable_with_existing_primitive": false,
+      "note": "require_all_of unterstuetzt nur literale Wortgrenzen-Begriffe, KEINE Regex-Zeichenklassen -- diese Variante ist mit dem heutigen Matcher-Primitiv gar nicht direkt abbildbar, nur ueber einen neuen Detector-Mechanismus."
+    },
+    "B_bekannte_modellcodes": {
+      "description": "latitude + einer der im Korpus tatsaechlich beobachteten Modellcodes (geschlossene Liste)",
+      "codes": [
+        "5300",
+        "5401",
+        "5500",
+        "5501",
+        "7400"
+      ],
+      "implementable_with_existing_primitive": true,
+      "note": "Direkt als zusaetzliche literale Begriffe in der bestehenden require_all_of-Gruppe 2 abbildbar (OR-Erweiterung neben 'laptop'/'notebook')."
+    },
+    "C_zahl_direkt_nach_latitude": {
+      "description": "Zahl direkt (max. 3 Trennzeichen) nach 'latitude'/'latiitude' -- raeumliche Naehe statt geschlossener Liste",
+      "pattern": "lati[i]?tude\\W{0,3}(\\d{3,4})",
+      "implementable_with_existing_primitive": false,
+      "note": "require_all_of prueft nur Wort-PRAESENZ, keine Positions-/Abstandsbeziehung zwischen zwei Begriffen -- ebenfalls nicht nativ abbildbar."
+    }
+  },
+  "full_corpus_results": {
+    "A_global_5xxx_7xxx": {
+      "total_cases": 2306,
+      "true_positive": {
+        "before_matched": 2177,
+        "after_matched": 2180,
+        "new_matches": 3
+      },
+      "false_positive": {
+        "before_matched": 3,
+        "after_matched": 3,
+        "new_matches": 0
+      },
+      "unclear": {
+        "before_matched": 11,
+        "after_matched": 11,
+        "changes": 0
+      },
+      "changed_cases": [
+        {
+          "title": "Dell Latitude 5501 15,6\" FHD | i5-9400H | 8GB RAM | 250GB SSD",
+          "price": 229.0,
+          "historical_verdict": "TRUE_POSITIVE",
+          "historical_category": "office_pc",
+          "before_category": null,
+          "after_category": "notebook_resell",
+          "matched_rule": "Dell Latitude",
+          "reason": "Alternatives Modellsignal (Variante) erfuellt Gate 2 statt Geraetewort"
+        },
+        {
+          "title": "Dell Latitude 5500  i5-8365U 8GB Ram 250 GB SSD",
+          "price": 145.0,
+          "historical_verdict": "TRUE_POSITIVE",
+          "historical_category": "office_pc",
+          "before_category": null,
+          "after_category": "notebook_resell",
+          "matched_rule": "Dell Latitude ★ Resell-Top",
+          "reason": "Alternatives Modellsignal (Variante) erfuellt Gate 2 statt Geraetewort"
+        },
+        {
+          "title": "Dell Latitude 7400 14\" FHD i7-8665U 16GB DDR4 512GB SSD Win11 Pro FP ohne Füße",
+          "price": 169.9,
+          "historical_verdict": "TRUE_POSITIVE",
+          "historical_category": "office_pc",
+          "before_category": null,
+          "after_category": "notebook_resell",
+          "matched_rule": "Dell Latitude ★ Resell-Top",
+          "reason": "Alternatives Modellsignal (Variante) erfuellt Gate 2 statt Geraetewort"
+        }
+      ],
+      "tp_regressions": 0,
+      "new_fp_matches": 0,
+      "unclear_changes": 0,
+      "target_gaps_recovered": 3,
+      "target_gaps_total": 3
+    },
+    "B_bekannte_modellcodes": {
+      "total_cases": 2306,
+      "true_positive": {
+        "before_matched": 2177,
+        "after_matched": 2180,
+        "new_matches": 3
+      },
+      "false_positive": {
+        "before_matched": 3,
+        "after_matched": 3,
+        "new_matches": 0
+      },
+      "unclear": {
+        "before_matched": 11,
+        "after_matched": 11,
+        "changes": 0
+      },
+      "changed_cases": [
+        {
+          "title": "Dell Latitude 5501 15,6\" FHD | i5-9400H | 8GB RAM | 250GB SSD",
+          "price": 229.0,
+          "historical_verdict": "TRUE_POSITIVE",
+          "historical_category": "office_pc",
+          "before_category": null,
+          "after_category": "notebook_resell",
+          "matched_rule": "Dell Latitude",
+          "reason": "Alternatives Modellsignal (Variante) erfuellt Gate 2 statt Geraetewort"
+        },
+        {
+          "title": "Dell Latitude 5500  i5-8365U 8GB Ram 250 GB SSD",
+          "price": 145.0,
+          "historical_verdict": "TRUE_POSITIVE",
+          "historical_category": "office_pc",
+          "before_category": null,
+          "after_category": "notebook_resell",
+          "matched_rule": "Dell Latitude ★ Resell-Top",
+          "reason": "Alternatives Modellsignal (Variante) erfuellt Gate 2 statt Geraetewort"
+        },
+        {
+          "title": "Dell Latitude 7400 14\" FHD i7-8665U 16GB DDR4 512GB SSD Win11 Pro FP ohne Füße",
+          "price": 169.9,
+          "historical_verdict": "TRUE_POSITIVE",
+          "historical_category": "office_pc",
+          "before_category": null,
+          "after_category": "notebook_resell",
+          "matched_rule": "Dell Latitude ★ Resell-Top",
+          "reason": "Alternatives Modellsignal (Variante) erfuellt Gate 2 statt Geraetewort"
+        }
+      ],
+      "tp_regressions": 0,
+      "new_fp_matches": 0,
+      "unclear_changes": 0,
+      "target_gaps_recovered": 3,
+      "target_gaps_total": 3
+    },
+    "C_zahl_direkt_nach_latitude": {
+      "total_cases": 2306,
+      "true_positive": {
+        "before_matched": 2177,
+        "after_matched": 2180,
+        "new_matches": 3
+      },
+      "false_positive": {
+        "before_matched": 3,
+        "after_matched": 3,
+        "new_matches": 0
+      },
+      "unclear": {
+        "before_matched": 11,
+        "after_matched": 11,
+        "changes": 0
+      },
+      "changed_cases": [
+        {
+          "title": "Dell Latitude 5501 15,6\" FHD | i5-9400H | 8GB RAM | 250GB SSD",
+          "price": 229.0,
+          "historical_verdict": "TRUE_POSITIVE",
+          "historical_category": "office_pc",
+          "before_category": null,
+          "after_category": "notebook_resell",
+          "matched_rule": "Dell Latitude",
+          "reason": "Alternatives Modellsignal (Variante) erfuellt Gate 2 statt Geraetewort"
+        },
+        {
+          "title": "Dell Latitude 5500  i5-8365U 8GB Ram 250 GB SSD",
+          "price": 145.0,
+          "historical_verdict": "TRUE_POSITIVE",
+          "historical_category": "office_pc",
+          "before_category": null,
+          "after_category": "notebook_resell",
+          "matched_rule": "Dell Latitude ★ Resell-Top",
+          "reason": "Alternatives Modellsignal (Variante) erfuellt Gate 2 statt Geraetewort"
+        },
+        {
+          "title": "Dell Latitude 7400 14\" FHD i7-8665U 16GB DDR4 512GB SSD Win11 Pro FP ohne Füße",
+          "price": 169.9,
+          "historical_verdict": "TRUE_POSITIVE",
+          "historical_category": "office_pc",
+          "before_category": null,
+          "after_category": "notebook_resell",
+          "matched_rule": "Dell Latitude ★ Resell-Top",
+          "reason": "Alternatives Modellsignal (Variante) erfuellt Gate 2 statt Geraetewort"
+        }
+      ],
+      "tp_regressions": 0,
+      "new_fp_matches": 0,
+      "unclear_changes": 0,
+      "target_gaps_recovered": 3,
+      "target_gaps_total": 3
+    }
+  },
+  "synthetic_adversarial_tests": {
+    "note": "KEINE echten Korpus-/GT-Daten -- konstruierte Testtitel, um Risiko jenseits der 5 im Korpus vorhandenen Latitude-Titel sichtbar zu machen (der reale Korpus ist fuer diese Marke zu duenn, um Variantenunterschiede empirisch zu zeigen).",
+    "cases": [
+      {
+        "title": "Dell Latitude Netzteil 65W Ladegeraet 512GB externe SSD Festplatte Modell 5820 Ersatzteil",
+        "description": "Zubehoer (Ladegeraet+externe SSD), unrelated Modellnummer weit von 'latitude' entfernt",
+        "variant_a_matches": true,
+        "variant_b_matches": false,
+        "variant_c_matches": false,
+        "risk": "Variante A wuerde dieses Zubehoer-Bundle faelschlich als Notebook matchen."
+      },
+      {
+        "title": "Dell Latitude 5410 Netzteil Ladegeraet 65W Ersatzteil 512GB SSD extern",
+        "description": "Zubehoer (Ladegeraet), Zahl DIREKT nach 'Latitude' (kein echter bekannter Code)",
+        "variant_a_matches": true,
+        "variant_b_matches": false,
+        "variant_c_matches": true,
+        "risk": "Varianten A UND C wuerden dieses Zubehoer-Bundle faelschlich als Notebook matchen -- raeumliche Naehe allein garantiert nicht, dass die Zahl der tatsaechliche Modellcode des Geraets ist."
+      },
+      {
+        "title": "Dell Latitude Tasche 15 Zoll neuwertig",
+        "description": "Reines Zubehoer (Tasche), keine Groessenangabe",
+        "variant_a_matches": false,
+        "variant_b_matches": false,
+        "variant_c_matches": false,
+        "risk": "Kein Risiko -- Gate 3 (RAM/SSD-Groesse) blockiert bereits alle Varianten."
+      },
+      {
+        "title": "Dell Latitude E5570 Mainboard Ersatzteil 512GB SSD defekt",
+        "description": "Mainboard-Einzelteil mit Groessenangabe",
+        "variant_a_matches": false,
+        "variant_b_matches": false,
+        "variant_c_matches": false,
+        "risk": "Kein Risiko -- bereits bestehender category-level Exclude 'mainboard' UND globaler Exclude 'defekt' blockieren unabhaengig von der Variante."
+      },
+      {
+        "title": "Dell Latitude 5501 8GB RAM 250GB SSD",
+        "description": "Kontrollfall: echter Zielfall-aehnlicher Titel",
+        "variant_a_matches": true,
+        "variant_b_matches": true,
+        "variant_c_matches": true,
+        "risk": "Kein Risiko -- alle Varianten matchen korrekt."
+      }
+    ]
+  },
+  "recommendation": {
+    "safe_variant": "B_bekannte_modellcodes",
+    "status": "READY_FOR_IMPLEMENTATION",
+    "rejected_variants": {
+      "A_global_5xxx_7xxx": "NICHT empfohlen -- besteht den realen Korpus-Test (0 Regressionen), scheitert aber an 2 von 2 synthetischen Adversarial-Tests (Zubehoer-Bundles mit unrelated 4-stelligen Zahlen). Zusaetzlich mit dem bestehenden require_all_of-Primitiv gar nicht nativ implementierbar (Regex-Zeichenklasse).",
+      "C_zahl_direkt_nach_latitude": "NICHT als primaere Wahl empfohlen -- besteht den realen Korpus-Test, scheitert aber an 1 von 2 synthetischen Adversarial-Tests (Zubehoer mit Modellzahl direkt nach der Marke). Ebenfalls nicht nativ mit require_all_of implementierbar (Positions-/Abstandslogik)."
+    },
+    "implementation_note": "PROPOSED, NICHT UMGESETZT: require_all_of-Gruppe 2 der beiden Dell-Latitude-Regeln in notebook_resell.yaml um die 5 literalen Codes ['5300','5401','5500','5501','7400'] als zusaetzliche OR-Alternativen zu ['laptop','notebook'] erweitern. Bereits heute mit dem bestehenden Matcher-Primitiv umsetzbar, keine neue Architektur noetig."
+  }
+}

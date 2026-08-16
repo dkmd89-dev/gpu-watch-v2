@@ -16,10 +16,20 @@ GT-Korpus nicht vertretene HP-Sublinien (EliteBook/ProBook/Envy/
 Spectre) einschließen -- Cross-Category-Risiko nicht sicher
 kontrollierbar (siehe Analysebericht "A3-A7 Option D").
 
-Dell Latitude: nur 2 der 5 bekannten GT-Fälle haben ein Gerätewort im
-Titel -- die 3 übrigen (Latitude 5501/5500/7400, kein "laptop"/
-"notebook"-Wort) bleiben bewusst unmatched (Cluster "ohne Gerätewort",
-explizit außerhalb des Scopes dieser Phase).
+Dell Latitude: nur 2 der 5 bekannten GT-Fälle hatten hier ursprünglich ein
+Gerätewort im Titel -- die 3 übrigen (Latitude 5501/5500/7400) blieben
+zunächst bewusst unmatched (Cluster "ohne Gerätewort", damals außerhalb
+des Scopes dieser Phase).
+
+UPDATE (Latitude Recall-Gap, Variante B, 2026-08-16, siehe
+tools/ruleset_quality/generated/reports/latitude_recall_gap_simulation.{json,md}
+und notebook_resell.yaml-Kommentar): diese 3 Fälle wurden in einer
+separaten, gezielt freigegebenen Folgephase durch eine geschlossene,
+korpusbelegte Modellcode-Liste ("5300"/"5401"/"5500"/"5501"/"7400" als
+zusätzliche OR-Alternativen zur Geräte-Gruppe) gelöst -- siehe
+test_notebook_resell_latitude_variant_b_fix.py. Der Test unten ist
+entsprechend aktualisiert. ACEMAGIC/V330/HP sind von diesem Update NICHT
+betroffen.
 
 Preisgrenzen bewusst NICHT neu erfunden -- Wiederverwendung der bereits
 in Cluster B belastbar kalibrierten ThinkPad-Grenzen (180€/330€).
@@ -59,9 +69,12 @@ def test_dell_latitude_faelle_mit_geraetewort_matchen():
         assert r.matched is True and r.category == "notebook_resell", title
 
 
-def test_dell_latitude_faelle_ohne_geraetewort_bleiben_unmatched():
-    # Bewusst NICHT gefixt in dieser Phase -- fehlendes Geraetewort,
-    # ausserhalb des Scopes "A3-A7 Option D, Teil 1".
+def test_dell_latitude_faelle_ohne_geraetewort_matchen_seit_variante_b():
+    # UPDATE (Latitude Recall-Gap, Variante B, 2026-08-16): diese 3 Faelle
+    # matchen seit der gezielt freigegebenen Modellcode-Erweiterung korrekt
+    # -- siehe test_notebook_resell_latitude_variant_b_fix.py fuer die
+    # vollstaendige Regression (inkl. Adversarial-Faelle, die weiterhin
+    # NICHT matchen duerfen).
     for title, price in [
         (
             "Dell Latitude 5501 15,6\" FHD | i5-9400H | 8GB RAM | 250GB SSD",
@@ -75,7 +88,7 @@ def test_dell_latitude_faelle_ohne_geraetewort_bleiben_unmatched():
         ),
     ]:
         r = evaluate(title, price, _rules_cfg())
-        assert not (r.matched and r.category == "notebook_resell"), title
+        assert r.matched is True and r.category == "notebook_resell", title
 
 
 # ---------------------------------------------------------------

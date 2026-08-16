@@ -8,8 +8,10 @@ __pycache__/
 .pytest_cache/
 
 # Laufzeit-Daten & Logs
+data/*.log
 data/*.log.*
 data/*.txt
+data/seen.json
 
 
 # OS & Editor Artefakte

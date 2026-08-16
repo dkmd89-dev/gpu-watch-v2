@@ -11,21 +11,33 @@ Identisches Muster wie bereits dokumentierte Kompositum-Probleme
 Begriffe ergänzt (lokal, keine Änderung an _contains_term() selbst).
 
 Cluster A2 (echte Whitelist-Lücke): "L480"/"L590"/"E15" als weitere
-ThinkPad-Serien ergänzt. WICHTIG: nur die "ThinkPad E15"-Fälle sind
-mit diesem minimalen Fix lösbar -- "L480"/"L590"-Titel im GT-Korpus
-enthalten das Wort "ThinkPad" nicht wörtlich (nur "Lenovo Laptop
-L480"/"Notebook Lenovo L590") und scheitern daher weiterhin an der
-Marken-Gate-Gruppe (["thinkpad", "think pad"]) -- eine Lockerung dieser
-Gruppe wäre eine Architekturänderung außerhalb des Scopes dieser Phase
-(siehe Analysebericht "Notebook Recall Optimization – A1/A2/A8/A9 +
-A3-A7", Abschnitt 3/14) und wurde bewusst NICHT umgesetzt.
+ThinkPad-Serien ergänzt.
 
-Cluster A8 (GPU-Tier-Lücke, GTX 1650 ohne "Ti"): 3 GT-Fälle, aber nur
-2 real matchbar -- "Lenovo IdeaPad Gaming 3...GTX 1650" enthält kein
-"laptop"/"notebook"-Wort (identisches Gerätewort-Problem wie A2).
-"GTX 1650 Ti"/"RTX 2060"/"RTX 4070" bewusst NICHT ergänzt (je nur 1
-GT-Fall, keine belastbare Preisverteilung, siehe
-PROPOSED_PRICE_CALIBRATION im Analysebericht).
+UPDATE (L480/L590 Marken-Gate Erweiterung, Variante A, 2026-08-16):
+"L480"/"L590"-Titel im GT-Korpus enthalten das Wort "ThinkPad" nicht
+wörtlich (nur "Lenovo Laptop L480"/"Notebook Lenovo L590") und
+scheiterten daher zunächst weiterhin an der Marken-Gate-Gruppe
+(["thinkpad", "think pad"]). In einer separaten, gezielt freigegebenen
+Folgephase wurde "l480"/"l590" zusätzlich als Marken-Alternative in
+diese Gruppe aufgenommen (siehe notebook_resell.yaml-Kommentar und
+Analysebericht "L480/L590 Marken-Gate Impact Analysis") --
+siehe test_notebook_resell_l480_l590_marken_gate_fix.py für die
+vollständige Regression. Der Test unten ist entsprechend aktualisiert.
+
+Cluster A8 (GPU-Tier-Lücke, GTX 1650 ohne "Ti"): 3 GT-Fälle. "Lenovo
+IdeaPad Gaming 3...GTX 1650" enthielt zunächst kein "laptop"/
+"notebook"-Wort (identisches Gerätewort-Problem wie A2).
+
+UPDATE (IdeaPad Gaming 3 -- C1 Minimal Recall Fix, 2026-08-16): in
+einer separaten, gezielt freigegebenen Folgephase wurde die
+Geraetewort-Gruppe der GTX-1650-Regel um das eng gefasste Zwei-Wort-
+Signal "ideapad gaming" erweitert (siehe notebook_resell.yaml-
+Kommentar und Analysebericht "IdeaPad / IdeaPad Gaming Recall Impact
+Analysis") -- siehe test_notebook_resell_ideapad_gaming3_c1_fix.py für
+die vollständige Regression. Der Test unten ist entsprechend
+aktualisiert. "GTX 1650 Ti"/"RTX 2060"/"RTX 4070" bewusst weiterhin
+NICHT ergänzt (je nur 1 GT-Fall, keine belastbare Preisverteilung,
+siehe PROPOSED_PRICE_CALIBRATION im Analysebericht).
 
 Läuft gegen die echten, produktiven rules/*.yaml."""
 import sys
@@ -99,8 +111,10 @@ def test_cluster_a1_mainboard_kollisionsfall_bleibt_geblockt():
 
 
 # ---------------------------------------------------------------
-# Cluster A2 -- ThinkPad E15 matcht, L480/L590 (kein "ThinkPad"-Wort
-# im Titel) bleiben bewusst unmatched (siehe Moduldocstring)
+# Cluster A2 -- ThinkPad E15 matcht. L480/L590 (kein "ThinkPad"-Wort im
+# Titel) matchen seit der Marken-Gate-Erweiterung ebenfalls -- siehe
+# test_notebook_resell_l480_l590_marken_gate_fix.py für die dedizierte,
+# vollständige Regression dieses separaten Fixes.
 # ---------------------------------------------------------------
 
 def test_cluster_a2_thinkpad_e15_matcht():
@@ -112,10 +126,7 @@ def test_cluster_a2_thinkpad_e15_matcht():
     assert r.matched is True and r.category == "notebook_resell"
 
 
-def test_cluster_a2_l480_l590_ohne_thinkpad_wort_bleiben_unmatched():
-    # Bewusst NICHT gefixt in dieser Phase: fehlendes Marken-Gate-Signal
-    # ("thinkpad"/"think pad" nicht im Titel), keine Architekturänderung
-    # ohne separate Freigabe.
+def test_cluster_a2_l480_l590_matchen_seit_marken_gate_erweiterung():
     for title, price in [
         ("Lenovo Laptop L480 - Core i5 8250u - 8GB DDR4 - 256 GB NVMe - WIN", 125.0),
         (
@@ -124,7 +135,7 @@ def test_cluster_a2_l480_l590_ohne_thinkpad_wort_bleiben_unmatched():
         ),
     ]:
         r = evaluate(title, price, _rules_cfg())
-        assert not (r.matched and r.category == "notebook_resell"), title
+        assert r.matched is True and r.category == "notebook_resell", title
 
 
 # ---------------------------------------------------------------
@@ -162,14 +173,20 @@ def test_cluster_a8_gtx1650ti_bleibt_ausgeschlossen():
     assert not (r.matched and r.category == "notebook_resell")
 
 
-def test_cluster_a8_ideapad_gaming3_bleibt_unmatched_fehlendes_geraetewort():
+def test_cluster_a8_ideapad_gaming3_matcht_seit_c1_fix():
+    # UPDATE (IdeaPad Gaming 3 -- C1 Minimal Recall Fix, 2026-08-16): matcht
+    # seit der gezielt freigegebenen Erweiterung der Geraetewort-Gruppe um
+    # "ideapad gaming" -- siehe
+    # test_notebook_resell_ideapad_gaming3_c1_fix.py fuer die vollstaendige
+    # Regression (inkl. Adversarial-Faelle, die weiterhin NICHT matchen).
     r = evaluate(
         "Lenovo IdeaPad Gaming 3 15IMH05 | i5-10300H | GTX 1650 | 8GB RAM "
         "| 512GB SSD",
         339.0,
         _rules_cfg(),
     )
-    assert not (r.matched and r.category == "notebook_resell")
+    assert r.matched is True and r.category == "notebook_resell"
+    assert r.rule_label == "Gaming Laptop (GTX 1650)"
 
 
 def test_cluster_a8_grenzfall_350_euro_matcht_351_nicht():
