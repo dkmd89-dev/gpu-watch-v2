@@ -172,6 +172,24 @@ exclude_category:
   # 2 Treffer in found.json, beide echte Standalone-Zubehoer-Sets ohne
   # Konsole.
   - "zubehör set"
+  # FIX (UNCLEAR-FP-Root-Cause-Audit 2026-08-16, Cluster C7
+  # JOYCON_SET_OLED_MARKER_COLLISION): "Nintendo Switch OLED Joy-Con Set -
+  # Pokemon Scarlet & Violet mit Handschlaufaufen" matchte bisher fälschlich,
+  # weil der weiter unten definierte exclude_category_unless_also_contains-
+  # Kontext-Guard für den Key "joy-con" (siehe "Bewusst NICHT joy-con" unten)
+  # "oled" als Geräte-Verstärkungssignal akzeptiert -- hier bezeichnet "OLED"
+  # aber nur, für welche Switch-Variante das separate Joy-Con-Set kompatibel
+  # ist, kein verkauftes Konsolengehäuse. Bewusst NICHT "oled" aus der
+  # joy-con-Markerliste entfernen (würde den "joy-con"-Key global schwächen,
+  # unklares Risiko für "Konsole ... OLED ... Joy-Con"-Bundles außerhalb der
+  # geprüften Stichprobe) und bewusst NICHT bare "joy-con" (siehe die bereits
+  # dokumentierten 9 Kollisionsfälle unten) -- stattdessen die spezifische
+  # Zwei-Wort-Phrase "joy-con set" als bare Exclude, analog zu "zubehör set"
+  # oben. Blast Radius (Vollkorpus: docs/DASHBOARD_MATCH_FORENSICS.json,
+  # data/found.json, data/price_history.jsonl, 21320 Titel gesamt geprüft):
+  # genau 1 Treffer, exakt der beschriebene FP-Fall, 0 Kollisionen mit
+  # TRUE_POSITIVE- oder anderen UNCLEAR-Fällen.
+  - "joy-con set"
   # Nachtrag (kontrollierter Review, found.json-Realdatenabgleich gegen
   # den bereits als Gruppe-2-Zielkategorie dokumentierten Kommentar
   # "Controller/Headset/Lenkrad/Modchip/Schutzhülle" oben): die
@@ -579,6 +597,32 @@ exclude_category_unless_preceded_by:
   # Controller" bleibt erlaubt, "Nintendo Switch 2 GameCube Controller"
   # nicht.
   "gamecube controller": *bundle_konnektoren
+  # FIX (UNCLEAR-FP-Root-Cause-Audit 2026-08-16, Cluster C5
+  # THIRD_PARTY_ACCESSORY_BRAND_NAME_MARKER_COLLISION): "HORI Split Pad Pro
+  # Nintendo Switch Controller Schwarz mit OVP" matchte bisher fälschlich.
+  # "Split Pad Pro" ist ein Dritthersteller-Controller-Produktname (analog zu
+  # "Pro Controller"/"GameCube Controller" oben); der bereits vorhandene
+  # "pro controller"-Phrasen-Exclude greift hier NICHT, weil "Pro" und
+  # "Controller" im Titel durch "Nintendo Switch" getrennt stehen
+  # ("Split Pad Pro Nintendo Switch Controller"), wodurch der Titel
+  # stattdessen über das generische Wort "pro" in der weiter unten
+  # definierten exclude_category_unless_also_contains-Verstärkungsliste des
+  # Keys "ovp" durchrutscht. Bewusst NICHT das geteilte Wort "pro" aus dieser
+  # Liste entfernen (würde den Guard global schwächen, unklares Risiko für
+  # "PS4 Pro"/"Xbox ... Pro"-Konsolen außerhalb der geprüften Stichprobe) --
+  # stattdessen derselbe, bereits produktiv verifizierte Konnektor-Mechanismus
+  # wie bei "pro controller"/"gamecube controller": blockiert "split pad pro"
+  # nur, wenn KEIN Bundle-Konnektor unmittelbar davorsteht ("mit HORI Split
+  # Pad Pro" bliebe erlaubt). Blast Radius (Vollkorpus:
+  # docs/DASHBOARD_MATCH_FORENSICS.json, data/found.json,
+  # data/price_history.jsonl, 21320 Titel gesamt geprüft): genau 2 Treffer --
+  # der beschriebene FP-Fall sowie ein bereits bestätigter TRUE_POSITIVE
+  # ("HORI Split Pad Pro Controller Schwarz für Nintendo Switch"), der
+  # unverändert über controller.yaml (Kategorie "controller", nicht
+  # "konsolen_bundles") matcht und von dieser Änderung nicht berührt wird
+  # (verifiziert per evaluate()). 0 Kollisionen mit einem echten
+  # konsolen_bundles-TRUE_POSITIVE.
+  "split pad pro": *bundle_konnektoren
 
 scoring_weights:
   price: 0.85
