@@ -671,3 +671,124 @@ bewusste Nicht-Fixes dokumentiert, keine offene P0-Regelarbeit aus Batch 19a meh
 YAML-Dateien geändert: `iphone.yaml`, `konsolen_bundles.yaml`). **Volle Testsuite ausgeführt und
 grün: `pytest app/tests/` → 1470 passed, 0 failed** (66,9s) — erste Vollverifikation seit Batch 17
 (1372/1372), deckt damit auch die seit Batch 18 ausstehende Vollsuite-Pflicht (STATUS.md P0) ab.
+
+### 21. Root-Cause-Clustering der 23 `LIKELY_FALSE_POSITIVE`-Kandidaten + gezielter Fix (PR #52, `2a3d514`)
+
+Direkter Folgeschritt zu Batch 20e. Vor jeder YAML-Änderung: neues Analyse-Artefakt
+`unclear_fp_root_cause_analysis.{json,md}` clustert die 23 in Batch 20e als
+`LIKELY_FALSE_POSITIVE` klassifizierten UNCLEAR-Fälle in 7 technische Cluster (C1–C7) und prüft
+jeden Cluster gegen die 11 `LIKELY_TRUE_POSITIVE`-Gegenbeispiele, um versehentliche Kollisionen
+auszuschließen. Sicherheitsverteilung: C1–C4 (19 Kandidaten) waren bereits durch frühere Batches
+gelöst, keine Aktion nötig; C5 („Split Pad Pro") und C7 („Joy-Con Set") als `PROBABLY_SAFE`
+eingestuft und gefixt; C6 (RDR2/PS4-Steelbook-Bundle) als `HIGH_RISK` eingestuft und bewusst NICHT
+geändert — „bundle" ist im `require_all_of` gleichzeitig das auslösende Signal UND das
+Verstärkungssignal des ovp-Kontext-Guards, 3 bestätigte TRUE_POSITIVE-Fälle nutzen „bundle" selbst
+als Signal, kein sicherer Keyword-Fix identifiziert. Fix in `app/rules/konsolen_bundles.yaml`:
+`"split pad pro"` als `exclude_category_unless_preceded_by`-Eintrag (C5), `"joy-con set"` als bare
+`exclude_category`-Eintrag (C7). Geteilte generische Marker („pro"/„oled") bewusst nicht
+angefasst. 8 neue Tests. Vollkorpus-Regression (`docs/DASHBOARD_MATCH_FORENSICS.json`, 2306
+Einträge, vorher/nachher-Diff via `matcher.evaluate()`): exakt 2 Routing-Änderungen, beide
+beabsichtigt. 0 Regressionen bei allen 2252 TRUE_POSITIVE- und 19 FALSE_POSITIVE-Fällen sowie den
+übrigen 33 UNCLEAR-Fällen; `konsolen_bundles`-TRUE_POSITIVE-Treffer vorher/nachher: 191/191
+unverändert. Ruleset: 355 Regeln, 19 Kategorien, 0 Findings, Signatur `f8e07b8b8d97d61a` →
+`ff535311dcd59009`. Volle Testsuite: 1478 passed, 0 failed (105,74s).
+
+**Stand nach Batch 21 (verifiziert):** von den ursprünglich 19 historischen FALSE_POSITIVE-Fällen
+weiterhin 16 gelöst, 3 bewusst offen (unverändert zu Batch 20). Von den 23 UNCLEAR-
+`LIKELY_FALSE_POSITIVE`-Kandidaten aus Batch 20e: 22/23 gelöst (20 bereits vorher, 2 neu), 1/23
+bewusst offen (RDR2/PS4-Steelbook-Bundle, Manual-Review).
+
+### 22. Resale-/Profit-Audit auf echten Produktivdaten + 3 live bestätigte Profit-verzerrende Matching-Fehler behoben (PR #53, `2ce1e04`)
+
+Zweistufige Aufgabe. **Phase 1 (reiner Analyse-Audit, keine Code-/YAML-Änderung):** Prüfung des
+Resale-/Profit-Systems anhand echter Produktivdaten (`data/found.json`, `data/price_history.jsonl`,
+`data/time_to_sell.jsonl`). Bestätigte u. a., dass `estimated_resale_price` weiterhin denselben
+Purchase-Perspective-Bias hat wie dokumentiert (kein echtes Sale-Price-Signal existiert im
+gesamten Projekt) und dass `time_to_sell.jsonl` (Presence-Tracking-basiert) keine bestätigten
+Verkäufe misst. Als Nebenbefund: 3 live bestätigte, `margin_eur`/`margin_pct` verzerrende
+Matching-Fehler gefunden und als `AUDIT-FUND` markiert, bewusst nicht gefixt. **Phase 2 (gezielter
+Root-Cause-Audit + Fix):** ausschließlich für genau diese 3 Fälle, kein genereller Ruleset-Review.
+
+Drei technisch unabhängige Root Causes:
+
+- **Cluster A (`konsolen_bundles`):** „pro" ist gleichzeitig `require_all_of`-Signal („PS4 Pro")
+  und Verstärkungsmarker des „spiele"-Kontext-Guards — kollidiert mit der deutschen Präposition
+  „pro" („je Stück"). Fix: `"pro stück"` als bare `exclude_category`-Eintrag. Bewusst akzeptierter
+  Ground-Truth-Konflikt: 2 als TRUE_POSITIVE gelabelte „Ps4 Spiele...pro Stück"-Fälle matchen
+  dadurch ebenfalls nicht mehr — inhaltlich eindeutig Spiele-Einzelverkäufe, vermutlich Label-Fehler
+  analog zum Switch/Xbox-Artefakt aus Batch 20b.
+- **Cluster B (`vintage_elektronik`):** `require_all_of` unterscheidet nicht zwischen einem echten
+  Verstärker und einem Zeitschriften-/Heft-Konvolut, das nur ÜBER Verstärker berichtet („Image hifi
+  Hefte Röhrenverstärker"). Fix: `"hefte"` als bare `exclude_category`-Eintrag, identisches Muster
+  wie die bereits vorhandenen Sammler-/Dokumentations-Excludes „foto"/„funktionsbeschreibung".
+- **Cluster C (`monitor_curved`):** „Teildefekt" (Kompositum) wird vom globalen „defekt"-Exclude
+  wegen fehlender Wortgrenze (`matcher.py::_contains_term()`) nicht erfasst. Fix: lokaler
+  `exclude_category`-Eintrag NUR in `monitor_curved.yaml`, bewusst NICHT global in `_global.yaml` —
+  „teildefekt" gilt in `iphone`/`retro_konsolen` als bestätigter TRUE_POSITIVE-Marker.
+
+8 neue Tests (`test_profit_matching_root_cause_audit_fix.py`), je ein Fixtest + ein
+Sicherheitstest pro Cluster (echte Konsolen/Verstärker/Monitore matchen weiterhin) plus ein
+Cross-Kategorie-Regressionstest („teildefekt" bleibt in `iphone`/`retro_konsolen`
+TRUE_POSITIVE). Vollkorpus-Regression: 0 unerwartete Änderungen. Ruleset unverändert bei 355
+Regeln (3 additive Excludes in bestehenden Kategorien), 0 Findings.
+
+### 23. Notebook-Recall-Optimierung — 99-TRUE_POSITIVE-Recall-Forensics-Audit + gezielte Fixes (PR #54, `9fc967c`/`8507c44`)
+
+Mehrstufige Aufgabe, beginnend mit einer reinen Analysephase. **99-TRUE_POSITIVE-Recall-Forensics
+(Analyse, keine Codeänderung):** systematische Untersuchung aller unmatched TRUE_POSITIVE-Fälle aus
+`docs/DASHBOARD_MATCH_FORENSICS.json` — 101 Fälle (nicht 99, siehe unten), einzeln klassifiziert als
+`GROUND_TRUTH_CONFIRMED`/`GROUND_TRUTH_UNCLEAR`/`GROUND_TRUTH_SUSPECT` statt die Ground-Truth-Labels
+ungeprüft zu übernehmen. Ergebnis: 43 CONFIRMED (davon 42 Notebook-Resale, 1 `controller`/„akku"),
+31 UNCLEAR (v. a. `office_pc`-Aufrüstkit-Definitionsfrage), 27 SUSPECT (mutmaßliche
+Ground-Truth-Label-Fehler: Zubehör/Ersatzteile, Spieltitel, bereits bekannte historische Fixes).
+Root Cause der 42 Notebook-Gaps: `notebook_resell.yaml` deckt nur eine schmale
+Marken-/Modell-/GPU-Whitelist ab, während `office_pc`/`gaming_pc` Laptops bereits korrekt
+ausschließen (Nachwirkung eines früheren, korrekten Precision-Fixes).
+
+**Fix-Phasen (schrittweise mit Zwischenfreigaben), alle ausschließlich in
+`app/rules/notebook_resell.yaml`:**
+
+- **Cluster B (11 Fälle):** ThinkPad-Preisgrenze „Guter Preis" 240€ → 330€ — datenbasiert
+  kalibriert auf den höchsten real bestätigten TRUE_POSITIVE-Preis (329€, aufgerundet), keine
+  price_history.jsonl-Datenpunkte vorhanden. Blast Radius im vollständigen 2306-Eintrag-Korpus:
+  exakt die 11 bekannten Fälle, 0 zusätzliche Kandidaten.
+- **Cluster A1 (6 Fälle):** „T490s"/„T14s" ergänzt — kein neues Modell, sondern derselbe
+  Wortgrenzen-/Kompositum-Bug in `_contains_term()` wie bei „teildefekt"/„defekt" (Batch 22) und
+  „ps4slim"/„ps4". Bewusst lokal gelöst, kein globaler Matcher-Eingriff (Blast Radius von 625
+  projektweiten Begriffen wäre unverhältnismäßig).
+- **Cluster A2 (2 von 4 Fällen):** „ThinkPad E15" ergänzt. „L480"/„L590" bewusst NICHT gefixt — die
+  Titel enthalten „ThinkPad" nicht wörtlich, scheitern am Marken-Gate; Lockerung wäre eine
+  Architekturänderung außerhalb des Scopes.
+- **Cluster A8 (2 von 4 Fällen):** neue Regel „Gaming Laptop (GTX 1650)", Preisbasis nur 3
+  GT-Fälle (285–349€), `max_price: 350`. „GTX 1650 Ti"/„RTX 2060"/„RTX 4070" bewusst NICHT
+  ergänzt — je nur 1 Datenpunkt, keine belastbare Preisverteilung
+  (`PROPOSED_PRICE_CALIBRATION`).
+- **A3–A7-Gerätewort-Fälle (5 von 7 Fällen mit explizitem „laptop"/„notebook"-Wort im Titel):**
+  neue Marken-Regeln „Dell Latitude", „ACEMAGIC Laptop", „Lenovo V330" (Preisgrenzen wiederverwendet,
+  keine neuen Zahlen erfunden). „HP" (generic) bewusst NICHT implementiert — Cross-Category-Risiko
+  über HP OMEN/Pavilion Gaming (bereits eigene Regeln)/HP Zbook (= A10, außerhalb des Scopes)/
+  unbekannte Sublinien (EliteBook/ProBook/Envy/Spectre) nicht sicher kontrollierbar (`BLOCKED`).
+  7 weitere Fälle ganz ohne Gerätewort im Titel bewusst nicht bearbeitet (harte Scope-Grenze).
+
+Insgesamt 21 von 43 bestätigten Recall-Gaps geschlossen. Jede Teiländerung einzeln
+blast-radius-geprüft gegen den vollständigen 2306-Eintrag-Ground-Truth-Korpus, kumuliert 0
+unerwartete Routing-Änderungen. 23 neue Tests über 3 Testdateien
+(`test_notebook_resell_cluster_b_price_calibration_fix.py`,
+`test_notebook_resell_cluster_a1_a2_a8_fix.py`, `test_notebook_resell_a3_a7_geraetewort_fix.py`).
+1 bestehender Test notwendig aktualisiert (`test_office_pc_notebook_cross_category_fix.py` — testete
+explizit die durch die neue Datenbasis überholte alte 240€-Preisdeckel-Entscheidung, Kernaussage
+unverändert). Nach dem committen ausgelöste volle Testsuite (1509 Tests) deckte einen weiteren,
+vorher nicht erfassten Testfehler auf: `test_matcher_psu_requirement.py` verwendete „Dell Latitude
+Laptop..." als generischen Test-Titel für einen PSU-/Netzteil-Test und erwartete „matched is
+False" — ein Nebenprodukt der damals fehlenden Latitude-Markenabdeckung, nicht der eigentliche
+Testzweck (Nicht-Matchen als „netzteil"); korrigiert, Kernaussage bleibt erhalten und wird jetzt
+explizit geprüft.
+
+Bewusst zurückgestellt und dokumentiert (nicht Teil dieses Batches): „L480"/„L590"
+(Architekturfrage), GTX 1650 Ti/RTX 2060/RTX 4070 (fehlende Preisbasis), HP generic
+(Cross-Category-Risiko), 7 Fälle ohne Gerätewort, A10 (HP Zbook/Quadro-P600-Workstation-Grenzfall).
+
+**Stand nach Batch 23 (verifiziert):** 360 Regeln, 19 Kategorien, 0 Findings, Signatur
+`ff535311dcd59009` → `87626edfc333ff71` (1 YAML-Datei mehrfach erweitert). **Volle Testsuite
+ausgeführt und grün: `pytest app/tests/` → 1509 passed, 0 failed** (111,3s), vorheriger
+dokumentierter Vollstand: 1478/1478 (Batch 21).

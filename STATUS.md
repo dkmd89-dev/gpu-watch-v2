@@ -3,7 +3,7 @@
 > **Stand:** 2026-08-16
 > **Repository:** `dkmd89-dev/gpu-watch-v2`
 > **Branch:** `main`
-> **Letzter Code-Commit auf `main`:** `eeececb` (Merge PR #52)
+> **Letzter Code-Commit auf `main`:** `404242c` (Merge PR #54)
 > **Technische Referenz:** `TECHNISCHER_PROJEKTSTATUS.md`
 > **Vollständige Batch-Historie (wortgetreu):** `docs/STATUS_HISTORY.md`
 
@@ -36,47 +36,77 @@ Ergebnis: von den ursprünglich 19 historisch bestätigten FALSE_POSITIVE-Fälle
 gelöst**, 3 bewusst offen (2 Ground-Truth-Konflikt, 1 Manual-Review) — unverändert zu Batch 20, da
 Batch 21 die 35 UNCLEAR-Fälle betrifft, ein separates Set. Von den 23 UNCLEAR-
 `LIKELY_FALSE_POSITIVE`-Kandidaten sind jetzt **22/23 gelöst** (20 bereits vorher, 2 neu in
-Batch 21), 1 bewusst offen. Vollständige Details je Commit: `docs/STATUS_HISTORY.md`, Batch 20–21.
+Batch 21), 1 bewusst offen.
+
+Seither zwei weitere Batches (PR #53–54, neu in dieser Aktualisierung):
+
+- **Batch 22** (PR #53): Resale-/Profit-Audit auf echten Produktivdaten identifizierte 3 live
+  bestätigte, Profit-verzerrende Matching-Fehler; Root-Cause-Audit + gezielter Fix in 3
+  unabhängigen Kategorien (`konsolen_bundles`: „pro Stück"-Spiele-Einzelverkauf,
+  `vintage_elektronik`: „Hefte"-Zeitschriftenkonvolut, `monitor_curved`: „Teildefekt"-Kompositum-
+  Wortgrenzenbug). 8 neue Tests, 0 Regressionen gegen den vollständigen 2306-Eintrag-Ground-Truth-
+  Korpus. Ein bewusst akzeptierter Ground-Truth-Konflikt (2 „PS4 Spiele...pro Stück"-Fälle,
+  analog zum bereits dokumentierten Switch/Xbox-Artefakt aus Batch 20b).
+- **Batch 23** (PR #54): Notebook-Recall-Optimierung nach vorgelagerter 99-TRUE_POSITIVE-Recall-
+  Forensics (Analyse-Phase, keine Codeänderung — identifizierte 43 bestätigte Recall-Gaps, davon
+  42 im Notebook-Resale-Bereich). Davon 21 Gaps gezielt geschlossen: ThinkPad-Preisgrenze
+  datenbasiert 240€ → 330€ (11), Wortgrenzen-/Modellcode-Lücken „T490s"/„T14s"/„E15" (7), neue
+  Regel „Gaming Laptop (GTX 1650)" (2), neue Marken-Regeln Dell Latitude/ACEMAGIC/Lenovo V330 (5,
+  jeweils nur für Titel mit explizitem „laptop"/„notebook"-Wort — Architektur- und
+  Preisbasis-kritische Fälle wie „L480"/„L590", GTX 1650 Ti/RTX 2060/RTX 4070, HP (generic)
+  bewusst zurückgestellt). Jede Änderung einzeln blast-radius-geprüft, 23 neue Tests, 1
+  bestehender Test korrigiert (überholte Nebenerwartung). Vollständige Details:
+  `docs/STATUS_HISTORY.md`, Batch 20–23.
 
 ## 2. Verifizierter Stand
 
 ```text
-main: eeececb (Merge PR #52, HEAD dieser Aktualisierung)
+main: 404242c (Merge PR #54, HEAD dieser Aktualisierung)
 
-Batch 21 (PR #52, neu in dieser Aktualisierung):
-unclear_fp_root_cause_analysis.json/.md (neu): 23 LIKELY_FALSE_POSITIVE-Kandidaten aus
-  Batch 20e root-cause-geclustert in 7 Cluster (C1-C7), gegen 11 LIKELY_TRUE_POSITIVE
-  gegengeprueft, VOR jeder YAML-Aenderung. Sicherheitsverteilung: 4x SAFE_FIX (C1-C4,
-  bereits durch fruehere Batches geloest, 19 Kandidaten, keine Aktion), 2x PROBABLY_SAFE
-  (C5, C7, neu implementiert), 1x HIGH_RISK (C6, RDR2/PS4-Steelbook-Bundle, bewusst NICHT
-  geaendert -- "bundle" ist gleichzeitig Trigger- und Verstaerkungssignal fuer 3 echte
-  Treffer, bleibt Manual-Review).
-app/rules/konsolen_bundles.yaml: 2 neue additive Excludes --
-  "split pad pro" (exclude_category_unless_preceded_by, C5) und
-  "joy-con set" (bare exclude_category, C7). Geteilte generische Marker ("pro"/"oled")
-  bewusst NICHT angefasst.
-Vollkorpus-Regression (docs/DASHBOARD_MATCH_FORENSICS.json, 2306 Eintraege,
-  vorher/nachher-Diff via matcher.evaluate()): exakt 2 Routing-Aenderungen, beide
-  beabsichtigt (Split-Pad-Pro- und Joy-Con-Set-Fall). 0 Regressionen bei allen 2252
-  TRUE_POSITIVE- und 19 FALSE_POSITIVE-Faellen sowie den uebrigen 33 UNCLEAR-Faellen.
-  TP matched konsolen_bundles vorher/nachher: 191/191 unveraendert.
+Batch 22 (PR #53): 3 Profit-verzerrende Matching-Fehler behoben --
+  konsolen_bundles.yaml ("pro stueck"-Exclude), vintage_elektronik.yaml
+  ("hefte"-Exclude), monitor_curved.yaml ("teildefekt"-Exclude, lokal, NICHT
+  global -- "teildefekt" ist in iphone/retro_konsolen ein TRUE_POSITIVE-Marker).
+  8 neue Tests. Vollkorpus-Regression: 0 unerwartete Aenderungen, 1 bewusst
+  akzeptierter Ground-Truth-Konflikt (2 "PS4 Spiele...pro Stueck"-Faelle).
+
+Batch 23 (PR #54): Notebook-Recall-Optimierung, 21 von 43 im vorgelagerten
+  99-TRUE_POSITIVE-Recall-Forensics-Audit bestaetigten Gaps geschlossen --
+  ausschliesslich notebook_resell.yaml:
+  - ThinkPad-Preisgrenze "Guter Preis" 240€ -> 330€ (11 Faelle, datenbasiert
+    kalibriert auf hoechsten real bestaetigten Preis).
+  - "T490s"/"T14s" ergaenzt (Wortgrenzen-/Kompositum-Bug in _contains_term(),
+    kein neues Modell), "ThinkPad E15" ergaenzt (7 Faelle).
+  - Neue Regel "Gaming Laptop (GTX 1650)" (2 Faelle, Preisbasis 3 GT-Faelle).
+  - Neue Marken-Regeln Dell Latitude/ACEMAGIC/Lenovo V330 (5 Faelle, nur
+    Titel mit explizitem "laptop"/"notebook"-Wort).
+  Bewusst zurueckgestellt (dokumentiert, nicht Teil dieses Batches):
+  "L480"/"L590" (fehlendes "ThinkPad"-Wort im Titel), GTX 1650 Ti/RTX
+  2060/RTX 4070 (je nur 1 GT-Datenpunkt, keine belastbare Preisbasis),
+  HP (generic, Cross-Category-Risiko ueber A10/Zbook nicht kontrollierbar),
+  7 Faelle ohne Geraetewort, A10-Workstation-Grenzfall.
+  23 neue Tests, 1 bestehender Test korrigiert (ueberholte Nebenerwartung,
+  siehe docs/STATUS_HISTORY.md Batch 23). Jede Aenderung einzeln
+  blast-radius-geprueft gegen den vollstaendigen 2306-Eintrag-Ground-Truth-
+  Korpus, kumuliert 0 unerwartete Routing-Aenderungen.
 
 Rule Analyzer (verifiziert, dieser Session):
-355 Regeln
+360 Regeln
 19 Kategorien
 0 Findings
-Ruleset-Signatur: f8e07b8b8d97d61a -> ff535311dcd59009 (1 YAML-Datei geaendert)
+Ruleset-Signatur: ff535311dcd59009 -> 87626edfc333ff71 (2 YAML-Dateien in Batch 22
+  geaendert, 1 YAML-Datei in Batch 23 mehrfach erweitert)
 
 Volle Testsuite (verifiziert, dieser Session):
-pytest -q -> 1478 passed, 0 failed (105,74s)
-  (vorher 1470, +8 neue Tests in test_konsolen_bundles_marker_collision_fix.py)
+pytest -q -> 1509 passed, 0 failed (111,3s)
+  (vorher 1478, +31 neue Tests ueber Batch 22-23)
 
 data/found.json: laufender Produktivbetrieb (Scanner aktiv), nicht Teil dieser
   Doku-Aktualisierung -- Zaehlung daher bewusst nicht erneut ausgewiesen.
 ```
 
-**Volle Suite in dieser Session ausgeführt und grün: 1478/1478** (vorheriger dokumentierter
-Vollstand: 1470/1470, Batch 20).
+**Volle Suite in dieser Session ausgeführt und grün: 1509/1509** (vorheriger dokumentierter
+Vollstand: 1478/1478, Batch 21).
 
 ## 3. Batch-Übersicht (1–19)
 
@@ -110,10 +140,12 @@ Batch: **`docs/STATUS_HISTORY.md`**.
 | 20c | Ground Truth / Routing Assessment sauber getrennt | Neues Modul, `queue_category` statt Label-Vermischung | +44 | PR #49, `7159b6c` |
 | 20d | Fix-Queue strikt aus `assessment.status` abgeleitet | Bug behoben (`CATEGORY_CHANGED` fälschlich zu `ACTIVE_ROUTING_FP`), Konsistenz-Check ergänzt | +19 | PR #50, `8988854` |
 | 20e | 35 UNCLEAR-Fälle forensisch klassifiziert | 11 vermutlich TP / 23 vermutlich FP / 1 Manual-Review, **noch nicht in YAML umgesetzt** | — | PR #51, `33b6091` |
-| 21 | Root-Cause-Clustering der 23 `LIKELY_FALSE_POSITIVE` + gezielter Fix | 7 Cluster; 20/23 bereits gelöst, 2/23 neu gefixt (`konsolen_bundles`: „Split Pad Pro"/„Joy-Con Set"), 1/23 bewusst offen (Manual-Review) | +8, **1478/1478** | PR #52, `2a3d514` |
+| 21 | Root-Cause-Clustering der 23 `LIKELY_FALSE_POSITIVE` + gezielter Fix | 7 Cluster; 20/23 bereits gelöst, 2/23 neu gefixt (`konsolen_bundles`: „Split Pad Pro"/„Joy-Con Set"), 1/23 bewusst offen (Manual-Review) | +8, 1478/1478 | PR #52, `2a3d514` |
+| 22 | Resale-/Profit-Audit (real) + 3 Profit-verzerrende Matching-Fehler behoben | `konsolen_bundles`/„pro Stück", `vintage_elektronik`/„Hefte", `monitor_curved`/„Teildefekt" (lokal); 1 bewusst akzeptierter Ground-Truth-Konflikt | +8, 1486/1486 | PR #53, `2ce1e04` |
+| 23 | Notebook-Recall-Optimierung (99-TP-Audit-Folgeschritt) | 21/43 bestätigte Gaps geschlossen — ThinkPad-Preisgrenze, Wortgrenzen-/Modellcode-Lücken, GTX-1650-Regel, 3 neue Marken; mehrere Fälle bewusst dokumentiert zurückgestellt | +23, **1509/1509** | PR #54, `9fc967c`/`8507c44` |
 
-**Nach Batch 21 (verifiziert):** 355 Regeln, 19 Kategorien, 0 Findings, Ruleset-Signatur
-`ff535311dcd59009`, volle Suite **1478/1478 grün**.
+**Nach Batch 23 (verifiziert):** 360 Regeln, 19 Kategorien, 0 Findings, Ruleset-Signatur
+`87626edfc333ff71`, volle Suite **1509/1509 grün**.
 
 ## 4. Datenqualität — offene Punkte
 
@@ -141,20 +173,31 @@ Batch: **`docs/STATUS_HISTORY.md`**.
 | 20 | Category-FP-Forensics-Tool | ✅ Fix-Queue vollständig abgearbeitet — 16/19 historische FP gelöst, 3 bewusst offen (2 Ground-Truth-Konflikt, 1 Manual-Review), 0 `ACTIVE_ROUTING_FP` | 19a, 20a–d |
 | 21 | 35 historisch UNCLEAR-Fälle (`konsolen_bundles`/`retro_konsolen`) | forensisch klassifiziert (11 vermutlich TP, 23 vermutlich FP, 1 Manual-Review) | 20e |
 | 22 | Fix-Queue für die 23 `LIKELY_FALSE_POSITIVE`-Kandidaten aus Batch 20e | ✅ root-cause-geclustert (7 Cluster) + 22/23 gelöst (20 bereits vorher, 2 neu: „Split Pad Pro"/„Joy-Con Set"), 1/23 bewusst offen (RDR2/PS4-Steelbook-Bundle, „bundle" = Trigger- und Verstärkungssignal für 3 echte Treffer, Manual-Review) | 21 |
+| 23 | 3 live bestätigte Profit-verzerrende Matching-Fehler (Resale-/Profit-Audit) | ✅ 3 unabhängige Root Causes gezielt gefixt (`konsolen_bundles`/„pro Stück", `vintage_elektronik`/„Hefte", `monitor_curved`/„Teildefekt"), 1 bewusst akzeptierter Ground-Truth-Konflikt | 22 |
+| 24 | Notebook-Recall-Gap (99-TRUE_POSITIVE-Recall-Forensics-Audit) | 21/43 bestätigte Gaps geschlossen, mehrere Fälle dokumentiert zurückgestellt (s. Abschnitt 5 P0) | 23 |
 
 ## 5. Nächste Prioritäten
 
 ### P0 — offen
 
-- **Neu:** RDR2/PS4-Steelbook-Bundle-Fall (Cluster C6, Batch 21) bleibt bewusst ungelöst —
-  „bundle" ist im require_all_of gleichzeitig das auslösende Signal UND das Verstärkungssignal
-  des ovp-Kontext-Guards; 3 bestätigte TRUE_POSITIVE-Fälle nutzen „bundle" selbst als Signal.
-  Kein sicherer Keyword-Fix identifiziert (siehe `unclear_fp_root_cause_analysis.md`, Cluster C6).
-  Braucht eigene Freigabe für einen strukturelleren Ansatz, keine schnelle YAML-Änderung.
+- **Neu (Batch 23):** Notebook-Recall — mehrere Fälle bewusst dokumentiert zurückgestellt, jeweils
+  aus konkretem, geprüftem Grund: `L480`/`L590` (fehlendes „ThinkPad"-Wort im Titel, Lockerung des
+  Marken-Gates wäre Architekturänderung), GTX 1650 Ti / RTX 2060 / RTX 4070 (je nur 1
+  Ground-Truth-Datenpunkt, keine belastbare Preisbasis — `PROPOSED_PRICE_CALIBRATION`), HP
+  (generic Laptop-Marke, Cross-Category-Risiko über HP Zbook/OMEN/Pavilion Gaming und unbekannte
+  Sublinien nicht sicher kontrollierbar — `BLOCKED`), 7 weitere Fälle ganz ohne
+  „laptop"/„notebook"-Wort im Titel, A10 (HP Zbook/Quadro-P600-Workstation-Grenzfall, offene
+  Definitionsfrage). Braucht jeweils eigene Freigabe, kein automatischer Folgeschritt.
+- **Neu (Batch 22):** RDR2/PS4-Steelbook-Bundle-Fall (Cluster C6, Batch 21) bleibt bewusst
+  ungelöst — „bundle" ist im require_all_of gleichzeitig das auslösende Signal UND das
+  Verstärkungssignal des ovp-Kontext-Guards; 3 bestätigte TRUE_POSITIVE-Fälle nutzen „bundle"
+  selbst als Signal. Kein sicherer Keyword-Fix identifiziert (siehe
+  `unclear_fp_root_cause_analysis.md`, Cluster C6). Braucht eigene Freigabe für einen
+  strukturelleren Ansatz, keine schnelle YAML-Änderung.
 - ~~Fix-Queue für die 23 `LIKELY_FALSE_POSITIVE`-Fälle aus Batch 20e~~ — **erledigt in Batch 21**:
   root-cause-geclustert, 22/23 gelöst (20 bereits vorher, 2 neu gefixt), 1/23 s.o. offen.
 - ~~Volle Testsuite stand seit Batch 18 aus~~ — **erledigt** (Batch 20): 1470/1470 grün, seither
-  erneut verifiziert in Batch 21: **1478/1478**.
+  erneut verifiziert in Batch 21 (1478/1478) und Batch 23: **1509/1509**.
 - ~~Fix-Queue-P0-Eintrag Batch 19a (`iphone`)~~ — **erledigt** (Batch 20a).
 - 9 bewusst offene Restlücken aus Batch 18 (Teil 2, „zweifelhafte Treffer") — nur bei neuem,
   eindeutigerem Datenpunkt erneut aufgreifen.
@@ -234,6 +277,18 @@ priorisieren.
   „Split Pad Pro"- und „Joy-Con Set"-Fehltreffer in `konsolen_bundles.yaml` behoben (0
   Regressionen bei 2252 TRUE_POSITIVE- und 19 FALSE_POSITIVE-Fällen, Vollkorpus verifiziert);
   RDR2/PS4-Steelbook-Bundle-Fall bewusst nicht angefasst (PR #52, Batch 21)
+- Resale-/Profit-Audit auf echten Produktivdaten + 3 live bestätigte Profit-verzerrende
+  Matching-Fehler root-cause-analysiert und gefixt: `konsolen_bundles`/„pro Stück",
+  `vintage_elektronik`/„Hefte", `monitor_curved`/„Teildefekt" (lokal, nicht global — Kollision
+  mit TRUE_POSITIVE-Verwendung in `iphone`/`retro_konsolen`); 0 Regressionen, 1 bewusst
+  akzeptierter Ground-Truth-Konflikt (PR #53, Batch 22)
+- 99-TRUE_POSITIVE-Recall-Forensics-Audit (Analyse, keine Codeänderung): 43 bestätigte
+  Recall-Gaps identifiziert und root-cause-geclustert, davon 21 in der Notebook-Recall-
+  Optimierung gezielt geschlossen — ThinkPad-Preisgrenze datenbasiert kalibriert,
+  Wortgrenzen-/Modellcode-Lücken ergänzt, neue GTX-1650-Regel, 3 neue Marken-Regeln (Dell
+  Latitude, ACEMAGIC, Lenovo V330); mehrere Fälle bewusst dokumentiert zurückgestellt
+  (fehlende Preisbasis, Architekturfrage, unkontrollierbares Cross-Category-Risiko) (PR #54,
+  Batch 23)
 
 *Vollständige Details, Root-Cause-Analysen und Blast-Radius-Nachweise: `docs/STATUS_HISTORY.md`.*
 

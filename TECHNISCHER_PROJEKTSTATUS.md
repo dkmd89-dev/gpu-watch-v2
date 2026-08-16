@@ -6,9 +6,9 @@
 >
 > **Stand:** 2026-08-16
 > **Repository:** `dkmd89-dev/gpu-watch-v2`  ·  **Branch:** `main`
-> **HEAD:** `ee26893` (Merge PR #51, Batch 20)
-> **Ruleset-Signatur:** `f8e07b8b8d97d61a`  ·  355 Regeln, 19 Kategorien, 0 Findings
-> **Volle Testsuite (zuletzt verifiziert):** `pytest app/tests/` → **1470 passed, 0 failed** (66,9s)
+> **HEAD:** `404242c` (Merge PR #54, Batch 23)
+> **Ruleset-Signatur:** `87626edfc333ff71`  ·  360 Regeln, 19 Kategorien, 0 Findings
+> **Volle Testsuite (zuletzt verifiziert):** `pytest app/tests/` → **1509 passed, 0 failed** (111,3s)
 
 **Restrukturierung dieser Version:** Frühere Fassungen dieser Datei enthielten eine
 vollständige Batch-für-Batch-Erzählung (Abschnitte 3.1–3.24). Das duplizierte
@@ -36,9 +36,15 @@ Regelwerks: ein dediziertes, read-only **Ruleset-Qualitätssystem**
 (`tools/ruleset_quality/`, siehe Abschnitt 4.8) liefert seit 2026-08-14
 reproduzierbare Regression-Benchmarks statt punktueller Audits. Darauf aufbauend
 wurde ein Category-False-Positive-Forensics-Tool samt priorisierter Fix-Queue
-gebaut und die Fix-Queue vollständig abgearbeitet (Batch 19a/20a–20e, siehe
-Abschnitt 5) — offen ist aktuell nur noch die YAML-Umsetzung für 23 neu
-klassifizierte `LIKELY_FALSE_POSITIVE`-Kandidaten (STATUS.md P0).
+gebaut und die Fix-Queue vollständig abgearbeitet (Batch 19a/20a–20e). Seither
+zwei weitere Batches: ein Resale-/Profit-Audit auf echten Produktivdaten deckte 3
+live bestätigte, Profit-verzerrende Matching-Fehler auf, die root-cause-gefixt
+wurden (Batch 22, PR #53); ein anschließender 99-TRUE_POSITIVE-Recall-Forensics-
+Audit identifizierte 43 bestätigte Recall-Gaps im Notebook-Resale-Bereich, von
+denen 21 in einer datenbasiert kalibrierten Notebook-Recall-Optimierung
+geschlossen wurden (Batch 23, PR #54) — mehrere Fälle bleiben mit dokumentierter
+Begründung offen (fehlende Preisbasis, Architekturfrage, Cross-Category-Risiko),
+siehe STATUS.md Abschnitt 5, P0.
 
 ---
 
@@ -46,16 +52,16 @@ klassifizierte `LIKELY_FALSE_POSITIVE`-Kandidaten (STATUS.md P0).
 
 ```text
 Branch: main
-HEAD:   ee26893 (Merge PR #51)
+HEAD:   404242c (Merge PR #54)
 
 Ruleset (rule_analyzer.py):
-  355 Regeln, 19 Kategorien, 0 Findings
-  Signatur: f8e07b8b8d97d61a
+  360 Regeln, 19 Kategorien, 0 Findings
+  Signatur: 87626edfc333ff71
 
 Testsuite:
-  pytest app/tests/ -q -> 1470 passed, 0 failed (66,9s)
-  Erste vollständige Verifikation seit Batch 17 (1372/1372) —
-  deckt die seit Batch 18 offene P0-Pflicht „volle Suite nach
+  pytest app/tests/ -q -> 1509 passed, 0 failed (111,3s)
+  Vollständig verifiziert nach Batch 23 (vorheriger Vollstand:
+  1478/1478, Batch 21) — deckt die P0-Pflicht „volle Suite nach
   expliziter Freigabe" ab (CLAUDE.md Abschnitt 3, Punkt 4.4).
 
 data/found.json: laufender Produktivbetrieb (Scanner aktiv) — kein
@@ -328,8 +334,10 @@ Kompakte Zusammenfassung; vollständige Tabelle mit allen 21 Punkten:
 Vollständige, aktuell gepflegte Priorisierung: `STATUS.md` Abschnitt 5.
 
 ```text
-P0  Fix-Queue für die 23 LIKELY_FALSE_POSITIVE-Fälle aus Batch 20e (offen,
-    braucht eigene Freigabe)
+P0  Notebook-Recall-Restfälle (L480/L590, GTX 1650 Ti/RTX 2060/RTX 4070, HP
+    generic, Fälle ohne Gerätewort, A10-Workstation-Grenzfall) sowie
+    RDR2/PS4-Steelbook-Bundle-Fall (Cluster C6) — je offen, braucht eigene
+    Freigabe
      ↓
 P1  Resale-Confidence ausbauen, Datenqualitätsdiagnosen automatisieren
      ↓
