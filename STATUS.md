@@ -3,7 +3,7 @@
 > **Stand:** 2026-08-16
 > **Repository:** `dkmd89-dev/gpu-watch-v2`
 > **Branch:** `main`
-> **Letzter Code-Commit auf `main`:** `ee26893` (Merge PR #51)
+> **Letzter Code-Commit auf `main`:** `eeececb` (Merge PR #52)
 > **Technische Referenz:** `TECHNISCHER_PROJEKTSTATUS.md`
 > **Vollständige Batch-Historie (wortgetreu):** `docs/STATUS_HISTORY.md`
 
@@ -12,59 +12,71 @@
 ## 1. Gesamtstatus
 
 **Stabil / aktiv weiterentwickelbar.** Seit dem letzten dokumentierten Stand (`9ec8f86`, PR #44)
-wurden Batch 19 (Forensics-Tool, PR #45–46) und Batch 20 (PR #47–51) gemergt:
+wurden Batch 19 (Forensics-Tool, PR #45–46), Batch 20 (PR #47–51) und Batch 21 (PR #52) gemergt:
 
 - **Batch 19** (bereits vollständig dokumentiert): Category-False-Positive-Forensics-Tool +
   priorisierte Fix-Queue (PR #45), Wiederherstellung einer versehentlich gelöschten
   `konsolen_bundles.yaml` (PR #46).
-- **Batch 20** (neu in dieser Aktualisierung): die Fix-Queue aus Batch 19a wurde vollständig
+- **Batch 20** (bereits vollständig dokumentiert): die Fix-Queue aus Batch 19a wurde vollständig
   abgearbeitet — `iphone`-Mainboard-Fehltreffer und PS4/PS5-HDMI-Reparatur-Fehltreffer per YAML
   gefixt (PR #47–48), Ground-Truth-Snapshot und aktueller Routing-Zustand sauber als zwei getrennte
   Dimensionen modelliert statt vermischt (PR #49–50), und die verbleibenden 35 historisch
-  UNCLEAR-Fälle forensisch klassifiziert (PR #51): **11× vermutlich echter Treffer, 23× vermutlich
-  Fehltreffer, 1× Manual-Review** — noch nicht in YAML-Fixes umgesetzt (siehe P0).
+  UNCLEAR-Fälle forensisch klassifiziert (PR #51): 11× vermutlich echter Treffer, 23× vermutlich
+  Fehltreffer, 1× Manual-Review.
+- **Batch 21** (neu in dieser Aktualisierung): die 23 `LIKELY_FALSE_POSITIVE`-Kandidaten aus
+  Batch 20e wurden root-cause-geclustert (7 Cluster, `unclear_fp_root_cause_analysis.{json,md}`) und
+  gegen die 11 `LIKELY_TRUE_POSITIVE`-Gegenbeispiele geprüft, **bevor** irgendeine YAML-Änderung
+  erfolgte. Ergebnis: 20/23 Kandidaten waren durch frühere Batches bereits gelöst (keine Aktion
+  nötig), 2/23 wurden gezielt neu gefixt (`konsolen_bundles.yaml`: „Split Pad Pro"- und
+  „Joy-Con Set"-Fehltreffer, PR #52), 1/23 (RDR2/PS4-Steelbook-Bundle) bewusst **nicht** gefixt —
+  „bundle" ist dort gleichzeitig Trigger- und Verstärkungssignal für 3 echte Treffer, bleibt
+  Manual-Review.
 
-Ergebnis: von den ursprünglich 19 historisch bestätigten FALSE_POSITIVE-Fällen sind jetzt **16
-gelöst**, 3 bewusst offen (2 Ground-Truth-Konflikt, 1 Manual-Review) — **0 aktive, ungelöste FP**
-mehr in der Fix-Queue. Vollständige Details je Commit: `docs/STATUS_HISTORY.md`, Batch 20.
+Ergebnis: von den ursprünglich 19 historisch bestätigten FALSE_POSITIVE-Fällen sind weiterhin **16
+gelöst**, 3 bewusst offen (2 Ground-Truth-Konflikt, 1 Manual-Review) — unverändert zu Batch 20, da
+Batch 21 die 35 UNCLEAR-Fälle betrifft, ein separates Set. Von den 23 UNCLEAR-
+`LIKELY_FALSE_POSITIVE`-Kandidaten sind jetzt **22/23 gelöst** (20 bereits vorher, 2 neu in
+Batch 21), 1 bewusst offen. Vollständige Details je Commit: `docs/STATUS_HISTORY.md`, Batch 20–21.
 
 ## 2. Verifizierter Stand
 
 ```text
-main: ee26893 (Merge PR #51, HEAD dieser Aktualisierung)
+main: eeececb (Merge PR #52, HEAD dieser Aktualisierung)
 
-Batch 20 gesamt (PR #47-51):
-false_positive_fix_queue.json: 13 Buckets -> 10 ALREADY_FIXED, 2 GROUND_TRUTH_CONFLICT
-  (Nintendo-Switch-Bundle, Xbox-Bundle), 1 MANUAL_REVIEW (Nintendo DS Lite),
-  0 ACTIVE_ROUTING_FP.
-unclear_routing_assessment (35 historische UNCLEAR-Faelle, PR #51):
-  11x LIKELY_TRUE_POSITIVE, 23x LIKELY_FALSE_POSITIVE, 0x GROUND_TRUTH_CONFLICT,
-  1x MANUAL_REVIEW (Nintendo DS Lite, identisch zum bereits bestaetigten FP-Fall).
-app/rules/iphone.yaml: exclude_category um "mainboard"/"motherboard" ergaenzt.
-app/rules/konsolen_bundles.yaml: exclude_category_unless_also_contains um "reparatur"
-  ergaenzt (Kontextliste: konsole/system/Speichergroessen/xl/oled/lite/v1/v2/ovp).
-0 Regressionen (rule_analyzer.py 0 Findings, Benchmark gegen
-  historical_forensics_baseline.json: 0 neue CRITICAL/HIGH_CANDIDATE-Faelle).
+Batch 21 (PR #52, neu in dieser Aktualisierung):
+unclear_fp_root_cause_analysis.json/.md (neu): 23 LIKELY_FALSE_POSITIVE-Kandidaten aus
+  Batch 20e root-cause-geclustert in 7 Cluster (C1-C7), gegen 11 LIKELY_TRUE_POSITIVE
+  gegengeprueft, VOR jeder YAML-Aenderung. Sicherheitsverteilung: 4x SAFE_FIX (C1-C4,
+  bereits durch fruehere Batches geloest, 19 Kandidaten, keine Aktion), 2x PROBABLY_SAFE
+  (C5, C7, neu implementiert), 1x HIGH_RISK (C6, RDR2/PS4-Steelbook-Bundle, bewusst NICHT
+  geaendert -- "bundle" ist gleichzeitig Trigger- und Verstaerkungssignal fuer 3 echte
+  Treffer, bleibt Manual-Review).
+app/rules/konsolen_bundles.yaml: 2 neue additive Excludes --
+  "split pad pro" (exclude_category_unless_preceded_by, C5) und
+  "joy-con set" (bare exclude_category, C7). Geteilte generische Marker ("pro"/"oled")
+  bewusst NICHT angefasst.
+Vollkorpus-Regression (docs/DASHBOARD_MATCH_FORENSICS.json, 2306 Eintraege,
+  vorher/nachher-Diff via matcher.evaluate()): exakt 2 Routing-Aenderungen, beide
+  beabsichtigt (Split-Pad-Pro- und Joy-Con-Set-Fall). 0 Regressionen bei allen 2252
+  TRUE_POSITIVE- und 19 FALSE_POSITIVE-Faellen sowie den uebrigen 33 UNCLEAR-Faellen.
+  TP matched konsolen_bundles vorher/nachher: 191/191 unveraendert.
 
 Rule Analyzer (verifiziert, dieser Session):
 355 Regeln
 19 Kategorien
 0 Findings
-Ruleset-Signatur: f6216b45c6440ab5 -> f8e07b8b8d97d61a (2 YAML-Dateien geaendert)
+Ruleset-Signatur: f8e07b8b8d97d61a -> ff535311dcd59009 (1 YAML-Datei geaendert)
 
 Volle Testsuite (verifiziert, dieser Session):
-pytest app/tests/ -q -> 1470 passed, 0 failed (66,89s)
+pytest -q -> 1478 passed, 0 failed (105,74s)
+  (vorher 1470, +8 neue Tests in test_konsolen_bundles_marker_collision_fix.py)
 
 data/found.json: laufender Produktivbetrieb (Scanner aktiv), nicht Teil dieser
   Doku-Aktualisierung -- Zaehlung daher bewusst nicht erneut ausgewiesen.
 ```
 
-**Volle Suite in dieser Session ausgeführt und grün: 1470/1470.** Damit ist die seit Batch 18
-offene P0-Pflicht („volle Suite nach expliziter Freigabe ausführen") erfüllt — letzter davor
-dokumentierter Vollstand war 1372/1372 (Batch 17). Zwischen Batch 17 und jetzt kamen laut
-Commit-Historie u.a. 15 (Batch 18), 44 und 19 neue/erweiterte Tests (Batch 20c/20d) hinzu; die
-genaue Differenz einzelner Zwischenstände wurde nicht Batch für Batch nachgezählt, der aktuelle
-Endstand (1470/1470) ist jedoch real gegen die installierte Suite verifiziert.
+**Volle Suite in dieser Session ausgeführt und grün: 1478/1478** (vorheriger dokumentierter
+Vollstand: 1470/1470, Batch 20).
 
 ## 3. Batch-Übersicht (1–19)
 
@@ -98,9 +110,10 @@ Batch: **`docs/STATUS_HISTORY.md`**.
 | 20c | Ground Truth / Routing Assessment sauber getrennt | Neues Modul, `queue_category` statt Label-Vermischung | +44 | PR #49, `7159b6c` |
 | 20d | Fix-Queue strikt aus `assessment.status` abgeleitet | Bug behoben (`CATEGORY_CHANGED` fälschlich zu `ACTIVE_ROUTING_FP`), Konsistenz-Check ergänzt | +19 | PR #50, `8988854` |
 | 20e | 35 UNCLEAR-Fälle forensisch klassifiziert | 11 vermutlich TP / 23 vermutlich FP / 1 Manual-Review, **noch nicht in YAML umgesetzt** | — | PR #51, `33b6091` |
+| 21 | Root-Cause-Clustering der 23 `LIKELY_FALSE_POSITIVE` + gezielter Fix | 7 Cluster; 20/23 bereits gelöst, 2/23 neu gefixt (`konsolen_bundles`: „Split Pad Pro"/„Joy-Con Set"), 1/23 bewusst offen (Manual-Review) | +8, **1478/1478** | PR #52, `2a3d514` |
 
-**Nach Batch 20 (verifiziert):** 355 Regeln, 19 Kategorien, 0 Findings, Ruleset-Signatur
-`f8e07b8b8d97d61a`, volle Suite **1470/1470 grün**.
+**Nach Batch 21 (verifiziert):** 355 Regeln, 19 Kategorien, 0 Findings, Ruleset-Signatur
+`ff535311dcd59009`, volle Suite **1478/1478 grün**.
 
 ## 4. Datenqualität — offene Punkte
 
@@ -126,17 +139,22 @@ Batch: **`docs/STATUS_HISTORY.md`**.
 | 18 | `found.json`-Vollanalyse | ✅ 36 Fehltreffer über 3 Kategorien erledigt | 17 |
 | 19 | Nutzer-Fehltreffer-Analyse | ✅ 25/34 erledigt, Fix E bewusst nicht (kein isolierter Root Cause) | 18 |
 | 20 | Category-FP-Forensics-Tool | ✅ Fix-Queue vollständig abgearbeitet — 16/19 historische FP gelöst, 3 bewusst offen (2 Ground-Truth-Konflikt, 1 Manual-Review), 0 `ACTIVE_ROUTING_FP` | 19a, 20a–d |
-| 21 | 35 historisch UNCLEAR-Fälle (`konsolen_bundles`/`retro_konsolen`) | ⚠️ forensisch klassifiziert (11 vermutlich TP, 23 vermutlich FP, 1 Manual-Review) — **YAML-Fix für die 23 LIKELY_FALSE_POSITIVE noch offen, braucht eigene Freigabe** | 20e |
+| 21 | 35 historisch UNCLEAR-Fälle (`konsolen_bundles`/`retro_konsolen`) | forensisch klassifiziert (11 vermutlich TP, 23 vermutlich FP, 1 Manual-Review) | 20e |
+| 22 | Fix-Queue für die 23 `LIKELY_FALSE_POSITIVE`-Kandidaten aus Batch 20e | ✅ root-cause-geclustert (7 Cluster) + 22/23 gelöst (20 bereits vorher, 2 neu: „Split Pad Pro"/„Joy-Con Set"), 1/23 bewusst offen (RDR2/PS4-Steelbook-Bundle, „bundle" = Trigger- und Verstärkungssignal für 3 echte Treffer, Manual-Review) | 21 |
 
 ## 5. Nächste Prioritäten
 
 ### P0 — offen
 
-- **Neu:** Fix-Queue für die 23 `LIKELY_FALSE_POSITIVE`-Fälle aus Batch 20e (35er-UNCLEAR-Set) —
-  rein diagnostisch klassifiziert, noch **kein** YAML-Fix umgesetzt. Braucht eigene Freigabe;
-  vermutlich derselbe „ovp"/„bundle"/„set"-Weak-Signal-Mechanismus wie in Batch 17/18/20a.
-- ~~Volle Testsuite stand seit Batch 18 aus~~ — **erledigt in dieser Aktualisierung**: 1470/1470
-  grün verifiziert (siehe Abschnitt 2).
+- **Neu:** RDR2/PS4-Steelbook-Bundle-Fall (Cluster C6, Batch 21) bleibt bewusst ungelöst —
+  „bundle" ist im require_all_of gleichzeitig das auslösende Signal UND das Verstärkungssignal
+  des ovp-Kontext-Guards; 3 bestätigte TRUE_POSITIVE-Fälle nutzen „bundle" selbst als Signal.
+  Kein sicherer Keyword-Fix identifiziert (siehe `unclear_fp_root_cause_analysis.md`, Cluster C6).
+  Braucht eigene Freigabe für einen strukturelleren Ansatz, keine schnelle YAML-Änderung.
+- ~~Fix-Queue für die 23 `LIKELY_FALSE_POSITIVE`-Fälle aus Batch 20e~~ — **erledigt in Batch 21**:
+  root-cause-geclustert, 22/23 gelöst (20 bereits vorher, 2 neu gefixt), 1/23 s.o. offen.
+- ~~Volle Testsuite stand seit Batch 18 aus~~ — **erledigt** (Batch 20): 1470/1470 grün, seither
+  erneut verifiziert in Batch 21: **1478/1478**.
 - ~~Fix-Queue-P0-Eintrag Batch 19a (`iphone`)~~ — **erledigt** (Batch 20a).
 - 9 bewusst offene Restlücken aus Batch 18 (Teil 2, „zweifelhafte Treffer") — nur bei neuem,
   eindeutigerem Datenpunkt erneut aufgreifen.
@@ -212,6 +230,10 @@ priorisieren.
   behoben, Konsistenz-Check ergänzt (PR #49–50, Batch 20c–d)
 - 35 historisch UNCLEAR-Fälle forensisch klassifiziert (11 TP/23 FP/1 Manual-Review) (PR #51,
   Batch 20e)
+- Root-Cause-Clustering der 23 `LIKELY_FALSE_POSITIVE`-Kandidaten (7 Cluster) + gezielter Fix:
+  „Split Pad Pro"- und „Joy-Con Set"-Fehltreffer in `konsolen_bundles.yaml` behoben (0
+  Regressionen bei 2252 TRUE_POSITIVE- und 19 FALSE_POSITIVE-Fällen, Vollkorpus verifiziert);
+  RDR2/PS4-Steelbook-Bundle-Fall bewusst nicht angefasst (PR #52, Batch 21)
 
 *Vollständige Details, Root-Cause-Analysen und Blast-Radius-Nachweise: `docs/STATUS_HISTORY.md`.*
 
