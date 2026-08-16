@@ -340,6 +340,25 @@ exclude_category_unless_also_contains:
   # mitblockiert, obwohl die Analyse ihn als vermutlich echten Verkauf
   # einstuft -- Einzelfall ohne belastbares Unterscheidungsmerkmal zu den
   # 18 Spiele-FP, nicht separat gelöst.
+  # FIX (Cluster-Audit "OVP-Kontext-Guard-Luecke", 2026-08-16): zwei
+  # historisch UNCLEAR-Faelle ("Nintendo Switch 1. Generation ... OVP +
+  # Kaufbeleg", 125€; "Xbox One S 1 TB + 1 Controller ... OVP", 80€, siehe
+  # unclear_routing_assessment.json, beide LIKELY_TRUE_POSITIVE/HIGH)
+  # hatten trotz eindeutigem Geraete-Marker im Titel keinen Treffer in
+  # dieser Liste: "1. Generation"/"2. Generation" fehlte hier, obwohl es
+  # bei den "joy-con"/"fuer nintendo switch"-Keys weiter unten bereits als
+  # gueltiger Kontext gefuehrt wird (Inkonsistenz) -- "1 TB"/"2 TB" (mit
+  # Leerzeichen) wird von der Wortgrenzen-Pruefung nicht als "1tb"/"2tb"
+  # erkannt (identisches Formatproblem wie an anderer Stelle im Projekt
+  # dokumentiert, z.B. HP-Analyse "8 GB" vs. "8gb"). Bewusst NICHT als
+  # bare "1. generation"/"1 tb" ergaenzt: Adversarial-Test zeigte reale
+  # Kollisionen ("Joy-Con Controller 2. Generation fuer Nintendo Switch
+  # OVP" wuerde faelschlich matchen; "Xbox One S Headset 1 TB Bundle
+  # Angebot OVP" matcht bereits unabhaengig von dieser Aenderung ueber den
+  # bestehenden "bundle"-Marker faelschlich -- bekannte, separate
+  # Precision-Luecke, hier nicht mitgeloest). Stattdessen markengebundene
+  # Phrasen, die nur bei direkter Wortfolge greifen. Blast Radius (voller
+  # 2306-Eintrag-Korpus): genau die 2 Zielfaelle, 0 Kollateralaenderungen.
   ovp:
     - "konsole"
     - "spielkonsole"
@@ -364,6 +383,12 @@ exclude_category_unless_also_contains:
     - "bundle"
     - "set"
     - "mit spiele"
+    - "nintendo switch 1. generation"
+    - "nintendo switch 2. generation"
+    - "xbox one s 1 tb"
+    - "xbox one s 2 tb"
+    - "xbox one x 1 tb"
+    - "xbox one x 2 tb"
   gehäuse:
     - "vergilbt"
     - "verkratzt"
