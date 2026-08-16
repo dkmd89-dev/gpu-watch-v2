@@ -108,7 +108,7 @@ Dashboard / API / Statistics
 ```
 
 Zusätzlich, **außerhalb** dieser Produktionskette (read-only, kein Import durch
-`app.py`/`matcher.py`): `tools/ruleset_quality/` — Regression-Benchmark- und
+`app.py`/`matcher/`): `tools/ruleset_quality/` — Regression-Benchmark- und
 Qualitätssystem (Abschnitt 4.8).
 
 ### 3.2 Verzeichnisstruktur
@@ -118,7 +118,13 @@ app/
 ├── app.py                    # Flask-Einstiegspunkt, Scan-Loop, Persistenz-Orchestrierung
 │                              # (bereits reduziert, weiterhin Kandidat für
 │                              #  kontrollierte, bedarfsgetriebene Modularisierung)
-├── matcher.py                 # Kern-Matching-Logik gegen YAML-Regeln
+├── matcher/                    # Kern-Matching-Logik gegen YAML-Regeln (Package seit `da07f1c`)
+│   ├── core.py                  # MatchResult, evaluate() (Orchestrator)
+│   ├── text_matching.py          # Term-/Regex-Matching-Primitive
+│   ├── vram.py                   # GPU-VRAM-Parsing
+│   ├── hardware_requirements.py  # PC_AUSSCHLIESSEN, Hardware-Anforderungsprüfung
+│   ├── score_bridge.py           # Brücke zu scoring/deal_score.py
+│   └── rules_io.py               # load_rules, compute_ruleset_signature
 ├── rules_loader.py             # YAML-Regeln laden (Rules-Cache)
 ├── rule_analyzer.py            # read-only Diagnose: unerreichbare Regeln, Duplikate, Exclude-Konflikte
 ├── rule_coverage.py            # Coverage-Messung
@@ -183,7 +189,7 @@ kein stabiler Referenzwert.
 ### 4.2 YAML-Regelwerk & Matcher
 
 19 aktive Kategorien unter `app/rules/*.yaml`, `_global.yaml` ist keine eigene
-Kategorie (globale Excludes/Thresholds). Der Matcher (`matcher.py`) bewertet jeden
+Kategorie (globale Excludes/Thresholds). Der Matcher (`matcher/`, Package) bewertet jeden
 Titel gegen `require_all_of`-Gruppen, kontextbewusste Excludes
 (`exclude_category`, `exclude_category_unless_also_contains`,
 `exclude_category_unless_preceded_by`), First-Match-Wins-Routing bei
@@ -252,7 +258,7 @@ Kernsystem, siehe CLAUDE.md Abschnitt 2, Punkt 9).
 ### 4.8 Ruleset-Qualitätssystem (`tools/ruleset_quality/`)
 
 Read-only Analyse-, Benchmark- und Forensics-Tooling, **kein Bestandteil der
-Produktionskette** (kein Import durch `app.py`/`matcher.py`/`rule_analyzer.py`/
+Produktionskette** (kein Import durch `app.py`/`matcher/`/`rule_analyzer.py`/
 `rule_coverage.py`). Importiert ausschließlich bereits produktive Funktionen
 (`matcher.evaluate()`, `matcher.compute_ruleset_signature()`,
 `category_validation.is_still_valid_category()`, `rule_analyzer.analyze_ruleset()`,

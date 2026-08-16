@@ -3,7 +3,8 @@
 > **Stand:** 2026-08-16
 > **Repository:** `dkmd89-dev/gpu-watch-v2`
 > **Branch:** `main`
-> **Letzter Code-Commit auf `main`:** `404242c` (Merge PR #54)
+> **Letzter Code-Commit (lokal, noch nicht gepusht):** `da07f1c` (matcher/-Modularisierung)
+> **Letzter Code-Commit auf `main` (remote):** `404242c` (Merge PR #54)
 > **Technische Referenz:** `TECHNISCHER_PROJEKTSTATUS.md`
 > **Vollständige Batch-Historie (wortgetreu):** `docs/STATUS_HISTORY.md`
 
@@ -319,7 +320,12 @@ Regression-Benchmark/Qualitätssystem, siehe `docs/STATUS_HISTORY.md` und
 - Neue Detector-Typen benötigen weiterhin Python-Code.
 - Fixes verwenden bestehende YAML-/Matcher-Primitive statt eines neuen generischen Matcher-Systems.
 - `tools/ruleset_quality/` ist kein Bestandteil der Produktionskette und wird von `app.py`/
-  `matcher.py` nicht importiert.
+  `matcher/` nicht importiert.
+- `matcher.py` ist seit `da07f1c` (lokal committet, noch nicht gepusht/PR) ein Package
+  (`app/matcher/`): `core.py` (`MatchResult`, `evaluate()`), `text_matching.py`, `vram.py`,
+  `hardware_requirements.py`, `score_bridge.py`, `rules_io.py`. `__init__.py` re-exportiert die
+  komplette bisherige Oberfläche — alle Importpfade (auch privater Funktionen) bleiben
+  unverändert, keine Logikänderung.
 
 ## 8. Arbeitsregeln
 

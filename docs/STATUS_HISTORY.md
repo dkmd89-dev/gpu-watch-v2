@@ -792,3 +792,17 @@ Bewusst zurückgestellt und dokumentiert (nicht Teil dieses Batches): „L480"/�
 `ff535311dcd59009` → `87626edfc333ff71` (1 YAML-Datei mehrfach erweitert). **Volle Testsuite
 ausgeführt und grün: `pytest app/tests/` → 1509 passed, 0 failed** (111,3s), vorheriger
 dokumentierter Vollstand: 1478/1478 (Batch 21).
+
+### 24. `matcher.py` zu Package modularisiert (`da07f1c`, lokal committet, noch nicht gepusht)
+
+`matcher.py` (1317 Zeilen, dokumentiertes God-File) in 6 Schritten auf `app/matcher/` verteilt:
+`core.py` (`MatchResult`, `evaluate()`), `text_matching.py` (Term-/Regex-Primitive), `vram.py`
+(`_vram_gb`), `hardware_requirements.py` (`PC_AUSSCHLIESSEN`, Hardware-Anforderungsprüfung),
+`score_bridge.py` (`_build_score_inputs`), `rules_io.py` (`load_rules`,
+`compute_ruleset_signature`). `__init__.py` re-exportiert die komplette bisherige Oberfläche
+(auch die intern als API genutzten privaten Funktionen) — kein Aufrufer (`app.py`,
+`category_validation.py`, `rule_analyzer.py`, `rule_coverage.py`, `rules_loader.py`,
+`recompute_top_deal.py`, `tools/ruleset_quality/common.py`, Testsuite) musste angepasst werden.
+Reine Strukturänderung, keine Logikänderung — Ruleset-Signatur vor/nach identisch
+(`87626edfc333ff71`). Getestet: `pytest -k matcher` (301/301), abhängige Module (86/86). Volle
+Suite steht noch aus (manuell durch Nutzer).
