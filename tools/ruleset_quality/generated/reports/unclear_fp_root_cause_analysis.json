@@ -1,0 +1,1358 @@
+{
+  "metadata": {
+    "generated_at": "2026-08-16T00:24:16.177152+00:00",
+    "ruleset_signature": "f8e07b8b8d97d61a",
+    "source_unclear_assessment": "tools/ruleset_quality/unclear_routing_assessment.py::build_report() (in-memory regeneriert; committete unclear_routing_assessment.json/.md sind fehlerhaft, siehe consistency_note unten)",
+    "source_ground_truth": "docs/DASHBOARD_MATCH_FORENSICS.json (unveraendert)",
+    "consistency_note": "Die im Repo committeten Dateien tools/ruleset_quality/generated/reports/unclear_routing_assessment.{json,md} enthalten faelschlich nur 1 Fall (Testartefakt aus einem pytest-tmp-Fixture-Lauf, source_ground_truth zeigt auf /tmp/pytest-of-robin/.../forensics.json). Die 35-Faelle-Klassifikation selbst ist vollstaendig und korrekt in der kuratierten _UNCLEAR_ASSESSMENTS-Tabelle in tools/ruleset_quality/unclear_routing_assessment.py erhalten. Dieser Report wurde durch In-Memory-Aufruf von build_report() (ohne write_outputs()) neu erzeugt, um mit den korrekten 35 Faellen zu arbeiten. KEINE der beiden committeten Dateien wurde veraendert -- das Beheben dieses Test-Artefakt-Bugs ist NICHT Teil dieses Auftrags und wird hier nur dokumentiert, nicht behoben."
+  },
+  "summary": {
+    "total_unclear": 35,
+    "likely_false_positive": 23,
+    "likely_true_positive": 11,
+    "manual_review": 1,
+    "ground_truth_conflict": 0,
+    "fp_still_live_under_current_rules": 3,
+    "fp_already_resolved_under_current_rules": 20,
+    "tp_currently_blocked_recall_risk": 2
+  },
+  "side_finding_recall_risk": {
+    "description": "AUSSERHALB des FP-Scopes dieses Auftrags, aber waehrend der Gegenpruefung entdeckt: 2 der 11 LIKELY_TRUE_POSITIVE-Faelle (echte Konsolenangebote) matchen unter den AKTUELLEN Regeln nicht mehr (routing_status=C_NO_LONGER_MATCHES) -- ein moeglicher Recall-Verlust, keine Handlung in diesem Auftrag.",
+    "cases": [
+      {
+        "title": "Nintendo Switch 1. Generation – Neon Blau/Rot – OVP  + Kaufbeleg",
+        "blocked_by": [
+          "ovp"
+        ],
+        "note": "exclude_category_unless_also_contains['ovp']-Verstaerkungsliste enthaelt 'v1'/'v2', aber NICHT die Textform '1. generation'/'2. generation', obwohl dieselbe Liste beim Key 'joy-con' bereits '1. generation'/'2. generation' enthaelt -- Inkonsistenz zwischen den Verstaerkungslisten verschiedener Keys."
+      },
+      {
+        "title": "Xbox One S 1 TB + 1 Controller - Weiß - OVP - Top Zustand",
+        "blocked_by": [
+          "ovp"
+        ],
+        "note": "exclude_category_unless_also_contains['ovp']-Verstaerkungsliste enthaelt '1tb' (ohne Leerzeichen), Titel schreibt '1 TB' (mit Leerzeichen) -- Tokenisierungs-Luecke."
+      }
+    ],
+    "recommendation": "Separates Ticket/Freigabe erforderlich, nicht Teil dieses Root-Cause-Audits."
+  },
+  "signal_matrix": [
+    {
+      "case_id": "https://www.kleinanzeigen.de/s-anzeige/2x-nintendo-switch-2-pro-controller-neu-ovp/3480514740-279-924",
+      "title": "2x Nintendo Switch 2 Pro Controller NEU OVP",
+      "status": "LIKELY_FALSE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": false,
+      "controller_mentioned": true,
+      "joycon_mentioned": false,
+      "single_game_title": false,
+      "accessory_product_name": true,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": false,
+      "set_word": false,
+      "ovp_word": true,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": true,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "ovp"
+      ],
+      "current_routing_status": "C_NO_LONGER_MATCHES",
+      "block_mechanism": "exclude_unless_preceded_by"
+    },
+    {
+      "case_id": "https://www.ebay.de/itm/137596202274",
+      "title": "Bayonetta & Vanquish 10th Anniversary Bundle - PlayStation 4 - Neu & OVP",
+      "status": "LIKELY_FALSE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": false,
+      "controller_mentioned": false,
+      "joycon_mentioned": false,
+      "single_game_title": true,
+      "accessory_product_name": false,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": true,
+      "set_word": false,
+      "ovp_word": true,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "bundle"
+      ],
+      "current_routing_status": "C_NO_LONGER_MATCHES",
+      "block_mechanism": "exclude_unless_also_contains"
+    },
+    {
+      "case_id": "https://www.ebay.de/itm/298569642364",
+      "title": "HORI Split Pad Pro Nintendo Switch Controller Schwarz mit OVP",
+      "status": "LIKELY_FALSE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": false,
+      "controller_mentioned": true,
+      "joycon_mentioned": false,
+      "single_game_title": false,
+      "accessory_product_name": true,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": false,
+      "set_word": false,
+      "ovp_word": true,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "ovp"
+      ],
+      "current_routing_status": "A_SAME_WRONG_CATEGORY",
+      "block_mechanism": "current_match"
+    },
+    {
+      "case_id": "https://www.ebay.de/itm/278262114576",
+      "title": "Metroid Prime Remastered Nintendo Switch 2023 Gebraucht In OVP  guter Zustand ",
+      "status": "LIKELY_FALSE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": false,
+      "controller_mentioned": false,
+      "joycon_mentioned": false,
+      "single_game_title": true,
+      "accessory_product_name": false,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": false,
+      "set_word": false,
+      "ovp_word": true,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "ovp"
+      ],
+      "current_routing_status": "C_NO_LONGER_MATCHES",
+      "block_mechanism": "exclude_unless_also_contains"
+    },
+    {
+      "case_id": "https://www.ebay.de/itm/398090521820",
+      "title": "NEU - OVP! Nintendo Switch Pro Controller - Monster Hunter Rise Sunbreak Edition",
+      "status": "LIKELY_FALSE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": false,
+      "controller_mentioned": true,
+      "joycon_mentioned": false,
+      "single_game_title": false,
+      "accessory_product_name": true,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": false,
+      "set_word": false,
+      "ovp_word": true,
+      "storage_size": false,
+      "edition_word": true,
+      "quantity_marker": false,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "ovp"
+      ],
+      "current_routing_status": "C_NO_LONGER_MATCHES",
+      "block_mechanism": "exclude_unless_preceded_by"
+    },
+    {
+      "case_id": "https://www.ebay.de/itm/407131833744",
+      "title": "Nintendo Pokémon Purpur Nintendo Switch neu/sealed in OVP",
+      "status": "LIKELY_FALSE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": false,
+      "controller_mentioned": false,
+      "joycon_mentioned": false,
+      "single_game_title": true,
+      "accessory_product_name": false,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": false,
+      "set_word": false,
+      "ovp_word": true,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "ovp"
+      ],
+      "current_routing_status": "C_NO_LONGER_MATCHES",
+      "block_mechanism": "exclude_unless_also_contains"
+    },
+    {
+      "case_id": "https://www.ebay.de/itm/267751986716",
+      "title": "Nintendo Switch - Controller Joy-Con Neon-Grün / Neon-Pink 2er - NEU OVP",
+      "status": "LIKELY_FALSE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": false,
+      "controller_mentioned": true,
+      "joycon_mentioned": true,
+      "single_game_title": false,
+      "accessory_product_name": true,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": false,
+      "set_word": false,
+      "ovp_word": true,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "ovp"
+      ],
+      "current_routing_status": "C_NO_LONGER_MATCHES",
+      "block_mechanism": "exclude_unless_also_contains"
+    },
+    {
+      "case_id": "https://www.ebay.de/itm/800482418310",
+      "title": "Nintendo Switch - Minecraft FRA mit OVP",
+      "status": "LIKELY_FALSE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": false,
+      "controller_mentioned": false,
+      "joycon_mentioned": false,
+      "single_game_title": true,
+      "accessory_product_name": false,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": false,
+      "set_word": false,
+      "ovp_word": true,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "ovp"
+      ],
+      "current_routing_status": "C_NO_LONGER_MATCHES",
+      "block_mechanism": "exclude_unless_also_contains"
+    },
+    {
+      "case_id": "https://www.ebay.de/itm/407120679305",
+      "title": "Nintendo Switch 2 - Pro Controller NSWITCH 2 Neu & OVP",
+      "status": "LIKELY_FALSE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": false,
+      "controller_mentioned": true,
+      "joycon_mentioned": false,
+      "single_game_title": false,
+      "accessory_product_name": true,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": false,
+      "set_word": false,
+      "ovp_word": true,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": true,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "ovp"
+      ],
+      "current_routing_status": "C_NO_LONGER_MATCHES",
+      "block_mechanism": "exclude_unless_preceded_by"
+    },
+    {
+      "case_id": "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-2-gamecube-controller-ovp-neu/3480875199-227-2761",
+      "title": "Nintendo Switch 2 GameCube Controller | OVP | NEU",
+      "status": "LIKELY_FALSE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": false,
+      "controller_mentioned": true,
+      "joycon_mentioned": false,
+      "single_game_title": false,
+      "accessory_product_name": true,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": false,
+      "set_word": false,
+      "ovp_word": true,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "ovp"
+      ],
+      "current_routing_status": "C_NO_LONGER_MATCHES",
+      "block_mechanism": "exclude_unless_preceded_by"
+    },
+    {
+      "case_id": "https://www.ebay.de/itm/407132075434",
+      "title": "Nintendo Switch 2 GameCube Controller – Nintendo Classics – OVP – NEU",
+      "status": "LIKELY_FALSE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": false,
+      "controller_mentioned": true,
+      "joycon_mentioned": false,
+      "single_game_title": false,
+      "accessory_product_name": true,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": false,
+      "set_word": false,
+      "ovp_word": true,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "ovp"
+      ],
+      "current_routing_status": "C_NO_LONGER_MATCHES",
+      "block_mechanism": "exclude_unless_preceded_by"
+    },
+    {
+      "case_id": "https://www.ebay.de/itm/267751985916",
+      "title": "Nintendo Switch Controller - Joy-Con 2er-Set Neon-Rot/Neon-Blau -NEU",
+      "status": "LIKELY_FALSE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": false,
+      "controller_mentioned": true,
+      "joycon_mentioned": true,
+      "single_game_title": false,
+      "accessory_product_name": true,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": false,
+      "set_word": true,
+      "ovp_word": false,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "set"
+      ],
+      "current_routing_status": "C_NO_LONGER_MATCHES",
+      "block_mechanism": "exclude_unless_also_contains"
+    },
+    {
+      "case_id": "https://www.ebay.de/itm/128017856305",
+      "title": "Nintendo Switch OLED Joy-Con Set - Pokemon Scarlet & Violet mit Handschlaufaufen",
+      "status": "LIKELY_FALSE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": false,
+      "controller_mentioned": false,
+      "joycon_mentioned": true,
+      "single_game_title": false,
+      "accessory_product_name": true,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": false,
+      "set_word": true,
+      "ovp_word": false,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "set"
+      ],
+      "current_routing_status": "A_SAME_WRONG_CATEGORY",
+      "block_mechanism": "current_match"
+    },
+    {
+      "case_id": "https://www.ebay.de/itm/336734053355",
+      "title": "Nintendo Switch Pro Controller - Schwarz mit OVP kaum genutzt",
+      "status": "LIKELY_FALSE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": false,
+      "controller_mentioned": true,
+      "joycon_mentioned": false,
+      "single_game_title": false,
+      "accessory_product_name": true,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": false,
+      "set_word": false,
+      "ovp_word": true,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "ovp"
+      ],
+      "current_routing_status": "C_NO_LONGER_MATCHES",
+      "block_mechanism": "exclude_unless_preceded_by"
+    },
+    {
+      "case_id": "https://www.ebay.de/itm/318646020850",
+      "title": "Nintendo Switch Pro Controller Original | OVP | TOP Zustand",
+      "status": "LIKELY_FALSE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": false,
+      "controller_mentioned": true,
+      "joycon_mentioned": false,
+      "single_game_title": false,
+      "accessory_product_name": true,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": false,
+      "set_word": false,
+      "ovp_word": true,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "ovp"
+      ],
+      "current_routing_status": "C_NO_LONGER_MATCHES",
+      "block_mechanism": "exclude_unless_preceded_by"
+    },
+    {
+      "case_id": "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-pro-controller-in-ovp/3480100632-279-1186",
+      "title": "Nintendo Switch Pro Controller in OVP",
+      "status": "LIKELY_FALSE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": false,
+      "controller_mentioned": true,
+      "joycon_mentioned": false,
+      "single_game_title": false,
+      "accessory_product_name": true,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": false,
+      "set_word": false,
+      "ovp_word": true,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "ovp"
+      ],
+      "current_routing_status": "C_NO_LONGER_MATCHES",
+      "block_mechanism": "exclude_unless_preceded_by"
+    },
+    {
+      "case_id": "https://www.ebay.de/itm/286899614096",
+      "title": "Nintendo Switch Pro Controller, TOP Zustand mit OVP",
+      "status": "LIKELY_FALSE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": false,
+      "controller_mentioned": true,
+      "joycon_mentioned": false,
+      "single_game_title": false,
+      "accessory_product_name": true,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": false,
+      "set_word": false,
+      "ovp_word": true,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "ovp"
+      ],
+      "current_routing_status": "C_NO_LONGER_MATCHES",
+      "block_mechanism": "exclude_unless_preceded_by"
+    },
+    {
+      "case_id": "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-sports-inkl-12-in-1-zubehoer-set/3480799134-227-2661",
+      "title": "Nintendo Switch Sports inkl. 12-in-1 Zubehör Set",
+      "status": "LIKELY_FALSE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": false,
+      "controller_mentioned": false,
+      "joycon_mentioned": false,
+      "single_game_title": true,
+      "accessory_product_name": false,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": false,
+      "set_word": true,
+      "ovp_word": false,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "set"
+      ],
+      "current_routing_status": "C_NO_LONGER_MATCHES",
+      "block_mechanism": "bare_category_exclude"
+    },
+    {
+      "case_id": "https://www.kleinanzeigen.de/s-anzeige/pok-mon-let-s-go-evoli-nintendo-switch-ovp-komplett/3480723859-227-3213",
+      "title": "Pokémon Let’s Go Evoli! Nintendo Switch – OVP komplett",
+      "status": "LIKELY_FALSE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": false,
+      "controller_mentioned": false,
+      "joycon_mentioned": false,
+      "single_game_title": true,
+      "accessory_product_name": false,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": false,
+      "set_word": false,
+      "ovp_word": true,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "ovp"
+      ],
+      "current_routing_status": "C_NO_LONGER_MATCHES",
+      "block_mechanism": "exclude_unless_also_contains"
+    },
+    {
+      "case_id": "https://www.ebay.de/itm/327297670888",
+      "title": "Read Dead Redemption 1+2 PlayStation 4 PS4 Steelbook Bundle NEU OVP",
+      "status": "LIKELY_FALSE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": false,
+      "controller_mentioned": false,
+      "joycon_mentioned": false,
+      "single_game_title": true,
+      "accessory_product_name": false,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": true,
+      "set_word": false,
+      "ovp_word": true,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "bundle"
+      ],
+      "current_routing_status": "A_SAME_WRONG_CATEGORY",
+      "block_mechanism": "current_match"
+    },
+    {
+      "case_id": "https://www.ebay.de/itm/298566727139",
+      "title": "STAR FOX - Nintendo Switch 2 - NEU-OVP - Händler YAPIDO",
+      "status": "LIKELY_FALSE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": false,
+      "controller_mentioned": false,
+      "joycon_mentioned": false,
+      "single_game_title": true,
+      "accessory_product_name": false,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": false,
+      "set_word": false,
+      "ovp_word": true,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "ovp"
+      ],
+      "current_routing_status": "C_NO_LONGER_MATCHES",
+      "block_mechanism": "exclude_unless_also_contains"
+    },
+    {
+      "case_id": "https://www.ebay.de/itm/227468705699",
+      "title": "Star Fox \"NEU & OVP\" (Nintendo Switch 2)",
+      "status": "LIKELY_FALSE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": false,
+      "controller_mentioned": false,
+      "joycon_mentioned": false,
+      "single_game_title": true,
+      "accessory_product_name": false,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": false,
+      "set_word": false,
+      "ovp_word": true,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "ovp"
+      ],
+      "current_routing_status": "C_NO_LONGER_MATCHES",
+      "block_mechanism": "exclude_unless_also_contains"
+    },
+    {
+      "case_id": "https://www.ebay.de/itm/800481313890",
+      "title": "Super Smash Bros. Ultimate (Nintendo Switch) (Inklusive OVP)",
+      "status": "LIKELY_FALSE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": false,
+      "controller_mentioned": false,
+      "joycon_mentioned": false,
+      "single_game_title": true,
+      "accessory_product_name": false,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": false,
+      "set_word": false,
+      "ovp_word": true,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "ovp"
+      ],
+      "current_routing_status": "C_NO_LONGER_MATCHES",
+      "block_mechanism": "exclude_unless_also_contains"
+    },
+    {
+      "case_id": "https://www.ebay.de/itm/366595666798",
+      "title": "Microsoft Xbox One X 1TB Schwarz Inkl OVP Ohne Controller",
+      "status": "LIKELY_TRUE_POSITIVE",
+      "console_model": true,
+      "console_keyword_explicit": false,
+      "controller_mentioned": true,
+      "joycon_mentioned": false,
+      "single_game_title": false,
+      "accessory_product_name": false,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": false,
+      "set_word": false,
+      "ovp_word": true,
+      "storage_size": true,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "ovp"
+      ],
+      "current_routing_status": "A_SAME_WRONG_CATEGORY",
+      "block_mechanism": "current_match"
+    },
+    {
+      "case_id": "https://www.ebay.de/itm/287514519935",
+      "title": "Nintendo Switch 1. Generation – Neon Blau/Rot – OVP  + Kaufbeleg",
+      "status": "LIKELY_TRUE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": false,
+      "controller_mentioned": false,
+      "joycon_mentioned": false,
+      "single_game_title": false,
+      "accessory_product_name": false,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": false,
+      "set_word": false,
+      "ovp_word": true,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "ovp"
+      ],
+      "current_routing_status": "C_NO_LONGER_MATCHES",
+      "block_mechanism": "exclude_unless_also_contains"
+    },
+    {
+      "case_id": "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-grau-bundle-neue-sticks-kein-drift-extras-/3480736743-279-9668",
+      "title": "Nintendo Switch Grau Bundle  Neue Sticks (Kein Drift) + Extras!",
+      "status": "LIKELY_TRUE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": false,
+      "controller_mentioned": false,
+      "joycon_mentioned": false,
+      "single_game_title": false,
+      "accessory_product_name": false,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": true,
+      "set_word": false,
+      "ovp_word": false,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "bundle"
+      ],
+      "current_routing_status": "A_SAME_WRONG_CATEGORY",
+      "block_mechanism": "current_match"
+    },
+    {
+      "case_id": "https://www.ebay.de/itm/188766880820",
+      "title": "Nintendo Switch HAC-001(-01) Joy-Controller Bundle 32GB Handheld-Spielekonsole -",
+      "status": "LIKELY_TRUE_POSITIVE",
+      "console_model": true,
+      "console_keyword_explicit": true,
+      "controller_mentioned": true,
+      "joycon_mentioned": false,
+      "single_game_title": false,
+      "accessory_product_name": false,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": true,
+      "set_word": false,
+      "ovp_word": false,
+      "storage_size": true,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": true,
+      "generic_secondary_signal_only": [
+        "bundle"
+      ],
+      "current_routing_status": "A_SAME_WRONG_CATEGORY",
+      "block_mechanism": "current_match"
+    },
+    {
+      "case_id": "https://www.ebay.de/itm/298572812276",
+      "title": "Nintendo Switch Komplett Set OVP",
+      "status": "LIKELY_TRUE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": false,
+      "controller_mentioned": false,
+      "joycon_mentioned": false,
+      "single_game_title": false,
+      "accessory_product_name": false,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": false,
+      "set_word": true,
+      "ovp_word": true,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "set",
+        "ovp"
+      ],
+      "current_routing_status": "A_SAME_WRONG_CATEGORY",
+      "block_mechanism": "current_match"
+    },
+    {
+      "case_id": "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-neon-bundle-neue-sticks-kein-drift-extras/3480680031-279-9668",
+      "title": "Nintendo Switch Neon Bundle  Neue Sticks (Kein Drift!) + Extras",
+      "status": "LIKELY_TRUE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": false,
+      "controller_mentioned": false,
+      "joycon_mentioned": false,
+      "single_game_title": false,
+      "accessory_product_name": false,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": true,
+      "set_word": false,
+      "ovp_word": false,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "bundle"
+      ],
+      "current_routing_status": "A_SAME_WRONG_CATEGORY",
+      "block_mechanism": "current_match"
+    },
+    {
+      "case_id": "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-oled-modell-weiss-komplett-mit-ovp/3480437137-279-8400",
+      "title": "Nintendo Switch OLED Modell - Weiß - Komplett mit OVP",
+      "status": "LIKELY_TRUE_POSITIVE",
+      "console_model": true,
+      "console_keyword_explicit": false,
+      "controller_mentioned": false,
+      "joycon_mentioned": false,
+      "single_game_title": false,
+      "accessory_product_name": false,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": false,
+      "set_word": false,
+      "ovp_word": true,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "ovp"
+      ],
+      "current_routing_status": "A_SAME_WRONG_CATEGORY",
+      "block_mechanism": "current_match"
+    },
+    {
+      "case_id": "https://www.ebay.de/itm/188763698665",
+      "title": "Nintendo Switch Spielkonsole mit Set - Guter Zustand",
+      "status": "LIKELY_TRUE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": true,
+      "controller_mentioned": false,
+      "joycon_mentioned": false,
+      "single_game_title": false,
+      "accessory_product_name": false,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": false,
+      "set_word": true,
+      "ovp_word": false,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": true,
+      "generic_secondary_signal_only": [
+        "set"
+      ],
+      "current_routing_status": "A_SAME_WRONG_CATEGORY",
+      "block_mechanism": "current_match"
+    },
+    {
+      "case_id": "https://www.ebay.de/itm/188763696701",
+      "title": "Nintendo Switch Spielkonsole mit Set - Top Zustand",
+      "status": "LIKELY_TRUE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": true,
+      "controller_mentioned": false,
+      "joycon_mentioned": false,
+      "single_game_title": false,
+      "accessory_product_name": false,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": false,
+      "set_word": true,
+      "ovp_word": false,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": true,
+      "generic_secondary_signal_only": [
+        "set"
+      ],
+      "current_routing_status": "A_SAME_WRONG_CATEGORY",
+      "block_mechanism": "current_match"
+    },
+    {
+      "case_id": "https://www.ebay.de/itm/298572811262",
+      "title": "Nintendo Switch V1 HAC-001 mit OVP + Komplett | BLITZVERSAND⚡️",
+      "status": "LIKELY_TRUE_POSITIVE",
+      "console_model": true,
+      "console_keyword_explicit": false,
+      "controller_mentioned": false,
+      "joycon_mentioned": false,
+      "single_game_title": false,
+      "accessory_product_name": false,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": false,
+      "set_word": false,
+      "ovp_word": true,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "ovp"
+      ],
+      "current_routing_status": "A_SAME_WRONG_CATEGORY",
+      "block_mechanism": "current_match"
+    },
+    {
+      "case_id": "https://www.ebay.de/itm/377405800415",
+      "title": "Xbox One S 1 TB + 1 Controller - Weiß - OVP - Top Zustand",
+      "status": "LIKELY_TRUE_POSITIVE",
+      "console_model": false,
+      "console_keyword_explicit": false,
+      "controller_mentioned": true,
+      "joycon_mentioned": false,
+      "single_game_title": false,
+      "accessory_product_name": false,
+      "replacement_part": false,
+      "repair_service": false,
+      "dock_mentioned": false,
+      "cable_mentioned": false,
+      "charger_mentioned": false,
+      "bundle_word": false,
+      "set_word": false,
+      "ovp_word": true,
+      "storage_size": false,
+      "edition_word": false,
+      "quantity_marker": false,
+      "explicit_system_language": false,
+      "generic_secondary_signal_only": [
+        "ovp"
+      ],
+      "current_routing_status": "C_NO_LONGER_MATCHES",
+      "block_mechanism": "exclude_unless_also_contains"
+    }
+  ],
+  "clusters": [
+    {
+      "cluster_id": "C1",
+      "cluster_name": "PRO_CONTROLLER_GAMECUBE_CONTROLLER_PHRASE",
+      "count": 9,
+      "categories": [
+        "konsolen_bundles"
+      ],
+      "rules": [
+        "Nintendo Switch (V1/V2/OLED) ★ Top-Deal",
+        "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis"
+      ],
+      "representative_cases": [
+        "2x Nintendo Switch 2 Pro Controller NEU OVP",
+        "Nintendo Pokémon Purpur Nintendo Switch neu/sealed in OVP",
+        "Nintendo Switch 2 - Pro Controller NSWITCH 2 Neu & OVP"
+      ],
+      "cases": [
+        "https://www.kleinanzeigen.de/s-anzeige/2x-nintendo-switch-2-pro-controller-neu-ovp/3480514740-279-924",
+        "https://www.ebay.de/itm/407131833744",
+        "https://www.ebay.de/itm/407120679305",
+        "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-2-gamecube-controller-ovp-neu/3480875199-227-2761",
+        "https://www.ebay.de/itm/407132075434",
+        "https://www.ebay.de/itm/336734053355",
+        "https://www.ebay.de/itm/318646020850",
+        "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-pro-controller-in-ovp/3480100632-279-1186",
+        "https://www.ebay.de/itm/286899614096"
+      ],
+      "common_signals": [
+        "nintendo switch",
+        "ovp",
+        "\"pro controller\"/\"gamecube controller\" als eigenstaendiger Zwei-Wort-Ausdruck"
+      ],
+      "common_missing_signals": [
+        "konsole/spielkonsole/system/Modellnummer/Speichergroesse"
+      ],
+      "root_cause": "Group-1 (\"nintendo switch\") + Group-2 (\"ovp\") des require_all_of matchen, obwohl der Titel ausschliesslich ein Controller-Zubehoerteil (\"Pro Controller\"/\"GameCube Controller\") beschreibt. Die Plattform-Erwaehnung dient hier als Kompatibilitaetsangabe, nicht als Beweis fuer ein Konsolengehaeuse.",
+      "evidence": "require_all_of_detail aus docs/DASHBOARD_MATCH_FORENSICS.json bestaetigt hits=['nintendo switch'] + ['ovp'] fuer alle 9 Faelle; Titel enthaelt in keinem Fall ein Konsolen-/Speichergroessen-Marker.",
+      "tp_counterexamples": [],
+      "proposed_fix": {
+        "status": "BEREITS IMPLEMENTIERT (nicht Teil dieses Auftrags)",
+        "mechanism": "app/rules/konsolen_bundles.yaml :: exclude_category_unless_preceded_by",
+        "detail": "\"pro controller\"/\"pro-controller\"/\"gamecube controller\" werden blockiert, AUSSER ein Bundle-Konnektor (\"inkl\"/\"mit\"/\"+\"/\"und\"/\"sowie\") steht unmittelbar davor -- laut YAML-Kommentar bereits gegen 195 TRUE_POSITIVE-Titel mit 0 Kollisionen verifiziert."
+      },
+      "blast_radius": {
+        "current_matches": 0,
+        "hypothetical_exclusions": 9,
+        "affected_cases": 9,
+        "note": "Alle 9 Faelle sind bereits jetzt KEIN_TREFFER unter den aktuellen Produktivregeln (routing_status=C_NO_LONGER_MATCHES)."
+      },
+      "safety": "SAFE_FIX",
+      "safety_reason": "Bereits implementiert, dokumentiert 0-Kollisionen-verifiziert, aktuell reproduzierbar KEIN_TREFFER fuer alle 9 Faelle."
+    },
+    {
+      "cluster_id": "C2",
+      "cluster_name": "SINGLE_GAME_TITLE_WITHOUT_CONSOLE_MARKER",
+      "count": 7,
+      "categories": [
+        "konsolen_bundles"
+      ],
+      "rules": [
+        "Nintendo Switch (V1/V2/OLED) ★ Top-Deal"
+      ],
+      "representative_cases": [
+        "Metroid Prime Remastered Nintendo Switch 2023 Gebraucht In OVP  guter Zustand ",
+        "Nintendo Pokémon Purpur Nintendo Switch neu/sealed in OVP",
+        "Nintendo Switch - Minecraft FRA mit OVP"
+      ],
+      "cases": [
+        "https://www.ebay.de/itm/278262114576",
+        "https://www.ebay.de/itm/407131833744",
+        "https://www.ebay.de/itm/800482418310",
+        "https://www.kleinanzeigen.de/s-anzeige/pok-mon-let-s-go-evoli-nintendo-switch-ovp-komplett/3480723859-227-3213",
+        "https://www.ebay.de/itm/298566727139",
+        "https://www.ebay.de/itm/227468705699",
+        "https://www.ebay.de/itm/800481313890"
+      ],
+      "common_signals": [
+        "nintendo switch (Plattformangabe)",
+        "ovp"
+      ],
+      "common_missing_signals": [
+        "konsole/spielkonsole/system",
+        "bundle/set (als Konnektor fuer den ovp-Kontext-Check)"
+      ],
+      "root_cause": "Ein einzelner Spieltitel als Eigenname (\"Minecraft\", \"Pokémon Purpur\", \"Star Fox\" etc.) + Plattformangabe + \"OVP\" erfuellt beide require_all_of-Gruppen, obwohl kein Konsolen-Kernprodukt verkauft wird.",
+      "evidence": "Fuer alle 7 Faelle greift der bereits vorhandene exclude_category_unless_also_contains-Guard auf den Key \"ovp\": \"ovp\" ist zwar vorhanden, aber KEIN Verstaerkungssignal (konsole/spielkonsole/bundle/set/Speichergroesse/Modellname) steht im selben Titel -- der Guard blockiert daher bereits jetzt zuverlaessig.",
+      "tp_counterexamples": [],
+      "proposed_fix": {
+        "status": "BEREITS IMPLEMENTIERT (nicht Teil dieses Auftrags)",
+        "mechanism": "app/rules/konsolen_bundles.yaml :: exclude_category_unless_also_contains['ovp']",
+        "detail": "Blockiert \"ovp\" als Sekundaersignal, wenn kein Konsolen-/Speichergroessen-/Bundle-Marker im selben Titel vorkommt."
+      },
+      "blast_radius": {
+        "current_matches": 0,
+        "hypothetical_exclusions": 7,
+        "affected_cases": 7,
+        "note": "Alle Faelle bereits KEIN_TREFFER, Guard-Mechanismus feuert unabhaengig von Interpunktion (kein Bindestrich-Zufall wie bei C6)."
+      },
+      "safety": "SAFE_FIX",
+      "safety_reason": "Bereits implementiert und robust (nicht interpunktionsabhaengig, siehe Diagnose-Skript-Output)."
+    },
+    {
+      "cluster_id": "C3",
+      "cluster_name": "JOYCON_CONTROLLER_ACCESSORY_WITHOUT_CONSOLE_MARKER",
+      "count": 2,
+      "categories": [
+        "konsolen_bundles"
+      ],
+      "rules": [
+        "Nintendo Switch (V1/V2/OLED) ★ Top-Deal"
+      ],
+      "representative_cases": [
+        "Nintendo Switch - Controller Joy-Con Neon-Grün / Neon-Pink 2er - NEU OVP",
+        "Nintendo Switch Controller - Joy-Con 2er-Set Neon-Rot/Neon-Blau -NEU"
+      ],
+      "cases": [
+        "https://www.ebay.de/itm/267751986716",
+        "https://www.ebay.de/itm/267751985916"
+      ],
+      "common_signals": [
+        "nintendo switch",
+        "joy-con",
+        "ovp/set"
+      ],
+      "common_missing_signals": [
+        "konsole/spielkonsole/oled/Speichergroesse/Modellnummer"
+      ],
+      "root_cause": "Standalone-Joy-Con-Controller-Paare/-Sets ohne Konsolengehaeuse; Plattformname dient nur als Kompatibilitaetsangabe.",
+      "evidence": "exclude_category_unless_also_contains['joy-con'] blockiert bereits: \"joy-con\" ist vorhanden, aber kein Verstaerkungssignal (konsole/oled/Speichergroesse/hac-001/Generation) im selben Titel.",
+      "tp_counterexamples": [
+        "Bewusst KEIN bare \"joy-con\"-Exclude (siehe YAML-Kommentar: 9 Kollisionen mit echten Switch-Bundles wie \"Nintendo Switch Konsole mit grauen Joy-Cons\" real verifiziert) -- der Kontext-Guard ist deshalb die einzig sichere Loesung, ein bare Exclude waere HIGH_RISK gewesen."
+      ],
+      "proposed_fix": {
+        "status": "BEREITS IMPLEMENTIERT (nicht Teil dieses Auftrags)",
+        "mechanism": "app/rules/konsolen_bundles.yaml :: exclude_category_unless_also_contains['joy-con'/'joycon'/'joy con']",
+        "detail": "Kontextbewusster Guard statt bare Exclude -- schuetzt die dokumentierten 9 echten Bundle-Kollisionsfaelle."
+      },
+      "blast_radius": {
+        "current_matches": 0,
+        "hypothetical_exclusions": 2,
+        "affected_cases": 2,
+        "note": "Beide Faelle robust blockiert (kein Verstaerkungssignal vorhanden), unabhaengig von Bindestrich-Zufall."
+      },
+      "safety": "SAFE_FIX",
+      "safety_reason": "Bereits implementiert, TP-Schutz explizit dokumentiert und verifiziert (9 Kollisionsfaelle bekannt und geschuetzt)."
+    },
+    {
+      "cluster_id": "C4",
+      "cluster_name": "ZUBEHOER_SET_BUNDLE_BARE_EXCLUDE",
+      "count": 1,
+      "categories": [
+        "konsolen_bundles"
+      ],
+      "rules": [
+        "Nintendo Switch (V1/V2/OLED) ★ Top-Deal"
+      ],
+      "representative_cases": [
+        "Nintendo Switch Sports inkl. 12-in-1 Zubehör Set"
+      ],
+      "cases": [
+        "https://www.kleinanzeigen.de/s-anzeige/nintendo-switch-sports-inkl-12-in-1-zubehoer-set/3480799134-227-2661"
+      ],
+      "common_signals": [
+        "nintendo switch",
+        "set",
+        "zubehör set"
+      ],
+      "common_missing_signals": [
+        "konsole/spielkonsole"
+      ],
+      "root_cause": "Spieltitel (\"Nintendo Switch Sports\") + Zubehoer-Set (12-in-1), kein Konsolengehaeuse.",
+      "evidence": "bare _category_exclude_terms Treffer: \"zubehör set\" (mit Leerzeichen, siehe YAML-Kommentar 2026-08-15).",
+      "tp_counterexamples": [],
+      "proposed_fix": {
+        "status": "BEREITS IMPLEMENTIERT (nicht Teil dieses Auftrags)",
+        "mechanism": "app/rules/konsolen_bundles.yaml :: exclude_category",
+        "detail": "\"zubehör set\"/\"zubehör-set\"/\"zubehörset\" als bare Exclude, 2 reale Treffer verifiziert, 0 Kollisionen."
+      },
+      "blast_radius": {
+        "current_matches": 0,
+        "hypothetical_exclusions": 1,
+        "affected_cases": 1,
+        "note": "Bereits KEIN_TREFFER."
+      },
+      "safety": "SAFE_FIX",
+      "safety_reason": "Bereits implementiert und verifiziert."
+    },
+    {
+      "cluster_id": "C5",
+      "cluster_name": "THIRD_PARTY_ACCESSORY_BRAND_NAME_MARKER_COLLISION",
+      "count": 1,
+      "categories": [
+        "konsolen_bundles"
+      ],
+      "rules": [
+        "Nintendo Switch (V1/V2/OLED) ★ Top-Deal"
+      ],
+      "representative_cases": [
+        "HORI Split Pad Pro Nintendo Switch Controller Schwarz mit OVP"
+      ],
+      "cases": [
+        "https://www.ebay.de/itm/298569642364"
+      ],
+      "common_signals": [
+        "nintendo switch",
+        "ovp",
+        "\"pro\" (Teil des Produktnamens \"Split Pad Pro\")"
+      ],
+      "common_missing_signals": [
+        "konsole/spielkonsole/Speichergroesse"
+      ],
+      "root_cause": "Der exclude_category_unless_also_contains-Guard fuer den Key \"ovp\" akzeptiert \"pro\" als Verstaerkungssignal (gedacht fuer \"PS4 Pro\"/\"Xbox ... Pro\"-Konsolenvarianten). \"HORI Split Pad Pro\" ist jedoch ein Dritthersteller-Controller-Produktname, dessen \"Pro\" nichts mit einer Konsolenvariante zu tun hat -- der generische Marker \"pro\" wird durch den Produktnamen zufaellig mitgetroffen und hebt den Guard auf, obwohl kein Konsolengehaeuse verkauft wird. Zusaetzlich: \"Pro\" + \"Controller\" stehen hier NICHT als direkte Zwei-Wort-Phrase (\"Split Pad Pro Nintendo Switch Controller\") -- der bereits vorhandene \"pro controller\"-Phrasen-Exclude (siehe C1) greift daher NICHT, weil die Woerter \"Pro\" und \"Controller\" im Titel durch \"Nintendo Switch\" getrennt sind.",
+      "evidence": "Diagnose-Skript bestaetigt: current_routing_status=A_SAME_WRONG_CATEGORY, block_mechanism=current_match (kein Guard feuert). Live-Korpus-Scan (found.json + price_history.jsonl, 19014 Titel): 0 Treffer fuer \"split pad pro\" -- der Fall ist historisch, aktuell nicht im Produktivkorpus vorhanden.",
+      "tp_counterexamples": [
+        "Keiner der 11 LIKELY_TRUE_POSITIVE-Faelle nutzt \"pro\" als sein einziges Verstaerkungssignal (alle nutzen Speichergroesse/\"spielkonsole\"/\"hac-001\"/\"komplett\" zusaetzlich oder stattdessen). Das bare Wort \"pro\" selbst NICHT anfassen -- \"PS4 Pro\"/\"Xbox ... Pro\" sind reale Konsolenvarianten ausserhalb der 35+11-Stichprobe, deren Risiko mit dieser Stichprobe NICHT abschliessend verifizierbar ist (siehe HIGH_RISK-Warnung unten)."
+      ],
+      "proposed_fix": {
+        "status": "NICHT IMPLEMENTIERT -- Fix-Hypothese",
+        "mechanism": "app/rules/konsolen_bundles.yaml :: exclude_category_unless_preceded_by (neuer Eintrag, gleicher *bundle_konnektoren-Anker wie 'pro controller'/'gamecube controller')",
+        "detail": "Neuen Eintrag \"split pad pro\" (und/oder \"hori split pad\") in exclude_category_unless_preceded_by mit demselben Konnektor-Anker (*bundle_konnektoren) hinzufuegen -- IDENTISCHER, bereits produktiv verifizierter Mechanismus wie bei \"pro controller\"/\"gamecube controller\" (C1). WICHTIG: das gemeinsam genutzte Wort \"pro\" in den bestehenden exclude_category_unless_also_contains-Listen (Keys \"ovp\"/\"spiele\") bleibt UNVERAENDERT -- eine Entfernung von \"pro\" dort waere ein globaler Eingriff mit unbekanntem Risiko fuer \"PS4 Pro\"/\"Xbox ... Pro\"-Konsolen ausserhalb der Stichprobe."
+      },
+      "blast_radius": {
+        "current_matches": 1,
+        "hypothetical_exclusions": 1,
+        "affected_cases": 1,
+        "corpus_collision_check": {
+          "phrase": "split pad pro",
+          "titles_scanned": 19014,
+          "collisions": 0
+        },
+        "note": "0 Kollisionen im vollstaendigen aktuellen Korpus (found.json+price_history.jsonl) fuer die vorgeschlagene Phrase."
+      },
+      "safety": "PROBABLY_SAFE",
+      "safety_reason": "Fix selbst ist eng/spezifisch und 0-Kollisionen-verifiziert -- aber nicht SAFE_FIX, weil eine vollstaendige Verifikation gegen den kompletten 2252-TRUE_POSITIVE-Korpus (ausserhalb der 35+11-Stichprobe dieses Audits) noch aussteht, analog zur bestehenden Praxis bei C1/C3/C4."
+    },
+    {
+      "cluster_id": "C6",
+      "cluster_name": "GAME_BUNDLE_MARKER_SELF_COLLISION",
+      "count": 2,
+      "categories": [
+        "konsolen_bundles"
+      ],
+      "rules": [
+        "PS4 Slim / Pro Bundle ★ Top-Deal",
+        "PS4 Slim / Pro Bundle 👍 Guter Preis"
+      ],
+      "representative_cases": [
+        "Read Dead Redemption 1+2 PlayStation 4 PS4 Steelbook Bundle NEU OVP",
+        "Bayonetta & Vanquish 10th Anniversary Bundle - PlayStation 4 - Neu & OVP"
+      ],
+      "cases": [
+        "https://www.ebay.de/itm/137596202274",
+        "https://www.ebay.de/itm/327297670888"
+      ],
+      "common_signals": [
+        "ps4/playstation 4",
+        "bundle",
+        "ovp"
+      ],
+      "common_missing_signals": [
+        "konsole/system/Speichergroesse/slim/pro (als tatsaechliches Geraetesignal)"
+      ],
+      "root_cause": "\"bundle\" ist gleichzeitig (a) das require_all_of-Gruppe-2-Signal, das den Treffer ueberhaupt ausloest, UND (b) in der Verstaerkungsliste des exclude_category_unless_also_contains-Guards fuer den Key \"ovp\" enthalten. Ein Titel, der \"Bundle\" nur im Sinne von \"zwei Spiele im Doppelpack\" verwendet (\"Read Dead Redemption 1+2 ... Steelbook Bundle\"), entwertet den eigenen OVP-Schutzmechanismus mit demselben Wort, das ihn ausgeloest hat -- der Guard kann nicht zwischen \"Konsolen-Bundle\" und \"Spiele-Doppelpack-Bundle\" unterscheiden. WICHTIGER NEBENBEFUND: der historisch als 'geloest' erscheinende Schwesterfall (\"Bayonetta & Vanquish ... Bundle - PlayStation 4 - Neu & OVP\") ist aktuell NUR deshalb KEIN_TREFFER, weil sein Titel zufaellig die Zeichenfolge \"playstation 4 -\" (mit direkt anschliessendem Bindestrich) enthaelt, wofuer ein SEPARATER Guard (Key \"playstation 4 -\") mit einer ANDEREN, engeren Verstaerkungsliste (nur Speichergroessen/Modellnamen, OHNE \"bundle\") existiert. Der Live-Fall \"Read Dead Redemption 1+2 ...\" enthaelt diesen Bindestrich nicht (\"PlayStation 4 PS4 Steelbook Bundle\" statt \"PlayStation 4 - ...\") und entkommt daher demselben Root Cause nur durch Interpunktion, nicht durch inhaltliche Unterscheidung -- der Schwesterfall ist somit KEIN robuster Fix, sondern Zufallstreffer.",
+      "evidence": "Diagnose-Skript: RDR2-Fall block_mechanism=current_match (kein Guard feuert); Bayonetta-Fall block_mechanism=exclude_unless_also_contains, fired_context_keys enthaelt 'playstation 4 -', NICHT 'ovp' (der ovp-Key selbst wird durch 'bundle' im selben Titel neutralisiert -- identisch zum RDR2-Fall).",
+      "tp_counterexamples": [
+        "3 der 11 LIKELY_TRUE_POSITIVE-Faelle nutzen 'bundle' selbst als Signal (\"Nintendo Switch Grau Bundle Neue Sticks...\", \"Nintendo Switch HAC-001 Joy-Controller Bundle 32GB Handheld-Spielekonsole\", \"Nintendo Switch Neon Bundle Neue Sticks...\") -- \"bundle\" darf daher NICHT generell aus der Verstaerkungsliste entfernt werden, sonst wuerden diese 3 echten Konsolenangebote neu blockiert."
+      ],
+      "proposed_fix": {
+        "status": "NICHT IMPLEMENTIERT -- keine sichere Fix-Hypothese identifiziert",
+        "mechanism": null,
+        "detail": "Kein Keyword-Fix identifizierbar, der (a) 'Read Dead Redemption 1+2 ... Bundle' zuverlaessig blockiert und (b) 'Nintendo Switch Grau Bundle Neue Sticks' weiterhin durchlaesst, OHNE eine neue, vom Titel unabhaengige Heuristik einzufuehren (z.B. 'enthaelt Bundle-Wort, aber KEIN Geraete-eigenes Signal wie Speichergroesse/Konsole/Modell' -- das waere strukturell dasselbe Problem, das den urspruenglichen 35er-UNCLEAR-Batch erzeugt hat, nur eine Ebene tiefer). Eine schmale Phrase wie 'steelbook bundle' wuerde nur den einen Live-Fall abdecken (0 weitere Korpustreffer), loest aber nicht das strukturelle Self-Collision-Problem und waere reines Symptom-Patching."
+      },
+      "blast_radius": {
+        "current_matches": 1,
+        "hypothetical_exclusions": null,
+        "affected_cases": 2,
+        "corpus_collision_check": {
+          "phrase_steelbook": {
+            "titles_scanned": 19014,
+            "collisions": 0
+          },
+          "phrase_bundle_broad": {
+            "titles_scanned": 19014,
+            "collisions": 19
+          }
+        },
+        "note": "'steelbook' hat 0 Korpustreffer (schmaler Fix moeglich, aber niedriger Wert). 'bundle' als bare Wort hat sehr viele Korpustreffer -- KEIN globaler Eingriff an diesem Signal ohne Vollkorpus-Review."
+      },
+      "safety": "HIGH_RISK",
+      "safety_reason": "FP und TP nutzen exakt dasselbe starke Signal ('bundle') ohne verlaessliche Kontexttrennung; die aktuell scheinbar geloeste Instanz (Bayonetta) ist nachweislich nur durch Interpunktions-Zufall geloest, nicht durch inhaltliche Logik -- Auftragsregel 'HIGH_RISK wenn FP und TP dieselben starken Signale verwenden und keine eindeutige Kontexttrennung existiert' greift hier direkt."
+    },
+    {
+      "cluster_id": "C7",
+      "cluster_name": "JOYCON_SET_OLED_MARKER_COLLISION",
+      "count": 1,
+      "categories": [
+        "konsolen_bundles"
+      ],
+      "rules": [
+        "Nintendo Switch (V1/V2/OLED) 👍 Guter Preis"
+      ],
+      "representative_cases": [
+        "Nintendo Switch OLED Joy-Con Set - Pokemon Scarlet & Violet mit Handschlaufaufen"
+      ],
+      "cases": [
+        "https://www.ebay.de/itm/128017856305"
+      ],
+      "common_signals": [
+        "nintendo switch",
+        "switch oled",
+        "joy-con",
+        "set",
+        "spieltitel (Pokemon Scarlet & Violet)"
+      ],
+      "common_missing_signals": [
+        "konsole/spielkonsole/Speichergroesse"
+      ],
+      "root_cause": "Der exclude_category_unless_also_contains-Guard fuer den Key \"joy-con\" akzeptiert \"oled\" als Verstaerkungssignal (gedacht fuer echte Switch-OLED-Konsolen mit Joy-Cons). Hier bezeichnet \"OLED\" jedoch nur, fuer welches Switch-Modell das separate Joy-Con-SET kompatibel ist -- kein OLED-Konsolengehaeuse wird verkauft. Strukturell identisch zu C5 (C5: \"pro\" faelschlich als Geraetebeweis, C7: \"oled\" faelschlich als Geraetebeweis).",
+      "evidence": "Diagnose-Skript: current_routing_status=A_SAME_WRONG_CATEGORY, block_mechanism=current_match. Titel enthaelt 'oled' (aus 'Switch OLED Joy-Con Set'), das die joy-con-Verstaerkungsliste erfuellt, obwohl es sich auf die Joy-Con-Variante bezieht, nicht auf ein Konsolengehaeuse.",
+      "tp_counterexamples": [
+        "TP \"Nintendo Switch OLED Modell - Weiß - Komplett mit OVP\" nutzt 'oled' ZUSAMMEN mit 'Modell'/'Komplett' -- kein Joy-Con-Bezug. Wuerde von einer gezielten Aenderung an der 'joy-con'-Liste (statt einer globalen 'oled'-Aenderung) nicht beruehrt, da diese TP den 'ovp'-Key trifft, nicht den 'joy-con'-Key."
+      ],
+      "proposed_fix": {
+        "status": "NICHT IMPLEMENTIERT -- Fix-Hypothese",
+        "mechanism": "app/rules/konsolen_bundles.yaml :: exclude_category (neue bare Phrase, analog 'zubehör set')",
+        "detail": "Neue bare exclude_category-Phrase \"joy-con set\" (und Varianten \"joy-con-set\"/\"joycon set\") -- 0 Korpustreffer, analog zur bestehenden 'zubehör set'-Loesung (C4). Alternative (enger, aber aufwendiger): 'oled' NUR aus der 'joy-con'/'joycon'/'joy con'-Verstaerkungsliste entfernen (NICHT aus der 'ovp'-Liste), da die TP-Gegenprobe zeigt, dass echte OLED-Konsolen ueber den 'ovp'-Key erkannt werden, nicht ueber den 'joy-con'-Key."
+      },
+      "blast_radius": {
+        "current_matches": 1,
+        "hypothetical_exclusions": 1,
+        "affected_cases": 1,
+        "corpus_collision_check": {
+          "phrase": "joy-con set",
+          "titles_scanned": 19014,
+          "collisions": 0
+        },
+        "note": "0 Kollisionen im vollstaendigen aktuellen Korpus fuer 'joy-con set'."
+      },
+      "safety": "PROBABLY_SAFE",
+      "safety_reason": "Fix ist eng/spezifisch und 0-Kollisionen-verifiziert; PROBABLY_SAFE statt SAFE_FIX, da bare 'joy-con' laut bestehender Dokumentation bereits 9 reale Kollisionsfaelle hatte -- die neue, engere Phrase 'joy-con set' muss vor Implementierung gegen denselben TRUE_POSITIVE-Korpus wie damals gegengeprueft werden, nicht nur gegen die 11 Faelle dieser Stichprobe."
+    }
+  ],
+  "manual_review_case": {
+    "case_id": "https://www.ebay.de/itm/318701631164",
+    "title": "Nintendo DS Lite Handheld-System hellblau Touchscreen",
+    "note": "Unveraendert MANUAL_REVIEW -- siehe root_cause_pattern=lexically_ambiguous_vs_confirmed_false_positive in unclear_routing_assessment.py. Kein Cluster, keine Fix-Hypothese in diesem Auftrag."
+  },
+  "safety_distribution": {
+    "SAFE_FIX": 4,
+    "PROBABLY_SAFE": 2,
+    "HIGH_RISK": 1
+  },
+  "global_recommendation": {
+    "verdict": "READY_FOR_TARGETED_FIX",
+    "scope": "Gilt AUSSCHLIESSLICH fuer C5 (HORI Split Pad Pro) und C7 (Switch OLED Joy-Con Set) -- beides schmale, 0-Kollisionen-verifizierte Phrasen-Excludes nach demselben bereits produktiven Muster wie C1/C3/C4 (exclude_category_unless_preceded_by bzw. bare exclude_category), OHNE die gemeinsam genutzten generischen Marker 'pro'/'oled'/'bundle' selbst anzufassen.",
+    "explicit_exclusion": "C6 (Read Dead Redemption 1+2 PS4 Bundle) bleibt DO_NOT_FIX_YET / MANUAL_REVIEW_REQUIRED -- keine sichere, keyword-basierte Trennung zwischen 'Spiele-Doppelpack-Bundle' und 'Konsolen-Bundle' gefunden, die nicht mindestens 3 bestaetigte TRUE_POSITIVE-Faelle gefaehrdet. C1-C4 sind bereits implementiert -- keine weitere Aktion noetig, nur zur Vollstaendigkeit dokumentiert.",
+    "pre_implementation_requirements": [
+      "app/rule_analyzer.py erneut laufen lassen vor jeder YAML-Aenderung.",
+      "C5/C7-Phrasen gegen den VOLLSTAENDIGEN TRUE_POSITIVE-Korpus (2252 Faelle in docs/DASHBOARD_MATCH_FORENSICS.json, nicht nur die 11 UNCLEAR-TP dieser Stichprobe) verifizieren, analog zur dokumentierten Praxis bei 'pro controller'/'gamecube controller'/'zubehör set'.",
+      "pytest app/tests/test_konsolen_bundles.py -v nach Implementierung, danach pytest app/tests/ -k konsolen_bundles -v.",
+      "Explizite Nutzer-Freigabe vor jeder YAML-Aenderung (CLAUDE.md Regel 3)."
+    ]
+  }
+}
