@@ -6,11 +6,13 @@
 >
 > **Stand:** 2026-08-16
 > **Repository:** `dkmd89-dev/gpu-watch-v2`  ·  **Branch:** `main`
-> **HEAD:** `fe05a72` (Merge PR #55, Batch 25)
-> **Ruleset-Signatur:** `0a9c9f4bb3590872`  ·  360 Regeln, 19 Kategorien, 0 Findings
+> **HEAD:** `75e0b82` (Merge PR #56, Batch 26)
+> **Ruleset-Signatur:** `09d66cde97932a9f`  ·  360 Regeln, 19 Kategorien, 0 Findings
+> **Category Recall Gate:** `CATEGORY_RECALL_MAXIMALLY_SECURED` (Batch 26) — nächster
+> Haupt-Workstream: Price Validation / Profit Validation
 > **Volle Testsuite (zuletzt vollständig verifiziert):** `pytest app/tests/` → **1509 passed, 0
-> failed** (111,3s, Batch 23). Batch 25 lief zielgerichtet (`test_notebook_resell_*.py`: 40
-> passed; `-k notebook_resell`: 68 passed) — volle Suite läuft nur nach expliziter Freigabe.
+> failed** (111,3s, Batch 23). Batch 25/26 liefen zielgerichtet (`-k notebook_resell`: 68 passed;
+> `-k konsolen_bundles`: 84 passed) — volle Suite läuft nur nach expliziter Freigabe.
 
 **Restrukturierung dieser Version:** Frühere Fassungen dieser Datei enthielten eine
 vollständige Batch-für-Batch-Erzählung (Abschnitte 3.1–3.24). Das duplizierte
@@ -52,7 +54,15 @@ Begründung offen (fehlende Preisbasis, Architekturfrage, Cross-Category-Risiko)
 siehe STATUS.md Abschnitt 5, P0. Vier weitere Recall-Cluster (Fujitsu Lifebook,
 HP generic, HP ZBook, Alienware) wurden vertieft analysiert, aber bewusst nicht
 implementiert (`BLOCKED`/`NEEDS_DESIGN_DECISION`/`NEEDS_DEFINITION`) — siehe
-STATUS.md Abschnitt 5, P0, für die Kurzfassung.
+STATUS.md Abschnitt 5, P0, für die Kurzfassung. Ein anschließender „Category
+Recall Maximal Absichern"-Workflow (Batch 26, PR #56) prüfte systematisch alle
+verbleibenden 69 unmatched TRUE_POSITIVE- und 24 unmatched UNCLEAR-Fälle, bevor
+irgendeine Preis-/Profit-Validierung beginnt: 1 echter Recall-Gap gefunden und
+gefixt (`konsolen_bundles.yaml` OVP-Kontext-Guard-Lücke), 9 weitere Cluster als
+bereits bewusste Ground-Truth-Konflikte bestätigt, 4 Einzelfälle als reine
+GT-Kategorie-Fehlzuordnungen identifiziert. Ergebnis:
+`CATEGORY_RECALL_MAXIMALLY_SECURED` — der Projektschwerpunkt wechselt jetzt zu
+Price Validation / Profit Validation.
 
 ---
 
@@ -60,20 +70,29 @@ STATUS.md Abschnitt 5, P0, für die Kurzfassung.
 
 ```text
 Branch: main
-HEAD:   fe05a72 (Merge PR #55, Batch 25)
+HEAD:   75e0b82 (Merge PR #56, Batch 26)
 
 Ruleset (rule_analyzer.py):
   360 Regeln, 19 Kategorien, 0 Findings
-  Signatur: 87626edfc333ff71 -> 0a9c9f4bb3590872 (Batch 25:
-    notebook_resell.yaml dreifach erweitert)
+  Signatur: 0a9c9f4bb3590872 -> 09d66cde97932a9f (Batch 26:
+    konsolen_bundles.yaml um 6 markengebundene OVP-Kontext-Phrasen erweitert)
+
+Ground-Truth-Abgleich (docs/DASHBOARD_MATCH_FORENSICS.json, 2306 Eintraege):
+  TP: 2252 gesamt / 2183 matched
+  FP: 19 gesamt / 3 matched
+  UNCLEAR: 35 gesamt / 13 matched (vorher 11, Batch 26: +2)
+
+Category Recall Gate (Batch 26): CATEGORY_RECALL_MAXIMALLY_SECURED --
+  alle 69 unmatched TP + 24 unmatched UNCLEAR einzeln klassifiziert,
+  siehe STATUS.md Abschnitt 1a fuer die vollstaendige Aufschluesselung.
 
 Testsuite:
   Vollständig verifiziert nach Batch 23: pytest app/tests/ -q ->
   1509 passed, 0 failed (111,3s) — deckt die P0-Pflicht „volle Suite
   nach expliziter Freigabe" ab (CLAUDE.md Abschnitt 3, Punkt 4.4).
-  Batch 25 lief gezielt (CLAUDE.md Abschnitt 3, Punkt 4.4, gestufte
-  Tests): pytest app/tests/test_notebook_resell_*.py -v -> 40 passed;
-  pytest app/tests/ -k notebook_resell -q -> 68 passed. Volle Suite
+  Batch 25/26 liefen gezielt (CLAUDE.md Abschnitt 3, Punkt 4.4, gestufte
+  Tests): pytest app/tests/ -k notebook_resell -q -> 68 passed;
+  pytest app/tests/ -k konsolen_bundles -q -> 84 passed. Volle Suite
   seit Batch 23 nicht erneut ohne explizite Freigabe ausgeführt.
 
 data/found.json: laufender Produktivbetrieb (Scanner aktiv) — kein
@@ -313,7 +332,7 @@ Kompakte Zusammenfassung; vollständige Tabelle mit allen 21 Punkten:
 | Bereich | Status |
 |---|---|
 | 19 historische FALSE_POSITIVE-Fälle (Forensics-Fix-Queue) | ✅ 16/19 gelöst, 3 bewusst offen (2 Ground-Truth-Konflikt: Switch/Xbox, 1 Manual-Review: DS-Lite) |
-| 35 historische UNCLEAR-Fälle | ⚠️ forensisch klassifiziert (11 TP / 23 FP / 1 Manual-Review), **YAML-Fix für die 23 FP-Fälle noch offen** (STATUS.md P0) |
+| 35 historische UNCLEAR-Fälle | ✅ forensisch klassifiziert (11 TP / 23 FP / 1 Manual-Review); die 2 real umsetzbaren LIKELY_TRUE_POSITIVE-Fälle in Batch 26 gefixt (konsolen_bundles OVP-Kontext-Guard); 23 FP-Fälle bewusst nicht gefixt (LIKELY_FALSE_POSITIVE = korrekt unmatched) |
 | Umlaut-Fingerprint-Bug | Code behoben, **nicht rückwirkend** — historische Zeilen in `handhelds`/`konsolen_bundles`/`retro_konsolen`/`vintage_elektronik` bleiben strukturell unzuverlässig für Fingerprint-Revalidierung |
 | `RX 7600 XT`/`RX 7600`-Überlappung | ✅ erledigt (min_vram_gb-Bug, 5 Modelle) |
 | `controller`/`ladekabel`-Exclude | ✅ erledigt |
@@ -357,6 +376,20 @@ Kompakte Zusammenfassung; vollständige Tabelle mit allen 21 Punkten:
   Wortgrenzen-Lookbehind nicht erkannt). Eine vollständige Lösung würde eine
   kleine, aber echte Erweiterung von `matcher/core.py` erfordern — betrifft
   ein geschütztes Kernsystem, nicht Teil einer reinen YAML-Änderung.
+- **Wiederkehrendes Ground-Truth-Konflikt-Muster** (verifiziert im Rahmen des
+  Batch-26-Category-Recall-Gate): ein erheblicher Teil der verbleibenden
+  unmatched TRUE_POSITIVE-Fälle im 2306-Eintrag-Korpus sind keine Matcher-
+  Bugs, sondern Titel, die eine Kategorie-YAML **bewusst und bereits real
+  verifiziert** ausschließt (Zubehör-/Ersatzteil-/Software-Titel), während
+  die Ground-Truth-Datei sie trotzdem als `TRUE_POSITIVE` labelt — analog
+  zu den bereits dokumentierten Switch/Xbox- und PS4-„pro Stück"-Artefakten.
+  Bestätigt in 9 weiteren Clustern (Aufrüstkit, konsolen_bundles, controller,
+  handhelds, retro_konsolen, lego_minifiguren, autoradio_opel_corsa, iPhone,
+  RAM) — jeweils mit dem bereits im Code dokumentierten Exclude-Kommentar
+  gegengeprüft, keine YAML-Änderung vorgesehen. Bei künftiger Recall-Arbeit:
+  vor jeder Cluster-Analyse zuerst prüfen, ob die Ziel-Titel bereits durch
+  einen dokumentierten `exclude_category`/`exclude_category_unless_*`-Eintrag
+  abgedeckt sind, bevor ein „Recall-Gap" angenommen wird.
 
 ---
 
@@ -365,17 +398,20 @@ Kompakte Zusammenfassung; vollständige Tabelle mit allen 21 Punkten:
 Vollständige, aktuell gepflegte Priorisierung: `STATUS.md` Abschnitt 5.
 
 ```text
-P0  Notebook-Recall-Restfälle (GTX 1650 Ti/RTX 2060/RTX 4070, Fälle ohne
-    Gerätewort, A10/HP-Zbook-Workstation-Grenzfall -- L480/L590 in Batch 25
-    erledigt) sowie RDR2/PS4-Steelbook-Bundle-Fall (Cluster C6) -- je offen,
-    braucht eigene Freigabe.
-    Vier weitere Cluster tiefenanalysiert, bewusst nicht implementiert:
-    Fujitsu Lifebook (BLOCKED), Alienware (BLOCKED, Groessen-Gruppe
-    strukturell unloesbar), HP generic (NEEDS_DESIGN_DECISION -- Trade-off
-    Zubehoer-Precision vs. Akku-Zustands-Recall, siehe Abschnitt 6), HP
-    ZBook (NEEDS_DEFINITION).
+P0  ✅ Category Recall Gate: CATEGORY_RECALL_MAXIMALLY_SECURED (Batch 26).
+    Naechster Haupt-Workstream: Price Validation / Profit Validation.
+    HP generic (NEEDS_DESIGN_DECISION) und HP ZBook (NEEDS_DEFINITION)
+    bleiben separat offen, blockieren das Recall-Gate NICHT -- vollstaendig
+    analysiert, Entscheidung ist eine Business-/Produktfrage.
+    Technisch nicht geloest, aber klassifiziert (Teil des Gate-Abschlusses):
+    Fujitsu Lifebook (BLOCKED), Alienware (BLOCKED), GTX 1650 Ti/RTX 2060/
+    RTX 4070 (fehlende Preisbasis), IdeaPad 5/VOYEE (fehlende Datenbasis),
+    RDR2/PS4-Steelbook-Bundle (Cluster C6, kein sicherer Fix), 7 Notebook-
+    Faelle ohne Geraetewort.
      ↓
-P1  Resale-Confidence ausbauen, Datenqualitätsdiagnosen automatisieren
+P1  Price Validation / Profit Validation (neuer Haupt-Workstream nach
+    Batch 26) -- Resale-Confidence ausbauen, Datenqualitätsdiagnosen
+    automatisieren
      ↓
 P2  app.py nur bei konkretem Änderungsdruck weiter modularisieren
      ↓
@@ -418,5 +454,5 @@ P3  Neue Kategorien/Deal-Intelligence erst nach Stabilitäts-/Qualitätsschritte
   frühe Phasenberichte (Performance, Rule-Analysis/-Coverage, Preiskalibrierung).
 
 Diese Dokumente liefern historische Details und Nachweise. Für den aktuellen
-technischen Code-Stand ist HEAD `fe05a72` maßgeblich; für die technische
+technischen Code-Stand ist HEAD `75e0b82` maßgeblich; für die technische
 Projektreferenz ist diese Datei maßgeblich.

@@ -3,7 +3,8 @@
 > **Stand:** 2026-08-16
 > **Repository:** `dkmd89-dev/gpu-watch-v2`
 > **Branch:** `main`
-> **Letzter Code-Commit auf `main` (remote):** `fe05a72` (Merge PR #55)
+> **Letzter Code-Commit auf `main` (remote):** `75e0b82` (Merge PR #56)
+> **Category Recall Gate:** `CATEGORY_RECALL_MAXIMALLY_SECURED` (siehe Abschnitt 1a)
 > **Technische Referenz:** `TECHNISCHER_PROJEKTSTATUS.md`
 > **Vollständige Batch-Historie (wortgetreu):** `docs/STATUS_HISTORY.md`
 
@@ -75,11 +76,64 @@ Seither zwei weitere Batches (PR #53–54, neu in dieser Aktualisierung):
   fehlende Ausschlussregel für Laufzeitdaten). 40 zielgerichtete + 68 kategorie-bezogene Tests
   grün; volle Suite in dieser Aktualisierung nicht erneut ausgeführt (keine explizite Freigabe in
   diesem Schritt).
+- **Batch 26** (PR #56, `62fd678`/`75e0b82`, neu in dieser Aktualisierung): „Category Recall
+  Maximal Absichern"-Workflow — systematische Prüfung aller verbleibenden 69 unmatched
+  TRUE_POSITIVE-Fälle plus der 24 unmatched UNCLEAR-Fälle, bevor irgendeine Preis-/Profit-
+  Validierung beginnt. Ergebnis: 1 echter, technisch klarer Recall-Gap gefunden und gefixt
+  (`konsolen_bundles.yaml`: „OVP"-Kontext-Guard-Lücke — „1./2. Generation" fehlte inkonsistent in
+  der `exclude_category_unless_also_contains["ovp"]`-Liste, „1 TB"/„2 TB" mit Leerzeichen wurde
+  nicht als „1tb"/„2tb" erkannt; markengebundene Phrasen statt bare Begriffe nach Adversarial-Test
+  2 Kollisionen aufdeckte). Löst 2 UNCLEAR-Fälle (125€, 80€), 0 Kollateralschäden im vollen
+  2306-Eintrag-Korpus, 84/84 kategoriebezogene Tests grün. Alle übrigen 4 geprüften Cluster
+  (Aufrüstkit 28, konsolen_bundles Zubehör 6, controller Zubehör 6, handhelds 6, retro_konsolen 3,
+  lego_minifiguren 2, autoradio_opel_corsa 2, iPhone 1, RAM 1) erwiesen sich bei näherer Prüfung
+  als bereits bewusste, dokumentierte Ground-Truth-Konflikte — die jeweiligen Excludes
+  funktionieren korrekt, keine YAML-Änderung vorgesehen. 4 weitere Einzelfälle (netzteil,
+  sata_ssd, vintage_elektronik, monitor_curved) als reine GT-Kategorie-Fehlzuordnungen
+  identifiziert (kein Matcher-Fix technisch sinnvoll möglich). Alle 69 unmatched TRUE_POSITIVE-
+  Fälle sind damit vollständig klassifiziert — Ergebnis: **`CATEGORY_RECALL_MAXIMALLY_SECURED`**
+  (Details: Abschnitt 1a).
+
+## 1a. Category Recall Gate (Batch 26, abgeschlossen)
+
+```text
+HEAD: 75e0b82 (Merge PR #56)
+Ruleset-Signatur: 09d66cde97932a9f
+Rule Analyzer: 0 Findings
+TP: 2252 gesamt / 2183 matched (69 unmatched, alle klassifiziert)
+FP: 19 gesamt / 3 matched
+UNCLEAR: 35 gesamt / 13 matched (22 unmatched, alle klassifiziert)
+Letzter Full-Corpus-Diff (PR #56): 2 Aenderungen, 0 Kollateralschaeden
+```
+
+Alle 69 unmatched TRUE_POSITIVE-Fälle einzeln geprüft und einer von fünf Endzuständen zugeordnet:
+
+| Klasse | Anzahl | Beispiele |
+|---|---:|---|
+| Gefixt (Batch 26) | 2 (UNCLEAR) | konsolen_bundles OVP-Kontext-Guard, PR #56 |
+| GT-Konflikt (bewusste, dokumentierte Excludes greifen korrekt) | 54 | Aufrüstkit (28), konsolen_bundles (6), controller (5), handhelds (6), retro_konsolen (3), lego_minifiguren (2), autoradio_opel_corsa (2), iPhone (1), RAM (1) |
+| Design-Entscheidung offen (vollständig analysiert) | 3 | HP generic (2, `NEEDS_DESIGN_DECISION`), HP ZBook (1, `NEEDS_DEFINITION`) |
+| Technisch nicht sicher lösbar (`BLOCKED`) | 2 | Alienware, Fujitsu Lifebook |
+| Fehlende Datenbasis | 6 | GPU-Tier-Lücken (3), IdeaPad 5 (2), VOYEE-Controller (1) |
+| GT-Kategorie-Fehlzuordnung (kein Matcher-Fix möglich) | 4 | netzteil→Audio-Verstärker, sata_ssd→externe USB-SSD, vintage_elektronik→Foto, monitor_curved→Heimtrainer |
+
+**Status: `CATEGORY_RECALL_MAXIMALLY_SECURED`.** Keine unerklärten Cluster mehr vorhanden. Die
+HP-Design-Entscheidungen (`NEEDS_DESIGN_DECISION`/`NEEDS_DEFINITION`) bleiben bewusst separat
+offen und **blockieren das Recall-Gate nicht** — sie sind vollständig analysiert, die
+verbleibende Entscheidung ist eine Business-/Produktfrage, keine technische. **Nächster
+Haupt-Workstream: Price Validation / Profit Validation** (siehe Abschnitt 5, P0).
 
 ## 2. Verifizierter Stand
 
 ```text
-main: fe05a72 (Merge PR #55, HEAD dieser Aktualisierung)
+main: 75e0b82 (Merge PR #56, HEAD dieser Aktualisierung)
+
+Batch 26 (PR #56, 62fd678): konsolen_bundles.yaml OVP-Kontext-Guard-Fix +
+  vollstaendiger Category-Recall-Gate-Abschluss. 2 UNCLEAR-Faelle recovered,
+  0 Kollateralschaeden. Alle 69 unmatched TRUE_POSITIVE-Faelle klassifiziert.
+  Ergebnis: CATEGORY_RECALL_MAXIMALLY_SECURED. 84/84 kategoriebezogene Tests
+  gruen. Signatur 0a9c9f4bb3590872 -> 09d66cde97932a9f.
+
 
 Batch 24 (8016eea/e7e1919, direkt auf main): matcher.py -> app/matcher/-Package
   modularisiert, reine Strukturaenderung, Signatur unveraendert.
@@ -121,23 +175,27 @@ Batch 23 (PR #54): Notebook-Recall-Optimierung, 21 von 43 im vorgelagerten
   blast-radius-geprueft gegen den vollstaendigen 2306-Eintrag-Ground-Truth-
   Korpus, kumuliert 0 unerwartete Routing-Aenderungen.
 
-Rule Analyzer (verifiziert nach Batch 25):
+Rule Analyzer (verifiziert nach Batch 26):
 360 Regeln
 19 Kategorien
 0 Findings
-Ruleset-Signatur: 87626edfc333ff71 -> 0a9c9f4bb3590872 (notebook_resell.yaml in
-  Batch 25 dreifach erweitert -- L480/L590, IdeaPad Gaming 3, Latitude-Modellcodes)
+Ruleset-Signatur: 0a9c9f4bb3590872 -> 09d66cde97932a9f (konsolen_bundles.yaml in
+  Batch 26 um 6 markengebundene OVP-Kontext-Phrasen erweitert)
 
-Zielgerichtete Tests (verifiziert nach Batch 25):
-pytest app/tests/test_notebook_resell_*.py -v -> 40 passed
-pytest app/tests/ -k notebook_resell -q -> 68 passed, 1464 deselected
+TP/FP/UNCLEAR (verifiziert nach Batch 26):
+TP: 2252 gesamt / 2183 matched
+FP: 19 gesamt / 3 matched
+UNCLEAR: 35 gesamt / 13 matched (vorher 11)
+
+Zielgerichtete Tests (verifiziert nach Batch 26):
+pytest app/tests/ -k konsolen_bundles -q -> 84 passed, 1448 deselected
 
 data/found.json: laufender Produktivbetrieb (Scanner aktiv), nicht Teil dieser
   Doku-Aktualisierung -- Zaehlung daher bewusst nicht erneut ausgewiesen.
 ```
 
-**Volle Suite zuletzt vollständig ausgeführt und grün: 1509/1509 (Batch 23).** In Batch 25 wurden
-gezielt die notebook_resell-relevanten Tests ausgeführt (CLAUDE.md Abschnitt 3, Punkt 4.4); die
+**Volle Suite zuletzt vollständig ausgeführt und grün: 1509/1509 (Batch 23).** In Batch 25/26 wurden
+gezielt die jeweils relevanten Tests ausgeführt (CLAUDE.md Abschnitt 3, Punkt 4.4); die
 volle Suite läuft ausschließlich nach expliziter Nutzer-Freigabe.
 
 ## 3. Batch-Übersicht (1–19)
@@ -177,11 +235,13 @@ Batch: **`docs/STATUS_HISTORY.md`**.
 | 23 | Notebook-Recall-Optimierung (99-TP-Audit-Folgeschritt) | 21/43 bestätigte Gaps geschlossen — ThinkPad-Preisgrenze, Wortgrenzen-/Modellcode-Lücken, GTX-1650-Regel, 3 neue Marken; mehrere Fälle bewusst dokumentiert zurückgestellt | +23, **1509/1509** | PR #54, `9fc967c`/`8507c44` |
 | 24 | `matcher.py` → `app/matcher/`-Package modularisiert | Reine Strukturänderung, Signatur unverändert, kein Aufrufer musste angepasst werden | 301/301 (targeted) | direkt auf `main`, `8016eea` |
 | 25 | Notebook-Recall-Fortsetzung: L480/L590, IdeaPad Gaming 3, Latitude-Modellcodes | 3 weitere additive Recall-Gap-Fixes in `notebook_resell.yaml`, alte `matcher.py` final entfernt | 40 (targeted), 68 (kategoriebezogen) | PR #55, `471795a` |
+| 26 | Category Recall Maximal Absichern — OVP-Kontext-Guard-Fix + vollständiges Recall-Gate | 2 UNCLEAR-Fälle recovered, alle 69 unmatched TP klassifiziert, `CATEGORY_RECALL_MAXIMALLY_SECURED` | 84 (kategoriebezogen) | PR #56, `62fd678` |
 
-**Nach Batch 25 (verifiziert):** 360 Regeln, 19 Kategorien, 0 Findings, Ruleset-Signatur
-`0a9c9f4bb3590872`. Zielgerichtete Tests grün (40 targeted / 68 kategoriebezogen); volle Suite
-zuletzt vollständig verifiziert in Batch 23 (1509/1509), seither nicht erneut ohne explizite
-Freigabe ausgeführt.
+**Nach Batch 26 (verifiziert):** 360 Regeln, 19 Kategorien, 0 Findings, Ruleset-Signatur
+`09d66cde97932a9f`. TP 2252/2183 matched, FP 19/3, UNCLEAR 35/13. Zielgerichtete Tests grün
+(84 kategoriebezogen); volle Suite zuletzt vollständig verifiziert in Batch 23 (1509/1509),
+seither nicht erneut ohne explizite Freigabe ausgeführt. **Category Recall Gate:
+`CATEGORY_RECALL_MAXIMALLY_SECURED`** — siehe Abschnitt 1a.
 
 ## 4. Datenqualität — offene Punkte
 
@@ -212,48 +272,35 @@ Freigabe ausgeführt.
 | 23 | 3 live bestätigte Profit-verzerrende Matching-Fehler (Resale-/Profit-Audit) | ✅ 3 unabhängige Root Causes gezielt gefixt (`konsolen_bundles`/„pro Stück", `vintage_elektronik`/„Hefte", `monitor_curved`/„Teildefekt"), 1 bewusst akzeptierter Ground-Truth-Konflikt | 22 |
 | 24 | Notebook-Recall-Gap (99-TRUE_POSITIVE-Recall-Forensics-Audit) | 21/43 bestätigte Gaps geschlossen, mehrere Fälle dokumentiert zurückgestellt (s. Abschnitt 5 P0) | 23 |
 | 25 | Notebook-Recall-Fortsetzung: 3 weitere Gaps geschlossen | ✅ L480/L590 (Marken-Gate), IdeaPad Gaming 3 (Gerätewort-Gate), Dell Latitude 5500/5501/7400 (Modellcode-Liste) — je per Vollkorpus-Diff + Adversarial-Test abgesichert, 0 Regressionen | 25 |
+| 26 | Category Recall Maximal Absichern (vollständiges Gate) | ✅ Alle 69 unmatched TRUE_POSITIVE + 24 unmatched UNCLEAR einzeln klassifiziert; 1 echter Recall-Gap gefunden+gefixt (konsolen_bundles OVP-Kontext-Guard), 9 Cluster als GT-Konflikt/Datenbasis-Problem/GT-Kategorie-Fehlzuordnung bestätigt; `CATEGORY_RECALL_MAXIMALLY_SECURED` | 26 |
 
 ## 5. Nächste Prioritäten
 
 ### P0 — offen
 
-- **Aus Batch 23, Stand nach Batch 25:** Notebook-Recall — `L480`/`L590` ist **erledigt** (Batch
-  25, Marken-Gate um die Modellcodes selbst erweitert). Weiterhin offen: GTX 1650 Ti / RTX 2060 /
-  RTX 4070 (je nur 1 Ground-Truth-Datenpunkt, keine belastbare Preisbasis —
-  `PROPOSED_PRICE_CALIBRATION`), 7 Fälle ganz ohne „laptop"/„notebook"-Wort im Titel, A10 (HP
-  Zbook/Quadro-P600-Workstation-Grenzfall, offene Definitionsfrage — siehe unten).
-- **Neu (mehrstufige Analysephase nach Batch 25, keine Codeänderung — Fujitsu/HP/Alienware
-  Recall-Impact-Analysen):** vier isolierte Recall-Gap-Cluster tiefenanalysiert (Root-Cause,
-  Vollkorpus-Blast-Radius, In-Memory-Simulation mehrerer Fixvarianten, Adversarial-Tests), jeweils
-  mit Hard Stop nach dem Bericht, keine YAML-/Code-Änderung:
-  - **Fujitsu Lifebook** (1 TP, 245€): `BLOCKED` — einziger primitive-basierter Fixkandidat
-    (Modellcode „u7510" als Gerätewort-Alternative) kollidiert im Adversarial-Test mit einem
-    Zubehörtitel, der denselben Modellcode nennt.
-  - **HP generic** (2 TP, 100€/270€): erste Analyse ergab `BLOCKED`; vertiefte Folgeanalyse
-    (Variante mit regel-eigenen Zubehör-Excludes) verbessert die Einstufung auf
-    `NEEDS_DESIGN_DECISION` — löst den 270€-Fall (100€-Fall bleibt an einem separaten
-    Format-Problem „8 GB" mit Leerzeichen blockiert) ohne reale Korpus-Kollateralschäden, trägt
-    aber einen architektonisch nachgewiesenen, nicht auflösbaren Trade-off: rule-level `exclude:`
-    kann „Akku 85%" (Zustandsangabe) nicht von „Akku" (Zubehörprodukt) unterscheiden. Eine
-    vollständige technische Lösung (Regex-Kontext-Primitiv) wäre möglich, erfordert aber eine
-    Erweiterung von `matcher/core.py` (geschütztes Kernsystem) — eigene Freigabe nötig, nicht Teil
-    dieser Analyse. Offener Entscheidungspunkt: siehe Abschnitt 6 unten (Verweis auf
-    Analyseberichte im Chat-Verlauf, nicht als Datei persistiert).
-  - **HP ZBook/Workstation** (1 Fall, TRUE_POSITIVE im GT-JSON, `NEEDS_DEFINITION`): bewusst
-    getrennt von HP generic behandelt, keine eigene Regel — Definitionsfrage, ob eine
-    Workstation-Sublinie unter `notebook_resell` fallen soll.
-  - **Alienware** (1 TP, GPU-Notebook): `BLOCKED` — unabhängig von Marken-/Modell-/GPU-Fragen
-    scheitert die gemeinsame Größen-Gruppe strukturell an Kompositum-Schreibweisen
-    („16GbDDR4", „2TbM2" ohne Wortgrenzen) — technisch unlösbar mit bestehenden Primitiven.
-  Alle vier Analysen rein im Chat-Verlauf dokumentiert (keine Datei im Repo), Ergebnisse hier
-  zusammengefasst, damit sie bei künftigen Sessions nicht erneut von Grund auf hergeleitet werden
-  müssen. Braucht jeweils eigene Freigabe für einen etwaigen nächsten Schritt.
-- **Neu (Batch 22):** RDR2/PS4-Steelbook-Bundle-Fall (Cluster C6, Batch 21) bleibt bewusst
-  ungelöst — „bundle" ist im require_all_of gleichzeitig das auslösende Signal UND das
-  Verstärkungssignal des ovp-Kontext-Guards; 3 bestätigte TRUE_POSITIVE-Fälle nutzen „bundle"
-  selbst als Signal. Kein sicherer Keyword-Fix identifiziert (siehe
-  `unclear_fp_root_cause_analysis.md`, Cluster C6). Braucht eigene Freigabe für einen
-  strukturelleren Ansatz, keine schnelle YAML-Änderung.
+- **✅ Category Recall Gate: `CATEGORY_RECALL_MAXIMALLY_SECURED` (Batch 26, PR #56).** Alle 69
+  unmatched TRUE_POSITIVE-Fälle und alle 24 unmatched UNCLEAR-Fälle einzeln geprüft und klassifiziert
+  (Details: Abschnitt 1a). Der einzige gefundene echte Recall-Gap (konsolen_bundles OVP-Kontext-
+  Guard) ist gefixt. **Nächster Haupt-Workstream: Price Validation / Profit Validation.**
+- **HP-Design-Entscheidungen bleiben separat offen und blockieren das Recall-Gate NICHT:**
+  - **HP generic** (2 TP, 100€/270€): `NEEDS_DESIGN_DECISION` — ein Fixkandidat (regel-eigene
+    Zubehör-Excludes) löst den 270€-Fall ohne reale Korpus-Kollateralschäden (100€-Fall bleibt an
+    einem separaten Format-Problem „8 GB" mit Leerzeichen blockiert), trägt aber einen
+    architektonisch nachgewiesenen, nicht auflösbaren Trade-off: rule-level `exclude:` kann
+    „Akku 85%" (Zustandsangabe) nicht von „Akku" (Zubehörprodukt) unterscheiden (siehe
+    TECHNISCHER_PROJEKTSTATUS.md Abschnitt 6). Eine vollständige technische Lösung (Regex-Kontext-
+    Primitiv) wäre möglich, erfordert aber eine Erweiterung von `matcher/core.py` (geschütztes
+    Kernsystem) — eigene Freigabe nötig.
+  - **HP ZBook/Workstation** (1 Fall, TRUE_POSITIVE im GT-JSON): `NEEDS_DEFINITION` —
+    Definitionsfrage, ob eine Workstation-Sublinie unter `notebook_resell` fallen soll.
+  - Alle Analysen rein im Chat-Verlauf dokumentiert (keine Datei im Repo), Ergebnisse hier
+    zusammengefasst. Braucht eigene Freigabe für einen etwaigen nächsten Schritt.
+- **BLOCKED / fehlende Datenbasis, als Teil des Category-Recall-Gate klassifiziert, technisch
+  nicht gelöst:** Fujitsu Lifebook (`BLOCKED`, Adversarial-Kollision), Alienware (`BLOCKED`,
+  Größen-Gruppe strukturell unlösbar), GTX 1650 Ti/RTX 2060/RTX 4070 (je 1 GT-Datenpunkt, keine
+  Preisbasis), IdeaPad 5 (2, keine Datenbasis), VOYEE-Controller (1, keine Datenbasis), RDR2/PS4-
+  Steelbook-Bundle (Cluster C6, „bundle" gleichzeitig Trigger- und Verstärkungssignal, kein
+  sicherer Keyword-Fix), 7 Notebook-Fälle ganz ohne „laptop"/„notebook"-Wort im Titel.
 - ~~Fix-Queue für die 23 `LIKELY_FALSE_POSITIVE`-Fälle aus Batch 20e~~ — **erledigt in Batch 21**:
   root-cause-geclustert, 22/23 gelöst (20 bereits vorher, 2 neu gefixt), 1/23 s.o. offen.
 - ~~Volle Testsuite stand seit Batch 18 aus~~ — **erledigt** (Batch 20): 1470/1470 grün, seither
@@ -361,6 +408,16 @@ priorisieren.
   HP generic `NEEDS_DESIGN_DECISION` (löst 1 von 2 Zielfällen, offener Trade-off zwischen
   Zubehör-Precision und Akku-Zustands-Recall), HP ZBook `NEEDS_DEFINITION`; keine Codeänderung,
   siehe Abschnitt 5 P0 für Details
+- „Category Recall Maximal Absichern"-Workflow vollständig durchlaufen (Batch 26, PR #56): alle
+  69 unmatched TRUE_POSITIVE- und 24 unmatched UNCLEAR-Fälle einzeln geprüft und klassifiziert.
+  1 echter Recall-Gap gefunden und gefixt (`konsolen_bundles.yaml` OVP-Kontext-Guard-Lücke, 2
+  UNCLEAR-Fälle recovered, 0 Kollateralschäden). 9 weitere Cluster (Aufrüstkit, konsolen_bundles
+  Zubehör, controller Zubehör, handhelds, retro_konsolen, lego_minifiguren, autoradio_opel_corsa,
+  iPhone, RAM) als bereits bewusste, dokumentierte Ground-Truth-Konflikte bestätigt — die
+  jeweiligen Excludes funktionieren korrekt, keine YAML-Änderung vorgesehen. 4 Einzelfälle
+  (netzteil, sata_ssd, vintage_elektronik, monitor_curved) als reine GT-Kategorie-Fehlzuordnungen
+  identifiziert. Ergebnis: **`CATEGORY_RECALL_MAXIMALLY_SECURED`** — nächster Haupt-Workstream
+  Price Validation / Profit Validation (PR #56, Batch 26)
 
 *Vollständige Details, Root-Cause-Analysen und Blast-Radius-Nachweise: `docs/STATUS_HISTORY.md`.*
 
