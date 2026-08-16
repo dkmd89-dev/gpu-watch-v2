@@ -793,7 +793,7 @@ Bewusst zurückgestellt und dokumentiert (nicht Teil dieses Batches): „L480"/�
 ausgeführt und grün: `pytest app/tests/` → 1509 passed, 0 failed** (111,3s), vorheriger
 dokumentierter Vollstand: 1478/1478 (Batch 21).
 
-### 24. `matcher.py` zu Package modularisiert (`da07f1c`, lokal committet, noch nicht gepusht)
+### 24. `matcher.py` zu Package modularisiert (`8016eea`, direkt auf `main`)
 
 `matcher.py` (1317 Zeilen, dokumentiertes God-File) in 6 Schritten auf `app/matcher/` verteilt:
 `core.py` (`MatchResult`, `evaluate()`), `text_matching.py` (Term-/Regex-Primitive), `vram.py`
@@ -804,5 +804,96 @@ dokumentierter Vollstand: 1478/1478 (Batch 21).
 `category_validation.py`, `rule_analyzer.py`, `rule_coverage.py`, `rules_loader.py`,
 `recompute_top_deal.py`, `tools/ruleset_quality/common.py`, Testsuite) musste angepasst werden.
 Reine Strukturänderung, keine Logikänderung — Ruleset-Signatur vor/nach identisch
-(`87626edfc333ff71`). Getestet: `pytest -k matcher` (301/301), abhängige Module (86/86). Volle
-Suite steht noch aus (manuell durch Nutzer).
+(`87626edfc333ff71`). Getestet: `pytest -k matcher` (301/301), abhängige Module (86/86). Die alte
+`app/matcher.py`-Datei blieb zunächst als Altlast im Repository liegen (nicht Teil dieses
+Commits) und wurde erst in Batch 25 final entfernt. Direkt auf `main` committet und gepusht (kein
+PR), Commit `8016eea`.
+
+### 25. Notebook-Recall-Fortsetzung: L480/L590, IdeaPad Gaming 3, Latitude-Modellcodes (PR #55, `471795a`/`fe05a72`)
+
+Direkte Fortsetzung von Batch 23 — drei der dort bewusst zurückgestellten bzw. in separaten
+Analysephasen identifizierten Recall-Gaps additiv geschlossen, ausschließlich
+`app/rules/notebook_resell.yaml`. Jede Änderung einzeln blast-radius-geprüft gegen den
+vollständigen 2306-Eintrag-Ground-Truth-Korpus sowie adversarial getestet (temporäre,
+nicht-persistierte Synthetik-Fälle):
+
+- **ThinkPad L480/L590 (2 Fälle, Marken-Gate-Erweiterung, Variante A):** in Batch 23 identifiziert,
+  aber zurückgestellt — „Lenovo Laptop L480..."/„Notebook Lenovo L590..." erfüllten die
+  Modellcode- und Größen-Gruppe bereits vollständig, scheiterten aber an der Marken-Gate-Gruppe
+  (verlangte zwingend „thinkpad"/„think pad", beide Titel enthalten das Wort nicht). Fix: „l480"/
+  „l590" zusätzlich als Marken-Alternative in Gruppe 1 beider ThinkPad-Preisstufen ergänzt.
+  Gegenüber einer separaten „Lenovo"+Modellcode-Regel (Variante B) bevorzugt: bleibt konsistent
+  mit der bestehenden Ein-Regel-Struktur und deckt zusätzlich Titel wie „ThinkPad L480 ..." (ohne
+  das Wort „Lenovo") ab. Blast Radius: je 1 Treffer gesamt im Korpus (die beiden Zielfälle selbst),
+  0 Zubehör-/Mainboard-/Akku-/Display-/Tastatur-/Docking-Kollisionen. Adversarial-Test (16
+  synthetische Fälle): 0 Fehlklassifikationen.
+- **Lenovo IdeaPad Gaming 3 (1 Fall, Gerätewort-Gate-Erweiterung, „C1 Minimal Recall Fix"):**
+  „Lenovo IdeaPad Gaming 3...GTX 1650..." (339€, TRUE_POSITIVE) erfüllte die GPU-Gruppe der Regel
+  „Gaming Laptop (GTX 1650)" bereits vollständig, scheiterte aber am Gerätewort-Gate — der Titel
+  enthält „gaming" (bewusst nicht als Ersatz akzeptiert, analog zur RTX3060-Regel-Entscheidung),
+  aber nicht „laptop"/„notebook". Fix: eng gefasstes Zwei-Wort-Signal „ideapad gaming" als
+  zusätzliche OR-Alternative zur Gerätewort-Gruppe ergänzt — bewusst als Erweiterung dieser Regel
+  statt einer separaten, generischen „ideapad"-Marken-Regel (hätte das Risiko geborgen, GPU-Fälle
+  mit falscher, nicht GPU-kalibrierter Preisbasis zu erfassen). Zwei normale, nicht-GPU IdeaPad-5-
+  Fälle bleiben bewusst weiterhin unmatched (keine sichere Variante identifiziert, Adversarial-Test
+  zeigte 3/12 Fehlklassifikationen für das einzig verfügbare Modellsignal „bare 5"). Blast Radius:
+  1 Treffer gesamt im Korpus (der Zielfall selbst), 0 Kollisionen. Adversarial-Test (12
+  synthetische Fälle inkl. Desktop-Gaming-PC mit identischer GPU): 0 Fehlklassifikationen.
+- **Dell Latitude 5500/5501/7400 (3 Fälle, Modellcode-Liste als Gerätewort-Alternative, „Variante
+  B"):** siehe `tools/ruleset_quality/generated/reports/latitude_recall_gap_simulation.{json,md}`
+  für die vollständige Simulation. Fix: Gerätewort-Gruppe um die 5 im Korpus tatsächlich
+  beobachteten Latitude-Modellcodes („5300","5401","5500","5501","7400") als zusätzliche
+  OR-Alternativen zu „laptop"/„notebook" ergänzt. Bewusst KEINE globale 5xxx/7xxx- oder generische
+  Zahlenerkennung (Variante A) und KEINE „Zahl direkt nach Latitude"-Positionslogik (Variante C):
+  beide bestanden im Simulationsbericht den synthetischen Adversarial-Test nicht (Zubehör-/
+  Ladegerät-Bundles mit unrelated 4-stelligen Zahlen matchten fälschlich). Nur die feste,
+  geschlossene Codeliste (Variante B) bestand sowohl den vollständigen Korpus-Test (3/3 Gaps
+  behoben, 0 Regressionen, 0 neue FP, 0 UNCLEAR-Änderungen) als auch beide Adversarial-Fälle.
+  Liste bewusst nicht ohne erneuten Korpus-Beleg erweiterbar.
+
+Zusätzlich: veraltete `app/matcher.py` (aus Batch 24 als Altlast liegen geblieben, 1317 Zeilen,
+vollständig durch das `matcher/`-Package abgelöst) final entfernt. Ruleset-Quality-Reports
+(`ground_truth_routing_assessment.{json,md}`, `unclear_routing_assessment.{json,md}`) und
+-Baseline (`baseline_20260815T193318Z_f8e07b8b8d97d61a.json`) auf aktuellen Stand aktualisiert.
+`.gitignore` um `data/*.log` und `data/seen.json` ergänzt (bisher fehlende Ausschlussregel für
+Laufzeit-Log bzw. 16MB-Presence-Tracking-State — beide waren zuvor weder getrackt noch
+ausgeschlossen). Drei Ad-hoc-Debug-Skripte (`script/debug_*.py`) aus vorherigen Sessions bewusst
+NICHT committet (Laufzeit-/Debug-Artefakte, kein Quellcode).
+
+3 neue Testdateien (`test_notebook_resell_ideapad_gaming3_c1_fix.py`,
+`test_notebook_resell_l480_l590_marken_gate_fix.py`, `test_notebook_resell_latitude_variant_b_fix.py`),
+2 bestehende Testdateien erweitert (`test_notebook_resell_a3_a7_geraetewort_fix.py`,
+`test_notebook_resell_cluster_a1_a2_a8_fix.py`) um die neuen Fälle. Zielgerichtete Tests:
+`pytest app/tests/test_notebook_resell_*.py -v` → 40 passed; `pytest app/tests/ -k
+notebook_resell -q` → 68 passed, 1464 deselected. Volle Suite in diesem Batch nicht erneut
+ausgeführt (keine explizite Nutzer-Freigabe für diesen Schritt, zuletzt vollständig verifiziert in
+Batch 23: 1509/1509).
+
+**Workflow:** Branch `claude/notebook-recall-l480-l590-ideapad-gaming-latitude-b` von `main`,
+PR #55 erstellt und vom Nutzer gemerged (Merge-Commit `fe05a72`) — konsistent mit dem in diesem
+Repository durchgängig etablierten Feature-Branch-→-PR-→-Merge-Workflow.
+
+**Stand nach Batch 25 (verifiziert):** 360 Regeln, 19 Kategorien, 0 Findings, Signatur
+`87626edfc333ff71` → `0a9c9f4bb3590872` (`notebook_resell.yaml` dreifach erweitert).
+
+**Im Anschluss (keine Codeänderung):** vier isolierte Recall-Cluster (Fujitsu Lifebook, HP
+generic, HP ZBook, Alienware) einzeln tiefenanalysiert — Root-Cause, Vollkorpus-Blast-Radius,
+In-Memory-Simulation mehrerer Fixvarianten, Adversarial-Tests, jeweils mit Hard Stop nach dem
+Bericht. Fujitsu Lifebook: `BLOCKED` (einziger Fixkandidat kollidiert im Adversarial-Test mit
+einem Zubehörtitel gleichen Modellcodes). Alienware: `BLOCKED` (die gemeinsame Größen-Gruppe
+scheitert strukturell an Kompositum-Schreibweisen wie „16GbDDR4" — unabhängig von Marken-/Modell-/
+GPU-Fragen technisch unlösbar mit bestehenden Primitiven). HP generic: erste Analyse `BLOCKED`,
+vertiefte Folgeanalyse (regel-eigene Zubehör-Excludes) verbessert auf `NEEDS_DESIGN_DECISION` —
+löst den 270€-Zielfall ohne reale Korpus-Kollateralschäden (100€-Fall bleibt an einem separaten
+Format-Problem blockiert), trägt aber einen architektonisch nachgewiesenen Trade-off: rule-level
+`exclude:` (reine, kontextfreie Presence-Prüfung) kann „Akku 85%" (Zustandsangabe) nicht von
+„Akku" (Zubehörprodukt) unterscheiden. Die bestehenden kontextbewussten Primitiven
+(`exclude_category_unless_also_contains`/`_preceded_by`) sind strukturell ausschließlich
+kategorienweit (Zuweisung in `rules_io.py` vor der Regel-Schleife, nicht rule-scoped nutzbar) und
+selbst dort nur wortlisten-, nicht regex-basiert — „%" wird von `_contains_term()` nach einer
+Ziffer wegen der Wortgrenzen-Lookbehind nicht erkannt. Eine vollständige technische Lösung wäre
+eine kleine Erweiterung von `matcher/core.py` um ein Regex-Kontext-Primitiv — betrifft ein
+geschütztes Kernsystem, eigene Freigabe nötig, nicht Teil dieser Analyse. HP ZBook: separat
+behandelt (TRUE_POSITIVE im GT-JSON, aber Definitionsfrage, ob eine Workstation-Sublinie unter
+`notebook_resell` fallen soll), `NEEDS_DEFINITION`. Keine Datei geändert, kein Commit — alle vier
+Analysen ausschließlich im Chat-Verlauf dokumentiert.

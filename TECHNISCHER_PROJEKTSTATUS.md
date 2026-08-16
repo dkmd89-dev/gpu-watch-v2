@@ -6,9 +6,11 @@
 >
 > **Stand:** 2026-08-16
 > **Repository:** `dkmd89-dev/gpu-watch-v2`  ·  **Branch:** `main`
-> **HEAD:** `404242c` (Merge PR #54, Batch 23)
-> **Ruleset-Signatur:** `87626edfc333ff71`  ·  360 Regeln, 19 Kategorien, 0 Findings
-> **Volle Testsuite (zuletzt verifiziert):** `pytest app/tests/` → **1509 passed, 0 failed** (111,3s)
+> **HEAD:** `fe05a72` (Merge PR #55, Batch 25)
+> **Ruleset-Signatur:** `0a9c9f4bb3590872`  ·  360 Regeln, 19 Kategorien, 0 Findings
+> **Volle Testsuite (zuletzt vollständig verifiziert):** `pytest app/tests/` → **1509 passed, 0
+> failed** (111,3s, Batch 23). Batch 25 lief zielgerichtet (`test_notebook_resell_*.py`: 40
+> passed; `-k notebook_resell`: 68 passed) — volle Suite läuft nur nach expliziter Freigabe.
 
 **Restrukturierung dieser Version:** Frühere Fassungen dieser Datei enthielten eine
 vollständige Batch-für-Batch-Erzählung (Abschnitte 3.1–3.24). Das duplizierte
@@ -42,9 +44,15 @@ live bestätigte, Profit-verzerrende Matching-Fehler auf, die root-cause-gefixt
 wurden (Batch 22, PR #53); ein anschließender 99-TRUE_POSITIVE-Recall-Forensics-
 Audit identifizierte 43 bestätigte Recall-Gaps im Notebook-Resale-Bereich, von
 denen 21 in einer datenbasiert kalibrierten Notebook-Recall-Optimierung
-geschlossen wurden (Batch 23, PR #54) — mehrere Fälle bleiben mit dokumentierter
+geschlossen wurden (Batch 23, PR #54). `matcher.py` wurde anschließend in ein
+Package modularisiert (Batch 24, `8016eea`) und drei weitere Recall-Gaps
+(ThinkPad L480/L590, IdeaPad Gaming 3, Dell Latitude Modellcodes) additiv
+geschlossen (Batch 25, PR #55) — mehrere Fälle bleiben mit dokumentierter
 Begründung offen (fehlende Preisbasis, Architekturfrage, Cross-Category-Risiko),
-siehe STATUS.md Abschnitt 5, P0.
+siehe STATUS.md Abschnitt 5, P0. Vier weitere Recall-Cluster (Fujitsu Lifebook,
+HP generic, HP ZBook, Alienware) wurden vertieft analysiert, aber bewusst nicht
+implementiert (`BLOCKED`/`NEEDS_DESIGN_DECISION`/`NEEDS_DEFINITION`) — siehe
+STATUS.md Abschnitt 5, P0, für die Kurzfassung.
 
 ---
 
@@ -52,17 +60,21 @@ siehe STATUS.md Abschnitt 5, P0.
 
 ```text
 Branch: main
-HEAD:   404242c (Merge PR #54)
+HEAD:   fe05a72 (Merge PR #55, Batch 25)
 
 Ruleset (rule_analyzer.py):
   360 Regeln, 19 Kategorien, 0 Findings
-  Signatur: 87626edfc333ff71
+  Signatur: 87626edfc333ff71 -> 0a9c9f4bb3590872 (Batch 25:
+    notebook_resell.yaml dreifach erweitert)
 
 Testsuite:
-  pytest app/tests/ -q -> 1509 passed, 0 failed (111,3s)
-  Vollständig verifiziert nach Batch 23 (vorheriger Vollstand:
-  1478/1478, Batch 21) — deckt die P0-Pflicht „volle Suite nach
-  expliziter Freigabe" ab (CLAUDE.md Abschnitt 3, Punkt 4.4).
+  Vollständig verifiziert nach Batch 23: pytest app/tests/ -q ->
+  1509 passed, 0 failed (111,3s) — deckt die P0-Pflicht „volle Suite
+  nach expliziter Freigabe" ab (CLAUDE.md Abschnitt 3, Punkt 4.4).
+  Batch 25 lief gezielt (CLAUDE.md Abschnitt 3, Punkt 4.4, gestufte
+  Tests): pytest app/tests/test_notebook_resell_*.py -v -> 40 passed;
+  pytest app/tests/ -k notebook_resell -q -> 68 passed. Volle Suite
+  seit Batch 23 nicht erneut ohne explizite Freigabe ausgeführt.
 
 data/found.json: laufender Produktivbetrieb (Scanner aktiv) — kein
   stabiler, hier ausgewiesener Zählwert (siehe Abschnitt 4.1).
@@ -332,6 +344,19 @@ Kompakte Zusammenfassung; vollständige Tabelle mit allen 21 Punkten:
 - **Tausch-/Barter-Anzeigen-Erkennung** (Titel-Muster „tausche"/„gegen") aus
   Notification/Preisstatistik ausschließen: mögliche Folgeaufgabe, noch nicht
   freigegeben — betrifft geschützte Kernsysteme.
+- **Rule-level `exclude:` kann Zustandsangabe nicht von Zubehör-/Ersatzteilsignal
+  unterscheiden** (verifiziert im Rahmen der HP-generic-Recall-Analyse,
+  Batch-25-Folgephase): ein Begriff wie „akku"/„battery" ist eine reine,
+  kontextfreie Presence-Prüfung — „HP Laptop ... Akku 85%" (Zustandsangabe) und
+  „HP Laptop Akku" (Zubehörprodukt) sind für `_contains_term()`/`_any_term()`
+  ununterscheidbar. Die bestehenden kontextbewussten Primitiven
+  (`exclude_category_unless_also_contains`/`_preceded_by`) sind strukturell
+  ausschließlich kategorienweit (siehe `rules_io.py`, Zuweisung vor der
+  Regel-Schleife) und selbst dort nur wortlisten-, nicht regex-basiert (das
+  Sonderzeichen „%" wird von `_contains_term()` nach einer Ziffer wegen der
+  Wortgrenzen-Lookbehind nicht erkannt). Eine vollständige Lösung würde eine
+  kleine, aber echte Erweiterung von `matcher/core.py` erfordern — betrifft
+  ein geschütztes Kernsystem, nicht Teil einer reinen YAML-Änderung.
 
 ---
 
@@ -340,10 +365,15 @@ Kompakte Zusammenfassung; vollständige Tabelle mit allen 21 Punkten:
 Vollständige, aktuell gepflegte Priorisierung: `STATUS.md` Abschnitt 5.
 
 ```text
-P0  Notebook-Recall-Restfälle (L480/L590, GTX 1650 Ti/RTX 2060/RTX 4070, HP
-    generic, Fälle ohne Gerätewort, A10-Workstation-Grenzfall) sowie
-    RDR2/PS4-Steelbook-Bundle-Fall (Cluster C6) — je offen, braucht eigene
-    Freigabe
+P0  Notebook-Recall-Restfälle (GTX 1650 Ti/RTX 2060/RTX 4070, Fälle ohne
+    Gerätewort, A10/HP-Zbook-Workstation-Grenzfall -- L480/L590 in Batch 25
+    erledigt) sowie RDR2/PS4-Steelbook-Bundle-Fall (Cluster C6) -- je offen,
+    braucht eigene Freigabe.
+    Vier weitere Cluster tiefenanalysiert, bewusst nicht implementiert:
+    Fujitsu Lifebook (BLOCKED), Alienware (BLOCKED, Groessen-Gruppe
+    strukturell unloesbar), HP generic (NEEDS_DESIGN_DECISION -- Trade-off
+    Zubehoer-Precision vs. Akku-Zustands-Recall, siehe Abschnitt 6), HP
+    ZBook (NEEDS_DEFINITION).
      ↓
 P1  Resale-Confidence ausbauen, Datenqualitätsdiagnosen automatisieren
      ↓
@@ -388,5 +418,5 @@ P3  Neue Kategorien/Deal-Intelligence erst nach Stabilitäts-/Qualitätsschritte
   frühe Phasenberichte (Performance, Rule-Analysis/-Coverage, Preiskalibrierung).
 
 Diese Dokumente liefern historische Details und Nachweise. Für den aktuellen
-technischen Code-Stand ist HEAD `ee26893` maßgeblich; für die technische
+technischen Code-Stand ist HEAD `fe05a72` maßgeblich; für die technische
 Projektreferenz ist diese Datei maßgeblich.
