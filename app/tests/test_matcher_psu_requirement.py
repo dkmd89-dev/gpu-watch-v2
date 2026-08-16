@@ -119,7 +119,15 @@ def test_e2e_laptop_mit_plausibler_watt_angabe_faellt_nicht_in_netzteil():
     # Regressionsschutz: ein Laptop-Angebot soll auch bei einer (unüblich
     # hohen, aber innerhalb des Detector-Plausibilitätsbereichs liegenden)
     # Watt-Zahl im Titel nicht als eigenständiges "netzteil"-Angebot
-    # matchen -- die exclude_category-Liste greift.
+    # matchen -- die exclude_category-Liste greift. Kernaussage dieses
+    # Tests ist ausschließlich das Nicht-Matchen als "netzteil", NICHT die
+    # Abwesenheit jeglichen Matches: seit der Notebook-Recall-Optimierung
+    # (A3-A7 Option D, 2026-08-16, neue "Dell Latitude"-Regel in
+    # notebook_resell.yaml) matcht dieser Titel korrekt als
+    # notebook_resell -- ehemals "matched is False" war ein Nebenprodukt
+    # der damals fehlenden Latitude-Markenabdeckung, nicht der eigentliche
+    # Testzweck.
     cfg = _load_cfg()
     r = evaluate("Dell Latitude Laptop i5 8GB RAM 256GB SSD 550W Netzteil", 150, cfg)
-    assert r.matched is False
+    assert r.category != "netzteil"
+    assert r.matched is True and r.category == "notebook_resell"
